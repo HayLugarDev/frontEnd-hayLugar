@@ -28,11 +28,8 @@
     try {
       const response = await axios.post('http://localhost:3000/api/auth/signin', {
         email: email.value,
-        password: password.value,
-      },{
-          withCredentials: true
-        }
-      );
+        password_hash: password.value,
+      });
       console.log(response)
       if (response) {
         localStorage.setItem('token', response.data.token);
