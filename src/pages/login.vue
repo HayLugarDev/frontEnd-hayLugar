@@ -29,8 +29,10 @@
       const response = await axios.post('http://localhost:3000/api/auth/signin', {
         email: email.value,
         password_hash: password.value,
+      }, { 
+        withCredentials: true 
       });
-      console.log(response)
+      console.log(response.data)
       if (response) {
         localStorage.setItem('token', response.data.token);
         router.push('/dashboard');

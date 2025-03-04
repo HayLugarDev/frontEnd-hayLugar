@@ -89,10 +89,11 @@
   const email = ref("");
   
   const espacio = ref({
-    ubicacion: "Calle 123, San Miguel de Tucumán",
-    descripcion: "Amplio estacionamiento con seguridad las 24 horas.",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrqkDEtWld9xiEELi9UXDNEKYzIZM-2rmWWA&s"
-  });
+  ubicacion: route.query.location,
+  descripcion: route.query.description,
+  precio: route.query.price_per_hour,
+  image: route.query.image
+});
   
   const detectarTipoTarjeta = () => {
     const num = numeroTarjeta.value;

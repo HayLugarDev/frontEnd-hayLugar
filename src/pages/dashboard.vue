@@ -76,7 +76,7 @@ const error = ref(null);
 
 const obtenerEspacios = async () => {
   try {
-    const response = await api.get("/spaces/getAll");
+    const response = await api.get("/spaces/getall");
     espacios.value = response.data.map(e => e.dataValues);
     cargando.value = false;
   } catch (err) {
