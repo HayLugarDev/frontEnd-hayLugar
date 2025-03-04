@@ -16,7 +16,7 @@ const routes = [
     { path: '/dashboard', component: dashboard },
     { path: '/add-space', component: addSpace },
     { path: '/espacio/:id', component: detailSpace },
-    { path: '/reserva', component: reserva },
+    { path: '/reserva/:id', component: reserva },
     { path: '/pago', component: payment },
     { path: '/confirmacion', component: confirmaReserva },
     { path: '/profile', component: profile },
