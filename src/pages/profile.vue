@@ -32,7 +32,7 @@
           </div>
         </div>
         <div>
-          <!-- Input de archivo oculto -->
+          <!-- Input de archivo oculto para foto -->
           <input type="file" @change="subirFoto" class="hidden" ref="inputFoto" />
           <button
             @click="cambiarFoto"
@@ -77,35 +77,16 @@
             placeholder="Correo de MercadoPago"
             class="border p-3 rounded"
           />
-          <!-- Puedes agregar más campos financieros aquí -->
+          <!-- Aquí se pueden agregar más campos financieros si es necesario -->
         </div>
       </div>
     </section>
 
     <!-- Historial de Reservas -->
-    <section class="bg-white p-8 rounded-lg shadow-lg mb-8">
-      <h2 class="text-2xl font-bold text-primary mb-4 flex items-center">
-        <font-awesome-icon icon="history" class="mr-2" />
-        Historial de Reservas
-      </h2>
-      <ul v-if="reservas.length" class="divide-y divide-gray-300">
-        <li v-for="(reserva, index) in reservas" :key="index" class="py-4">
-          <p class="flex items-center">
-            <font-awesome-icon icon="map-marker-alt" class="mr-2 text-primary" />
-            <strong>Ubicación:</strong> {{ reserva.location }}
-          </p>
-          <p class="flex items-center">
-            <font-awesome-icon icon="calendar-alt" class="mr-2 text-primary" />
-            <strong>Fecha:</strong> {{ formatDate(reserva.start_time) }}
-          </p>
-          <p class="flex items-center">
-            <font-awesome-icon icon="money-bill-wave" class="mr-2 text-primary" />
-            <strong>Total:</strong> ${{ reserva.total }}
-          </p>
-        </li>
-      </ul>
-      <p v-else class="text-gray-500">No tienes reservas anteriores.</p>
-    </section>
+    <ReservationHistory :reservations="reservas" />
+
+    <!-- Historial de Publicaciones -->
+    <PublicationHistory :publications="publicaciones" />
 
     <!-- Botón para Guardar Todos los Cambios -->
     <section>
@@ -123,8 +104,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import ReservationHistory from '../components/ReservationHistory.vue';
+import PublicationHistory from '../components/PublicationHistory.vue';
 
-// Declaramos la interfaz para el usuario
 interface Usuario {
   profile_picture: string;
   name: string;
@@ -153,6 +135,12 @@ const reservas = ref([
   { location: "Av. Siempre Viva", start_time: "2025-04-01T09:00:00Z", total: 750 }
 ]);
 
+
+const publicaciones = ref([
+  { location: "Calle 456, Centro", created_at: "2025-02-15T10:00:00Z" },
+  { location: "Av. Siempre Viva", created_at: "2025-03-01T11:30:00Z" }
+]);
+
 const router = useRouter();
 const inputFoto = ref<HTMLInputElement | null>(null);
 
@@ -164,6 +152,7 @@ const subirFoto = (event: Event): void => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
     const file = target.files[0];
+    // En producción, subir la foto al servidor y actualizar la URL
     usuario.value.profile_picture = URL.createObjectURL(file);
   }
 };
@@ -171,11 +160,6 @@ const subirFoto = (event: Event): void => {
 const guardarTodo = (): void => {
 
   alert("Cambios guardados exitosamente.");
-};
-
-const formatDate = (value: string): string => {
-  const date = new Date(value);
-  return date.toLocaleString();
 };
 
 const setAddress = (place: any): void => {
