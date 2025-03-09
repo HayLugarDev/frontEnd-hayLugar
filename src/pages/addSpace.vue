@@ -214,6 +214,8 @@ const description = ref('');
 const paymentMethods = ref([]);
 const previewImages = ref([]);
 
+const selectedFiles = ref([]);
+
 // Datos de la wallet para Mercado Pago
 const walletDetails = ref({
   mpEmail: ''
@@ -228,8 +230,9 @@ const status = ref('active');
 const router = useRouter();
 
 const handleFileUpload = (event) => {
-  const files = event.target.files;
-  for (let file of files) {
+  selectedFiles.value = [...event.target.files]; // Guardar los archivos reales
+  previewImages.value = [];
+  for (let file of selectedFiles.value) {
     const reader = new FileReader();
     reader.onload = (e) => previewImages.value.push(e.target.result);
     reader.readAsDataURL(file);
@@ -262,27 +265,34 @@ const addSpace = async () => {
   
   status.value = isActive.value ? 'active' : 'paused';
   
-  const newSpace = {
-    owner_id: owner_id.value,
-    location: location.value,
-    location_details: locationDetails.value,
-    latitude: latitude.value,
-    longitude: longitude.value,
-    price_per_hour: price_per_hour,
-    capacity: capacity.value,
-    type: type.value,
-    parking_type: parking_type.value,
-    description: description.value,
-    images: previewImages.value,
-    availability: availability.value,
-    status: status.value,
-    name: name.value,
-    paymentMethods: paymentMethods.value,
-    walletDetails: paymentMethods.value.includes('Mercado Pago') ? walletDetails.value : null,
-  };
+  const formData = new FormData();
+  formData.append('owner_id', owner_id.value);
+  formData.append('location', location.value);
+  formData.append('location_details', locationDetails.value);
+  formData.append('latitude', latitude.value);
+  formData.append('longitude', longitude.value);
+  formData.append('price_per_hour', price_per_hour);
+  formData.append('capacity', capacity.value);
+  formData.append('type', type.value);
+  formData.append('parking_type', parking_type.value);
+  formData.append('description', description.value);
+  formData.append('status', status.value);
+  formData.append('name', name.value);
+  formData.append('paymentMethods', JSON.stringify(paymentMethods.value));
+  
+  if (paymentMethods.value.includes('Mercado Pago')) {
+    formData.append('walletDetails', JSON.stringify(walletDetails.value));
+  }
+
+  // Agregar imágenes al FormData
+  selectedFiles.value.forEach((file) => {
+    formData.append('images', file);
+  });
 
   try {
-    await api.post('/spaces/create', newSpace);
+    await api.post('/spaces/create', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     router.push('/add-space');
   } catch (error) {
     console.error('Error en el registro del espacio:', error);

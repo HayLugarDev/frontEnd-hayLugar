@@ -70,7 +70,7 @@
             <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{ espacio.name }}
           </p>
           <img
-            :src="espacio.images || 'https://source.unsplash.com/400x300/?parking,garage'"
+            :src="espacio.images.length ? `http://localhost:3000${espacio.images[0]}` : 'https://d2syaugtnopsqd.cloudfront.net/wp-content/uploads/sites/10/2020/10/27135236/How-wide-is-a-parking-space-scaled.jpg'"
             alt="Espacio"
             class="w-full h-44 object-cover rounded-lg"
           />
@@ -116,8 +116,13 @@ const error = ref(null);
 const obtenerEspacios = async () => {
   try {
     const response = await api.get("/spaces/getAll");
-    // Asumimos que la respuesta viene con objetos con la propiedad dataValues, de lo contrario, ajusta según tu API
-    espacios.value = response.data.map(e => e.dataValues);
+    espacios.value = response.data.map(e => {
+      return {
+        ...e.dataValues,
+        images: JSON.parse(e.dataValues.images)
+      };
+    });
+    console.log(espacios.value);
     cargando.value = false;
   } catch (err) {
     error.value = "No se pudieron cargar los espacios.";
@@ -128,7 +133,6 @@ const obtenerEspacios = async () => {
 onMounted(obtenerEspacios);
 
 const buscar = () => {
-  // Implementa la lógica de búsqueda según tus requerimientos
   console.log("Buscar:", searchQuery.value);
 };
 </script>
