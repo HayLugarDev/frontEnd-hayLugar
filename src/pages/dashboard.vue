@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-secondary">
+  <div class="min-h-screen bg-secondary p-6">
     <!-- Barra de búsqueda con filtros avanzados -->
     <header class="bg-white shadow-md p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg">
       <div class="flex items-center space-x-4">
@@ -60,7 +60,7 @@
     <div class="flex flex-1 p-6">
       <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-if="cargando" class="text-center text-gray-500 w-full">Cargando espacios...</div>
-        <div v-if="error" class="text-center text-red-500 w-full">Error al cargar espacios.</div>
+        <div v-if="error" class="text-center text-red-500 w-full">{{ error }}</div>
         <div
           v-for="(espacio, index) in espacios"
           :key="index"
@@ -101,7 +101,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import api from '../services/apiService';
 
@@ -109,26 +109,53 @@ const searchQuery = ref("");
 const checkIn = ref("");
 const checkOut = ref("");
 const rangoTiempo = ref("hora");
-const espacios = ref([]);
+const espacios = ref<any[]>([]);
 const cargando = ref(true);
-const error = ref(null);
+const error = ref<string | null>(null);
 
-const obtenerEspacios = async () => {
+// Función para obtener la ubicación actual del usuario
+const obtenerUbicacionActual = (): Promise<{ lat: number, lng: number }> => {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    } else {
+      reject(new Error("Geolocalización no soportada."));
+    }
+  });
+};
+
+// Función para cargar publicaciones cercanas desde el backend
+const cargarPublicacionesCercanas = async () => {
   try {
-    const response = await api.get("/spaces/getAll");
-    // Asumimos que la respuesta viene con objetos con la propiedad dataValues, de lo contrario, ajusta según tu API
-    espacios.value = response.data.map(e => e.dataValues);
+    const { lat, lng } = await obtenerUbicacionActual();
+    // Puedes definir un radio por defecto, por ejemplo 10 km.
+    const response = await api.get(`/spaces/getSpacesNearby?lat=${lat}&lng=${lng}&radius=10`);
+    espacios.value = response.data;
     cargando.value = false;
-  } catch (err) {
-    error.value = "No se pudieron cargar los espacios.";
+  } catch (err: any) {
+    console.error(err);
+    error.value = "No se pudieron cargar los espacios cercanos.";
     cargando.value = false;
   }
 };
 
-onMounted(obtenerEspacios);
+onMounted(() => {
+  // Puedes llamar a la función de ubicacion para filtrar espacios cercanos
+  cargarPublicacionesCercanas();
+});
 
 const buscar = () => {
-  // Implementa la lógica de búsqueda según tus requerimientos
+  // Si se requiere búsqueda manual, aquí podrías integrar lógica adicional.
   console.log("Buscar:", searchQuery.value);
 };
 </script>
