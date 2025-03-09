@@ -4,7 +4,7 @@ import dashboard from '../pages/dashboard.vue';
 import register from '../pages/register.vue';
 import addSpace from '../pages/addSpace.vue';
 import detailSpace from '../pages/detailSpace.vue';
-import reserva from '../pages/checkout.vue';
+import checkout from '../pages/checkout.vue';
 import payment from '../pages/payment.vue';
 import confirmaReserva from '../pages/confirmaReserva.vue';
 import profile from '../pages/profile.vue';
@@ -16,7 +16,7 @@ const routes = [
     { path: '/dashboard', component: dashboard },
     { path: '/add-space', component: addSpace },
     { path: '/espacio/:id', component: detailSpace },
-    { path: '/reserva', component: reserva },
+    { path: '/reserva/:id', component: checkout },
     { path: '/pago', component: payment },
     { path: '/confirmacion', component: confirmaReserva },
     { path: '/profile', component: profile },

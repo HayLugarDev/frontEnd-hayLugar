@@ -14,7 +14,7 @@
           <span class="text-lg font-semibold text-black">Ubicación:</span>
           <GMapAutocomplete class="input-field" @place_changed="setPlace" />
         </label>
-        <!-- Se almacenan los datos básicos de ubicación -->
+        <!-- Datos básicos de ubicación -->
         <input v-model="latitude" type="hidden" />
         <input v-model="longitude" type="hidden" />
         <input v-model="location" type="hidden" />
@@ -33,14 +33,47 @@
         </label>
 
         <!-- Tipo de Vehículo -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">Tipo de vehículo:</span>
-          <select v-model="type" class="input-field">
-            <option value="Auto">🚗 Auto</option>
-            <option value="Bicicleta">🚲 Bicicleta</option>
-            <option value="Camioneta">🚙 Camioneta</option>
-          </select>
-        </label>
+        <div>
+          <span class="text-lg font-semibold text-black block mb-2">Tipo de vehículo:</span>
+          <div class="flex space-x-4">
+            <!-- Botón para Auto -->
+            <button
+              type="button"
+              @click="type = 'Auto'"
+              :class="[
+                'flex items-center space-x-2 px-4 py-2 rounded-lg border',
+                type === 'Auto' ? 'bg-primary text-white border-primary' : 'bg-white text-black'
+              ]"
+            >
+              <font-awesome-icon :icon="['fas', 'car']" />
+              <span>Auto</span>
+            </button>
+            <!-- Botón para Bicicleta -->
+            <button
+              type="button"
+              @click="type = 'Bicicleta'"
+              :class="[
+                'flex items-center space-x-2 px-4 py-2 rounded-lg border',
+                type === 'Bicicleta' ? 'bg-primary text-white border-primary' : 'bg-white text-black'
+              ]"
+            >
+              <font-awesome-icon :icon="['fas', 'bicycle']" />
+              <span>Bicicleta</span>
+            </button>
+            <!-- Botón para Camioneta -->
+            <button
+              type="button"
+              @click="type = 'Camioneta'"
+              :class="[
+                'flex items-center space-x-2 px-4 py-2 rounded-lg border',
+                type === 'Camioneta' ? 'bg-primary text-white border-primary' : 'bg-white text-black'
+              ]"
+            >
+              <font-awesome-icon :icon="['fas', 'truck']" />
+              <span>Camioneta</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Capacidad -->
         <label class="block">
@@ -107,11 +140,15 @@
         <fieldset class="border p-4 rounded-lg">
           <legend class="text-lg font-semibold text-black">Métodos de Pago Aceptados</legend>
           <div class="grid grid-cols-2 gap-2">
-            <label>
-              <input type="checkbox" v-model="paymentMethods" value="Efectivo" /> 💵 Efectivo
+            <label class="flex items-center space-x-1">
+              <input type="checkbox" v-model="paymentMethods" value="Efectivo" />
+              <font-awesome-icon :icon="['fas', 'money-bill-wave']" />
+              <span>Efectivo</span>
             </label>
-            <label>
-              <input type="checkbox" v-model="paymentMethods" value="Mercado Pago" @change="updatePaymentFields" /> 💳 Mercado Pago
+            <label class="flex items-center space-x-1">
+              <input type="checkbox" v-model="paymentMethods" value="Mercado Pago" @change="updatePaymentFields" />
+              <font-awesome-icon :icon="['fas', 'credit-card']" />
+              <span>Mercado Pago</span>
             </label>
           </div>
         </fieldset>
@@ -125,7 +162,7 @@
           </label>
         </fieldset>
 
-        
+        <!-- Toggle para Publicación Activa -->
         <div class="flex items-center space-x-4">
           <span class="text-lg font-semibold text-black">Publicación Activa</span>
           <label class="switch">
@@ -138,9 +175,13 @@
         <label class="block">
           <span class="text-lg font-semibold text-black">Imágenes del Espacio:</span>
           <input type="file" multiple @change="handleFileUpload" class="input-field" />
-          
           <div class="flex flex-wrap mt-2 gap-2">
-            <img v-for="(img, index) in previewImages" :key="index" :src="img" class="w-20 h-20 object-cover rounded-lg shadow-md" />
+            <img
+              v-for="(img, index) in previewImages"
+              :key="index"
+              :src="img"
+              class="w-20 h-20 object-cover rounded-lg shadow-md"
+            />
           </div>
         </label>
 
@@ -158,7 +199,6 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import api from '../services/apiService';
 
-
 const name = ref('');
 const location = ref('');
 const locationDetails = ref('');
@@ -168,26 +208,24 @@ const price = ref(0);
 const price_unit = ref('hour');
 const availability = ref({ start: '', end: '', dateRange: [] });
 const capacity = ref(0);
-const type = ref('Auto');
+const type = ref('Auto'); // Valor inicial (se actualizará con los botones)
 const parking_type = ref('');
 const description = ref('');
 const paymentMethods = ref([]);
 const previewImages = ref([]);
 
-// Datos de la wallet 
+// Datos de la wallet para Mercado Pago
 const walletDetails = ref({
   mpEmail: ''
 });
 
-// Toggle
+// Toggle para la publicación activa
 const isActive = ref(true);
-
 
 const owner_id = ref(1); // Se asigna según el usuario logueado
 const status = ref('active');
 
 const router = useRouter();
-
 
 const handleFileUpload = (event) => {
   const files = event.target.files;
@@ -198,23 +236,19 @@ const handleFileUpload = (event) => {
   }
 };
 
-
 const setPlace = (place) => {
   location.value = place.formatted_address || '';
   latitude.value = place.geometry.location.lat();
   longitude.value = place.geometry.location.lng();
 };
 
-
 const updateAvailabilityFields = () => {
   availability.value = { start: '', end: '', dateRange: [] };
 };
 
-
 const updatePaymentFields = () => {
-
+  // Aquí podrías realizar validaciones o ajustes al cambiar métodos de pago
 };
-
 
 const addSpace = async () => {
   let price_per_hour = price.value;
@@ -226,7 +260,6 @@ const addSpace = async () => {
     price_per_hour = price.value / (24 * 30);
   }
   
-
   status.value = isActive.value ? 'active' : 'paused';
   
   const newSpace = {
@@ -256,7 +289,6 @@ const addSpace = async () => {
   }
 };
 </script>
-
 
 <style>
 .bg-light {
@@ -293,7 +325,7 @@ const addSpace = async () => {
   color: #000;
 }
 
-
+/* Estilos para el toggle switch */
 .switch {
   position: relative;
   display: inline-block;
