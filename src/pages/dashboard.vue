@@ -40,6 +40,7 @@
         <div v-if="cargando" class="text-center text-gray-500 w-full">Cargando espacios...</div>
         <div v-if="error" class="text-center text-red-500 w-full">Error al cargar espacios.</div>
         <div v-for="(espacio, index) in espacios" :key="index" class="bg-white p-5 shadow-lg rounded-xl hover:shadow-xl transition-all">
+          <p class="text-lg font-bold mt-3">📍 {{ espacio.name }}</p>
           <img :src="espacio.images || 'https://source.unsplash.com/400x300/?parking,garage'" alt="Espacio" class="w-full h-44 object-cover rounded-lg" />
           <p class="text-lg font-bold mt-3">📍 {{ espacio.location }}</p>
           <p class="text-primary font-semibold">💰 ${{ espacio.price_per_hour }}/hora</p>
