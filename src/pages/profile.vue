@@ -106,14 +106,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import ReservationHistory from '../components/ReservationHistory.vue';
 import PublicationHistory from '../components/PublicationHistory.vue';
 import { useUserStore } from '../store/userStore';
 import api from '../services/apiService';
 
 const userStore = useUserStore();
-const router = useRouter();
 const inputFoto = ref<HTMLInputElement | null>(null);
 
 // Se utilizará el usuario proveniente del store. Si aún no se cargó, se usa un objeto vacío por defecto.
@@ -129,32 +127,32 @@ const usuario = computed(() => userStore.user || {
   walletEmail: ""
 });
 
-// Reactive variables para reservas y publicaciones
+
 const reservas = ref([]);
 const publicaciones = ref([]);
 
-// Función para obtener reservas del usuario (ajusta el endpoint según tu API)
+
 const fetchReservations = async () => {
   try {
     const token = localStorage.getItem('token');
     const response = await api.get('/reservations/user', {
       headers: { Authorization: `Bearer ${token}` }
     });
-    // Se asume que la respuesta trae un array en response.data.reservations
+ 
     reservas.value = response.data.reservations;
   } catch (error) {
     console.error("Error al cargar las reservas", error);
   }
 };
 
-// Función para obtener publicaciones del usuario (ajusta el endpoint según tu API)
+
 const fetchPublications = async () => {
   try {
     const token = localStorage.getItem('token');
     const response = await api.get('/publications/user', {
       headers: { Authorization: `Bearer ${token}` }
     });
-    // Se asume que la respuesta trae un array en response.data.publications
+  
     publicaciones.value = response.data.publications;
   } catch (error) {
     console.error("Error al cargar las publicaciones", error);
@@ -175,7 +173,7 @@ const subirFoto = (event: Event): void => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
     const file = target.files[0];
-    // En producción, se subiría la foto al servidor y se actualizaría la URL
+    
     if (userStore.user) {
       userStore.user.profile_picture = URL.createObjectURL(file);
     }

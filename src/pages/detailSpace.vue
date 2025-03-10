@@ -107,7 +107,7 @@ const markerIcon = computed(() => {
     } else if (tipo === "camioneta") {
       iconUrl = truckMarker;
     }
-    return { url: iconUrl, scaledSize: { width: 40, height: 40 } };
+    return { url: iconUrl, scaledSize: { width: 60, height: 60 } };
   }
   return null;
 });
