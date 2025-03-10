@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-secondary p-6">
+  <div class="flex flex-col min-h-screen bg-secondary">
     <!-- Barra de búsqueda con filtros avanzados -->
     <header class="bg-white shadow-md p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg">
       <div class="flex items-center space-x-4">
@@ -60,7 +60,7 @@
     <div class="flex flex-1 p-6">
       <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-if="cargando" class="text-center text-gray-500 w-full">Cargando espacios...</div>
-        <div v-if="error" class="text-center text-red-500 w-full">{{ error }}</div>
+        <div v-if="error" class="text-center text-red-500 w-full">Error al cargar espacios.</div>
         <div
           v-for="(espacio, index) in espacios"
           :key="index"
@@ -70,7 +70,7 @@
             <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{ espacio.name }}
           </p>
           <img
-            :src="espacio.images.length ? `http://localhost:3000${espacio.images[0]}` : 'https://d2syaugtnopsqd.cloudfront.net/wp-content/uploads/sites/10/2020/10/27135236/How-wide-is-a-parking-space-scaled.jpg'"
+            :src="espacio.images || 'https://source.unsplash.com/400x300/?parking,garage'"
             alt="Espacio"
             class="w-full h-44 object-cover rounded-lg"
           />
@@ -101,7 +101,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue';
 import api from '../services/apiService';
 
@@ -109,61 +109,26 @@ const searchQuery = ref("");
 const checkIn = ref("");
 const checkOut = ref("");
 const rangoTiempo = ref("hora");
-const espacios = ref<any[]>([]);
+const espacios = ref([]);
 const cargando = ref(true);
-const error = ref<string | null>(null);
+const error = ref(null);
 
-// Función para obtener la ubicación actual del usuario
-const obtenerUbicacionActual = (): Promise<{ lat: number, lng: number }> => {
-  return new Promise((resolve, reject) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          reject(error);
-        }
-      );
-    } else {
-      reject(new Error("Geolocalización no soportada."));
-    }
-  });
-};
-
-// Función para cargar publicaciones cercanas desde el backend
-const cargarPublicacionesCercanas = async () => {
+const obtenerEspacios = async () => {
   try {
-    const { lat, lng } = await obtenerUbicacionActual();
-    // Puedes definir un radio por defecto, por ejemplo 10 km.
-    const response = await api.get(`/spaces/getSpacesNearby?lat=${lat}&lng=${lng}&radius=10`);
-    espacios.value = response.data;
-    
-    const responseGet = await api.get("/spaces/getAll");
-    espacios.value = responseGet.data.map(e => {
-      return {
-        ...e.dataValues,
-        images: JSON.parse(e.dataValues.images)
-      };
-    });
-    console.log(espacios.value);
+    const response = await api.get("/spaces/getAll");
+    // Asumimos que la respuesta viene con objetos con la propiedad dataValues, de lo contrario, ajusta según tu API
+    espacios.value = response.data.map(e => e.dataValues);
     cargando.value = false;
-  } catch (err: any) {
-    console.error(err);
-    error.value = "No se pudieron cargar los espacios cercanos.";
+  } catch (err) {
+    error.value = "No se pudieron cargar los espacios.";
     cargando.value = false;
   }
 };
 
-onMounted(() => {
-  // Puedes llamar a la función de ubicacion para filtrar espacios cercanos
-  cargarPublicacionesCercanas();
-});
+onMounted(obtenerEspacios);
 
 const buscar = () => {
+  // Implementa la lógica de búsqueda según tus requerimientos
   console.log("Buscar:", searchQuery.value);
 };
 </script>
