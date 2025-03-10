@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-secondary p-6">
+  <div class="min-h-screen bg-secondary p-6" v-if="!userStore.loading">
     <!-- Encabezado del Perfil -->
     <header class="flex flex-col items-center mb-8">
       <h1 class="text-4xl font-bold text-primary mb-4">
@@ -9,7 +9,7 @@
     </header>
 
     <!-- Información Personal y Datos Financieros -->
-    <section class="bg-white p-8 rounded-lg shadow-lg mb-8">
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-8" v-if="usuario">
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-4">
           <img
@@ -72,7 +72,7 @@
         </p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
-            v-model="usuario.walletEmail"
+           
             type="email"
             placeholder="Correo de MercadoPago"
             class="border p-3 rounded"
@@ -89,9 +89,9 @@
     <PublicationHistory :publications="publicaciones" />
 
     <!-- Botón para Guardar Todos los Cambios -->
-    <section>
+    <section class="mt-8">
       <button
-        @click="guardarTodo"
+       @click="guardarTodo"
         class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all"
       >
         <font-awesome-icon icon="save" class="mr-2" />
@@ -99,50 +99,73 @@
       </button>
     </section>
   </div>
+  <div v-else class="min-h-screen flex items-center justify-center">
+    <p>Cargando información...</p>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ReservationHistory from '../components/ReservationHistory.vue';
 import PublicationHistory from '../components/PublicationHistory.vue';
+import { useUserStore } from '../store/userStore';
+import api from '../services/apiService';
 
-interface Usuario {
-  profile_picture: string;
-  name: string;
-  last_name: string;
-  email: string;
-  dni: string;
-  address: string;
-  phone: string;
-  walletEmail: string;
-}
+const userStore = useUserStore();
+const router = useRouter();
+const inputFoto = ref<HTMLInputElement | null>(null);
 
-const usuario = ref<Usuario>({
+// Se utilizará el usuario proveniente del store. Si aún no se cargó, se usa un objeto vacío por defecto.
+const usuario = computed(() => userStore.user || {
+  id:"",
   profile_picture: "https://source.unsplash.com/100x100/?person,avatar",
-  name: "Juan",
-  last_name: "Pérez",
-  email: "juanperez@email.com",
-  dni: "12345678",
-  address: "Av. Principal 123",
-  phone: "+54 9 11 1234 5678",
+  name: "",
+  last_name: "",
+  email: "",
+  dni: "",
+  address: "",
+  phone: "",
   walletEmail: ""
 });
 
+// Reactive variables para reservas y publicaciones
+const reservas = ref([]);
+const publicaciones = ref([]);
 
-const reservas = ref([
-  { location: "Calle 123, San Miguel", start_time: "2025-03-10T08:00:00Z", total: 500 },
-  { location: "Av. Siempre Viva", start_time: "2025-04-01T09:00:00Z", total: 750 }
-]);
+// Función para obtener reservas del usuario (ajusta el endpoint según tu API)
+const fetchReservations = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.get('/reservations/user', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    // Se asume que la respuesta trae un array en response.data.reservations
+    reservas.value = response.data.reservations;
+  } catch (error) {
+    console.error("Error al cargar las reservas", error);
+  }
+};
 
+// Función para obtener publicaciones del usuario (ajusta el endpoint según tu API)
+const fetchPublications = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.get('/publications/user', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    // Se asume que la respuesta trae un array en response.data.publications
+    publicaciones.value = response.data.publications;
+  } catch (error) {
+    console.error("Error al cargar las publicaciones", error);
+  }
+};
 
-const publicaciones = ref([
-  { location: "Calle 456, Centro", created_at: "2025-02-15T10:00:00Z" },
-  { location: "Av. Siempre Viva", created_at: "2025-03-01T11:30:00Z" }
-]);
-
-const router = useRouter();
-const inputFoto = ref<HTMLInputElement | null>(null);
+onMounted(async () => {
+  await userStore.fetchUser();
+  await fetchReservations();
+  await fetchPublications();
+});
 
 const cambiarFoto = (): void => {
   inputFoto.value?.click();
@@ -152,21 +175,36 @@ const subirFoto = (event: Event): void => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
     const file = target.files[0];
-    // En producción, subir la foto al servidor y actualizar la URL
-    usuario.value.profile_picture = URL.createObjectURL(file);
+    // En producción, se subiría la foto al servidor y se actualizaría la URL
+    if (userStore.user) {
+      userStore.user.profile_picture = URL.createObjectURL(file);
+    }
   }
 };
 
-const guardarTodo = (): void => {
-
-  alert("Cambios guardados exitosamente.");
+const guardarTodo = async (): Promise<void> => {
+  try {
+    const token = localStorage.getItem('token');
+    // Se envían los datos actualizados del usuario al backend
+    const response = await api.put(`/users/update/${usuario.value.id}`, usuario.value, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    alert("Cambios guardados exitosamente.");
+    // Actualiza el store con la respuesta del backend
+    userStore.user = response.data;
+  } catch (error) {
+    console.error("Error al guardar los cambios", error);
+    alert("Hubo un error al guardar los cambios.");
+  }
 };
 
 const setAddress = (place: any): void => {
-  usuario.value.address = place.formatted_address || "";
+  if (userStore.user) {
+    userStore.user.address = place.formatted_address || "";
+  }
 };
 </script>
 
 <style scoped>
-
+/* Puedes agregar estilos adicionales aquí si lo requieres */
 </style>

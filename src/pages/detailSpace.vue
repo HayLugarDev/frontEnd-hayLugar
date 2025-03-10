@@ -1,15 +1,11 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary p-6 gap-6">
-    <!-- Cabecera: Mapa a la izquierda, Fotos a la derecha -->
     <header class="flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden">
-      <!-- Mapa Personalizado (60% ancho en desktop) -->
-      <div class="w-full md:w-3/5 h-64 md:h-80">
+      <div class="w-full md:w-3/5 h-40 md:h-64">
         <CustomGoogleMap
           v-if="espacio"
           api-key="AIzaSyAmrMZNbht09n3JRbOqQD002iel4JJZV0E"
           :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-          
-         
         >
           <Marker
             :options="{
@@ -19,8 +15,7 @@
           />
         </CustomGoogleMap>
       </div>
-      <!-- Galería de Fotos (40% ancho en desktop) -->
-      <div class="w-full md:w-2/5 h-64 md:h-80 overflow-x-auto flex gap-2 p-2">
+      <div class="w-full md:w-2/5 h-40 md:h-64 overflow-x-auto flex gap-2 p-2">
         <template v-if="espacio && espacio.images && espacio.images.length">
           <img
             v-for="(img, index) in espacio.images"
@@ -40,7 +35,6 @@
       </div>
     </header>
 
-    <!-- Detalles del Espacio -->
     <section class="bg-white p-6 rounded-lg shadow-md">
       <h1 class="text-2xl font-bold text-primary">{{ espacio?.location }}</h1>
       <p class="text-gray-600 mt-2">{{ espacio?.description }}</p>
@@ -50,7 +44,6 @@
       </p>
     </section>
 
-    <!-- Información del Anfitrión -->
     <section v-if="espacio?.host" class="bg-white p-6 rounded-lg shadow-md flex items-center">
       <img
         :src="espacio.host.image || 'https://source.unsplash.com/100x100/?person,avatar'"
@@ -66,7 +59,6 @@
       </div>
     </section>
 
-    <!-- Botón para Reservar -->
     <section>
       <button @click="reservar" class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
         <font-awesome-icon icon="calendar-check" class="mr-2" />
@@ -83,20 +75,17 @@ import api from '../services/apiService';
 import { Marker } from 'vue3-google-map';
 import CustomGoogleMap from '../components/GoogleMap.vue';
 
-
-import carMarker from '../assets/car-icon.png';
-import bicycleMarker from '../assets/bike-icon.png';
-import truckMarker from '../assets/truck_marker.png';
+import carMarker from '../assets/logo.png';
+import bicycleMarker from '../assets/logo.png';
+import truckMarker from '../assets/logo.png';
 
 const router = useRouter();
 const route = useRoute();
 const rangoTiempo = ref("hora");
 const espacio = ref(null);
 
-
 const obtenerEspacio = async () => {
   try {
-    
     const id = route.params.id;
     const response = await api.get(`/spaces/getbyid/${id}`);
     espacio.value = response.data;
@@ -106,7 +95,6 @@ const obtenerEspacio = async () => {
 };
 
 onMounted(obtenerEspacio);
-
 
 const markerIcon = computed(() => {
   if (espacio.value && espacio.value.type) {
@@ -119,36 +107,10 @@ const markerIcon = computed(() => {
     } else if (tipo === "camioneta") {
       iconUrl = truckMarker;
     }
-    if (iconUrl) {
-   
-      if (typeof google !== 'undefined' && google.maps && google.maps.Size) {
-        return {
-          url: iconUrl,
-          scaledSize: new google.maps.Size(30, 30)
-        };
-      } else {
-        return { url: iconUrl };
-      }
-    }
+    return { url: iconUrl, scaledSize: { width: 40, height: 40 } };
   }
   return null;
 });
-
-
-const customMapOptions = {
-  styles: [
-    {
-      featureType: "all",
-      elementType: "all",
-      stylers: [
-        { saturation: -20 },
-        { gamma: 0.8 }
-      ]
-    }
-  ],
-  disableDefaultUI: false,
-  zoomControl: true,
-};
 
 const reservar = () => {
   if (espacio.value) {
@@ -158,5 +120,4 @@ const reservar = () => {
 </script>
 
 <style scoped>
-
 </style>

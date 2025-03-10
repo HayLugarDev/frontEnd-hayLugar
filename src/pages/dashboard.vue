@@ -3,7 +3,7 @@
     <!-- Barra de búsqueda con filtros avanzados -->
     <header class="bg-white shadow-md p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg">
       <div class="flex items-center space-x-4">
-        <img src="/src/assets/logo.jpeg" alt="HayLugAR Logo" class="w-28" />
+        <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-28" />
       </div>
       <div class="flex flex-col md:flex-row items-center w-full md:w-auto bg-gray-100 p-3 rounded-full shadow-md">
         <div class="flex items-center space-x-2">
@@ -29,7 +29,9 @@
       </div>
       <div class="flex items-center space-x-4 mt-2 md:mt-0">
         <router-link to="/profile" class="text-textPrimary hover:text-primary font-medium">
-          <font-awesome-icon icon="user" class="mr-1" /> Mi Perfil
+          <font-awesome-icon icon="user" class="mr-1" /> 
+          <span v-if="userStore.user">Bienvenido, {{ userStore.user.name }}</span>
+          <span v-else>Mi Perfil</span>
         </router-link>
         <router-link to="/settings" class="text-textPrimary hover:text-primary font-medium">
           <font-awesome-icon icon="cog" class="mr-1" /> Configuración
@@ -104,6 +106,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import api from '../services/apiService';
+import { useUserStore } from '../store/userStore';
+
 
 const searchQuery = ref("");
 const checkIn = ref("");
@@ -112,6 +116,8 @@ const rangoTiempo = ref("hora");
 const espacios = ref([]);
 const cargando = ref(true);
 const error = ref(null);
+
+const userStore = useUserStore()
 
 const obtenerEspacios = async () => {
   try {
@@ -125,7 +131,10 @@ const obtenerEspacios = async () => {
   }
 };
 
-onMounted(obtenerEspacios);
+onMounted(async () => {
+  await obtenerEspacios();
+  await userStore.fetchUser();
+});
 
 const buscar = () => {
   // Implementa la lógica de búsqueda según tus requerimientos

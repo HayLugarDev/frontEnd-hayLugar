@@ -1,7 +1,7 @@
 <template>
     <div class="flex items-center justify-center min-h-screen bg-primary">
       <div class="bg-white p-8 rounded-lg shadow-lg w-96">
-        <img src="/src/assets/logo.jpeg" alt="HayLugAR Logo" class="mx-auto mb-4 w-24" />
+        <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="mx-auto mb-4 w-24" />
         <h1 class="text-2xl font-bold text-center text-dark">Iniciar Sesión</h1>
         <form @submit.prevent="login">
           <input v-model="email" type="email" placeholder="Correo electrónico" class="w-full mt-4 p-2 border rounded" required />
