@@ -68,7 +68,7 @@
           :key="index"
           class="bg-white p-10 shadow-lg rounded-xl hover:shadow-xl transition-all"
         >
-          <p class="text-lg font-bold mt-3">
+          <p class="text-2xl font-bold text-primary">
             <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-20" /> {{ espacio.name }}
           </p>
           <img
@@ -83,7 +83,7 @@
             <font-awesome-icon icon="money-bill-wave" class="mr-1" /> ${{ espacio.price_per_hour }}/hora
           </p>
           <router-link :to="`/espacio/${espacio.id}`">
-            <button class="mt-3 bg-primary text-white px-4 py-3 rounded-lg w-full hover:shadow-md transition-all">
+            <button class="mt-3 bg-accent text-white px-6 py-3 rounded-lg w-full hover:shadow-md font-bold shadow-md transition-all">
               <font-awesome-icon icon="calendar-check" class="mr-1" /> Reservar
             </button>
           </router-link>
