@@ -3,7 +3,7 @@
     <!-- Barra de búsqueda con filtros avanzados -->
     <header class="bg-white shadow-md p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg">
       <div class="flex items-center space-x-4">
-        <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-28" />
+        <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-40" />
       </div>
       <div class="flex flex-col md:flex-row items-center w-full md:w-auto bg-gray-100 p-3 rounded-full shadow-md">
         <div class="flex items-center space-x-2">
@@ -60,21 +60,21 @@
     
     <!-- Contenedor de contenido principal -->
     <div class="flex flex-1 p-6">
-      <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div v-if="cargando" class="text-center text-gray-500 w-full">Cargando espacios...</div>
         <div v-if="error" class="text-center text-red-500 w-full">Error al cargar espacios.</div>
         <div
           v-for="(espacio, index) in espacios"
           :key="index"
-          class="bg-white p-5 shadow-lg rounded-xl hover:shadow-xl transition-all"
+          class="bg-white p-10 shadow-lg rounded-xl hover:shadow-xl transition-all"
         >
           <p class="text-lg font-bold mt-3">
-            <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{ espacio.name }}
+            <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-20" /> {{ espacio.name }}
           </p>
           <img
             :src="espacio.images || 'https://source.unsplash.com/400x300/?parking,garage'"
             alt="Espacio"
-            class="w-full h-44 object-cover rounded-lg"
+            class="w-full h-40 object-cover rounded-lg"
           />
           <p class="text-lg font-bold mt-3">
             <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{ espacio.location }}

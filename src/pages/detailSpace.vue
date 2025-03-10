@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary p-6 gap-6">
     <header class="flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden p-6">
+      <div class="flex items-center space-x-4">
+        <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-40" />
+      </div>
       <div class="flex-1">
         <h1 class="text-3xl font-bold text-primary">{{ espacio?.location }}</h1>
         <p class="text-gray-600 mt-2">{{ espacio?.description }}</p>
