@@ -1,11 +1,28 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary p-6 gap-6">
-    <header class="flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden">
-      <div class="w-full md:w-3/5 h-40 md:h-64">
+    <header class="flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden p-6">
+      <div class="flex-1">
+        <h1 class="text-3xl font-bold text-primary">{{ espacio?.location }}</h1>
+        <p class="text-gray-600 mt-2">{{ espacio?.description }}</p>
+        <p class="text-lg text-primary font-semibold mt-4">
+          <font-awesome-icon icon="money-bill-wave" class="mr-1" />
+          ${{ espacio?.price_per_hour }}/{{ rangoTiempo }}
+        </p>
+        <br />
+        <section class="flex justify-left">
+      <button @click="reservar" class="bg-accent text-white px-6 py-3 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
+        <font-awesome-icon icon="calendar-check" class="mr-2" />
+        Reservar Ahora
+      </button>
+    </section>
+      </div>
+      
+      <div class="w-80 h-90 flex justify-center items-center">
         <CustomGoogleMap
           v-if="espacio"
           api-key="AIzaSyAmrMZNbht09n3JRbOqQD002iel4JJZV0E"
           :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
+          class="w-full h-full rounded-lg overflow-hidden shadow-md"
         >
           <Marker
             :options="{
@@ -15,33 +32,25 @@
           />
         </CustomGoogleMap>
       </div>
-      <div class="w-full md:w-2/5 h-40 md:h-64 overflow-x-auto flex gap-2 p-2">
-        <template v-if="espacio && espacio.images && espacio.images.length">
-          <img
-            v-for="(img, index) in espacio.images"
-            :key="index"
-            :src="img"
-            alt="Foto del espacio"
-            class="h-full object-cover rounded-lg shadow-md"
-          />
-        </template>
-        <template v-else>
-          <img
-            src="https://source.unsplash.com/400x300/?parking,garage"
-            alt="Foto del espacio"
-            class="h-full object-cover rounded-lg shadow-md"
-          />
-        </template>
-      </div>
     </header>
 
-    <section class="bg-white p-6 rounded-lg shadow-md">
-      <h1 class="text-2xl font-bold text-primary">{{ espacio?.location }}</h1>
-      <p class="text-gray-600 mt-2">{{ espacio?.description }}</p>
-      <p class="text-lg text-primary font-semibold mt-4">
-        <font-awesome-icon icon="money-bill-wave" class="mr-1" />
-        ${{ espacio?.price_per_hour }}/{{ rangoTiempo }}
-      </p>
+    <section class="bg-white p-6 rounded-lg shadow-md flex gap-4 overflow-x-auto">
+      <template v-if="espacio && espacio.images && espacio.images.length">
+        <img
+          v-for="(img, index) in espacio.images"
+          :key="index"
+          :src="img"
+          alt="Foto del espacio"
+          class="h-48 object-cover rounded-lg shadow-md"
+        />
+      </template>
+      <template v-else>
+        <img
+          src="https://source.unsplash.com/400x300/?parking,garage"
+          alt="Foto del espacio"
+          class="h-48 object-cover rounded-lg shadow-md"
+        />
+      </template>
     </section>
 
     <section v-if="espacio?.host" class="bg-white p-6 rounded-lg shadow-md flex items-center">
@@ -59,12 +68,7 @@
       </div>
     </section>
 
-    <section>
-      <button @click="reservar" class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
-        <font-awesome-icon icon="calendar-check" class="mr-2" />
-        Reservar Ahora
-      </button>
-    </section>
+ 
   </div>
 </template>
 
@@ -107,7 +111,7 @@ const markerIcon = computed(() => {
     } else if (tipo === "camioneta") {
       iconUrl = truckMarker;
     }
-    return { url: iconUrl, scaledSize: { width: 60, height: 60 } };
+    return { url: iconUrl, scaledSize: { width: 40, height: 40 } };
   }
   return null;
 });

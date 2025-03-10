@@ -189,6 +189,28 @@
         <button type="submit" class="btn-primary">Guardar Espacio</button>
       </form>
     </div>
+
+    <!-- Modal de Éxito -->
+    <transition name="fade">
+      <div
+        v-if="showSuccessModal"
+        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+      >
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
+          <div class="flex flex-col items-center">
+            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
+            <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
+            <p class="text-lg text-gray-700 text-center mb-6">El espacio se ha guardado correctamente.</p>
+            <button
+              @click="closeModal"
+              class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -208,7 +230,7 @@ const price = ref(0);
 const price_unit = ref('hour');
 const availability = ref({ start: '', end: '', dateRange: [] });
 const capacity = ref(0);
-const type = ref('Auto'); // Valor inicial (se actualizará con los botones)
+const type = ref('Auto'); // Valor inicial
 const parking_type = ref('');
 const description = ref('');
 const paymentMethods = ref([]);
@@ -221,16 +243,17 @@ const walletDetails = ref({
   mpEmail: ''
 });
 
-// Toggle para la publicación activa
+
 const isActive = ref(true);
 
-const owner_id = ref(1); // Se asigna según el usuario logueado
+const owner_id = ref(1); 
 const status = ref('active');
 
 const router = useRouter();
+const showSuccessModal = ref(false);
 
 const handleFileUpload = (event) => {
-  selectedFiles.value = [...event.target.files]; // Guardar los archivos reales
+  selectedFiles.value = [...event.target.files]; 
   previewImages.value = [];
   for (let file of selectedFiles.value) {
     const reader = new FileReader();
@@ -250,7 +273,7 @@ const updateAvailabilityFields = () => {
 };
 
 const updatePaymentFields = () => {
-  // Aquí podrías realizar validaciones o ajustes al cambiar métodos de pago
+  // Aquí  realizar validaciones o ajustes al cambiar métodos de pago
 };
 
 const addSpace = async () => {
@@ -293,10 +316,16 @@ const addSpace = async () => {
     await api.post('/spaces/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    router.push('/add-space');
+    showSuccessModal.value = true;
   } catch (error) {
     console.error('Error en el registro del espacio:', error);
   }
+};
+
+const closeModal = () => {
+  showSuccessModal.value = false;
+  
+  router.push('/dashboard');
 };
 </script>
 
@@ -378,5 +407,13 @@ input:checked + .slider:before {
 }
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* Modal transitions */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>

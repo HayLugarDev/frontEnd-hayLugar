@@ -72,7 +72,6 @@
         </p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
-           
             type="email"
             placeholder="Correo de MercadoPago"
             class="border p-3 rounded"
@@ -91,13 +90,45 @@
     <!-- Botón para Guardar Todos los Cambios -->
     <section class="mt-8">
       <button
-       @click="guardarTodo"
+        @click="guardarTodo"
         class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all"
       >
         <font-awesome-icon icon="save" class="mr-2" />
         Guardar Cambios
       </button>
     </section>
+
+    <!-- Modal de Éxito -->
+    <transition name="fade">
+      <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
+          <div class="flex flex-col items-center">
+            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
+            <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
+            <p class="text-lg text-gray-700 text-center mb-6">Los cambios se han guardado correctamente.</p>
+            <button @click="closeSuccessModal" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+              Continuar
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal de Error -->
+    <transition name="fade">
+      <div v-if="showErrorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
+          <div class="flex flex-col items-center">
+            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
+            <h2 class="text-3xl font-bold text-red-600 mb-2">¡Error!</h2>
+            <p class="text-lg text-gray-700 text-center mb-6">{{ errorMessage }}</p>
+            <button @click="closeErrorModal" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-800 transition">
+              Intentar de Nuevo
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
   <div v-else class="min-h-screen flex items-center justify-center">
     <p>Cargando información...</p>
@@ -106,6 +137,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import ReservationHistory from '../components/ReservationHistory.vue';
 import PublicationHistory from '../components/PublicationHistory.vue';
 import { useUserStore } from '../store/userStore';
@@ -114,9 +146,9 @@ import api from '../services/apiService';
 const userStore = useUserStore();
 const inputFoto = ref<HTMLInputElement | null>(null);
 
-// Se utilizará el usuario proveniente del store. Si aún no se cargó, se usa un objeto vacío por defecto.
+
 const usuario = computed(() => userStore.user || {
-  id:"",
+  id: "",
   profile_picture: "https://source.unsplash.com/100x100/?person,avatar",
   name: "",
   last_name: "",
@@ -127,24 +159,24 @@ const usuario = computed(() => userStore.user || {
   walletEmail: ""
 });
 
-
 const reservas = ref([]);
 const publicaciones = ref([]);
 
-
+const showSuccessModal = ref(false);
+const showErrorModal = ref(false);
+const errorMessage = ref('');
+const router = useRouter();
 const fetchReservations = async () => {
   try {
     const token = localStorage.getItem('token');
     const response = await api.get('/reservations/user', {
       headers: { Authorization: `Bearer ${token}` }
     });
- 
     reservas.value = response.data.reservations;
   } catch (error) {
     console.error("Error al cargar las reservas", error);
   }
 };
-
 
 const fetchPublications = async () => {
   try {
@@ -152,7 +184,6 @@ const fetchPublications = async () => {
     const response = await api.get('/publications/user', {
       headers: { Authorization: `Bearer ${token}` }
     });
-  
     publicaciones.value = response.data.publications;
   } catch (error) {
     console.error("Error al cargar las publicaciones", error);
@@ -173,7 +204,6 @@ const subirFoto = (event: Event): void => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
     const file = target.files[0];
-    
     if (userStore.user) {
       userStore.user.profile_picture = URL.createObjectURL(file);
     }
@@ -183,16 +213,16 @@ const subirFoto = (event: Event): void => {
 const guardarTodo = async (): Promise<void> => {
   try {
     const token = localStorage.getItem('token');
-    // Se envían los datos actualizados del usuario al backend
     const response = await api.put(`/users/update/${usuario.value.id}`, usuario.value, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    alert("Cambios guardados exitosamente.");
-    // Actualiza el store con la respuesta del backend
     userStore.user = response.data;
+
+    showSuccessModal.value = true;
   } catch (error) {
     console.error("Error al guardar los cambios", error);
-    alert("Hubo un error al guardar los cambios.");
+    errorMessage.value = "Hubo un error al guardar los cambios. Por favor, inténtalo nuevamente.";
+    showErrorModal.value = true;
   }
 };
 
@@ -201,8 +231,26 @@ const setAddress = (place: any): void => {
     userStore.user.address = place.formatted_address || "";
   }
 };
+
+const closeSuccessModal = () => {
+  router.push('/dashboard');
+  showSuccessModal.value = false;
+ 
+};
+
+const closeErrorModal = () => {
+  showErrorModal.value = false;
+};
 </script>
 
 <style scoped>
-/* Puedes agregar estilos adicionales aquí si lo requieres */
+
+
+/* Transición para el modal */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
 </style>
