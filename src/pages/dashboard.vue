@@ -70,7 +70,7 @@
             <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{ espacio.name }}
           </p>
           <img
-            :src="espacio.images || 'https://source.unsplash.com/400x300/?parking,garage'"
+            :src="espacio.images.length ? `http://localhost:3000${espacio.images[0]}` : 'https://d2syaugtnopsqd.cloudfront.net/wp-content/uploads/sites/10/2020/10/27135236/How-wide-is-a-parking-space-scaled.jpg'"
             alt="Espacio"
             class="w-full h-44 object-cover rounded-lg"
           />
@@ -141,6 +141,15 @@ const cargarPublicacionesCercanas = async () => {
     // Puedes definir un radio por defecto, por ejemplo 10 km.
     const response = await api.get(`/spaces/getSpacesNearby?lat=${lat}&lng=${lng}&radius=10`);
     espacios.value = response.data;
+    
+    const responseGet = await api.get("/spaces/getAll");
+    espacios.value = responseGet.data.map(e => {
+      return {
+        ...e.dataValues,
+        images: JSON.parse(e.dataValues.images)
+      };
+    });
+    console.log(espacios.value);
     cargando.value = false;
   } catch (err: any) {
     console.error(err);
@@ -155,7 +164,6 @@ onMounted(() => {
 });
 
 const buscar = () => {
-  // Si se requiere búsqueda manual, aquí podrías integrar lógica adicional.
   console.log("Buscar:", searchQuery.value);
 };
 </script>

@@ -40,7 +40,7 @@
       });
       
       console.log(response)
-      
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error al registrar usuario:', error);
       alert('Ocurrió un error. Inténtalo de nuevo.');
