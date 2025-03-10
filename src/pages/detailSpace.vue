@@ -5,8 +5,8 @@
         <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-40" />
       </div>
       <div class="flex-1">
-        <h1 class="text-3xl font-bold text-primary">{{ espacio?.location }}</h1>
-        <p class="text-gray-600 mt-2">{{ espacio?.description }}</p>
+        <h1 class="text-3xl font-bold text-primary">{{ espacio?.name }}</h1>
+        <p class="text-gray-600 mt-2">{{ espacio?.location }}</p>
         <p class="text-lg text-primary font-semibold mt-4">
           <font-awesome-icon icon="money-bill-wave" class="mr-1" />
           ${{ espacio?.price_per_hour }}/{{ rangoTiempo }}
@@ -54,6 +54,7 @@
           class="h-48 object-cover rounded-lg shadow-md"
         />
       </template>
+      <p class="text-gray-600 mt-2">{{ espacio?.description }}</p>
     </section>
 
     <section v-if="espacio?.host" class="bg-white p-6 rounded-lg shadow-md flex items-center">
