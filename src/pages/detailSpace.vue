@@ -23,7 +23,6 @@
       <div class="w-80 h-90 flex justify-center items-center">
         <CustomGoogleMap
           v-if="espacio"
-          api-key="AIzaSyAmrMZNbht09n3JRbOqQD002iel4JJZV0E"
           :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
           class="w-full h-full rounded-lg overflow-hidden shadow-md"
         >

@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary">
-    <!-- Barra de búsqueda con filtros avanzados -->
+
     <header class="bg-white shadow-md p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg">
       <div class="flex items-center space-x-4">
         <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-40" />
@@ -29,7 +29,7 @@
       </div>
       <div class="flex items-center space-x-4 mt-2 md:mt-0">
         <router-link to="/profile" class="text-textPrimary hover:text-primary font-medium">
-          <font-awesome-icon icon="user" class="mr-1" /> 
+          <font-awesome-icon icon="user" class="mr-1" />
           <span v-if="userStore.user">Bienvenido, {{ userStore.user.name }}</span>
           <span v-else>Mi Perfil</span>
         </router-link>
@@ -38,8 +38,8 @@
         </router-link>
       </div>
     </header>
-    
-    <!-- Categorías de búsqueda -->
+
+
     <div class="flex overflow-x-auto p-4 bg-white shadow-md rounded-lg mt-4 space-x-4">
       <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
         <font-awesome-icon icon="city" class="mr-2" /> Centro
@@ -57,12 +57,30 @@
         <font-awesome-icon icon="motorcycle" class="mr-2" /> Motos
       </button>
     </div>
+
     
+    <div class="flex justify-end p-4">
+      <label class="flex items-center cursor-pointer">
+        <span class="mr-2">Vista de Mapa</span>
+        <input type="checkbox" v-model="showMap" class="hidden" />
+        <div class="w-12 h-6 bg-primary rounded-full relative">
+          <div
+            :class="{
+              'translate-x-6': showMap,
+              'translate-x-0': !showMap
+            }"
+            class="absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300"
+          ></div>
+        </div>
+      </label>
+    </div>
+
     <!-- Contenedor de contenido principal -->
     <div class="flex flex-1 p-6">
-      <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Vista de Cards -->
+      <div v-if="!showMap" class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div v-if="cargando" class="text-center text-gray-500 w-full">Cargando espacios...</div>
-        <div v-if="error" class="text-center text-red-500 w-full">Error al cargar espacios.</div>
+        <div v-if="error" class="text-center text-red-500 w-full">{{ error }}</div>
         <div
           v-for="(espacio, index) in espacios"
           :key="index"
@@ -72,7 +90,7 @@
             <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-20" /> {{ espacio.name }}
           </p>
           <img
-            :src="espacio.images || 'https://source.unsplash.com/400x300/?parking,garage'"
+            :src="espacio.images.length ? espacio.images[0] : 'https://source.unsplash.com/400x300/?parking,garage'"
             alt="Espacio"
             class="w-full h-40 object-cover rounded-lg"
           />
@@ -89,9 +107,38 @@
           </router-link>
         </div>
       </div>
+      <div v-else class="flex-1">
+        <CustomGoogleMap
+          :center="center"
+          :zoom="zoom"
+          :options="mapOptions"
+          class="w-full h-full rounded-lg overflow-hidden shadow-md"
+        >
+          <Marker
+            v-for="(espacio, index) in espacios"
+            :key="index"
+            :options="getMarkerOptions(espacio)"
+            @mouseover="() => handleMouseOver(espacio)"
+            @mouseout="handleMouseOut"
+            @click="() => handleMarkerClick(espacio)"
+          />
+          <InfoWindow
+            v-if="hoveredSpace"
+            :position="{
+              lat: Number(hoveredSpace.latitude),
+              lng: Number(hoveredSpace.longitude)
+            }"
+            @closeclick="handleMouseOut"
+          >
+            <div class="p-2">
+              <h3 class="text-lg font-bold">{{ hoveredSpace.name }}</h3>
+              <p class="text-sm">{{ hoveredSpace.location }}</p>
+              <p class="text-sm text-primary">${{ hoveredSpace.price_per_hour }}/hora</p>
+            </div>
+          </InfoWindow>
+        </CustomGoogleMap>
+      </div>
     </div>
-    
-    <!-- Botón para Agregar Espacio -->
     <div class="fixed bottom-6 right-6 flex items-center space-x-3">
       <router-link to="/add-space">
         <button class="bg-primary text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all flex items-center space-x-2">
@@ -107,22 +154,79 @@
 import { ref, onMounted } from 'vue';
 import api from '../services/apiService';
 import { useUserStore } from '../store/userStore';
+import { Marker, InfoWindow } from 'vue3-google-map';
+import { useRouter } from 'vue-router';
+import logoMarker from '../assets/logo.png';
+import CustomGoogleMap from '../components/GoogleMap.vue';
+
+const router = useRouter();
+
+
+const markerIcon = logoMarker;
+
+
+const getMarkerOptions = (espacio) => ({
+  position: { lat: Number(espacio.latitude), lng: Number(espacio.longitude) },
+  icon: { url: markerIcon, scaledSize: { width: 40, height: 40 } }
+});
 
 
 const searchQuery = ref("");
 const checkIn = ref("");
 const checkOut = ref("");
 const rangoTiempo = ref("hora");
+
+
 const espacios = ref([]);
 const cargando = ref(true);
 const error = ref(null);
 
-const userStore = useUserStore()
+
+const showMap = ref(false);
+
+
+const hoveredSpace = ref(null);
+
+
+const center = ref({ lat: -26.8333, lng: -65.2167 });
+const zoom = ref(15);
+const mapOptions = ref({
+  styles: [
+    { featureType: "all", elementType: "geometry", stylers: [{ color: "#ebe3cd" }] },
+    { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#523735" }] },
+    { featureType: "all", elementType: "labels.text.stroke", stylers: [{ color: "#f5f1e6" }] },
+    { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#c9b2a6" }] },
+    { featureType: "administrative.land_parcel", elementType: "geometry.stroke", stylers: [{ color: "#dcd2be" }] },
+    { featureType: "administrative.land_parcel", elementType: "labels.text.fill", stylers: [{ color: "#ae9e90" }] },
+    { featureType: "landscape.natural", elementType: "geometry", stylers: [{ color: "#dfd2ae" }] },
+    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#dfd2ae" }] },
+    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#93817c" }] },
+    { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#a5b076" }] },
+    { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#447530" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#f5f1e6" }] },
+    { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#fdfcf8" }] },
+    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#f8c967" }] },
+    { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#e9bc62" }] },
+    { featureType: "road.highway.controlled_access", elementType: "geometry", stylers: [{ color: "#e98d58" }] },
+    { featureType: "road.highway.controlled_access", elementType: "geometry.stroke", stylers: [{ color: "#db8555" }] },
+    { featureType: "transit", elementType: "geometry", stylers: [{ color: "#dfd2ae" }] },
+    { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#b9d3c2" }] },
+    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#92998d" }] }
+  ],
+  disableDefaultUI: true,
+  zoomControl: true,
+  streetViewControl: false,
+  fullscreenControl: false,
+  mapTypeControl: false,
+});
+
+
+const userStore = useUserStore();
+
 
 const obtenerEspacios = async () => {
   try {
     const response = await api.get("/spaces/getAll");
-    // Asumimos que la respuesta viene con objetos con la propiedad dataValues, de lo contrario, ajusta según tu API
     espacios.value = response.data.map(e => e.dataValues);
     cargando.value = false;
   } catch (err) {
@@ -132,16 +236,47 @@ const obtenerEspacios = async () => {
 };
 
 onMounted(async () => {
+  
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        center.value = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        console.log(position)
+      },
+      (err) => {
+        console.error("Error al obtener geolocalización:", err);
+      }
+    );
+  }
   await obtenerEspacios();
   await userStore.fetchUser();
 });
 
 const buscar = () => {
-  // Implementa la lógica de búsqueda según tus requerimientos
   console.log("Buscar:", searchQuery.value);
+};
+
+
+const handleMouseOver = (espacio) => {
+  console.log("MouseOver en espacio:", espacio);
+  hoveredSpace.value = espacio;
+};
+
+const handleMouseOut = () => {
+  hoveredSpace.value = null;
+};
+
+const handleMarkerClick = (espacio) => {
+  router.push(`/espacio/${espacio.id}`);
 };
 </script>
 
 <style scoped>
-/* Puedes agregar estilos adicionales aquí si lo requieres */
+
+.gm-style-iw {
+  z-index: 9999 !important;
+}
 </style>
