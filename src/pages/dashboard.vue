@@ -47,9 +47,9 @@
       <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
         <font-awesome-icon icon="leaf" class="mr-2" /> Zonas verdes
       </button>
-      <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
+      <!-- <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
         <font-awesome-icon icon="umbrella-beach" class="mr-2" /> Cerca del río
-      </button>
+      </button> -->
       <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
         <font-awesome-icon icon="car" class="mr-2" /> Garages privados
       </button>
@@ -101,7 +101,7 @@
             <font-awesome-icon icon="money-bill-wave" class="mr-1" /> ${{ espacio.price_per_hour }}/hora
           </p>
           <router-link :to="`/espacio/${espacio.id}`">
-            <button class="mt-3 bg-accent text-white px-6 py-3 rounded-lg w-full hover:shadow-md font-bold shadow-md transition-all">
+            <button class="mt-3 bg-accent text-black px-6 py-3 rounded-lg w-full hover:shadow-md font-bold shadow-md transition-all">
               <font-awesome-icon icon="calendar-check" class="mr-1" /> Reservar
             </button>
           </router-link>

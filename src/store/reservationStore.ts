@@ -1,6 +1,6 @@
 // stores/reservationStore.ts
 import { defineStore } from 'pinia';
-import api from '../services/apiService'; // Asegúrate de que apiService esté configurado
+import api from '../services/apiService';
 import { useUserStore } from './userStore';
 
 export const useReservationStore = defineStore('reservation', {
@@ -13,24 +13,27 @@ export const useReservationStore = defineStore('reservation', {
       start_time: null as string | null,
       end_time: null as string | null,
       total: 0,
-      status: 'pending',  
+      payment_method: null as string | null, // "tarjeta", "mercadopago", "transferencia"
+      pay_data: null as Record<string, any> | null, // Datos de facturación (invoice_name, invoice_dni, invoice_address, invoice_email)
     },
     loading: false,
     error: null as string | null,
   }),
+
   actions: {
     /**
-     * Actualiza la reserva con los datos proporcionados.  
+     * Actualiza la reserva con los datos proporcionados.
      * Si no se pasa user_id, se asigna automáticamente desde el store de usuario.
      */
     setReservationData(data: Partial<typeof this.reservation>) {
       const userStore = useUserStore();
-      // Si no se provee user_id y el usuario está autenticado, asignarlo
       if (!data.user_id && userStore.user) {
         data.user_id = userStore.user.id;
       }
       this.reservation = { ...this.reservation, ...data };
+      console.log("Reserva actualizada:", this.reservation);
     },
+
     /**
      * Envía la reserva al backend para guardarla en la base de datos.
      */
@@ -38,8 +41,9 @@ export const useReservationStore = defineStore('reservation', {
       this.loading = true;
       this.error = null;
       try {
+        console.log("LLEGA?",this.reservation)
         const response = await api.post('/reservations/create', this.reservation);
-        this.reservation.id = response.data.id; // Se actualiza el id según la respuesta
+        this.reservation.id = response.data.id; // Actualiza el id según la respuesta del backend
         return response.data;
       } catch (error) {
         this.error = 'Error al crear la reserva';
@@ -49,8 +53,9 @@ export const useReservationStore = defineStore('reservation', {
         this.loading = false;
       }
     },
+
     /**
-     * Limpia los datos de la reserva.
+     * Limpia los datos de la reserva para iniciar un nuevo proceso.
      */
     clearReservation() {
       this.reservation = {
@@ -61,7 +66,8 @@ export const useReservationStore = defineStore('reservation', {
         start_time: null,
         end_time: null,
         total: 0,
-        status: 'pending',
+        payment_method: null,
+        pay_data: null,
       };
     },
   },
