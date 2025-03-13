@@ -92,10 +92,11 @@ const totalPagar = computed(() => {
 
 const obtenerEspacio = async () => {
   try {
-    const id = route.params.id; // Se espera una ruta como /checkout/:id
+    const id = route.params.id;
     const response = await api.get(`/spaces/getbyid/${id}`);
-    
+    espacio.value = response.data;
     rangoTiempo.value = "hour";
+    return response.data;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
   }

@@ -83,31 +83,31 @@ const reserva = ref(null);
 
 const obtenerReserva = async () => {
   try {
-    const id = route.params.id; // Se espera que la ruta sea /confirmacion/:id
-    // Llamada real al backend:
-    // const response = await api.get(`/reservations/${id}`);
-    // reserva.value = response.data;
+    const id = route.query.id; 
+    const response = await api.get(`/reservations/${id}`, { withCredentials : true });
+    console.log(response.data);
+    reserva.value = response.data;
     
     // Simulación (reemplaza esta parte con la llamada real)
-    reserva.value = {
-      id,
-      espacio: {
-        location: "Calle 123, San Miguel de Tucumán",
-        description: "Amplio estacionamiento con seguridad 24 horas.",
-        image: "https://source.unsplash.com/400x300/?parking,garage"
-      },
-      cantidad: 2,
-      rangoTiempo: "hora",
-      total: 1000,
-      metodoPago: "tarjeta", // "tarjeta", "mercadopago" o "transferencia"
-      tipoTarjeta: "Visa",
-      datosFacturacion: {
-        nombre: "Juan Pérez",
-        dni: "12345678",
-        direccion: "Calle Falsa 123",
-        email: "juan@example.com"
-      }
-    };
+    // reserva.value = {
+    //   id,
+    //   espacio: {
+    //     location: "Calle 123, San Miguel de Tucumán",
+    //     description: "Amplio estacionamiento con seguridad 24 horas.",
+    //     image: "https://source.unsplash.com/400x300/?parking,garage"
+    //   },
+    //   cantidad: 2,
+    //   rangoTiempo: "hora",
+    //   total: 1000,
+    //   metodoPago: "tarjeta", // "tarjeta", "mercadopago" o "transferencia"
+    //   tipoTarjeta: "Visa",
+    //   datosFacturacion: {
+    //     nombre: "Juan Pérez",
+    //     dni: "12345678",
+    //     direccion: "Calle Falsa 123",
+    //     email: "juan@example.com"
+    //   }
+    // };
   } catch (error) {
     console.error("Error al obtener la reserva:", error);
   }

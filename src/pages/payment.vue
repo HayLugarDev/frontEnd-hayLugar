@@ -121,7 +121,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import api from '../services/apiService';
 
@@ -129,7 +129,10 @@ import api from '../services/apiService';
 const router = useRouter();
 const route = useRoute();
 const metodoPago = ref("tarjeta");
-const total = ref(parseFloat(route.query.total) || 500);
+
+// Datos del espacio
+const horaEntrada = ref("");
+const horaSalida = ref("");
 
 // Datos de la tarjeta (si se selecciona 'tarjeta')
 const numeroTarjeta = ref("");
@@ -142,6 +145,7 @@ const nombre = ref("");
 const dni = ref("");
 const direccion = ref("");
 const email = ref("");
+const total = ref(parseFloat(route.query.total) || 500);
 
 // Objeto de espacio real (se obtiene desde el detalle de reserva)
 const espacio = ref(null);
@@ -165,7 +169,7 @@ const obtenerEspacio = async () => {
     console.error("Error al obtener datos del espacio:", error);
   }
 };
-obtenerEspacio();
+onMounted(obtenerEspacio);
 
 // Función para detectar el tipo de tarjeta (simulación básica)
 const detectarTipoTarjeta = () => {
@@ -192,7 +196,7 @@ const obtenerIconoTarjeta = () => {
 };
 
 // Función para confirmar el pago
-const confirmarPago = () => {
+const confirmarPago = async () => {
   // Validar datos de facturación
   if (!nombre.value || !dni.value || !direccion.value || !email.value) {
     alert("Por favor, completa todos los datos de facturación.");
@@ -205,10 +209,35 @@ const confirmarPago = () => {
       return;
     }
   }
-  // Simular el proceso de pago (en un flujo real aquí se integraría la pasarela)
-  alert("Pago confirmado mediante " + metodoPago.value);
-  // Aquí se podría enviar la información a la base de datos
-  router.push("/confirmacion");
+  const reservationData = {
+    owner_id: espacio.value.owner_id, 
+    space_id: espacio.value.id, 
+    start_time: horaEntrada.value, 
+    end_time: horaSalida.value, 
+    total: route.query.total,
+    payment_method: metodoPago.value,
+    pay_data: { 
+      invoice_name: nombre.value,
+      invoice_dni: dni.value,
+      invoice_address: direccion.value,
+      invoice_email: email.value 
+    }
+  }
+  try {
+    console.log(reservationData);
+    const response = await api.post('/reservations/create', reservationData, { withCredentials : true });
+    if (response.status === 201) {
+    alert("Pago confirmado mediante " + metodoPago.value);
+    router.push({
+      path: '/confirmacion',
+      query: { id: espacio.value.id }
+    });
+  }
+    return response.data;
+  } catch (error) {
+    console.error("Error crear la reserva:", error);
+    alert("Ocurrió un error al procesar la solicitud. Por favor, intenta nuevamente más tarde");
+  }
 };
 </script>
 
