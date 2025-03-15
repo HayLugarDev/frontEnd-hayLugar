@@ -8,7 +8,7 @@
       <li v-for="(reserva, index) in reservations" :key="index" class="py-4">
         <p class="flex items-center">
           <font-awesome-icon icon="map-marker-alt" class="mr-2 text-primary" />
-          <strong>Ubicación:</strong> {{ reserva.location }}
+          <strong>Ubicación:</strong> {{ reserva.Space.location }}
         </p>
         <p class="flex items-center">
           <font-awesome-icon icon="calendar-alt" class="mr-2 text-primary" />
@@ -26,18 +26,20 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
 import { useUserStore } from '../store/userStore';
 import api from '../services/apiService';
 
-interface Reservation {
+interface Space {
   location: string;
+}
+
+interface Reservation {
+  Space: Space;
   start_time: string;
   total: number;
 }
 
 const reservations = ref<Reservation[]>([]);
-const route = useRoute();
 const userStore = useUserStore();
 
 const fetchReservations = async () => {
@@ -48,6 +50,7 @@ const fetchReservations = async () => {
   }
   try {
     const response = await api.get(`reservations/history/${userId}`);
+    console.log(response.data);
     reservations.value = response.data;
   } catch (error) {
     console.error("Error al obtener historial de reservas", error);
