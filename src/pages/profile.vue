@@ -169,7 +169,7 @@ const router = useRouter();
 const fetchReservations = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await api.get('/reservations/user', {
+    const response = await api.get(`reservations/history/${userStore.user?.id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     reservas.value = response.data.reservations;
