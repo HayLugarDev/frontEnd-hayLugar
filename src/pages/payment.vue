@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col md:flex-row min-h-screen bg-secondary p-6 gap-6">
-    <!-- Sección Izquierda: Resumen del Pago y Formulario de Facturación -->
+    <!-- Sección Izquierda: Resumen del Pago y Formulario de Pago -->
     <section class="w-full md:w-2/3 space-y-6">
       <h1 class="text-3xl font-bold text-primary">Confirmar Pago</h1>
       
@@ -55,60 +55,35 @@
         </div>
       </div>
       
-      <!-- Formulario de Tarjeta (si se selecciona 'tarjeta') -->
+      <!-- Sección de Pago con Tarjeta usando MercadoPago Card Payment Brick -->
       <div v-if="metodoPago === 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-semibold mb-4">Detalles de la Tarjeta</h2>
-        <input 
-          v-model="numeroTarjeta" 
-          @input="detectarTipoTarjeta" 
-          type="text" 
-          placeholder="Número de Tarjeta" 
-          class="border p-2 rounded w-full mb-2" 
-        />
-        <div v-if="tipoTarjeta" class="flex items-center gap-2 mb-2">
-          <img :src="obtenerIconoTarjeta()" alt="Icono de Tarjeta" class="w-12 h-auto" v-if="obtenerIconoTarjeta()" />
-          <span class="font-semibold">{{ tipoTarjeta }}</span>
-        </div>
-        <div class="flex gap-4 mt-2">
-          <input 
-            v-model="expiracion" 
-            type="text" 
-            placeholder="MM/YY" 
-            class="border p-2 rounded w-1/2" 
-          />
-          <input 
-            v-model="cvv" 
-            type="text" 
-            placeholder="CVV" 
-            class="border p-2 rounded w-1/2" 
-          />
-        </div>
+        <h2 class="text-lg font-semibold mb-4">Pago con Tarjeta</h2>
+        <!-- Contenedor donde se montará el Brick -->
+        <form id="form-checkout" class="flex flex-col max-w-lg">
+          <div id="form-checkout__cardNumber" class="container"></div>
+          <div id="form-checkout__expirationDate" class="container"></div>
+          <div id="form-checkout__securityCode" class="container"></div>
+          <input type="text" id="form-checkout__cardholderName" placeholder="Titular de la tarjeta" class="border p-2 rounded my-2"/>
+          <select id="form-checkout__issuer" class="border p-2 rounded my-2"></select>
+          <select id="form-checkout__installments" class="border p-2 rounded my-2"></select>
+          <select id="form-checkout__identificationType" class="border p-2 rounded my-2"></select>
+          <input type="text" id="form-checkout__identificationNumber" placeholder="Número del documento" class="border p-2 rounded my-2"/>
+          <input type="email" id="form-checkout__cardholderEmail" placeholder="E-mail" class="border p-2 rounded my-2"/>
+          <button type="submit" id="form-checkout__submit" class="bg-accent text-white p-2 rounded mt-4">Pagar</button>
+          <progress value="0" class="progress-bar mt-2">Cargando...</progress>
+        </form>
       </div>
       
-      <!-- Simulación de Integración con MercadoPago -->
-      <div v-if="metodoPago === 'mercadopago'" class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-semibold mb-4">MercadoPago</h2>
-        <p class="text-gray-600 mb-2">
-          La integración con MercadoPago no está implementada aún. Se simulará el pago.
-        </p>
+      <!-- Botón de Confirmación para métodos distintos a tarjeta -->
+      <div v-if="metodoPago !== 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
+        <button 
+          @click="confirmarPagoSimulado" 
+          class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all"
+        >
+          <font-awesome-icon icon="check-circle" class="mr-2" />
+          Confirmar y Pagar
+        </button>
       </div>
-      
-      <!-- Datos para Transferencia Bancaria -->
-      <div v-if="metodoPago === 'transferencia'" class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-semibold mb-4">Datos para Transferencia Bancaria</h2>
-        <p class="text-gray-600">Banco: Banco Nación</p>
-        <p class="text-gray-600">CBU: 2850590940090418135200</p>
-        <p class="text-gray-600">Alias: HAYLUGAR.PAY</p>
-      </div>
-      
-      <!-- Botón de Confirmación -->
-      <button 
-        @click="confirmarPago" 
-        class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all"
-      >
-        <font-awesome-icon icon="check-circle" class="mr-2" />
-        Confirmar y Pagar
-      </button>
     </section>
     
     <!-- Sección Derecha: Imagen Resumen (Opcional) -->
@@ -122,36 +97,28 @@
   </div>
 </template>
 
-<script setup>
-import { onMounted, ref } from 'vue';
+<script setup lang="ts">
+import { onMounted, ref, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import api from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
+import { loadMercadoPago } from '@mercadopago/sdk-js';
 
 const router = useRouter();
 const route = useRoute();
 const reservationStore = useReservationStore();
 
-// Variables para método de pago y datos de facturación
+// Datos de facturación y reserva
 const metodoPago = ref("tarjeta");
 const nombre = ref("");
 const dni = ref("");
 const direccion = ref("");
 const email = ref("");
-const total = ref(parseFloat(route.query.total) || 0);
-
-// Variables para pago con tarjeta
-const numeroTarjeta = ref("");
-const expiracion = ref("");
-const cvv = ref("");
-const tipoTarjeta = ref("");
-
-// Variables para reserva (recibidas desde checkout)
+const totalQuery = Array.isArray(route.query.total) ? route.query.total[0] : route.query.total;
+const total = ref(parseFloat(totalQuery || "0"));
 const startTime = ref(route.query.start_time || "");
 const endTime = ref(route.query.end_time || "");
-
-// Objeto de espacio (se obtiene desde el detalle de reserva)
-const espacio = ref(null);
+const espacio = ref<any>(null);
 
 const obtenerEspacio = async () => {
   try {
@@ -171,62 +138,175 @@ const obtenerEspacio = async () => {
   }
 };
 
-onMounted(obtenerEspacio);
-console.log("montado");
+onMounted(async () => {
+  await obtenerEspacio();
+  if (metodoPago.value === 'tarjeta') {
+    await nextTick();
+    await initCardBrick();
+  }
+});
 
-// Función para detectar el tipo de tarjeta (simulación básica)
-const detectarTipoTarjeta = () => {
-  const num = numeroTarjeta.value;
-  if (/^4/.test(num)) {
-    tipoTarjeta.value = "Visa";
-  } else if (/^5[1-5]/.test(num)) {
-    tipoTarjeta.value = "MasterCard";
-  } else if (/^3[47]/.test(num)) {
-    tipoTarjeta.value = "American Express";
-  } else if (/^6/.test(num)) {
-    tipoTarjeta.value = "Discover";
+watch(metodoPago, async (newVal) => {
+  if (newVal === 'tarjeta') {
+    await nextTick();
+    await initCardBrick();
+  }
+});
+
+let cardForm: any = null;
+
+const initCardBrick = async () => {
+  await loadMercadoPago();
+  const mp = new window.MercadoPago('TEST-f39e0ddb-bc5b-491c-9245-0461fdeccb74', { locale: 'es-AR' });
+  const brickConfig = {
+    amount: total.value.toString(),
+    autoMount: true,
+    iframe: true,
+    form: {
+      id: "form-checkout",
+      cardNumber: {
+        id: "form-checkout__cardNumber",
+        placeholder: "Número de tarjeta",
+      },
+      expirationDate: {
+        id: "form-checkout__expirationDate",
+        placeholder: "MM/YY",
+      },
+      securityCode: {
+        id: "form-checkout__securityCode",
+        placeholder: "Código de seguridad",
+      },
+      cardholderName: {
+        id: "form-checkout__cardholderName",
+        placeholder: "Titular de la tarjeta",
+      },
+      issuer: {
+        id: "form-checkout__issuer",
+        placeholder: "Banco emisor",
+      },
+      installments: {
+        id: "form-checkout__installments",
+        placeholder: "Cuotas",
+      },
+      identificationType: {
+        id: "form-checkout__identificationType",
+        placeholder: "Tipo de documento",
+      },
+      identificationNumber: {
+        id: "form-checkout__identificationNumber",
+        placeholder: "Número del documento",
+      },
+      cardholderEmail: {
+        id: "form-checkout__cardholderEmail",
+        placeholder: "E-mail",
+      },
+    },
+    callbacks: {
+      onFormMounted: (error: any) => {
+        if (error) {
+          console.warn("Error al montar el brick:", error);
+          return;
+        }
+        console.log("Brick montado exitosamente.");
+      },
+      onSubmit: async (event: Event) => {
+        event.preventDefault();
+        const cardFormData = cardForm?.getCardFormData();
+        if (!cardFormData) return;
+        const {
+          paymentMethodId: payment_method_id,
+          issuerId: issuer_id,
+          cardholderEmail: cardholderEmail,
+          amount,
+          token,
+          installments,
+          identificationNumber,
+          identificationType,
+        } = cardFormData;
+        
+        console.log("Datos del Brick:", {
+          payment_method_id,
+          issuer_id,
+          cardholderEmail,
+          amount,
+          token,
+          installments,
+          identificationNumber,
+          identificationType,
+        });
+        
+        await confirmarPagoMercadoPago(token, amount);
+      },
+      onError: (error: any) => {
+        console.error("Error en el Brick:", error);
+      },
+      onFetching: (resource: any) => {
+        console.log("Fetching resource:", resource);
+        const progressBar = document.querySelector(".progress-bar");
+        progressBar?.removeAttribute("value");
+        return () => {
+          progressBar?.setAttribute("value", "0");
+        };
+      }
+    },
+  };
+
+  const container = document.getElementById("form-checkout");
+  if (container) {
+    container.innerHTML = "";
+    cardForm = mp.cardForm(brickConfig);
   } else {
-    tipoTarjeta.value = "";
+    console.error("No se encontró el contenedor 'form-checkout'");
   }
 };
 
-const obtenerIconoTarjeta = () => {
-  if (tipoTarjeta.value) {
-    return `/src/assets/${tipoTarjeta.value.toLowerCase()}.png`;
-  }
-  return "";
-};
-
-const confirmarPago = async () => {
-  // Validar datos de facturación
-  if (!nombre.value || !dni.value || !direccion.value || !email.value) {
-    alert("Por favor, completa todos los datos de facturación.");
-    return;
-  }
-  // Validar datos de tarjeta si se selecciona 'tarjeta'
-  if (metodoPago.value === "tarjeta") {
-    if (!numeroTarjeta.value || !expiracion.value || !cvv.value) {
-      alert("Por favor, completa todos los datos de la tarjeta.");
-      return;
-    }
-  }
-  
-  // Aquí se actualizaba el reservationStore con los datos de pago, 
-  // pero por el momento no queremos incluir esos campos. Se deja comentado:
-  
+const confirmarPagoMercadoPago = async (token: string, amount: string) => {
   reservationStore.setReservationData({
     payment_method: metodoPago.value,
-    payment_data: { 
+    pay_data: { 
       invoice_name: nombre.value,
       invoice_dni: dni.value,
       invoice_address: direccion.value,
       invoice_email: email.value 
     }
   });
- 
   
-  // Si deseas enviar la reserva sin datos de pago, omite esos campos:
-  console.log("Enviando reserva sin datos de pago:", reservationStore.reservation);
+  try {
+    const response = await api.post('/payments/process', {
+      token,
+      amount: Number(amount),
+      reservationId: reservationStore.reservation.id,
+    });
+    if (response.status === 201) {
+      console.log("Pago procesado exitosamente");
+      router.push({
+        path: '/confirmacion',
+        query: { id: espacio.value.id }
+      });
+    }
+  } catch (error) {
+    console.error("Error al procesar el pago:", error);
+    alert("Ocurrió un error al procesar el pago. Intenta nuevamente.");
+  }
+};
+
+const confirmarPagoSimulado = async () => {
+  if (!nombre.value || !dni.value || !direccion.value || !email.value) {
+    alert("Por favor, completa todos los datos de facturación.");
+    return;
+  }
+  
+  reservationStore.setReservationData({
+    payment_method: metodoPago.value,
+    pay_data: { 
+      invoice_name: nombre.value,
+      invoice_dni: dni.value,
+      invoice_address: direccion.value,
+      invoice_email: email.value 
+    }
+  });
+  
+  console.log("Enviando reserva:", reservationStore.reservation);
   try {
     const response = await reservationStore.submitReservation();
     if (response) {
@@ -245,5 +325,26 @@ const confirmarPago = async () => {
 </script>
 
 <style scoped>
-/* Agrega estilos adicionales si lo requieres */
+/* Estilos para el formulario del brick */
+#form-checkout {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+}
+
+.container {
+  height: 18px;
+  display: inline-block;
+  border: 1px solid rgb(118, 118, 118);
+  border-radius: 2px;
+  padding: 1px 2px;
+}
+
+/* Transición para el brick */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
 </style>

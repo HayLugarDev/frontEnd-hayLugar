@@ -1,4 +1,3 @@
-// stores/userStore.ts
 import { defineStore } from 'pinia';
 import api from '../services/apiService';
 
@@ -14,10 +13,10 @@ export const useUserStore = defineStore('user', {
       address: string;
       role: string;
       profile_picture: string;
-      // Otros campos que necesites
     },
     loading: false,
     error: null as string | null,
+    sessionExpired: false, 
   }),
   actions: {
     async fetchUser() {
@@ -26,11 +25,10 @@ export const useUserStore = defineStore('user', {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get('/users/profile', {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
-        // Suponiendo que el endpoint envía { success: true, user: { ... } }
         this.user = response.data.user;
-        console.log("USER",response)
+        console.log("USER", response);
       } catch (error) {
         this.error = 'No se pudo cargar la información del usuario';
         console.error('Error en fetchUser:', error);
@@ -41,6 +39,9 @@ export const useUserStore = defineStore('user', {
     clearUser() {
       this.user = null;
       this.error = null;
+    },
+    setSessionExpired(value: boolean) {
+      this.sessionExpired = value;
     },
   },
 });
