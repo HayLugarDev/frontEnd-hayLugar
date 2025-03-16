@@ -2,6 +2,7 @@
   <div class="flex flex-col md:flex-row min-h-screen bg-secondary p-6 gap-6">
     <section class="w-full md:w-2/3 space-y-6">
       <h1 class="text-3xl font-bold text-primary">Confirmar Pago</h1>
+      <!-- Resumen del Espacio y Reserva -->
       <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
         <img 
           :src="espacio?.image || 'https://source.unsplash.com/400x300/?parking,garage'" 
@@ -39,13 +40,16 @@
             <font-awesome-icon icon="credit-card" class="text-xl" />
             <span>Tarjeta de Crédito/Débito</span>
           </label>
+          <!-- Aquí podrías agregar otras opciones si lo deseas -->
         </div>
       </div>
 
-      <!-- Sección de Pago con Tarjeta usando  Brick  MercadoPago -->
+      <!-- Sección de Pago con Tarjeta usando MercadoPago Card Payment Brick -->
       <div v-if="metodoPago === 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
         <div id="cardPaymentBrick_container"></div>
       </div>
+
+      <!-- Botón de Confirmación para otros métodos (simulado) -->
       <div v-if="metodoPago !== 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
         <button 
           @click="confirmarPagoSimulado" 
@@ -110,7 +114,7 @@ const obtenerEspacio = async () => {
 onMounted(async () => {
   await obtenerEspacio();
   if (metodoPago.value === 'tarjeta') {
-    await nextTick()
+    await nextTick();
     setTimeout(async () => {
       await initCardBrick();
     }, 300);
@@ -166,7 +170,7 @@ const initCardBrick = async () => {
   const container = document.getElementById("cardPaymentBrick_container");
   if (container) {
     container.innerHTML = "";
-    
+    // Monta el brick usando el bricksBuilder
     window.cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
   } else {
     console.error("No se encontró el contenedor 'cardPaymentBrick_container'");
@@ -174,6 +178,16 @@ const initCardBrick = async () => {
 };
 
 const confirmarPagoMercadoPago = async (token: string, amount: string) => {
+  // Primero, creamos la reserva en estado pending
+  let reservationResponse;
+  try {
+    reservationResponse = await reservationStore.submitReservation();
+  } catch (error) {
+    console.error("Error al crear la reserva:", error);
+    alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
+    return;
+  }
+  // Actualizamos el store con los datos de pago
   reservationStore.setReservationData({
     payment_method: metodoPago.value,
     pay_data: { 
@@ -206,6 +220,16 @@ const confirmarPagoMercadoPago = async (token: string, amount: string) => {
 const confirmarPagoSimulado = async () => {
   if (!nombre.value || !dni.value || !direccion.value || !email.value) {
     alert("Por favor, completa todos los datos de facturación.");
+    return;
+  }
+  
+  // Crea la reserva en pending
+  let reservationResponse;
+  try {
+    reservationResponse = await reservationStore.submitReservation();
+  } catch (error) {
+    console.error("Error al crear la reserva:", error);
+    alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
     return;
   }
   
@@ -252,7 +276,6 @@ const confirmarPagoSimulado = async () => {
   padding: 1px 2px;
 }
 
-/* Transición para el brick */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.2s ease;
 }
