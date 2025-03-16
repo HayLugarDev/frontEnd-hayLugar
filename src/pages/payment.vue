@@ -1,10 +1,7 @@
 <template>
   <div class="flex flex-col md:flex-row min-h-screen bg-secondary p-6 gap-6">
-    <!-- Sección Izquierda: Resumen del Pago y Formulario de Pago -->
     <section class="w-full md:w-2/3 space-y-6">
       <h1 class="text-3xl font-bold text-primary">Confirmar Pago</h1>
-      
-      <!-- Resumen del Espacio y Reserva -->
       <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
         <img 
           :src="espacio?.image || 'https://source.unsplash.com/400x300/?parking,garage'" 
@@ -23,7 +20,7 @@
           </p>
         </div>
       </div>
-      
+
       <!-- Datos de Facturación -->
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-lg font-semibold mb-4">Datos de Facturación</h2>
@@ -32,7 +29,7 @@
         <input v-model="direccion" type="text" placeholder="Dirección" class="border p-2 rounded w-full mb-2" />
         <input v-model="email" type="email" placeholder="Correo Electrónico" class="border p-2 rounded w-full mb-2" />
       </div>
-      
+
       <!-- Métodos de Pago -->
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-lg font-semibold mb-4">Método de Pago</h2>
@@ -42,39 +39,13 @@
             <font-awesome-icon icon="credit-card" class="text-xl" />
             <span>Tarjeta de Crédito/Débito</span>
           </label>
-          <label class="flex items-center gap-3">
-            <input type="radio" v-model="metodoPago" value="mercadopago" class="form-radio" />
-            <font-awesome-icon icon="shopping-cart" class="text-xl" />
-            <span>MercadoPago</span>
-          </label>
-          <label class="flex items-center gap-3">
-            <input type="radio" v-model="metodoPago" value="transferencia" class="form-radio" />
-            <font-awesome-icon icon="university" class="text-xl" />
-            <span>Transferencia Bancaria</span>
-          </label>
         </div>
       </div>
-      
-      <!-- Sección de Pago con Tarjeta usando MercadoPago Card Payment Brick -->
+
+      <!-- Sección de Pago con Tarjeta usando  Brick  MercadoPago -->
       <div v-if="metodoPago === 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-semibold mb-4">Pago con Tarjeta</h2>
-        <!-- Contenedor donde se montará el Brick -->
-        <form id="form-checkout" class="flex flex-col max-w-lg">
-          <div id="form-checkout__cardNumber" class="container"></div>
-          <div id="form-checkout__expirationDate" class="container"></div>
-          <div id="form-checkout__securityCode" class="container"></div>
-          <input type="text" id="form-checkout__cardholderName" placeholder="Titular de la tarjeta" class="border p-2 rounded my-2"/>
-          <select id="form-checkout__issuer" class="border p-2 rounded my-2"></select>
-          <select id="form-checkout__installments" class="border p-2 rounded my-2"></select>
-          <select id="form-checkout__identificationType" class="border p-2 rounded my-2"></select>
-          <input type="text" id="form-checkout__identificationNumber" placeholder="Número del documento" class="border p-2 rounded my-2"/>
-          <input type="email" id="form-checkout__cardholderEmail" placeholder="E-mail" class="border p-2 rounded my-2"/>
-          <button type="submit" id="form-checkout__submit" class="bg-accent text-white p-2 rounded mt-4">Pagar</button>
-          <progress value="0" class="progress-bar mt-2">Cargando...</progress>
-        </form>
+        <div id="cardPaymentBrick_container"></div>
       </div>
-      
-      <!-- Botón de Confirmación para métodos distintos a tarjeta -->
       <div v-if="metodoPago !== 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
         <button 
           @click="confirmarPagoSimulado" 
@@ -85,8 +56,6 @@
         </button>
       </div>
     </section>
-    
-    <!-- Sección Derecha: Imagen Resumen (Opcional) -->
     <aside class="w-full md:w-1/3 flex justify-center items-center">
       <img 
         :src="espacio?.image || 'https://source.unsplash.com/400x300/?parking,garage'" 
@@ -141,15 +110,19 @@ const obtenerEspacio = async () => {
 onMounted(async () => {
   await obtenerEspacio();
   if (metodoPago.value === 'tarjeta') {
-    await nextTick();
-    await initCardBrick();
+    await nextTick()
+    setTimeout(async () => {
+      await initCardBrick();
+    }, 300);
   }
 });
 
 watch(metodoPago, async (newVal) => {
   if (newVal === 'tarjeta') {
     await nextTick();
-    await initCardBrick();
+    setTimeout(async () => {
+      await initCardBrick();
+    }, 300);
   }
 });
 
@@ -158,105 +131,45 @@ let cardForm: any = null;
 const initCardBrick = async () => {
   await loadMercadoPago();
   const mp = new window.MercadoPago('TEST-f39e0ddb-bc5b-491c-9245-0461fdeccb74', { locale: 'es-AR' });
-  const brickConfig = {
-    amount: total.value.toString(),
-    autoMount: true,
-    iframe: true,
-    form: {
-      id: "form-checkout",
-      cardNumber: {
-        id: "form-checkout__cardNumber",
-        placeholder: "Número de tarjeta",
+  const bricksBuilder = mp.bricks();
+  const settings = {
+    initialization: {
+      amount: total.value.toString(),
+      payer: {
+        email: email.value || "default@example.com",
       },
-      expirationDate: {
-        id: "form-checkout__expirationDate",
-        placeholder: "MM/YY",
+    },
+    customization: {
+      visual: {
+        style: {
+          theme: 'default',
+        },
       },
-      securityCode: {
-        id: "form-checkout__securityCode",
-        placeholder: "Código de seguridad",
-      },
-      cardholderName: {
-        id: "form-checkout__cardholderName",
-        placeholder: "Titular de la tarjeta",
-      },
-      issuer: {
-        id: "form-checkout__issuer",
-        placeholder: "Banco emisor",
-      },
-      installments: {
-        id: "form-checkout__installments",
-        placeholder: "Cuotas",
-      },
-      identificationType: {
-        id: "form-checkout__identificationType",
-        placeholder: "Tipo de documento",
-      },
-      identificationNumber: {
-        id: "form-checkout__identificationNumber",
-        placeholder: "Número del documento",
-      },
-      cardholderEmail: {
-        id: "form-checkout__cardholderEmail",
-        placeholder: "E-mail",
+      paymentMethods: {
+        maxInstallments: 1,
       },
     },
     callbacks: {
-      onFormMounted: (error: any) => {
-        if (error) {
-          console.warn("Error al montar el brick:", error);
-          return;
-        }
-        console.log("Brick montado exitosamente.");
+      onReady: () => {
+        console.log("Brick is ready");
       },
-      onSubmit: async (event: Event) => {
-        event.preventDefault();
-        const cardFormData = cardForm?.getCardFormData();
-        if (!cardFormData) return;
-        const {
-          paymentMethodId: payment_method_id,
-          issuerId: issuer_id,
-          cardholderEmail: cardholderEmail,
-          amount,
-          token,
-          installments,
-          identificationNumber,
-          identificationType,
-        } = cardFormData;
-        
-        console.log("Datos del Brick:", {
-          payment_method_id,
-          issuer_id,
-          cardholderEmail,
-          amount,
-          token,
-          installments,
-          identificationNumber,
-          identificationType,
-        });
-        
-        await confirmarPagoMercadoPago(token, amount);
+      onSubmit: async (cardFormData: any) => {
+        console.log("Datos del Brick:", cardFormData);
+        await confirmarPagoMercadoPago(cardFormData.token, cardFormData.amount);
       },
       onError: (error: any) => {
         console.error("Error en el Brick:", error);
       },
-      onFetching: (resource: any) => {
-        console.log("Fetching resource:", resource);
-        const progressBar = document.querySelector(".progress-bar");
-        progressBar?.removeAttribute("value");
-        return () => {
-          progressBar?.setAttribute("value", "0");
-        };
-      }
     },
   };
 
-  const container = document.getElementById("form-checkout");
+  const container = document.getElementById("cardPaymentBrick_container");
   if (container) {
     container.innerHTML = "";
-    cardForm = mp.cardForm(brickConfig);
+    
+    window.cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
   } else {
-    console.error("No se encontró el contenedor 'form-checkout'");
+    console.error("No se encontró el contenedor 'cardPaymentBrick_container'");
   }
 };
 
@@ -325,7 +238,6 @@ const confirmarPagoSimulado = async () => {
 </script>
 
 <style scoped>
-/* Estilos para el formulario del brick */
 #form-checkout {
   display: flex;
   flex-direction: column;
