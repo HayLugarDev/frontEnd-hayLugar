@@ -40,7 +40,6 @@
             <font-awesome-icon icon="credit-card" class="text-xl" />
             <span>Tarjeta de Crédito/Débito</span>
           </label>
-          <!-- Aquí podrías agregar otras opciones si lo deseas -->
         </div>
       </div>
 
@@ -81,7 +80,7 @@ const router = useRouter();
 const route = useRoute();
 const reservationStore = useReservationStore();
 
-// Datos de facturación y reserva
+// Datos de facturación y reserva (inputs y query)
 const metodoPago = ref("tarjeta");
 const nombre = ref("");
 const dni = ref("");
@@ -93,6 +92,7 @@ const startTime = ref(route.query.start_time || "");
 const endTime = ref(route.query.end_time || "");
 const espacio = ref<any>(null);
 
+// Función para obtener los datos del espacio
 const obtenerEspacio = async () => {
   try {
     const id = route.query.id || null;
@@ -132,6 +132,7 @@ watch(metodoPago, async (newVal) => {
 
 let cardForm: any = null;
 
+// Inicializa el Brick de MercadoPago
 const initCardBrick = async () => {
   await loadMercadoPago();
   const mp = new window.MercadoPago('TEST-f39e0ddb-bc5b-491c-9245-0461fdeccb74', { locale: 'es-AR' });
@@ -140,7 +141,7 @@ const initCardBrick = async () => {
     initialization: {
       amount: total.value.toString(),
       payer: {
-        email: email.value || "default@example.com",
+        email: email.value || "",
       },
     },
     customization: {
@@ -159,7 +160,11 @@ const initCardBrick = async () => {
       },
       onSubmit: async (cardFormData: any) => {
         console.log("Datos del Brick:", cardFormData);
-        await confirmarPagoMercadoPago(cardFormData.token, cardFormData.amount);
+        // Extraer el token, el monto y el payment_method_id real del objeto del Brick
+        const tokenGenerado = cardFormData.token;
+        const monto = cardFormData.transaction_amount;
+        const paymentMethodReal = cardFormData.payment_method_id;
+        await confirmarPagoMercadoPago(tokenGenerado, monto, paymentMethodReal);
       },
       onError: (error: any) => {
         console.error("Error en el Brick:", error);
@@ -170,15 +175,30 @@ const initCardBrick = async () => {
   const container = document.getElementById("cardPaymentBrick_container");
   if (container) {
     container.innerHTML = "";
-    // Monta el brick usando el bricksBuilder
     window.cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
   } else {
     console.error("No se encontró el contenedor 'cardPaymentBrick_container'");
   }
 };
 
-const confirmarPagoMercadoPago = async (token: string, amount: string) => {
-  // Primero, creamos la reserva en estado pending
+// Función para confirmar el pago utilizando el Checkout API
+// Ahora se recibe paymentMethodReal
+const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMethodReal: string) => {
+  // Guardamos el token recibido en una variable local
+  const tokenValue = token;
+  
+  // Actualizamos el store con los datos de facturación
+  reservationStore.setReservationData({
+    payment_method: metodoPago.value,
+    payment_data: { 
+      invoice_name: nombre.value,
+      invoice_dni: dni.value,
+      invoice_address: direccion.value,
+      invoice_email: email.value 
+    }
+  });
+  
+  // Creamos la reserva en estado "pending" y capturamos el resultado
   let reservationResponse;
   try {
     reservationResponse = await reservationStore.submitReservation();
@@ -187,23 +207,34 @@ const confirmarPagoMercadoPago = async (token: string, amount: string) => {
     alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
     return;
   }
-  // Actualizamos el store con los datos de pago
-  reservationStore.setReservationData({
-    payment_method: metodoPago.value,
-    pay_data: { 
-      invoice_name: nombre.value,
-      invoice_dni: dni.value,
-      invoice_address: direccion.value,
-      invoice_email: email.value 
-    }
-  });
   
+  // Extraemos el ID de la reserva directamente de la respuesta
+  const reservationId = reservationResponse.id;
+  
+  // Construir el payload para enviar a nuestro endpoint que procesa el pago,
+  // asegurándonos de incluir el payment_method_id real y otros campos requeridos.
+  const payload = {
+    reservation_id: reservationId,
+    transaction_amount: Number(amount),
+    description: `Pago para la reserva #${reservationId}`,
+    email: email.value,  // Debe venir de req.user.email en el backend
+    payment_method_id: paymentMethodReal,  // Ahora se usa el valor real (ej.: "visa")
+    token: tokenValue,
+    issuer_id: 310, // Valor fijo o dinámico según corresponda
+    payer: {
+      email: email.value,
+      identification: {
+        type: "DNI",
+        number: dni.value.toString(),
+      },
+    },
+    installments: 1
+  };
+  console.log("Payload a enviar:", payload);
+  
+  // Procesamos el pago mediante nuestro endpoint (ejemplo: /payments/create)
   try {
-    const response = await api.post('/payments/process', {
-      token,
-      amount: Number(amount),
-      reservationId: reservationStore.reservation.id,
-    });
+    const response = await api.post('/payments/process_payment', payload);
     if (response.status === 201) {
       console.log("Pago procesado exitosamente");
       router.push({
@@ -217,13 +248,23 @@ const confirmarPagoMercadoPago = async (token: string, amount: string) => {
   }
 };
 
+// Función para el caso simulado (otros métodos de pago)
 const confirmarPagoSimulado = async () => {
   if (!nombre.value || !dni.value || !direccion.value || !email.value) {
     alert("Por favor, completa todos los datos de facturación.");
     return;
   }
   
-  // Crea la reserva en pending
+  reservationStore.setReservationData({
+    payment_method: metodoPago.value,
+    payment_data: { 
+      invoice_name: nombre.value,
+      invoice_dni: dni.value,
+      invoice_address: direccion.value,
+      invoice_email: email.value 
+    }
+  });
+  
   let reservationResponse;
   try {
     reservationResponse = await reservationStore.submitReservation();
@@ -232,16 +273,6 @@ const confirmarPagoSimulado = async () => {
     alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
     return;
   }
-  
-  reservationStore.setReservationData({
-    payment_method: metodoPago.value,
-    pay_data: { 
-      invoice_name: nombre.value,
-      invoice_dni: dni.value,
-      invoice_address: direccion.value,
-      invoice_email: email.value 
-    }
-  });
   
   console.log("Enviando reserva:", reservationStore.reservation);
   try {

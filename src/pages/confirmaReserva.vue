@@ -15,12 +15,12 @@
         <p class="mb-2"><strong>Fecha y Hora de Finalización:</strong> {{ reservation.end_time }}</p>
         <p class="mb-2"><strong>Total a Pagar:</strong> ${{ reservation.total }}</p>
         <p class="mb-2"><strong>Método de Pago:</strong> {{ reservation.payment_method }}</p>
-        <div v-if="reservation.pay_data" class="mt-4">
+        <div v-if="reservation.payment_data" class="mt-4">
           <h2 class="text-xl font-semibold">Datos de Facturación</h2>
-          <p><strong>Nombre:</strong> {{ reservation.pay_data.invoice_name }}</p>
-          <p><strong>DNI:</strong> {{ reservation.pay_data.invoice_dni }}</p>
-          <p><strong>Dirección:</strong> {{ reservation.pay_data.invoice_address }}</p>
-          <p><strong>Email:</strong> {{ reservation.pay_data.invoice_email }}</p>
+          <p><strong>Nombre:</strong> {{ reservation.payment_data.invoice_name }}</p>
+          <p><strong>DNI:</strong> {{ reservation.payment_data.invoice_dni }}</p>
+          <p><strong>Dirección:</strong> {{ reservation.payment_data.invoice_address }}</p>
+          <p><strong>Email:</strong> {{ reservation.payment_data.invoice_email }}</p>
         </div>
       </div>
       <div v-else>

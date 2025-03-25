@@ -14,7 +14,7 @@ export const useReservationStore = defineStore('reservation', {
       end_time: null as string | null,
       total: 0,
       payment_method: null as string | null, // "tarjeta", "mercadopago", "transferencia"
-      pay_data: null as Record<string, any> | null, // Datos de facturación (invoice_name, invoice_dni, invoice_address, invoice_email)
+      payment_data: null as Record<string, any> | null, // Datos de facturación (invoice_name, invoice_dni, invoice_address, invoice_email)
     },
     loading: false,
     error: null as string | null,
@@ -67,7 +67,7 @@ export const useReservationStore = defineStore('reservation', {
         end_time: null,
         total: 0,
         payment_method: null,
-        pay_data: null,
+        payment_data: null,
       };
     },
   },
