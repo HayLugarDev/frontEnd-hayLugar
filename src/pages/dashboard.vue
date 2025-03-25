@@ -24,7 +24,7 @@
             class="inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-primary rounded-full">
             {{ userStore.user.name.charAt(0) }}{{ userStore.user.last_name ? userStore.user.last_name.charAt(0) : '' }}
           </div>
-          <div class="flex flex-row gap-2 items-center">
+          <div v-else class="flex flex-row gap-2 items-center">
             <div @click="router.push('/login')" class="hover:scale-105 transition-al text-xl border p-3 sm:p-2 rounded-xl shadow-lg">
               Ingresar
             </div>
