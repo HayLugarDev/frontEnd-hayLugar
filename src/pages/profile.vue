@@ -13,7 +13,7 @@
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-4">
           <img
-            :src="usuario.profile_picture"
+            :src="usuario.profile_picture || defaultProfilePicture"
             alt="Foto de perfil"
             class="w-24 h-24 object-cover rounded-full shadow-lg"
           />
@@ -33,7 +33,7 @@
         </div>
         <div>
           <!-- Input de archivo oculto para foto -->
-          <input type="file" @change="subirFoto" class="hidden" ref="inputFoto" />
+          <!-- <input type="file" @change="subirFoto" class="hidden" ref="inputFoto" /> -->
           <button
             @click="cambiarFoto"
             class="flex items-center bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition"
@@ -131,7 +131,7 @@
     </transition>
   </div>
   <div v-else class="min-h-screen flex items-center justify-center">
-    <p>Cargando información...</p>
+    <img :src="loadIcon" alt="" class="max-w-10">
   </div>
 </template>
 
@@ -142,6 +142,8 @@ import ReservationHistory from '../components/ReservationHistory.vue';
 import PublicationHistory from '../components/PublicationHistory.vue';
 import { useUserStore } from '../store/userStore';
 import api from '../services/apiService';
+import defaultProfilePicture from '../assets/user_icon.png';
+import loadIcon from "../assets/load-icon_primary.svg";
 
 const userStore = useUserStore();
 const inputFoto = ref<HTMLInputElement | null>(null);
@@ -149,7 +151,7 @@ const inputFoto = ref<HTMLInputElement | null>(null);
 
 const usuario = computed(() => userStore.user || {
   id: "",
-  profile_picture: "https://source.unsplash.com/100x100/?person,avatar",
+  profile_picture: defaultProfilePicture,
   name: "",
   last_name: "",
   email: "",
@@ -166,55 +168,19 @@ const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
 const errorMessage = ref('');
 const router = useRouter();
-const fetchReservations = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await api.get(`reservations/history/${userStore.user?.id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    reservas.value = response.data.reservations;
-  } catch (error) {
-    console.error("Error al cargar las reservas", error);
-  }
-};
-
-const fetchPublications = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await api.get('/publications/user', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    publicaciones.value = response.data.publications;
-  } catch (error) {
-    console.error("Error al cargar las publicaciones", error);
-  }
-};
 
 onMounted(async () => {
   await userStore.fetchUser();
-  await fetchReservations();
-  await fetchPublications();
 });
 
 const cambiarFoto = (): void => {
   inputFoto.value?.click();
 };
 
-const subirFoto = (event: Event): void => {
-  const target = event.target as HTMLInputElement;
-  if (target.files && target.files[0]) {
-    const file = target.files[0];
-    if (userStore.user) {
-      userStore.user.profile_picture = URL.createObjectURL(file);
-    }
-  }
-};
-
 const guardarTodo = async (): Promise<void> => {
   try {
-    const token = localStorage.getItem('token');
     const response = await api.put(`/users/update/${usuario.value.id}`, usuario.value, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${userStore.token}` }
     });
     userStore.user = response.data;
 

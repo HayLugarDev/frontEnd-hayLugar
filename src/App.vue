@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
+  import { RouterView, useRoute } from 'vue-router';
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100 text-gray-900">
-    <RouterView />
-  </div>
+  <router-view />
+  <span class="flex items-center justify-center bg-secondary">
+    © 2025 HayLugar. All rights reserved
+  </span>
 </template>
 
 <style scoped>

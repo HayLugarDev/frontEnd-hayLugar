@@ -202,7 +202,7 @@
             <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
             <p class="text-lg text-gray-700 text-center mb-6">El espacio se ha guardado correctamente.</p>
             <button
-              @click="closeModal"
+              @click="closeSuccesModal"
               class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
             >
               Continuar
@@ -259,6 +259,7 @@ const handleFileUpload = (event) => {
     const reader = new FileReader();
     reader.onload = (e) => previewImages.value.push(e.target.result);
     reader.readAsDataURL(file);
+    console.log(file);
   }
 };
 
@@ -313,18 +314,18 @@ const addSpace = async () => {
   });
 
   try {
-    await api.post('/spaces/create', formData, {
+    const response = await api.post('/spaces/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+    console.log(response);
     showSuccessModal.value = true;
   } catch (error) {
     console.error('Error en el registro del espacio:', error);
   }
 };
 
-const closeModal = () => {
+const closeSuccesModal = () => {
   showSuccessModal.value = false;
-  
   router.push('/dashboard');
 };
 </script>

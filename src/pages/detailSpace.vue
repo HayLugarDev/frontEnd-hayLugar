@@ -37,7 +37,7 @@
     </header>
 
     <section class="bg-white p-6 rounded-lg shadow-md flex gap-4 overflow-x-auto">
-      <template v-if="espacio && espacio.images && espacio.images.length">
+      <template v-if="espacio && espacio.images">
         <img
           v-for="(img, index) in espacio.images"
           :key="index"
