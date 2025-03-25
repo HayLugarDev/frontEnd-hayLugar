@@ -16,30 +16,62 @@ export const useUserStore = defineStore('user', {
     },
     loading: false,
     error: null as string | null,
-    sessionExpired: false, 
+    sessionExpired: false,
+    token: localStorage.getItem('token') || null,
   }),
+
+  getters: {
+    isAuthenticated: (state) => !!state.token, // Devuelve true si hay token
+  },
+
   actions: {
     async fetchUser() {
       this.loading = true;
       this.error = null;
       try {
-        const token = localStorage.getItem('token');
+        const token = this.token;
+        console.log(token);
+        if (!token) {
+          throw new Error('No hay token en el store');
+        }
+
         const response = await api.get('/users/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
+        
         this.user = response.data.user;
-        console.log("USER", response);
+        console.log('Usuario cargado:', this.user);
       } catch (error) {
-        this.error = 'No se pudo cargar la información del usuario';
         console.error('Error en fetchUser:', error);
+        if (error.response?.status === 401) {
+          this.expireSession();
+        }
+        this.error = 'No se pudo cargar la información del usuario';
       } finally {
         this.loading = false;
       }
     },
+
+    setToken(token: string | null) {
+      this.token = token;
+      if (token) {
+        localStorage.setItem('token', token);
+      } else {
+        localStorage.removeItem('token');
+      }
+    },
+
     clearUser() {
       this.user = null;
+      this.setToken(null);
       this.error = null;
     },
+
+    expireSession() {
+      this.sessionExpired = true;
+      this.clearUser();
+    },
+
     setSessionExpired(value: boolean) {
       this.sessionExpired = value;
     },
