@@ -7,7 +7,7 @@
         <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-20" />
       </div>
       <div v-if="userMenu"
-        class="absolute top-auto sm:top-36 right-0 max-w-52 rounded-xl bg-white shadow-md flex flex-col items-start w-full px-2">
+        class="absolute top-24 right-0 max-w-52 rounded-xl bg-secondary shadow-md flex flex-col items-start w-full px-2">
         <button @click="router.push('/profile')"
           class="hover:bg-gray-300 p-2 w-full text-start text-primary hover:text-blue-500 font-medium"><font-awesome-icon
             icon="user" class="xl:mr-1 text-xl" /> Mi perfil</button>
@@ -18,17 +18,17 @@
           class="hover:bg-gray-300 p-2 w-full text-start text-red-700 font-medium"><b><font-awesome-icon
               icon="fa-sign-out" class="xl:mr-1 text-xl" /> Salir</b></button>
       </div>
-      <div class="col-start-5 lg:order-3 space-x-4 mt-2 md:mt-0 ml-2 xl:ml-0 xl:gap-2 flex justify-end">
+      <div v-if="authChecked" class="col-start-5 lg:order-3 space-x-4 mt-2 md:mt-0 ml-2 xl:ml-0 xl:gap-2 flex justify-end">
         <button @click="openMenu" class="text-primary font-medium">
-          <div v-if="userStore.user"
-            class="inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-primary rounded-full">
+          <div v-if="isAuthenticated && userStore.user"
+            class="inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-indigo-950 rounded-full">
             {{ userStore.user.name.charAt(0) }}{{ userStore.user.last_name ? userStore.user.last_name.charAt(0) : '' }}
           </div>
           <div v-else class="flex flex-row gap-2 items-center">
-            <div @click="router.push('/login')" class="hover:scale-105 transition-al text-xl border p-3 sm:p-2 rounded-xl shadow-lg">
+            <div @click="router.push('/login')" class="hover:scale-105 transition-al text-xl border p-3 sm:p-2 rounded-xl shadow-xl">
               Ingresar
             </div>
-            <div @click="router.push('/register')" class="hover:scale-105 transition-al text-secondary inline-block text-xl border border-secondary p-3 sm:p-2 rounded-xl shadow-lg bg-primary">
+            <div @click="router.push('/register')" class="hover:scale-105 transition-al text-secondary inline-block text-xl border p-3 sm:p-2 rounded-xl shadow-xl bg-primary">
               Registrarse
             </div>
           </div>
@@ -94,9 +94,9 @@
     </div>
 
     <!-- Contenedor de contenido principal -->
-    <div class="flex flex-1 p-6">
+    <div class="flex flex-1 p-2 sm:p-6">
       <!-- Vista de Cards -->
-      <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
         <div v-if="cargando" class="absolute top-1/4 flex justify-center items-center marker:text-center w-full">
           <img :src="loadIcon" alt="" class="max-w-10">
         </div>
@@ -104,13 +104,14 @@
           error }}</div>
         <div v-for="(espacio, index) in espacios" :key="index"
           class="bg-white p-10 shadow-lg rounded-xl hover:shadow-xl transition-all">
-          <p class="text-2xl font-bold text-primary">
-            <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-20" /> {{ espacio.name }}
-          </p>
+          <div class="flex flex-row items-center">
+            <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-20" />
+            <div class="text-2xl font-bold text-primary">{{ espacio.name }}</div>
+          </div>
           <img :src="`http://localhost:3000${espacio.images[0]}`" alt="Espacio"
             class="w-full h-40 object-cover rounded-lg" />
-          <p class="text-lg font-bold mt-3">
-            <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{ espacio.location }}
+          <p class="text-lg font-bold mt-3 text-gray-700">
+            <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{ espacio.location.split(',')[0] }}
           </p>
           <p class="text-primary font-semibold">
             <font-awesome-icon icon="money-bill-wave" class="mr-1" /> ${{ espacio.price_per_hour }}/hora
@@ -154,7 +155,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from '../services/apiService';
 import { useUserStore } from '../store/userStore';
 import { Marker, InfoWindow } from 'vue3-google-map';
@@ -190,6 +191,7 @@ const center = ref({ lat: -26.8333, lng: -65.2167 });
 const zoom = ref(15);
 const activedSession = ref(false);
 const userMenu = ref(false);
+const authChecked = ref(false);
 
 const mapOptions = ref({
   styles: [
@@ -225,7 +227,6 @@ const obtenerEspacios = async () => {
   try {
     const response = await api.get("/spaces/getAll");
     const data = response.data.map(e => {
-      // Convertir e.dataValues.images de string JSON a array
       if (typeof e.dataValues.images === 'string') {
         try {
           e.dataValues.images = JSON.parse(e.dataValues.images);
@@ -262,25 +263,29 @@ onMounted(async () => {
   }
   await obtenerEspacios();
   await userStore.fetchUser();
+  authChecked.value = true;
   console.log('Usuario en el store:', userStore.user);
   console.log('Authenticado: ', userStore.isAuthenticated);
 });
 
+const isAuthenticated = computed(() => {
+  return !!userStore.token;
+});
+
 const verifyToken = async (route) => {
-  console.log(userStore.isAuthenticated);
   const result = await verifyActiveSession(route, userStore.sessionExpired);
   if (!result) {
     userStore.clearUser();
     activedSession.value = true;
-    console.log(activedSession.value);
-    return;
-  }
-  if (route === '/quit' && userStore.isAuthenticated) {
-    userStore.clearUser();
-    window.location.href = '/dashboard';
     return;
   }
   if (userStore.isAuthenticated) {
+    if(route === '/quit') {
+      userStore.clearUser();
+      authChecked.value=false;
+      window.location.href = '/dashboard';
+      return;
+    }
     activedSession.value = !userStore.isAuthenticated;
     return router.push(route);
   } else {
