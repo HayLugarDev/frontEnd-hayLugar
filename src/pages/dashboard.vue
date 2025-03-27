@@ -3,20 +3,12 @@
 
     <header
       class="relative backdrop:bg-white shadow-md p-6 grid grid-cols-5 gap-4 lg:flex lg:flex-row justify-around items-center rounded-b-lg">
-      <div class="items-center space-x-4">
-        <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-20" />
-      </div>
+      <Logo />
       <div v-if="userMenu"
         class="absolute top-24 right-0 max-w-52 rounded-xl bg-secondary shadow-md flex flex-col items-start w-full px-2">
-        <button @click="router.push('/profile')"
-          class="hover:bg-gray-300 p-2 w-full text-start text-primary hover:text-blue-500 font-medium"><font-awesome-icon
-            icon="user" class="xl:mr-1 text-xl" /> Mi perfil</button>
-        <button @click="router.push('/settings')"
-          class="hover:bg-gray-300 p-2 w-full text-start text-primary hover:text-blue-500 font-medium"><font-awesome-icon
-            icon="cog" class="xl:mr-1 text-xl" /> Ajustes</button>
-        <button @click="verifyToken('/quit')"
-          class="hover:bg-gray-300 p-2 w-full text-start text-red-700 font-medium"><b><font-awesome-icon
-              icon="fa-sign-out" class="xl:mr-1 text-xl" /> Salir</b></button>
+        <MenuUserButton :route="'/profile'" :text="'Mi Perfil'" :usedIcon="'user'" />
+        <MenuUserButton :route="'/settings'" :text="'Configuracion'" :usedIcon="'cog'"/>
+        <LogoutButton :action="verifyToken" :route="'/quit'" :usedIcon="'fa-sign-out'"/>
       </div>
       <div v-if="authChecked" class="col-start-5 lg:order-3 space-x-4 mt-2 md:mt-0 ml-2 xl:ml-0 xl:gap-2 flex justify-end">
         <button @click="openMenu" class="text-primary font-medium">
@@ -58,27 +50,7 @@
         </button>
       </div>
     </header>
-
-
-    <div class="flex overflow-x-auto p-4 bg-white shadow-md rounded-lg space-x-4">
-      <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
-        <font-awesome-icon icon="city" class="mr-2" /> Centro
-      </button>
-      <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
-        <font-awesome-icon icon="leaf" class="mr-2" /> Zonas verdes
-      </button>
-      <!-- <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
-        <font-awesome-icon icon="umbrella-beach" class="mr-2" /> Cerca del río
-      </button> -->
-      <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
-        <font-awesome-icon icon="car" class="mr-2" /> Garages privados
-      </button>
-      <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
-        <font-awesome-icon icon="motorcycle" class="mr-2" /> Motos
-      </button>
-    </div>
-
-
+    <ZoneNavbar />
     <div class="flex justify-end p-4">
       <label class="flex items-center cursor-pointer">
         <span class="mr-2">Vista de Mapa</span>
@@ -163,6 +135,10 @@ import { useRouter } from 'vue-router';
 import logoMarker from '../assets/logo.png';
 import CustomGoogleMap from '../components/GoogleMap.vue';
 import SessionExpired from '../components/SessionExpired.vue';
+import MenuUserButton from '../components/MenuUserButton.vue';
+import LogoutButton from '../components/LogoutButton.vue';
+import ZoneNavbar from "../components/ZoneNavbar.vue";
+import Logo from '../components/Logo.vue';
 import { verifyActiveSession } from '../middleware/verifyToken';
 import loadIcon from "../assets/load-icon_primary.svg";
 
