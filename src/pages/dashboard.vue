@@ -6,9 +6,21 @@
       <Logo />
       <div v-if="userMenu"
         class="absolute top-24 right-0 max-w-52 rounded-xl bg-secondary shadow-md flex flex-col items-start w-full px-2">
-        <MenuUserButton :route="'/profile'" :text="'Mi Perfil'" :usedIcon="'user'" />
-        <MenuUserButton :route="'/settings'" :text="'Configuracion'" :usedIcon="'cog'"/>
-        <LogoutButton :action="verifyToken" :route="'/quit'" :usedIcon="'fa-sign-out'"/>
+        <MenuUserButton 
+          :route="'/profile'" 
+          :text="'Mi Perfil'" 
+          :usedIcon="'user'" 
+        />
+        <MenuUserButton 
+          :route="'/settings'" 
+          :text="'Configuracion'" 
+          :usedIcon="'cog'"
+        />
+        <LogoutButton 
+          :action="verifyToken" 
+          :route="'/quit'" 
+          :usedIcon="'fa-sign-out'"
+        />
       </div>
       <div v-if="authChecked" class="col-start-5 lg:order-3 space-x-4 mt-2 md:mt-0 ml-2 xl:ml-0 xl:gap-2 flex justify-end">
         <button @click="openMenu" class="text-primary font-medium">
@@ -17,12 +29,18 @@
             {{ userStore.user.name.charAt(0) }}{{ userStore.user.last_name ? userStore.user.last_name.charAt(0) : '' }}
           </div>
           <div v-else class="flex flex-row gap-2 items-center">
-            <div @click="router.push('/login')" class="hover:scale-105 transition-al text-xl border p-3 sm:p-2 rounded-xl shadow-xl">
-              Ingresar
-            </div>
-            <div @click="router.push('/register')" class="hover:scale-105 transition-al text-secondary inline-block text-xl border p-3 sm:p-2 rounded-xl shadow-xl bg-primary">
-              Registrarse
-            </div>
+            <GlobalButton 
+              :route="'/login'" 
+              :text="'Ingresar'" 
+              :color="'text-primary'" 
+              background="bg-secondary" 
+            />
+            <GlobalButton 
+              :route="'register'" 
+              :text="'Registrarse'" 
+              :color="'text-secondary'" 
+              background="bg-primary" 
+            />
           </div>
         </button>
       </div>
@@ -65,40 +83,23 @@
       </label>
     </div>
 
-    <!-- Contenedor de contenido principal -->
     <div class="flex flex-1 p-2 sm:p-6">
-      <!-- Vista de Cards -->
       <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
         <div v-if="cargando" class="absolute top-1/4 flex justify-center items-center marker:text-center w-full">
           <img :src="loadIcon" alt="" class="max-w-10">
         </div>
         <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">{{
           error }}</div>
-        <div v-for="(espacio, index) in espacios" :key="index"
-          class="bg-white p-10 shadow-lg rounded-xl hover:shadow-xl transition-all">
-          <div class="flex flex-row items-center">
-            <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-20" />
-            <div class="text-2xl font-bold text-primary">{{ espacio.name }}</div>
-          </div>
-          <img :src="`http://localhost:3000${espacio.images[0]}`" alt="Espacio"
-            class="w-full h-40 object-cover rounded-lg" />
-          <p class="text-lg font-bold mt-3 text-gray-700">
-            <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{ espacio.location.split(',')[0] }}
-          </p>
-          <p class="text-primary font-semibold">
-            <font-awesome-icon icon="money-bill-wave" class="mr-1" /> ${{ espacio.price_per_hour }}/hora
-          </p>
-          <router-link :to="`/espacio/${espacio.id}`">
-            <button
-              class="mt-3 bg-accent text-black px-6 py-3 rounded-lg w-full hover:shadow-md font-bold shadow-md transition-all">
-              <font-awesome-icon icon="calendar-check" class="mr-1" /> Reservar
-            </button>
-          </router-link>
+        <div v-for="(espacio, index) in espacios" :key="index">
+          <SpaceCard :espacio="espacio" />
         </div>
       </div>
       <div v-else class="flex-1">
-        <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions"
-          class="w-full h-full rounded-lg overflow-hidden shadow-md">
+        <CustomGoogleMap class="w-full h-full rounded-lg overflow-hidden shadow-md"
+          :center="center" 
+          :zoom="zoom" 
+          :options="mapOptions"
+        >
           <Marker v-for="(espacio, index) in espacios" :key="index" :options="getMarkerOptions(espacio)"
             @mouseover="() => handleMouseOver(espacio)" @mouseout="handleMouseOut"
             @click="() => handleMarkerClick(espacio)" />
@@ -116,11 +117,12 @@
       </div>
     </div>
     <div class="fixed bottom-6 right-6 flex items-center space-x-3">
-      <button @click="verifyToken('/add-space')"
-        class="bg-primary text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all flex items-center space-x-2">
-        <font-awesome-icon icon="plus" class="text-lg" />
-        <span class="hidden md:block">Publicar Espacio</span>
-      </button>
+      <FloatingButton 
+        @click="verifyToken('/add-space')" 
+        :text="'Publicar espacio'" 
+        :color="'text-secondary'" 
+        background='bg-primary' 
+      />
     </div>
     <SessionExpired :sessionExpired="activedSession" />
   </div>
@@ -141,10 +143,12 @@ import ZoneNavbar from "../components/ZoneNavbar.vue";
 import Logo from '../components/Logo.vue';
 import { verifyActiveSession } from '../middleware/verifyToken';
 import loadIcon from "../assets/load-icon_primary.svg";
+import GlobalButton from '../components/GlobalButton.vue';
+import SpaceCard from '../components/SpaceCard.vue';
+import FloatingButton from '../components/FloatingButton.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
-
 const markerIcon = logoMarker;
 
 
@@ -202,6 +206,11 @@ const mapOptions = ref({
 const obtenerEspacios = async () => {
   try {
     const response = await api.get("/spaces/getAll");
+    if (response.data.length < 1) {
+      cargando.value = false;
+      error.value = "No hay espacios todavía"
+      return;
+    }
     const data = response.data.map(e => {
       if (typeof e.dataValues.images === 'string') {
         try {
