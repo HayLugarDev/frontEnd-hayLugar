@@ -13,55 +13,45 @@
         </p>
         <br />
         <section class="flex justify-left">
-      <button @click="reservar" class="bg-accent text-white px-6 py-3 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
-        <font-awesome-icon icon="calendar-check" class="mr-2" />
-        Reservar Ahora
-      </button>
-    </section>
+          <button @click="reservar"
+            class="bg-accent text-white px-6 py-3 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
+            <font-awesome-icon icon="calendar-check" class="mr-2" />
+            Reservar Ahora
+          </button>
+        </section>
       </div>
-      
+
       <div class="w-80 h-90 flex justify-center items-center">
-        <CustomGoogleMap
-          v-if="espacio"
-          :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-          class="w-full h-full rounded-lg overflow-hidden shadow-md"
-        >
-          <Marker
-            :options="{
-              position: { lat: Number(espacio.latitude), lng: Number(espacio.longitude) },
-              icon: markerIcon
-            }"
-          />
+        <CustomGoogleMap v-if="espacio" :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
+          class="w-full h-full rounded-lg overflow-hidden shadow-md">
+          <Marker :options="{
+            position: { lat: Number(espacio.latitude), lng: Number(espacio.longitude) },
+            icon: markerIcon
+          }" />
         </CustomGoogleMap>
       </div>
     </header>
 
     <section class="bg-white p-6 rounded-lg shadow-md flex gap-4 overflow-x-auto">
-      <template v-if="espacio && espacio.images">
-        <img
-          v-for="(img, index) in espacio.images"
-          :key="index"
-          :src="img"
-          alt="Foto del espacio"
-          class="h-48 object-cover rounded-lg shadow-md"
-        />
-      </template>
-      <template v-else>
-        <img
-          src="https://source.unsplash.com/400x300/?parking,garage"
-          alt="Foto del espacio"
-          class="h-48 object-cover rounded-lg shadow-md"
-        />
-      </template>
-      <p class="text-gray-600 mt-2">{{ espacio?.description }}</p>
+      <div class="flex flex-col">
+        <div class="flex flex-row gap-2">
+          <template v-if="espacio && espacio.images">
+            <img v-for="(img, index) in espacio.images" :key="index" :src="`http://localhost:3000${img}`" alt="Foto del espacio"
+              class="h-60 w-60 object-cover rounded-lg shadow-md border" />
+          </template>
+          <template v-else>
+            <img src="https://source.unsplash.com/400x300/?parking,garage" alt="Foto del espacio"
+              class="h-48 object-cover rounded-lg shadow-md" />
+          </template>
+        </div>
+        <span class="mt-4 font-semibold">Descripción: </span>
+        <p class="text-gray-600 w-auto font-medium">{{ espacio?.description }}</p>
+      </div>
     </section>
 
     <section v-if="espacio?.host" class="bg-white p-6 rounded-lg shadow-md flex items-center">
-      <img
-        :src="espacio.host.image || 'https://source.unsplash.com/100x100/?person,avatar'"
-        alt="Imagen del anfitrión"
-        class="w-16 h-16 rounded-full shadow-md mr-4"
-      />
+      <img :src="espacio.host.image || 'https://source.unsplash.com/100x100/?person,avatar'" alt="Imagen del anfitrión"
+        class="w-16 h-16 rounded-full shadow-md mr-4" />
       <div>
         <p class="text-lg font-semibold">Anfitrión: {{ espacio.host.nombre }}</p>
         <p class="text-gray-600">
@@ -71,7 +61,7 @@
       </div>
     </section>
 
- 
+
   </div>
 </template>
 
@@ -95,7 +85,16 @@ const obtenerEspacio = async () => {
   try {
     const id = route.params.id;
     const response = await api.get(`/spaces/getbyid/${id}`);
-    espacio.value = response.data;
+    console.log(response);
+    if (typeof response.data.images === 'string') {
+      try {
+        response.data.images = JSON.parse(response.data.images);
+      } catch (error) {
+        console.error('Error al parsear images:', error);
+        response.data.images = [];
+      }
+    }
+    return espacio.value = response.data;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
   }
@@ -126,5 +125,4 @@ const reservar = () => {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

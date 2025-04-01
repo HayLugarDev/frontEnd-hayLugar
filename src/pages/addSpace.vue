@@ -3,12 +3,13 @@
     <div class="bg-white p-8 rounded-lg shadow-lg max-w-3xl w-full border border-gray-300">
       <h1 class="text-4xl font-bold text-center text-primary mb-8">Registrar Nuevo Espacio</h1>
       <form @submit.prevent="addSpace" class="space-y-6">
-        <!-- Nombre del Espacio -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">Nombre del espacio:</span>
-          <input v-model="name" type="text" class="input-field" required />
-        </label>
-
+        <FormField 
+          v-model="name" 
+          label="Nombre del espacio:" 
+          type="text" 
+          placeholder="Ej: Casa centro" 
+          required 
+        />
         <!-- Ubicación con Autocomplete -->
         <label class="block">
           <span class="text-lg font-semibold text-black">Ubicación:</span>
@@ -20,82 +21,65 @@
         <input v-model="location" type="hidden" />
 
         <!-- Detalles Adicionales de Ubicación -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">
-            Detalles de Ubicación (edificio, piso, número, subsuelo, etc.):
-          </span>
-          <input
-            v-model="locationDetails"
-            type="text"
-            class="input-field"
-            placeholder="Ej: Edificio A, 3er piso, subsuelo, Nº 15"
-          />
-        </label>
+        <FormField 
+          v-model="locationDetails" 
+          label="Detalles de Ubicación (edificio, piso, número, subsuelo, etc.):" 
+          type="text" 
+          placeholder="Ej: Edificio A, 3er piso, subsuelo, Nº 15" 
+          required 
+        />
 
-        <!-- Tipo de Vehículo -->
+        <!-- Tipos de Vehículos -->
         <div>
-          <span class="text-lg font-semibold text-black block mb-2">Tipo de vehículo:</span>
+          <span class="text-lg font-semibold text-black block mb-2">Tipos de vehículos:</span>
           <div class="flex space-x-4">
-            <!-- Botón para Auto -->
-            <button
-              type="button"
-              @click="type = 'Auto'"
-              :class="[
-                'flex items-center space-x-2 px-4 py-2 rounded-lg border',
-                type === 'Auto' ? 'bg-primary text-white border-primary' : 'bg-white text-black'
-              ]"
-            >
-              <font-awesome-icon :icon="['fas', 'car']" />
-              <span>Auto</span>
-            </button>
-            <!-- Botón para Bicicleta -->
-            <button
-              type="button"
-              @click="type = 'Bicicleta'"
-              :class="[
-                'flex items-center space-x-2 px-4 py-2 rounded-lg border',
-                type === 'Bicicleta' ? 'bg-primary text-white border-primary' : 'bg-white text-black'
-              ]"
-            >
-              <font-awesome-icon :icon="['fas', 'bicycle']" />
-              <span>Bicicleta</span>
-            </button>
-            <!-- Botón para Camioneta -->
-            <button
-              type="button"
-              @click="type = 'Camioneta'"
-              :class="[
-                'flex items-center space-x-2 px-4 py-2 rounded-lg border',
-                type === 'Camioneta' ? 'bg-primary text-white border-primary' : 'bg-white text-black'
-              ]"
-            >
-              <font-awesome-icon :icon="['fas', 'truck']" />
-              <span>Camioneta</span>
-            </button>
+            <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('car')" vehicleType="Auto" iconType="car"
+              @click="toggleParkingType('car')" />
+            <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('motorcycle')" vehicleType="Motocicleta"
+              iconType="motorcycle" @click="toggleParkingType('motorcycle')" />
+            <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('bicycle')" vehicleType="Bicicleta"
+              iconType="bicycle" @click="toggleParkingType('bicycle')" />
+            <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('van')" vehicleType="Camioneta"
+              iconType="truck" @click="toggleParkingType('van')" />
           </div>
         </div>
 
         <!-- Capacidad -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">Capacidad:</span>
-          <input v-model.number="capacity" type="number" min="1" class="input-field" placeholder="Ej: 4" required />
-        </label>
+        <FormField 
+          v-model.number="capacity" 
+          label="Capacidad:" 
+          type="number" 
+          placeholder="Ej: 4"
+          required 
+        />
 
         <!-- Tipo de Estacionamiento -->
         <label class="block">
           <span class="text-lg font-semibold text-black">Tipo de estacionamiento:</span>
+          <select v-model="type" class="input-field">
+            <option disabled value="">Seleccione una opción</option>
+            <option value="garage">Garage propio</option>
+            <option value="large_space">Espacio grande</option>
+            <option value="private_parking">Estacionamiento privado</option>
+          </select>
+        </label>
+
+        <!-- Superficie de Estacionamiento -->
+        <label class="block">
+          <span class="text-lg font-semibold text-black">Superficie de estacionamiento:</span>
           <select v-model="parking_type" class="input-field">
             <option disabled value="">Seleccione una opción</option>
-            <option value="Cubierto">Cubierto</option>
-            <option value="Descubierto">Descubierto</option>
-            <option value="Ninguno">Ninguno</option>
+            <option value="cubierto">Cubierto</option>
+            <option value="descubierto">Descubierto</option>
+            <option value="ninguno">Ninguno</option>
           </select>
         </label>
 
         <!-- Descripción -->
         <label class="block">
           <span class="text-lg font-semibold text-black">Descripción del espacio:</span>
-          <textarea v-model="description" class="input-field" rows="3" placeholder="Ingrese una descripción detallada"></textarea>
+          <textarea v-model="description" class="input-field" rows="3"
+            placeholder="Ingrese una descripción detallada"></textarea>
         </label>
 
         <!-- Tarifa y Duración -->
@@ -158,7 +142,8 @@
           <legend class="text-lg font-semibold text-black">Datos de Wallet (Mercado Pago)</legend>
           <label class="block">
             <span class="text-lg font-semibold text-black">Correo de Mercado Pago:</span>
-            <input v-model="walletDetails.mpEmail" type="email" class="input-field" placeholder="correo@ejemplo.com" required />
+            <input v-model="walletDetails.mpEmail" type="email" class="input-field" placeholder="correo@ejemplo.com"
+              required />
           </label>
         </fieldset>
 
@@ -176,12 +161,8 @@
           <span class="text-lg font-semibold text-black">Imágenes del Espacio:</span>
           <input type="file" multiple @change="handleFileUpload" class="input-field" />
           <div class="flex flex-wrap mt-2 gap-2">
-            <img
-              v-for="(img, index) in previewImages"
-              :key="index"
-              :src="img"
-              class="w-20 h-20 object-cover rounded-lg shadow-md"
-            />
+            <img v-for="(img, index) in previewImages" :key="index" :src="img"
+              class="w-20 h-20 object-cover rounded-lg shadow-md" />
           </div>
         </label>
 
@@ -192,19 +173,14 @@
 
     <!-- Modal de Éxito -->
     <transition name="fade">
-      <div
-        v-if="showSuccessModal"
-        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-      >
+      <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
           <div class="flex flex-col items-center">
             <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
             <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
             <p class="text-lg text-gray-700 text-center mb-6">El espacio se ha guardado correctamente.</p>
-            <button
-              @click="closeSuccesModal"
-              class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
-            >
+            <button @click="closeSuccesModal"
+              class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
               Continuar
             </button>
           </div>
@@ -220,6 +196,8 @@ import { useRouter } from 'vue-router';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import api from '../services/apiService';
+import VehicleTypeButton from "../components/VehicleTypeButton.vue";
+import FormField from '../components/FormField.vue';
 
 const name = ref('');
 const location = ref('');
@@ -230,7 +208,7 @@ const price = ref(0);
 const price_unit = ref('hour');
 const availability = ref({ start: '', end: '', dateRange: [] });
 const capacity = ref(0);
-const type = ref('Auto'); // Valor inicial
+const type = ref(''); // Valor inicial
 const parking_type = ref('');
 const description = ref('');
 const paymentMethods = ref([]);
@@ -246,14 +224,25 @@ const walletDetails = ref({
 
 const isActive = ref(true);
 
-const owner_id = ref(1); 
+const owner_id = ref(1);
 const status = ref('active');
 
 const router = useRouter();
 const showSuccessModal = ref(false);
 
+const selectedVehicleTypes = ref([]);
+
+const toggleParkingType = (type) => {
+  console.log(selectedVehicleTypes.value);
+  if (selectedVehicleTypes.value.includes(type)) {
+    selectedVehicleTypes.value = selectedVehicleTypes.value.filter(t => t !== type);
+  } else {
+    selectedVehicleTypes.value.push(type);
+  }
+};
+
 const handleFileUpload = (event) => {
-  selectedFiles.value = [...event.target.files]; 
+  selectedFiles.value = [...event.target.files];
   previewImages.value = [];
   for (let file of selectedFiles.value) {
     const reader = new FileReader();
@@ -278,6 +267,7 @@ const updatePaymentFields = () => {
 };
 
 const addSpace = async () => {
+  console.log(selectedVehicleTypes.value);
   let price_per_hour = price.value;
   if (price_unit.value === 'day') {
     price_per_hour = price.value / 24;
@@ -286,10 +276,11 @@ const addSpace = async () => {
   } else if (price_unit.value === 'month') {
     price_per_hour = price.value / (24 * 30);
   }
-  
+
   status.value = isActive.value ? 'active' : 'paused';
-  
+
   const formData = new FormData();
+
   formData.append('owner_id', owner_id.value);
   formData.append('location', location.value);
   formData.append('location_details', locationDetails.value);
@@ -302,23 +293,30 @@ const addSpace = async () => {
   formData.append('description', description.value);
   formData.append('status', status.value);
   formData.append('name', name.value);
+
   formData.append('paymentMethods', JSON.stringify(paymentMethods.value));
+
+  selectedVehicleTypes.value.forEach((type, index) => {
+  formData.append(`vehicle_types[${index}]`, type);
+});
+
   
   if (paymentMethods.value.includes('Mercado Pago')) {
     formData.append('walletDetails', JSON.stringify(walletDetails.value));
   }
 
   // Agregar imágenes al FormData
-  selectedFiles.value.forEach((file) => {
+  selectedFiles.value.forEach((file, _index) => {
     formData.append('images', file);
   });
+  console.log(parking_type.value);
 
   try {
     const response = await api.post('/spaces/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    console.log(response);
     showSuccessModal.value = true;
+    console.log(response);
   } catch (error) {
     console.error('Error en el registro del espacio:', error);
   }
@@ -354,6 +352,7 @@ const closeSuccesModal = () => {
   text-align: center;
   transition: background 0.3s ease;
 }
+
 .btn-primary:hover {
   background-color: #0056b3;
 }
@@ -361,6 +360,7 @@ const closeSuccesModal = () => {
 .text-primary {
   color: #007bff;
 }
+
 .text-black {
   color: #000;
 }
@@ -372,11 +372,13 @@ const closeSuccesModal = () => {
   width: 60px;
   height: 34px;
 }
+
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
+
 .slider {
   position: absolute;
   cursor: pointer;
@@ -387,6 +389,7 @@ const closeSuccesModal = () => {
   background-color: #ccc;
   transition: .4s;
 }
+
 .slider:before {
   position: absolute;
   content: "";
@@ -397,24 +400,31 @@ const closeSuccesModal = () => {
   background-color: white;
   transition: .4s;
 }
-input:checked + .slider {
+
+input:checked+.slider {
   background-color: #007bff;
 }
-input:checked + .slider:before {
+
+input:checked+.slider:before {
   transform: translateX(26px);
 }
+
 .slider.round {
   border-radius: 34px;
 }
+
 .slider.round:before {
   border-radius: 50%;
 }
 
 /* Modal transitions */
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s;
 }
-.fade-enter-from, .fade-leave-to {
+
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>
