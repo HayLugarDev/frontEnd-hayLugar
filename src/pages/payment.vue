@@ -135,7 +135,6 @@ let cardForm: any = null;
 // Inicializa el Brick de MercadoPago
 const initCardBrick = async () => {
   await loadMercadoPago();
-  //const mp = new window.MercadoPago('APP_USR-2f328087-7b2a-4841-93b2-33c09ad4a027', { locale: 'es-AR' });
   const mp = new window.MercadoPago('TEST-f39e0ddb-bc5b-491c-9245-0461fdeccb74', { locale: 'es-AR' });
   const bricksBuilder = mp.bricks();
   const settings = {
