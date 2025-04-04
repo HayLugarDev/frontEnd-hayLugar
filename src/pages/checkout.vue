@@ -77,6 +77,7 @@ import { useReservationStore } from '../store/reservationStore';
 import { verifyActiveSession } from '../middleware/verifyToken';
 import { useUserStore } from '../store/userStore';
 import SessionExpired from '../components/SessionExpired.vue';
+import { getSpaceById } from '../services/spaceService';
 
 const userStore = useUserStore();
 const activedSession = ref(false);
@@ -121,18 +122,10 @@ const endTime = computed(() => {
 const obtenerEspacio = async () => {
   try {
     const id = route.params.id;
-    const response = await api.get(`/spaces/getbyid/${id}`);
-    if (typeof response.data.images === 'string') {
-      try {
-        response.data.images = JSON.parse(response.data.images);
-      } catch (error) {
-        console.error('Error al parsear images:', error);
-        response.data.images = [];
-      }
-    }
-    espacio.value = response.data;
+    const space = await getSpaceById(id);
+    espacio.value = space;
     rangoTiempo.value = "hour";
-    return response.data;
+    return space;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
   }
@@ -154,6 +147,7 @@ const procesarPago = async () => {
     const { id, owner_id } = espacio.value;
     const queryParams = {
       id,
+      owner_id,
       total: totalPagar.value,
       start_time: startTime.value,
       end_time: endTime.value

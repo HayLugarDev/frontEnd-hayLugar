@@ -5,7 +5,7 @@
       <!-- Resumen del Espacio y Reserva -->
       <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
         <img 
-          :src="espacio?.image || 'https://source.unsplash.com/400x300/?parking,garage'" 
+          :src="`http://localhost:3000${espacio?.images[0]}`" 
           alt="Imagen del espacio" 
           class="w-32 h-32 object-cover rounded-lg shadow-md mr-6" 
         />
@@ -61,7 +61,7 @@
     </section>
     <aside class="w-full md:w-1/3 flex justify-center items-center">
       <img 
-        :src="espacio?.image || 'https://source.unsplash.com/400x300/?parking,garage'" 
+        :src="`http://localhost:3000${espacio?.images[1]}` || 'https://source.unsplash.com/400x300/?parking,garage'" 
         alt="Imagen del espacio" 
         class="rounded-lg shadow-lg max-w-full" 
       />
@@ -75,6 +75,7 @@ import { useRouter, useRoute } from 'vue-router';
 import api from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
 import { loadMercadoPago } from '@mercadopago/sdk-js';
+import { getSpaceById } from '../services/spaceService';
 
 const router = useRouter();
 const route = useRoute();
@@ -95,19 +96,13 @@ const espacio = ref<any>(null);
 // Función para obtener los datos del espacio
 const obtenerEspacio = async () => {
   try {
-    const id = route.query.id || null;
-    if (id) {
-      const response = await api.get(`/spaces/getbyid/${id}`);
-      espacio.value = response.data;
-    } else {
-      espacio.value = {
-        ubicacion: "Calle 123, San Miguel de Tucumán",
-        description: "Amplio estacionamiento con seguridad 24 horas.",
-        image: "https://source.unsplash.com/400x300/?parking,garage"
-      };
-    }
+    const id = route.query.id;
+    const data = await getSpaceById(Number(id));
+    console.log(data);
+    espacio.value = data;
+    return data;
   } catch (error) {
-    console.error("Error al obtener datos del espacio:", error);
+    console.error("Error al obtener el espacio:", error);
   }
 };
 

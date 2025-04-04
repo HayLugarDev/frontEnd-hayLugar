@@ -68,13 +68,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import api from '../services/apiService';
 import { Marker } from 'vue3-google-map';
 import CustomGoogleMap from '../components/GoogleMap.vue';
 
 import carMarker from '../assets/logo.png';
 import bicycleMarker from '../assets/logo.png';
 import truckMarker from '../assets/logo.png';
+import { getSpaceById } from '../services/spaceService';
 
 const router = useRouter();
 const route = useRoute();
@@ -84,17 +84,8 @@ const espacio = ref(null);
 const obtenerEspacio = async () => {
   try {
     const id = route.params.id;
-    const response = await api.get(`/spaces/getbyid/${id}`);
-    console.log(response);
-    if (typeof response.data.images === 'string') {
-      try {
-        response.data.images = JSON.parse(response.data.images);
-      } catch (error) {
-        console.error('Error al parsear images:', error);
-        response.data.images = [];
-      }
-    }
-    return espacio.value = response.data;
+    const space = await getSpaceById(id);
+    return espacio.value = space;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
   }

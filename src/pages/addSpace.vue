@@ -124,11 +124,11 @@
         <fieldset class="border p-4 rounded-lg">
           <legend class="text-lg font-semibold text-black">Métodos de Pago Aceptados</legend>
           <div class="grid grid-cols-2 gap-2">
-            <label class="flex items-center space-x-1">
+            <!-- <label class="flex items-center space-x-1">
               <input type="checkbox" v-model="paymentMethods" value="Efectivo" />
               <font-awesome-icon :icon="['fas', 'money-bill-wave']" />
               <span>Efectivo</span>
-            </label>
+            </label> -->
             <label class="flex items-center space-x-1">
               <input type="checkbox" v-model="paymentMethods" value="Mercado Pago" @change="updatePaymentFields" />
               <font-awesome-icon :icon="['fas', 'credit-card']" />
