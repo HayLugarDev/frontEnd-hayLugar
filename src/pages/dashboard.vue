@@ -1,50 +1,28 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary">
 
-    <header
-      class="relative backdrop:bg-white shadow-md p-6 grid grid-cols-5 gap-4 lg:flex lg:flex-row justify-around items-center rounded-b-lg">
+    <header class="backdrop:bg-white shadow-md gap-4 flex flex-row justify-around items-center rounded-b-lg">
       <Logo />
-      <div v-if="userMenu"
-        class="absolute top-24 right-0 max-w-52 rounded-xl bg-secondary shadow-md flex flex-col items-start w-full px-2">
-        <MenuUserButton 
-          :route="'/profile'" 
-          :text="'Mi Perfil'" 
-          :usedIcon="'user'" 
-        />
-        <MenuUserButton 
-          :route="'/settings'" 
-          :text="'Configuracion'" 
-          :usedIcon="'cog'"
-        />
-        <LogoutButton 
-          :action="verifyToken" 
-          :route="'/quit'" 
-          :usedIcon="'fa-sign-out'"
-        />
-      </div>
-      <div v-if="authChecked" class="col-start-5 lg:order-3 space-x-4 mt-2 md:mt-0 ml-2 xl:ml-0 xl:gap-2 flex justify-end">
+      <div v-if="authChecked"
+        class="col-start-5 lg:order-3 space-x-4 mt-2 md:mt-0 ml-2 xl:ml-0 xl:gap-2 flex justify-end">
         <button @click="openMenu" class="text-primary font-medium">
           <div v-if="isAuthenticated && userStore.user"
-            class="inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-indigo-950 rounded-full">
+            class="relative inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-indigo-950 rounded-full">
             {{ userStore.user.name.charAt(0) }}{{ userStore.user.last_name ? userStore.user.last_name.charAt(0) : '' }}
+            <div v-if="userMenu"
+              class="absolute top-12 right-0 sm:left-0 rounded-xl bg-secondary shadow-md flex flex-col items-start w-60 px-2 z-10">
+              <MenuUserButton :route="'/profile'" :text="'Mi Perfil'" :usedIcon="'user'" />
+              <MenuUserButton :route="'/settings'" :text="'Configuracion'" :usedIcon="'cog'" />
+              <LogoutButton :action="verifyToken" :route="'/quit'" :usedIcon="'fa-sign-out'" />
+            </div>
           </div>
           <div v-else class="flex flex-row gap-2 items-center">
-            <GlobalButton 
-              :route="'/login'" 
-              :text="'Ingresar'" 
-              :color="'text-primary'" 
-              background="bg-secondary" 
-            />
-            <GlobalButton 
-              :route="'register'" 
-              :text="'Registrarse'" 
-              :color="'text-secondary'" 
-              background="bg-primary" 
-            />
+            <GlobalButton :route="'/login'" :text="'Ingresar'" :color="'text-primary'" background="bg-secondary" />
+            <GlobalButton :route="'register'" :text="'Registrarse'" :color="'text-secondary'" background="bg-primary" />
           </div>
         </button>
       </div>
-      <div
+      <!-- <div
         class="col-span-5 justify-center flex flex-col md:flex-row items-center md:w-auto bg-gray-100 p-3 rounded-full shadow-md">
         <div class="flex items-center">
           <font-awesome-icon icon="map-marker-alt" class="text-xl text-primary" />
@@ -66,8 +44,24 @@
           class="bg-primary text-white p-2 xl:p-3 rounded-full ml-2 shadow-md hover:scale-105 transition-all">
           <font-awesome-icon icon="search" />
         </button>
-      </div>
+      </div> -->
     </header>
+    <div
+      class="grid grid-cols-6 gap-4 sm:gap-6 items-center justify-center overflow-x-auto px-4 py-10 sm:py-16 bg-primary shadow-md rounded-lg">
+      <span class="anton-regular col-span-6 sm:col-span-4 sm:col-start-2 text-3xl sm:text-4xl lg:text-5xl text-white">
+        <font-awesome-icon icon="map-marker-alt" class="text-5xl text-secondary" />
+        Encontra tu próximo estacionamiento...
+      </span>
+      <div
+        class="relative col-span-6 sm:col-span-4 sm:col-start-2 flex flex-row items-center w-full rounded-full shadow-xl">
+        <input v-model="searchQuery" type="text" placeholder="Buscar ubicación"
+          class="flex-1 outline-none p-4 rounded-full text-textPrimary shadow-sm text-xl" />
+        <button @click="buscar"
+          class="absolute right-2 text-primary p-2 text-xl xl:p-3 rounded-full ml-2 hover:scale-105 transition-all">
+          <font-awesome-icon icon="search" />
+        </button>
+      </div>
+    </div>
     <ZoneNavbar />
     <div class="flex justify-end p-4">
       <label class="flex items-center cursor-pointer">
@@ -95,11 +89,8 @@
         </div>
       </div>
       <div v-else class="flex-1">
-        <CustomGoogleMap class="w-full h-full rounded-lg overflow-hidden shadow-md"
-          :center="center" 
-          :zoom="zoom" 
-          :options="mapOptions"
-        >
+        <CustomGoogleMap class="w-full h-full rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
+          :options="mapOptions">
           <Marker v-for="(espacio, index) in espacios" :key="index" :options="getMarkerOptions(espacio)"
             @mouseover="() => handleMouseOver(espacio)" @mouseout="handleMouseOut"
             @click="() => handleMarkerClick(espacio)" />
@@ -117,12 +108,8 @@
       </div>
     </div>
     <div class="fixed bottom-6 right-6 flex items-center space-x-3">
-      <FloatingButton 
-        @click="verifyToken('/add-space')" 
-        :text="'Publicar espacio'" 
-        :color="'text-secondary'" 
-        background='bg-primary' 
-      />
+      <FloatingButton @click="verifyToken('/add-space')" :text="'Publicar espacio'" :color="'text-secondary'"
+        background='bg-primary' />
     </div>
     <SessionExpired :sessionExpired="activedSession" />
   </div>
@@ -265,9 +252,9 @@ const verifyToken = async (route) => {
     return;
   }
   if (userStore.isAuthenticated) {
-    if(route === '/quit') {
+    if (route === '/quit') {
       userStore.clearUser();
-      authChecked.value=false;
+      authChecked.value = false;
       window.location.href = '/dashboard';
       return;
     }
@@ -303,5 +290,11 @@ const handleMarkerClick = (espacio) => {
 <style scoped>
 .gm-style-iw {
   z-index: 9999 !important;
+}
+
+.anton-regular {
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 </style>
