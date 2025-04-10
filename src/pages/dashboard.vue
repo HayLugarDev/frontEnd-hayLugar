@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary">
-
     <header class="backdrop:bg-white shadow-md gap-4 flex flex-row justify-around items-center rounded-b-lg">
       <Logo />
       <div v-if="authChecked"
@@ -10,7 +9,7 @@
             class="relative inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-indigo-950 rounded-full">
             {{ userStore.user.name.charAt(0) }}{{ userStore.user.last_name ? userStore.user.last_name.charAt(0) : '' }}
             <div v-if="userMenu"
-              class="absolute top-12 right-0 sm:left-0 rounded-xl bg-secondary shadow-md flex flex-col items-start w-60 px-2 z-10">
+              class="absolute top-12 right-0 sm:left-0 rounded-xl bg-secondary shadow-md flex flex-col items-start w-60 z-10">
               <MenuUserButton :route="'/profile'" :text="'Mi Perfil'" :usedIcon="'user'" />
               <MenuUserButton :route="'/settings'" :text="'Configuracion'" :usedIcon="'cog'" />
               <LogoutButton :action="verifyToken" :route="'/quit'" :usedIcon="'fa-sign-out'" />
