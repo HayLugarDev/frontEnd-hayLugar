@@ -1,8 +1,8 @@
 <template>
     <button 
         @click="router.push(route)" 
-        class="hover:bg-gray-300 p-2 w-full text-start text-primary hover:text-blue-500 font-medium rounded-lg">
-        <font-awesome-icon :icon="usedIcon" class="xl:mr-1 text-xl" />
+        class="hover:bg-secondary p-2 text-gray-400 hover:scale-105 transition-all font-medium rounded-lg">
+        <font-awesome-icon :icon="usedIcon" class="text-2xl" />
         {{ text }}
     </button>
 </template>

@@ -1,25 +1,20 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary">
-    <header class="backdrop:bg-white shadow-md gap-4 flex flex-row justify-around items-center rounded-b-lg">
+    <header class="backdrop:bg-secondary shadow-md gap-4 flex flex-row justify-between items-center rounded-b-lg px-10">
       <Logo />
-      <div v-if="authChecked"
-        class="col-start-5 lg:order-3 space-x-4 mt-2 md:mt-0 ml-2 xl:ml-0 xl:gap-2 flex justify-end">
-        <button @click="openMenu" class="text-primary font-medium">
-          <div v-if="isAuthenticated && userStore.user"
-            class="relative inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-indigo-950 rounded-full">
+      <div v-if="authChecked" class="flex flex-row justify-between gap-2">
+        <div v-if="isAuthenticated && userStore.user" class="flex flex-row gap-4">
+          <button @click="router.push('/profile')"
+            class="font-medium inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-indigo-950 rounded-full shadow-lg">
             {{ userStore.user.name.charAt(0) }}{{ userStore.user.last_name ? userStore.user.last_name.charAt(0) : '' }}
-            <div v-if="userMenu"
-              class="absolute top-12 right-0 sm:left-0 rounded-xl bg-secondary shadow-md flex flex-col items-start w-60 z-10">
-              <MenuUserButton :route="'/profile'" :text="'Mi Perfil'" :usedIcon="'user'" />
-              <MenuUserButton :route="'/settings'" :text="'Configuracion'" :usedIcon="'cog'" />
-              <LogoutButton :action="verifyToken" :route="'/quit'" :usedIcon="'fa-sign-out'" />
-            </div>
-          </div>
-          <div v-else class="flex flex-row gap-2 items-center">
-            <GlobalButton :route="'/login'" :text="'Ingresar'" :color="'text-primary'" background="bg-secondary" />
-            <GlobalButton :route="'register'" :text="'Registrarse'" :color="'text-secondary'" background="bg-primary" />
-          </div>
-        </button>
+          </button>
+          <MenuUserButton :route="'/settings'" :usedIcon="'cog'" />
+          <LogoutButton :action="verifyToken" :route="'/quit'" />
+        </div>
+        <div v-else class="flex flex-row gap-2 items-center">
+          <GlobalButton :route="'/login'" :text="'Ingresar'" :color="'text-primary'" background="bg-secondary" />
+          <GlobalButton :route="'register'" :text="'Registrarse'" :color="'text-secondary'" background="bg-primary" />
+        </div>
       </div>
       <!-- <div
         class="col-span-5 justify-center flex flex-col md:flex-row items-center md:w-auto bg-gray-100 p-3 rounded-full shadow-md">
@@ -46,7 +41,7 @@
       </div> -->
     </header>
     <div
-      class="grid grid-cols-6 gap-4 sm:gap-6 items-center justify-center overflow-x-auto px-4 py-10 sm:py-16 bg-primary shadow-md rounded-lg">
+      class="grid grid-cols-6 gap-4 sm:gap-6 items-center justify-center overflow-x-auto px-4 py-10 sm:py-12 bg-primary shadow-md rounded-lg">
       <span class="anton-regular col-span-6 sm:col-span-4 sm:col-start-2 text-3xl sm:text-4xl lg:text-5xl text-white">
         <font-awesome-icon icon="map-marker-alt" class="text-5xl text-secondary" />
         Encontra tu próximo estacionamiento...
@@ -54,7 +49,7 @@
       <div
         class="relative col-span-6 sm:col-span-4 sm:col-start-2 flex flex-row items-center w-full rounded-full shadow-xl">
         <input v-model="searchQuery" type="text" placeholder="Buscar ubicación"
-          class="flex-1 outline-none p-4 rounded-full text-textPrimary shadow-sm text-xl" />
+          class="flex-1 outline-none p-4 rounded-full text-gray-500 shadow-sm text-xl" />
         <button @click="buscar"
           class="absolute right-2 text-primary p-2 text-xl xl:p-3 rounded-full ml-2 hover:scale-105 transition-all">
           <font-awesome-icon icon="search" />
@@ -116,7 +111,6 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import api from '../services/apiService';
 import { useUserStore } from '../store/userStore';
 import { Marker, InfoWindow } from 'vue3-google-map';
 import { useRouter } from 'vue-router';
@@ -132,6 +126,7 @@ import loadIcon from "../assets/load-icon_primary.svg";
 import GlobalButton from '../components/GlobalButton.vue';
 import SpaceCard from '../components/SpaceCard.vue';
 import FloatingButton from '../components/FloatingButton.vue';
+import { getAllSpaces } from '../services/spaceService';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -191,24 +186,11 @@ const mapOptions = ref({
 
 const obtenerEspacios = async () => {
   try {
-    const response = await api.get("/spaces/getAll");
-    if (response.data.length < 1) {
-      cargando.value = false;
-      error.value = "No hay espacios todavía"
-      return;
+    const spaces = await getAllSpaces();
+    if (!spaces || spaces.length < 1) {
+      return 'No hay espacios todavía';
     }
-    const data = response.data.map(e => {
-      if (typeof e.dataValues.images === 'string') {
-        try {
-          e.dataValues.images = JSON.parse(e.dataValues.images);
-        } catch (error) {
-          console.error('Error al parsear images:', error);
-          e.dataValues.images = [];
-        }
-      }
-      return e.dataValues;
-    });
-    espacios.value = data;
+    espacios.value = spaces;
     cargando.value = false;
   } catch (err) {
     error.value = "No se pudieron cargar los espacios.";

@@ -1,5 +1,25 @@
 import api from "./apiService";
 
+export const getAllSpaces = async () => {
+  try {
+    const response = await api.get("/spaces/getAll");
+    const data = Array.isArray(response.data) ? response.data.map((e: { dataValues: { images: string | []; }; }) => {
+      if (typeof e.dataValues.images === 'string') {
+        try {
+          e.dataValues.images = JSON.parse(e.dataValues.images);
+        } catch (error) {
+          console.error('Error al parsear images:', error);
+          e.dataValues.images = [];
+        }
+      }
+      return e.dataValues;
+    }) : [];
+    return data;
+  } catch (error) {
+    console.error("Error al obtener los espacios:", error);
+  }
+}
+
 export const getSpaceById = async (id: number) => {
   try {
     const response = await api.get(`/spaces/getbyid/${id}`);

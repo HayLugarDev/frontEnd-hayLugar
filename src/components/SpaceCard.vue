@@ -1,15 +1,15 @@
 <template>
-    <div class="bg-white p-10 shadow-lg rounded-xl hover:shadow-xl transition-all">
+    <div class="bg-white sm:p-10 shadow-lg rounded-xl hover:shadow-xl transition-all">
         <div class="flex flex-row items-center">
-            <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-20" />
+            <Logo />
             <div class="text-2xl font-bold text-primary">{{ espacio.name }}</div>
         </div>
         <img :src="`http://localhost:3000${espacio.images[0]}`" alt="Espacio"
-            class="w-full h-40 object-cover rounded-lg" />
-        <p class="text-lg font-bold mt-3 text-gray-700">
+            class="w-full h-48 object-cover rounded-lg" />
+        <p class="px-2 text-lg font-bold mt-3 text-gray-700">
             <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{ espacio.location.split(',')[0] }}
         </p>
-        <p class="text-primary font-semibold">
+        <p class="px-2 text-primary font-semibold">
             <font-awesome-icon icon="money-bill-wave" class="mr-1" /> ${{ espacio.price_per_hour }}/hora
         </p>
         <router-link :to="`/espacio/${espacio.id}`">
@@ -21,6 +21,8 @@
     </div>
 </template>
 <script setup>
+import Logo from './Logo.vue';
+
 const props = defineProps({
     espacio: Object
 });

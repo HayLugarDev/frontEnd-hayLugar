@@ -1,11 +1,11 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-secondary p-6 gap-6">
+  <div class="flex flex-col min-h-screen bg-secondary sm:p-6 gap-6">
     <header class="flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden p-6">
-      <div class="flex items-center space-x-4">
-        <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="w-40" />
-      </div>
       <div class="flex-1">
-        <h1 class="text-3xl font-bold text-primary">{{ espacio?.name }}</h1>
+        <div class="flex flex-row items-center">
+            <Logo />
+            <div class="text-2xl font-bold text-primary">{{ espacio?.name }}</div>
+        </div>
         <p class="text-gray-600 mt-2">{{ espacio?.location }}</p>
         <p class="text-lg text-primary font-semibold mt-4">
           <font-awesome-icon icon="money-bill-wave" class="mr-1" />
@@ -32,9 +32,9 @@
       </div>
     </header>
 
-    <section class="bg-white p-6 rounded-lg shadow-md flex gap-4 overflow-x-auto">
+    <section class="bg-white p-6 rounded-lg shadow-md flex gap-4">
       <div class="flex flex-col">
-        <div class="flex flex-row gap-2">
+        <div class="flex flex-row gap-2 overflow-x-auto">
           <template v-if="espacio && espacio.images">
             <img v-for="(img, index) in espacio.images" :key="index" :src="`http://localhost:3000${img}`" alt="Foto del espacio"
               class="h-60 w-60 object-cover rounded-lg shadow-md border" />
@@ -75,6 +75,7 @@ import carMarker from '../assets/logo.png';
 import bicycleMarker from '../assets/logo.png';
 import truckMarker from '../assets/logo.png';
 import { getSpaceById } from '../services/spaceService';
+import Logo from '../components/Logo.vue';
 
 const router = useRouter();
 const route = useRoute();

@@ -1,9 +1,8 @@
 <template>
   <div class="flex flex-col md:flex-row min-h-screen bg-secondary p-6 gap-6">
     <!-- Sección Izquierda: Resumen y Formulario de Reserva -->
-    <section class="w-full md:w-2/3 space-y-6">
-      <h1 class="text-3xl font-bold text-primary">Finalizar Reserva</h1>
-
+    <section class="w-full lg:w-2/3 space-y-6">
+      <h1 class="text-3xl font-bold text-primary px-2">Finalizar Reserva</h1>
       <!-- Resumen del Espacio -->
       <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
         <img
@@ -61,8 +60,8 @@
     </section>
 
     <!-- Sección Derecha: Imagen Opcional -->
-    <aside class="w-full md:w-1/3 flex justify-center items-center">
-      <img :src="`http://localhost:3000${espacio?.images[1]}` || 'https://source.unsplash.com/400x300/?parking,garage'"
+    <aside class="w-full lg:w-1/3 lg:flex flex-col justify-center items-center hidden gap-4">
+      <img v-for="(img, index) in espacio?.images?.slice(1, 4)" :key="index" :src="`http://localhost:3000${img}`"
         alt="Imagen del espacio" class="rounded-lg shadow-lg max-w-full" />
     </aside>
   </div>
@@ -72,7 +71,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import api from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
 import { verifyActiveSession } from '../middleware/verifyToken';
 import { useUserStore } from '../store/userStore';
