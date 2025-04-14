@@ -158,8 +158,8 @@ const initCardBrick = async () => {
         // Extraer el token, el monto y el payment_method_id real del objeto del Brick
         const tokenGenerado = cardFormData.token;
         const monto = cardFormData.transaction_amount;
-        const paymentMethodReal = cardFormData.payment_method_id;
-        await confirmarPagoMercadoPago(tokenGenerado, monto, paymentMethodReal);
+        const paymentMethodId = cardFormData.payment_method_id;
+        await confirmarPagoMercadoPago(tokenGenerado, monto, paymentMethodId);
       },
       onError: (error: any) => {
         console.error("Error en el Brick:", error);
