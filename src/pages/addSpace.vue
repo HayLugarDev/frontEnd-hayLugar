@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-center min-h-screen bg-light px-4 py-10">
-    <div class="bg-white p-8 rounded-lg shadow-lg max-w-3xl w-full border border-gray-300">
+    <div class="bg-white p-4 sm:p-8 rounded-lg shadow-lg max-w-3xl w-full border border-gray-300">
       <h1 class="text-4xl font-bold text-center text-primary mb-8">Registrar Nuevo Espacio</h1>
       <form @submit.prevent="addSpace" class="space-y-6">
         <FormField 
@@ -32,7 +32,7 @@
         <!-- Tipos de Vehículos -->
         <div>
           <span class="text-lg font-semibold text-black block mb-2">Tipos de vehículos:</span>
-          <div class="flex space-x-4">
+          <div class="flex flex-col sm:flex-row gap-2">
             <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('car')" vehicleType="Auto" iconType="car"
               @click="toggleParkingType('car')" />
             <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('motorcycle')" vehicleType="Motocicleta"
@@ -85,7 +85,7 @@
         <!-- Tarifa y Duración -->
         <label class="block">
           <span class="text-lg font-semibold text-black">Tarifa y duración (ARS):</span>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 gap-2 sm:gap-4">
             <div class="relative">
               <span class="absolute left-3 top-3 text-gray-600">$</span>
               <input v-model.number="price" type="number" class="input-field pl-7" placeholder="Ej: 1500" required />
@@ -129,7 +129,7 @@
               <font-awesome-icon :icon="['fas', 'money-bill-wave']" />
               <span>Efectivo</span>
             </label> -->
-            <label class="flex items-center space-x-1">
+            <label class="flex items-center">
               <input type="checkbox" v-model="paymentMethods" value="Mercado Pago" @change="updatePaymentFields" />
               <font-awesome-icon :icon="['fas', 'credit-card']" />
               <span>Mercado Pago</span>

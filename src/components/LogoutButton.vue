@@ -1,8 +1,8 @@
 <template>
     <button 
         @click="executeAction"
-        class="p-2 text-start text-red-700 font-medium rounded-lg hover:scale-105 transition-all">
-        <b><font-awesome-icon :icon="usedIcon" class="xl:mr-1 text-xl" />Cerrar sesión</b>
+        class="p-2 text-start text-red-700 hover:bg-secondary font-medium rounded-lg hover:scale-105 transition-all">
+        <b><font-awesome-icon :icon="usedIcon" class="xl:mr-1 text-2xl" /></b>
     </button>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-secondary">
-    <header class="backdrop:bg-secondary shadow-md gap-4 flex flex-row justify-between items-center rounded-b-lg px-10">
+  <div class="flex flex-col min-h-screen bg-white">
+    <header class="backdrop:bg-secondary shadow-md gap-4 flex flex-row justify-between items-center rounded-b-lg px-4 sm:px-10">
       <Logo />
       <div v-if="authChecked" class="flex flex-row justify-between gap-2">
         <div v-if="isAuthenticated && userStore.user" class="flex flex-row gap-4">
@@ -9,7 +9,7 @@
             {{ userStore.user.name.charAt(0) }}{{ userStore.user.last_name ? userStore.user.last_name.charAt(0) : '' }}
           </button>
           <MenuUserButton :route="'/settings'" :usedIcon="'cog'" />
-          <LogoutButton :action="verifyToken" :route="'/quit'" />
+          <LogoutButton :action="verifyToken" :route="'/quit'" :usedIcon="'fa-sign-out'" />
         </div>
         <div v-else class="flex flex-row gap-2 items-center">
           <GlobalButton :route="'/login'" :text="'Ingresar'" :color="'text-primary'" background="bg-secondary" />
@@ -48,7 +48,7 @@
       </span>
       <div
         class="relative col-span-6 sm:col-span-4 sm:col-start-2 flex flex-row items-center w-full rounded-full shadow-xl">
-        <input v-model="searchQuery" type="text" placeholder="Buscar ubicación"
+        <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Buscar ubicación"
           class="flex-1 outline-none p-4 rounded-full text-gray-500 shadow-sm text-xl" />
         <button @click="buscar"
           class="absolute right-2 text-primary p-2 text-xl xl:p-3 rounded-full ml-2 hover:scale-105 transition-all">
@@ -71,7 +71,7 @@
       </label>
     </div>
 
-    <div class="flex flex-1 p-2 sm:p-6">
+    <div ref="refSeccionResultados" class="flex flex-1 p-2 sm:p-6">
       <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
         <div v-if="cargando" class="absolute top-1/4 flex justify-center items-center marker:text-center w-full">
           <img :src="loadIcon" alt="" class="max-w-10">
@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 import { useUserStore } from '../store/userStore';
 import { Marker, InfoWindow } from 'vue3-google-map';
 import { useRouter } from 'vue-router';
@@ -140,6 +140,8 @@ const getMarkerOptions = (espacio) => ({
 
 
 const searchQuery = ref("");
+const refSeccionResultados = ref(HTMLElement);
+console.log("Tipo de ref:", typeof refSeccionResultados);
 const checkIn = ref("");
 const checkOut = ref("");
 const rangoTiempo = ref("hora");
@@ -246,12 +248,18 @@ const verifyToken = async (route) => {
   }
 }
 
-const openMenu = () => {
-  userMenu.value = !userMenu.value;
-}
-
-const buscar = () => {
-  console.log("Buscar:", searchQuery.value);
+const buscar = async () => {
+  await obtenerEspacios();
+  const search = espacios.value.filter(espacio =>
+    espacio.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    espacio.location.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+  console.log(search);
+  espacios.value = search;
+  await nextTick();
+  if (refSeccionResultados.value && searchQuery.value) {
+    refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
+  }
 };
 
 const handleMouseOver = (espacio) => {
