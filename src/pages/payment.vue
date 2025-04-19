@@ -197,14 +197,18 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
   let reservationResponse;
   try {
     reservationResponse = await reservationStore.submitReservation();
-  } catch (error) {
-    console.error("Error al crear la reserva:", error);
-    alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
-    return;
-  }
-  
-  // Extraemos el ID de la reserva directamente de la respuesta
-  const reservationId = reservationResponse.id;
+} catch (error) {
+  console.error("Error al crear la reserva:", error);
+  alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
+  return;
+}
+// Extraemos el id desde axiosResponse.data
+const reservationId = reservationResponse.reservation.id;
+if (!reservationId) {
+  console.error("reservationId no encontrado en la respuesta:", reservationResponse);
+  alert("Error interno: no se pudo obtener el ID de la reserva.");
+  return;
+}
   
   // Construir el payload para enviar a nuestro endpoint que procesa el pago,
   // asegurándonos de incluir el payment_method_id real y otros campos requeridos.

@@ -8,7 +8,7 @@
             class="font-medium inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-indigo-950 rounded-full shadow-lg">
             {{ userStore.user.name.charAt(0) }}{{ userStore.user.last_name ? userStore.user.last_name.charAt(0) : '' }}
           </button>
-          <MenuUserButton :route="'/settings'" :usedIcon="'cog'" />
+          <MenuUserButton :route="'/wallet'" :usedIcon="'wallet'" />
           <LogoutButton :action="verifyToken" :route="'/quit'" :usedIcon="'fa-sign-out'" />
         </div>
         <div v-else class="flex flex-row gap-2 items-center">
