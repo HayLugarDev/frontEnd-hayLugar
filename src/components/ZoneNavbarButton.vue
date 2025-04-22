@@ -1,6 +1,6 @@
 <template>
-    <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
-        <font-awesome-icon :icon="usedIcon" class="mr-2" />
+    <button class=" inline-flex flex-col px-4 py-2 text-gray-600 hover:shadow-xl hover:bg-gray-100 rounded-xl">
+        <font-awesome-icon :icon="usedIcon" />
         {{ text }}
     </button>
 </template>

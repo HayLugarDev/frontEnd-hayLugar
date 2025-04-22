@@ -4,7 +4,7 @@
 
 <template>
   <router-view />
-  <span class="flex items-center justify-center bg-secondary">
+  <span class="flex items-center justify-center">
     © 2025 HayLugar. All rights reserved
   </span>
 </template>

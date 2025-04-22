@@ -1,8 +1,9 @@
 <template>
-<div class="flex overflow-x-auto p-4 bg-white shadow-md rounded-lg space-x-4 text-xs sm:text-sm md:text-xl">
+<div class="inline-flex gap-2 sm:gap-6 overflow-x-auto whitespace-nowrap no-scrollbar rounded sm:rounded-lg text-sm md:text-lg">
     <ZoneNavbarButton :text="'Centro'" :usedIcon="'city'" />
-    <ZoneNavbarButton :text="'Zonas verdes'" :usedIcon="'leaf'" />
-    <ZoneNavbarButton :text="'Garages privados'" :usedIcon="'car'" />
+    <ZoneNavbarButton :text="'Parques'" :usedIcon="'leaf'" />
+    <ZoneNavbarButton :text="'Atracciones'" :usedIcon="'fa-camera'" />
+    <ZoneNavbarButton :text="'Garages'" :usedIcon="'car'" />
     <ZoneNavbarButton :text="'Motos'" :usedIcon="'motorcycle'" />
 </div>
 </template>

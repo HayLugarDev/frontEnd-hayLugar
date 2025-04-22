@@ -1,63 +1,49 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-white">
-    <header class="backdrop:bg-secondary shadow-md gap-4 flex flex-row justify-between items-center rounded-b-lg px-4 sm:px-10">
-      <Logo />
-      <div v-if="authChecked" class="flex flex-row justify-between gap-2">
-        <div v-if="isAuthenticated && userStore.user" class="flex flex-row gap-4">
-          <button @click="router.push('/profile')"
-            class="font-medium inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-indigo-950 rounded-full shadow-lg">
-            {{ userStore.user.name.charAt(0) }}{{ userStore.user.last_name ? userStore.user.last_name.charAt(0) : '' }}
-          </button>
-          <MenuUserButton :route="'/settings'" :usedIcon="'cog'" />
-          <LogoutButton :action="verifyToken" :route="'/quit'" :usedIcon="'fa-sign-out'" />
-        </div>
-        <div v-else class="flex flex-row gap-2 items-center">
-          <GlobalButton :route="'/login'" :text="'Ingresar'" :color="'text-primary'" background="bg-secondary" />
-          <GlobalButton :route="'register'" :text="'Registrarse'" :color="'text-secondary'" background="bg-primary" />
-        </div>
-      </div>
-      <!-- <div
-        class="col-span-5 justify-center flex flex-col md:flex-row items-center md:w-auto bg-gray-100 p-3 rounded-full shadow-md">
-        <div class="flex items-center">
-          <font-awesome-icon icon="map-marker-alt" class="text-xl text-primary" />
-          <input v-model="searchQuery" type="text" placeholder="Buscar ubicación"
-            class="flex-1 outline-none px-4 py-2 bg-white rounded-full text-textPrimary shadow-sm" />
-        </div>
-        <input v-model="checkIn" type="date"
-          class="outline-none px-4 py-2 bg-white border-l md:border-none rounded-md shadow-sm" />
-        <input v-model="checkOut" type="date"
-          class="outline-none px-4 py-2 bg-white border-l md:border-none rounded-md shadow-sm" />
-        <select v-model="rangoTiempo"
-          class="outline-none px-4 py-2 bg-white border-l md:border-none rounded-md shadow-sm">
-          <option value="hora">Por Hora</option>
-          <option value="dia">Por Día</option>
-          <option value="semana">Por Semana</option>
-          <option value="mes">Por Mes</option>
-        </select>
-        <button @click="buscar"
-          class="bg-primary text-white p-2 xl:p-3 rounded-full ml-2 shadow-md hover:scale-105 transition-all">
-          <font-awesome-icon icon="search" />
-        </button>
-      </div> -->
-    </header>
-    <div
-      class="grid grid-cols-6 gap-4 sm:gap-6 items-center justify-center overflow-x-auto px-4 py-10 sm:py-12 bg-primary shadow-md rounded-lg">
-      <span class="anton-regular col-span-6 sm:col-span-4 sm:col-start-2 text-3xl sm:text-4xl lg:text-5xl text-white">
-        <font-awesome-icon icon="map-marker-alt" class="text-5xl text-secondary" />
-        Encontra tu próximo estacionamiento...
+  <div class="flex flex-col min-h-screen bg-secondary lexend xl:w-11/12 mx-auto">
+    <MainHeader />
+    <button class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
+      <font-awesome-icon icon="search" class="text-xs" />
+      <span class="lexend">Comenzar búsqueda</span>
+    </button>
+    <div class="hidden md:grid md:grid-cols-11 gap-4 sm:gap-6 items-center justify-center overflow-x-auto px-8 lg:px-4 py-8 sm:py-10 shadow-md border-b-2 bg-primary rounded-md">
+      <span
+        class="anton-regular col-span-6 sm:col-span-8 sm:col-start-2 text-3xl sm:text-4xl lg:text-4xl text-white">
+        <font-awesome-icon icon="map-marker-alt" class="text-5xl text-white" />
+        Encontrá tu próximo estacionamiento...
       </span>
-      <div
-        class="relative col-span-6 sm:col-span-4 sm:col-start-2 flex flex-row items-center w-full rounded-full shadow-xl">
-        <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Buscar ubicación"
-          class="flex-1 outline-none p-4 rounded-full text-gray-500 shadow-sm text-xl" />
-        <button @click="buscar"
-          class="absolute right-2 text-primary p-2 text-xl xl:p-3 rounded-full ml-2 hover:scale-105 transition-all">
-          <font-awesome-icon icon="search" />
-        </button>
+      <div class="relative grid grid-cols-6 col-span-10 col-start-2 col-end-11 xl:col-span-6 xl:col-start-3 xl:col-end-10 items-center justify-between rounded-full shadow-xl h-[70px]">
+        <div class="bg-white col-span-2 relative flex items-center shadow-sm h-full border-r rounded-l-full">
+          <label class="absolute top-2 left-6 px-2 text-sm" for="">Lugar</label>
+          <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Buscar ubicación"
+            class="text-gray-500 text-lg border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
+        </div>
+        <div class="bg-white col-span-2 relative flex items-center shadow-sm h-full border-r">
+          <label class="absolute top-2 left-6 px-2 text-sm" for="">Entrada</label>
+          <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Desde?"
+            class="text-gray-500 text-lg border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
+        </div>
+        <div class="bg-white col-span-2 relative flex items-center shadow-sm h-full border-none rounded-r-full">
+          <label class="absolute top-2 left-6 px-2 text-sm" for="">Salida</label>
+          <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Hasta?"
+            class="text-gray-500 text-lg border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
+        </div>
+        <div class="absolute p-0.5 h-full right-0.5">
+          <button @click="buscar"
+            class="z-1 col-span-1 p-4 h-full w-20 text-white hover:bg-primary bg-slate-700 text-xl rounded-full">
+            <font-awesome-icon icon="search" />
+          </button>
+        </div>
       </div>
     </div>
-    <ZoneNavbar />
-    <div class="flex justify-end p-4">
+    <div class="flex flex-row justify-between items-center shadow-md sm:rounded-xl bg-white h-16 py-2">
+      <ZoneNavbar />
+      <button
+        class="hidden sm:flex sm:flex-row items-center gap-2 p-2 rounded-xl sm:mr-4 hover:bg-gray-100 shadow-md h-full border hover:border-black">
+        <font-awesome-icon icon="fa-align-left" class="text-gray-500" />
+        <span>Filtrar</span>
+      </button>
+    </div>
+    <!-- <div class="flex justify-end p-4">
       <label class="flex items-center cursor-pointer">
         <span class="mr-2">Vista de Mapa</span>
         <input type="checkbox" v-model="showMap" class="hidden" />
@@ -69,10 +55,10 @@
           </div>
         </div>
       </label>
-    </div>
+    </div> -->
 
     <div ref="refSeccionResultados" class="flex flex-1 p-2 sm:p-6">
-      <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+      <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4 gap-2">
         <div v-if="cargando" class="absolute top-1/4 flex justify-center items-center marker:text-center w-full">
           <img :src="loadIcon" alt="" class="max-w-10">
         </div>
@@ -101,32 +87,25 @@
         </CustomGoogleMap>
       </div>
     </div>
-    <div class="fixed bottom-6 right-6 flex items-center space-x-3">
+    <!-- <div class="fixed bottom-6 right-6 flex items-center space-x-3">
       <FloatingButton @click="verifyToken('/add-space')" :text="'Publicar espacio'" :color="'text-secondary'"
         background='bg-primary' />
-    </div>
-    <SessionExpired :sessionExpired="activedSession" />
+    </div> -->
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { useUserStore } from '../store/userStore';
 import { Marker, InfoWindow } from 'vue3-google-map';
 import { useRouter } from 'vue-router';
 import logoMarker from '../assets/logo.png';
 import CustomGoogleMap from '../components/GoogleMap.vue';
-import SessionExpired from '../components/SessionExpired.vue';
-import MenuUserButton from '../components/MenuUserButton.vue';
-import LogoutButton from '../components/LogoutButton.vue';
 import ZoneNavbar from "../components/ZoneNavbar.vue";
-import Logo from '../components/Logo.vue';
-import { verifyActiveSession } from '../middleware/verifyToken';
 import loadIcon from "../assets/load-icon_primary.svg";
-import GlobalButton from '../components/GlobalButton.vue';
 import SpaceCard from '../components/SpaceCard.vue';
-import FloatingButton from '../components/FloatingButton.vue';
 import { getAllSpaces } from '../services/spaceService';
+import MainHeader from '../components/MainHeader.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -152,9 +131,6 @@ const showMap = ref(false);
 const hoveredSpace = ref(null);
 const center = ref({ lat: -26.8333, lng: -65.2167 });
 const zoom = ref(15);
-const activedSession = ref(false);
-const userMenu = ref(false);
-const authChecked = ref(false);
 
 const mapOptions = ref({
   styles: [
@@ -218,35 +194,9 @@ onMounted(async () => {
   }
   await obtenerEspacios();
   await userStore.fetchUser();
-  authChecked.value = true;
   console.log('Usuario en el store:', userStore.user);
   console.log('Authenticado: ', userStore.isAuthenticated);
 });
-
-const isAuthenticated = computed(() => {
-  return !!userStore.token;
-});
-
-const verifyToken = async (route) => {
-  const result = await verifyActiveSession(route, userStore.sessionExpired);
-  if (!result) {
-    userStore.clearUser();
-    activedSession.value = true;
-    return;
-  }
-  if (userStore.isAuthenticated) {
-    if (route === '/quit') {
-      userStore.clearUser();
-      authChecked.value = false;
-      window.location.href = '/dashboard';
-      return;
-    }
-    activedSession.value = !userStore.isAuthenticated;
-    return router.push(route);
-  } else {
-    return activedSession.value = !userStore.isAuthenticated;
-  }
-}
 
 const buscar = async () => {
   await obtenerEspacios();
@@ -286,4 +236,12 @@ const handleMarkerClick = (espacio) => {
   font-weight: 400;
   font-style: normal;
 }
+
+.lexend {
+  font-family: "Lexend Deca", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
 </style>
