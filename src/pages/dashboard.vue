@@ -35,14 +35,6 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-row justify-between items-center shadow-md sm:rounded-xl bg-white h-16 py-2">
-      <ZoneNavbar />
-      <button
-        class="hidden sm:flex sm:flex-row items-center gap-2 p-2 rounded-xl sm:mr-4 hover:bg-gray-100 shadow-md h-full border hover:border-black">
-        <font-awesome-icon icon="fa-align-left" class="text-gray-500" />
-        <span>Filtrar</span>
-      </button>
-    </div>
     <!-- <div class="flex justify-end p-4">
       <label class="flex items-center cursor-pointer">
         <span class="mr-2">Vista de Mapa</span>
@@ -56,6 +48,14 @@
         </div>
       </label>
     </div> -->
+    <div class="flex flex-row justify-between items-center shadow-md sm:rounded-xl bg-white h-16 py-2">
+      <ZoneNavbar />
+      <button
+        class="hidden sm:flex sm:flex-row items-center gap-2 p-2 rounded-xl sm:mr-4 hover:bg-gray-100 shadow-md h-full border hover:border-black">
+        <font-awesome-icon icon="fa-align-left" class="text-gray-500" />
+        <span>Filtrar</span>
+      </button>
+    </div>
 
     <div ref="refSeccionResultados" class="flex flex-1 p-2 sm:p-6">
       <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4 gap-2">

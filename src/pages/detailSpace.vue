@@ -1,7 +1,7 @@
 <template>
   <MainHeader />
   <div class="flex flex-col min-h-screen bg-secondary w-10/12 mx-auto">
-    <header class="flex flex-col md:flex-row rounded-lg overflow-hidden p-4 lg:px-16">
+    <header class="flex flex-col md:flex-row rounded-lg overflow-hidden p-4 lg:px-10">
       <div class="flex-1">
         <div class="flex flex-row items-center">
           <div class="text-3xl font-bold text-primary">{{ espacio?.name }}</div>
@@ -28,7 +28,7 @@
               </div>
             </template>
           </div>
-          <div class="w-11/12 mx-auto grid grid-cols-10 gap-2">
+          <div class="w-full mx-auto grid grid-cols-10 gap-10">
             <div class="col-span-6 grid grid-cols-3 grid-rows-3 gap-4 items-center justify-between p-4">
               <div class="col-span-2">
                 <p class="text-2xl font-bold text-gray-800">
@@ -56,45 +56,61 @@
               <section class="p-4 rounded-lg col-span-3 row-start-2 gap-4 border">
                 <div class="flex flex-col">
                   <span class="font-semibold">Descripción: </span>
-                  <p class="text-gray-600 w-auto font-medium">{{  espacio?.description  }}</p>
+                  <p class="text-gray-600 w-auto font-medium">{{ espacio?.description }}</p>
                 </div>
               </section>
+              <div class="col-span-3 w-80 h-90 flex justify-center items-center bg-red-500">
+                <CustomGoogleMap v-if="espacio"
+                  :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
+                  class="w-full h-full rounded-lg overflow-hidden shadow-md">
+                  <Marker :options="{
+                    position: { lat: Number(espacio.latitude), lng: Number(espacio.longitude) },
+                    icon: carMarker
+                  }" />
+                </CustomGoogleMap>
+              </div>
             </div>
-            <section class="col-span-4 shadow-2xl p-4 rounded-xl h-[600px]">
-              <div class="relative grid grid-cols-2 grid-rows-2 border rounded-md">
-                <span class="col-span-2 flex items-center justify-center text-xl text-gray-700 font-semibold">Completá tu reserva</span>
-                <MenuDropdown :options="['Por hora','Por día', 'Por mes']" :title="'Periódo de tiempo'"/>
-                <div class="col-span-1 flex flex-col border p-2 items-center justify-center">
-                  <label class="font-semibold">CheckIn</label>
-                  <span>14/05/2025</span>
+            <section class="col-span-4 shadow-2xl p-2 xl:p-4 rounded-xl h-full border border-zinc-700">
+              <div class="relative grid grid-cols-2 rounded-md p-6 gap-4">
+                <span class="col-span-2 flex items-start justify-start text-2xl gap-4 font-semibold underline">Completá
+                  tu
+                  reserva</span>
+                <div class="col-span-2 grid grid-cols-2 rounded-xl">
+                  <MenuDropdown v-model="tipoPlazoReserva" :options="['Por hora', 'Por día', 'Por mes']"
+                    :title="'Por cuanto tiempo?'" :class="'rounded-t-xl border border-gray-500'" />
+                  <div
+                    class="col-span-1 flex flex-col border border-gray-500 rounded-bl-xl p-2 items-center justify-center text-gray-800 cursor-pointer">
+                    <label class="font-semibold">CheckIn</label>
+                    <Datepicker v-if="tipoPlazoReserva === 'Por día'" v-model="tiempoInicial"
+                      :enable-time-picker="true === 'Por día'" placeholder="" />
+                    <Datepicker v-if="tipoPlazoReserva === 'Por hora'" v-model="tiempoInicial"
+                      :enable-time-picker="true === 'Por hora'" time-picker />
+                  </div>
+                  <div
+                    class="col-span-1 flex flex-col border border-gray-500 rounded-br-xl p-2 items-center justify-center text-gray-800 cursor-pointer">
+                    <label class="font-semibold">CheckOut</label>
+                    <Datepicker v-if="tipoPlazoReserva === 'Por día'" v-model="tiempoFinal"
+                      :enable-time-picker="true === 'Por día'" placeholder="" />
+                    <Datepicker v-if="tipoPlazoReserva === 'Por hora'" v-model="tiempoFinal"
+                      :enable-time-picker="true === 'Por hora'" time-picker />
+                  </div>
                 </div>
-                <div class="col-span-1 flex flex-col border p-2 items-center justify-center">
-                  <label class="font-semibold">CheckOut</label>
-                  <span>14/05/2025</span>
+                <MenuDropdown v-model="tipoVehiculo" :options="['Camioneta', 'Auto', 'Motocicleta', 'Bicicleta']"
+                  :title="'Seleccioná tu vehículo'" :class="'border border-gray-700 rounded-xl'" />
+                <div class="col-span-2 h-14 rounded-xl border border-gray-800 grid grid-cols-3 grid-rows-3">
+                  <span class="col-span-1 pl-4 pt-2 text-xs font-semibold">TARIFA:</span>
+                  <span class="col-span-3 text-center text-2xl font-bold text-primary">$1500</span>
                 </div>
-                <MenuDropdown :options="['Camioneta','Auto', 'Motocicleta', 'Bicicleta']" :title="'Seleccioná tu vehículo'"/>
+                <button @click="reservar"
+                  class="col-span-2 bg-accent text-white px-6 py-3 rounded-lg text-lg font-bold shadow-md hover:shadow-xl">
+                  <font-awesome-icon icon="calendar-check" class="mr-2" />
+                  Reservar Ahora
+                </button>
               </div>
             </section>
           </div>
         </div>
-        <!-- <section class="flex justify-left">
-          <button @click="reservar"
-            class="bg-accent text-white px-6 py-3 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
-            <font-awesome-icon icon="calendar-check" class="mr-2" />
-            Reservar Ahora
-          </button>
-        </section> -->
       </div>
-
-      <!-- <div class="w-80 h-90 flex justify-center items-center">
-        <CustomGoogleMap v-if="espacio" :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-          class="w-full h-full rounded-lg overflow-hidden shadow-md">
-          <Marker :options="{
-            position: { lat: Number(espacio.latitude), lng: Number(espacio.longitude) },
-            icon: markerIcon
-          }" />
-        </CustomGoogleMap>
-      </div> -->
     </header>
 
     <section v-if="espacio?.host" class="bg-white p-6 rounded-lg shadow-md flex items-center">
@@ -123,14 +139,17 @@ import carMarker from '../assets/logo.png';
 import bicycleMarker from '../assets/logo.png';
 import truckMarker from '../assets/logo.png';
 import { getSpaceById } from '../services/spaceService';
-import Logo from '../components/Logo.vue';
 import MenuDropdown from "../components/MenuDropdown.vue";
+import Datepicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const router = useRouter();
 const route = useRoute();
-const rangoTiempo = ref("hora");
+const tiempoInicial = ref(null);
+const tiempoFinal = ref(null);
+const tipoVehiculo = ref('');
+const tipoPlazoReserva = ref('Por hora');
 const espacio = ref(null);
-const openMenu = ref(false);
 
 const obtenerEspacio = async () => {
   try {
@@ -145,14 +164,17 @@ const obtenerEspacio = async () => {
 onMounted(obtenerEspacio);
 
 const markerIcon = computed(() => {
-  if (espacio.value && espacio.value.type) {
-    const tipo = espacio.value.type.toLowerCase();
+  if (espacio.value && espacio.value.vehicle_types) {
+    const tipo = espacio.value.vehicle_types.toLowerCase().split('"')[1]
+    console.log(tipo)
     let iconUrl = null;
-    if (tipo === "auto") {
+    if (tipo === "car") {
       iconUrl = carMarker;
-    } else if (tipo === "bicicleta") {
+    } else if (tipo === "van") {
+      iconUrl = markerIcon;
+    } else if (tipo === "bicycle") {
       iconUrl = bicycleMarker;
-    } else if (tipo === "camioneta") {
+    } else if (tipo === "motorcycle") {
       iconUrl = truckMarker;
     }
     return { url: iconUrl, scaledSize: { width: 40, height: 40 } };
@@ -163,6 +185,7 @@ const markerIcon = computed(() => {
 const reservar = () => {
   if (espacio.value) {
     router.push(`/reserva/${espacio.value.id}`);
+    console.log(tipoVehiculo.value);
   }
 };
 </script>
