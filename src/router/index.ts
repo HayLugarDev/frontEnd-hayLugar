@@ -8,6 +8,7 @@ import checkout from '../pages/checkout.vue';
 import payment from '../pages/payment.vue';
 import confirmaReserva from '../pages/confirmaReserva.vue';
 import profile from '../pages/profile.vue';
+import wallet from '../pages/wallet.vue';
 import { useUserStore } from '../store/userStore';
 
 const routes: RouteRecordRaw[] = [
@@ -21,6 +22,7 @@ const routes: RouteRecordRaw[] = [
     { path: '/pago', component: payment, meta: { requiresAuth: true }},
     { path: '/confirmacion', component: confirmaReserva, meta: { requiresAuth: true }},
     { path: '/profile', component: profile, meta: { requiresAuth: true } },
+    { path: '/wallet', component: wallet, meta: { requiresAuth: true } },
   
 ];
 

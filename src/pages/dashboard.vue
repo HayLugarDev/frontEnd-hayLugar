@@ -165,6 +165,7 @@ const mapOptions = ref({
 const obtenerEspacios = async () => {
   try {
     const spaces = await getAllSpaces();
+    console.log(spaces)
     if (!spaces || spaces.length < 1) {
       return 'No hay espacios todavía';
     }

@@ -1,37 +1,70 @@
+// services/spaceService.ts
 import api from "./apiService";
 
 export const getAllSpaces = async () => {
   try {
     const response = await api.get("/spaces/getAll");
-    const data = Array.isArray(response.data) ? response.data.map((e: { dataValues: { images: string | []; }; }) => {
-      if (typeof e.dataValues.images === 'string') {
+    const raw = response.data;
+    if (!Array.isArray(raw)) return [];
+
+    return raw.map((item: any) => {
+      // parseamos images
+      if (typeof item.dataValues.images === "string") {
         try {
-          e.dataValues.images = JSON.parse(e.dataValues.images);
-        } catch (error) {
-          console.error('Error al parsear images:', error);
-          e.dataValues.images = [];
+          item.dataValues.images = JSON.parse(item.dataValues.images);
+        } catch {
+          item.dataValues.images = [];
+        }
+      } else if (Array.isArray(item.dataValues.images)) {
+        item.dataValues.images = item.dataValues.images;
+      }
+      
+      // parseamos otros campos JSON si los necesitas...
+      if (typeof item.dataValues.paymentMethods === "string") {
+        try {
+          item.dataValues.paymentMethods = JSON.parse(item.dataValues.paymentMethods);
+        } catch {
+          item.dataValues.paymentMethods = [];
         }
       }
-      return e.dataValues;
-    }) : [];
-    return data;
+
+      return item.dataValues;
+    });
   } catch (error) {
     console.error("Error al obtener los espacios:", error);
+    return [];
   }
-}
+};
 
 export const getSpaceById = async (id: number) => {
   try {
     const response = await api.get(`/spaces/getbyid/${id}`);
-    if (typeof response.data.images === 'string') {
+    const item = response.data as any;
+
+    // mismo parsing para un solo registro
+    let images: string[] = [];
+    if (typeof item.images === "string") {
       try {
-        response.data.images = JSON.parse(response.data.images);
-      } catch (error) {
-        console.error('Error al parsear images:', error);
-        response.data.images = [];
+        images = JSON.parse(item.images);
+      } catch {
+        images = [];
       }
     }
-    return response.data;
+
+    let paymentMethods: string[] = [];
+    if (typeof item.paymentMethods === "string") {
+      try {
+        paymentMethods = JSON.parse(item.paymentMethods);
+      } catch {
+        paymentMethods = [];
+      }
+    }
+
+    return {
+      ...item,
+      images,
+      paymentMethods,
+    };
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
   }
