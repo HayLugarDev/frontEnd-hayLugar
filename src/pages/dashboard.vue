@@ -5,31 +5,31 @@
       <font-awesome-icon icon="search" class="text-xs" />
       <span class="lexend">Comenzar búsqueda</span>
     </button>
-    <div class="hidden md:grid md:grid-cols-11 gap-4 sm:gap-6 items-center justify-center overflow-x-auto px-8 lg:px-4 py-8 sm:py-10 shadow-md border-b-2 bg-primary rounded-md">
+    <div class="hidden md:grid md:grid-cols-11 gap-2 sm:gap-4 items-center justify-center overflow-x-auto px-8 lg:px-2 py-2 sm:py-4 shadow-md border-b-2 bg-primary rounded-md">
       <span
-        class="anton-regular col-span-6 sm:col-span-8 sm:col-start-2 text-3xl sm:text-4xl lg:text-4xl text-white">
-        <font-awesome-icon icon="map-marker-alt" class="text-5xl text-white" />
+        class="anton-regular col-span-6 sm:col-span-8 sm:col-start-2 text-3xl lg:text-4xl text-white">
+        <font-awesome-icon icon="map-marker-alt" class="text-4xl text-white" />
         Encontrá tu próximo estacionamiento...
       </span>
-      <div class="relative grid grid-cols-6 col-span-10 col-start-2 col-end-11 xl:col-span-6 xl:col-start-3 xl:col-end-10 items-center justify-between rounded-full shadow-xl h-[70px]">
+      <div class="relative grid grid-cols-6 col-span-10 col-start-2 col-end-10 lg:col-span-8 lg:col-start-3 lg:col-end-10 xl:col-span-6 xl:col-start-3 xl:col-end-10 items-center justify-between rounded-full shadow-xl h-14">
         <div class="bg-white col-span-2 relative flex items-center shadow-sm h-full border-r rounded-l-full">
-          <label class="absolute top-2 left-6 px-2 text-sm" for="">Lugar</label>
+          <label class="absolute top-1 left-6 px-2 text-sm" for="">Lugar</label>
           <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Buscar ubicación"
-            class="text-gray-500 text-lg border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
+            class="text-gray-500 text-md border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
         </div>
         <div class="bg-white col-span-2 relative flex items-center shadow-sm h-full border-r">
-          <label class="absolute top-2 left-6 px-2 text-sm" for="">Entrada</label>
+          <label class="absolute top-1 left-6 px-2 text-sm" for="">Entrada</label>
           <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Desde?"
-            class="text-gray-500 text-lg border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
+            class="text-gray-500 text-md border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
         </div>
         <div class="bg-white col-span-2 relative flex items-center shadow-sm h-full border-none rounded-r-full">
-          <label class="absolute top-2 left-6 px-2 text-sm" for="">Salida</label>
+          <label class="absolute top-1 left-6 px-2 text-sm" for="">Salida</label>
           <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Hasta?"
-            class="text-gray-500 text-lg border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
+            class="text-gray-500 text-md border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
         </div>
         <div class="absolute p-0.5 h-full right-0.5">
           <button @click="buscar"
-            class="z-1 col-span-1 p-4 h-full w-20 text-white hover:bg-primary bg-slate-700 text-xl rounded-full">
+            class="z-1 col-span-1 p-2 h-full w-14 text-white hover:bg-primary bg-slate-700 text-xl rounded-full">
             <font-awesome-icon icon="search" />
           </button>
         </div>
@@ -165,7 +165,6 @@ const mapOptions = ref({
 const obtenerEspacios = async () => {
   try {
     const spaces = await getAllSpaces();
-    console.log(spaces)
     if (!spaces || spaces.length < 1) {
       return 'No hay espacios todavía';
     }
@@ -231,18 +230,4 @@ const handleMarkerClick = (espacio) => {
 .gm-style-iw {
   z-index: 9999 !important;
 }
-
-.anton-regular {
-  font-family: "Anton", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.lexend {
-  font-family: "Lexend Deca", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-}
-
 </style>
