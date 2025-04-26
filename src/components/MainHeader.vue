@@ -1,7 +1,7 @@
 <template>
   <header
     class="backdrop:bg-secondary gap-4 hidden md:flex md:flex-row justify-between items-center rounded-b-lg border-b px-4 pt-2 sm:px-10 sm:mx-16">
-    <Logo widht="20" />
+    <Logo widht="16" />
     <div v-if="authChecked" class="flex flex-row justify-between gap-2">
       <div class="relative flex flex-row sm:gap-2 items-center max-h-12">
         <button @click="verifyToken('/add-space')"
@@ -27,8 +27,6 @@
           <li v-if="isAuthenticated && userStore.user" @click="verifyToken('/quit')"
             class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Cerrar sesión</li>
         </ul>
-        <!-- <GlobalButton :route="'/login'" :text="'Ingresar'" :color="'text-primary'" background="bg-secondary" />
-          <GlobalButton :route="'register'" :text="'Registrarse'" :color="'text-secondary'" background="bg-primary" /> -->
       </div>
     </div>
     <!-- <div
@@ -49,10 +47,6 @@
           <option value="semana">Por Semana</option>
           <option value="mes">Por Mes</option>
         </select>
-        <button @click="buscar"
-          class="bg-primary text-white p-2 xl:p-3 rounded-full ml-2 shadow-md hover:scale-105 transition-all">
-          <font-awesome-icon icon="search" />
-        </button>
       </div> -->
   </header>
   <SessionExpired :sessionExpired="activedSession" />

@@ -1,6 +1,6 @@
 <template>
   <GoogleMap
-  api-key="AIzaSyAmrMZNbht09n3JRbOqQD002iel4JJZV0E"
+  :apiKey="apiKey"
   
   class="w-full h-full rounded-lg shadow-md"
   :center="center"

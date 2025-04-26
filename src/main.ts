@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import { createPinia } from 'pinia';
 import './assets/main.css';
+import 'flowbite';
 import VueGoogleMaps from '@fawmi/vue-google-maps';
 // Importa la librería y los iconos que necesites
 import { library } from '@fortawesome/fontawesome-svg-core';
