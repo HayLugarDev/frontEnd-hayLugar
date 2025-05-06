@@ -3,9 +3,7 @@
         <div class="bg-secondary p-4 rounded-xl sm:hover:shadow-xl transition-all h-full">
             <div v-if="espacio && espacio.images && espacio.images.length" class="aspect-square relative">
                 <Logo :widht="'10'" class="absolute right-2 bottom-0 z-50" />
-                <!-- <img :src="`http://localhost:3000${espacio.images[0]}`" alt="Espacio"
-                    class="w-full h-full object-cover rounded-lg" /> -->
-                    <Carousel :images="espacio.images" class="w-full h-full object-cover rounded-lg" />
+                <Carousel :images="espacio.images" class="w-full h-full rounded-lg" :controls="false" />
             </div>
             <div class="p-2">
                 <div class="flex flex-row gap-2 items-end">
@@ -16,9 +14,6 @@
                         <p class="text-xl lg:text-sm text-gray-800">
                             <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{
                                 espacio.location.split(',')[1]
-                                ?.split(' ')
-                                .slice(2)
-                                .join(' ')
                             }}
                         </p>
                         <p class="text-md md:text-sm text-gray-500">
@@ -28,7 +23,8 @@
                             <font-awesome-icon icon="money-bill-wave" class="mr-1" /> ${{ espacio.price_per_hour }}/hora
                         </p>
                     </div>
-                    <span class="text-end text-gray-800 text-2xl lg:text-lg"><span class=" text-yellow-600">★</span>4,70</span>
+                    <span class="text-end text-gray-800 text-2xl lg:text-lg"><span
+                            class=" text-yellow-600">★</span>4,70</span>
                 </div>
             </div>
             <!-- <router-link :to="`/espacio/${espacio.id}`">

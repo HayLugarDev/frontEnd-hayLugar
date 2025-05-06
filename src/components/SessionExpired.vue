@@ -23,7 +23,7 @@ const closeModal = () => {
       <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
         <div class="flex flex-col items-center">
           <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-          <h2 class="text-3xl font-bold text-primary mb-2">Hay Lugar</h2>
+          <!-- <h2 class="text-3xl font-bold text-primary mb-2">Hay Lugar</h2> -->
           <p class="text-lg text-gray-700 text-center mb-6">
             Debes iniciar sesión para utilizar esta función.
           </p>

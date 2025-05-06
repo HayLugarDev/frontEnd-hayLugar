@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary lexend xl:w-11/12 mx-auto">
+    <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap"/>
     <MainHeader />
     <button class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
       <font-awesome-icon icon="search" class="text-xs" />
@@ -11,43 +12,12 @@
         <font-awesome-icon icon="map-marker-alt" class="text-4xl text-white" />
         Encontrá tu próximo estacionamiento...
       </span>
-      <div class="relative grid grid-cols-6 col-span-10 col-start-2 col-end-10 lg:col-span-8 lg:col-start-3 lg:col-end-10 xl:col-span-6 xl:col-start-3 xl:col-end-10 items-center justify-between rounded-full shadow-xl h-14">
-        <div class="bg-white col-span-2 relative flex items-center shadow-sm h-full border-r rounded-l-full">
-          <label class="absolute top-1 left-6 px-2 text-sm" for="">Lugar</label>
-          <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Buscar ubicación"
-            class="text-gray-500 text-md border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
-        </div>
-        <div class="bg-white col-span-2 relative flex items-center shadow-sm h-full border-r">
-          <label class="absolute top-1 left-6 px-2 text-sm" for="">Entrada</label>
-          <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Desde?"
-            class="text-gray-500 text-md border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
-        </div>
-        <div class="bg-white col-span-2 relative flex items-center shadow-sm h-full border-none rounded-r-full">
-          <label class="absolute top-1 left-6 px-2 text-sm" for="">Salida</label>
-          <input v-model="searchQuery" @keyup.enter="buscar" type="text" placeholder="Hasta?"
-            class="text-gray-500 text-md border-none w-full h-full rounded-full hover:bg-gray-100 px-8" />
-        </div>
-        <div class="absolute p-0.5 h-full right-0.5">
-          <button @click="buscar"
-            class="z-1 col-span-1 p-2 h-full w-14 text-white hover:bg-primary bg-slate-700 text-xl rounded-full">
-            <font-awesome-icon icon="search" />
-          </button>
-        </div>
-      </div>
+      <CustomInputGroup :inputs="[
+        { label: 'Lugar', placeholder: 'Buscar ubicación', modelValue: searchQuery, background: 'white', textColor: 'gray-500' },
+        { label: 'Entrada', placeholder: 'Desde?', modelValue: checkIn, background: 'white', textColor: 'gray-500' },
+        { label: 'Salida', placeholder: 'Hasta?', modelValue: checkOut, background: 'white', textColor: 'gray-500' },
+      ]" :columns="10" :columnSpan="3" :onSearch="buscar" class="bg-white"/>
     </div>
-    <!-- <div class="flex justify-end p-4">
-      <label class="flex items-center cursor-pointer">
-        <span class="mr-2">Vista de Mapa</span>
-        <input type="checkbox" v-model="showMap" class="hidden" />
-        <div class="w-12 h-6 bg-primary rounded-full relative">
-          <div :class="{
-            'translate-x-6': showMap,
-            'translate-x-0': !showMap
-          }" class="absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300">
-          </div>
-        </div>
-      </label>
-    </div> -->
     <div class="flex flex-row justify-between items-center shadow-md sm:rounded-xl bg-white h-16 py-2">
       <ZoneNavbar />
       <button
@@ -87,15 +57,12 @@
         </CustomGoogleMap>
       </div>
     </div>
-    <!-- <div class="fixed bottom-6 right-6 flex items-center space-x-3">
-      <FloatingButton @click="verifyToken('/add-space')" :text="'Publicar espacio'" :color="'text-secondary'"
-        background='bg-primary' />
-    </div> -->
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, computed } from 'vue';
+import axios from "axios";
 import { useUserStore } from '../store/userStore';
 import { Marker, InfoWindow } from 'vue3-google-map';
 import { useRouter } from 'vue-router';
@@ -106,6 +73,8 @@ import loadIcon from "../assets/load-icon_primary.svg";
 import SpaceCard from '../components/SpaceCard.vue';
 import { getAllSpaces } from '../services/spaceService';
 import MainHeader from '../components/MainHeader.vue';
+import FloatingButton from '../components/FloatingButton.vue';
+import CustomInputGroup from "../components/CustomInputGroup.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -119,11 +88,10 @@ const getMarkerOptions = (espacio) => ({
 
 
 const searchQuery = ref("");
-const refSeccionResultados = ref(HTMLElement);
-console.log("Tipo de ref:", typeof refSeccionResultados);
 const checkIn = ref("");
 const checkOut = ref("");
 const rangoTiempo = ref("hora");
+const refSeccionResultados = ref(HTMLElement);
 const espacios = ref([]);
 const cargando = ref(true);
 const error = ref(null);
@@ -131,6 +99,8 @@ const showMap = ref(false);
 const hoveredSpace = ref(null);
 const center = ref({ lat: -26.8333, lng: -65.2167 });
 const zoom = ref(15);
+const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
+
 
 const mapOptions = ref({
   styles: [
@@ -165,6 +135,7 @@ const mapOptions = ref({
 const obtenerEspacios = async () => {
   try {
     const spaces = await getAllSpaces();
+    console.log(spaces);
     if (!spaces || spaces.length < 1) {
       return 'No hay espacios todavía';
     }
@@ -199,17 +170,34 @@ onMounted(async () => {
 });
 
 const buscar = async () => {
-  await obtenerEspacios();
-  const search = espacios.value.filter(espacio =>
-    espacio.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    espacio.location.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-  console.log(search);
-  espacios.value = search;
-  await nextTick();
-  if (refSeccionResultados.value && searchQuery.value) {
-    refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
+  // if (!searchQuery.value || !checkIn.value || !checkOut.value) {
+  //   console.error('Debes completar búsqueda y fechas');
+  //   return;
+  // }
+  console.log("Buscando:", searchQuery.value, checkIn.value, checkOut.value);
+
+  try {
+    const { data } = await axios.get('/spaces/search', {
+      params: {
+        searchQuery: searchQuery?.value,
+        checkIn: checkIn?.value,
+        checkOut: checkOut?.value
+      }
+    });
+
+    espacios.value = data; // Ahora son los espacios ya filtrados
+    await nextTick();
+
+    if (refSeccionResultados.value && searchQuery.value) {
+      refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
+    }
+  } catch (error) {
+    console.error('Error al buscar espacios:', error);
   }
+};
+
+const toggleMap = () => {
+  showMap.value = !showMap.value;
 };
 
 const handleMouseOver = (espacio) => {

@@ -18,7 +18,7 @@
         <!-- Datos básicos de ubicación -->
         <input v-model="latitude" type="hidden" />
         <input v-model="longitude" type="hidden" />
-        <input v-model="location" type="hidden" />
+        <input v-model="location" />
 
         <!-- Detalles Adicionales de Ubicación -->
         <FormField 
@@ -253,7 +253,24 @@ const handleFileUpload = (event) => {
 };
 
 const setPlace = (place) => {
-  location.value = place.formatted_address || '';
+  const components = place.address_components || [];
+
+  const streetNumber = components.find(c => c.types.includes('street_number'))?.long_name || '';
+  const route = components.find(c => c.types.includes('route'))?.long_name || '';
+  const locality = components.find(c => 
+    c.types.includes('locality') || 
+    c.types.includes('sublocality')
+  )?.long_name || '';
+  const province = components.find(c => c.types.includes('administrative_area_level_1'))?.long_name || '';
+  const country = components.find(c => c.types.includes('country'))?.long_name || '';
+
+  // Armamos cada parte solo si existe
+  const street = [route, streetNumber].filter(Boolean).join(' ');
+
+  const parts = [street, locality, province, country].filter(Boolean);
+
+  location.value = parts.join(', ');
+
   latitude.value = place.geometry.location.lat();
   longitude.value = place.geometry.location.lng();
 };

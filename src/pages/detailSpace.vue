@@ -1,17 +1,11 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary lexend xl:w-11/12 mx-auto">
     <MainHeader />
-    <button
-      class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
-      <font-awesome-icon icon="search" class="text-xs" />
-      <span class="lexend">Comenzar búsqueda</span>
-    </button>
-    <main class="flex flex-col rounded-lg overflow-hidden lg:px-10 w-11/12 xl:w-10/12 mx-auto">
-      <div class="flex items-center">
-        <div class="text-4xl sm:text-3xl font-bold text-primary">{{ espacio?.name }}</div>
-      </div>
+    <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-10/12 mx-auto">
+      <font-awesome-icon icon="fa-angle-left"
+        class="absolute z-50 text-2xl  top-4 right-4 p-2 text-primary rounded-full aspect-square bg-secondary shadow-xl" />
       <div v-if="espacio && espacio.images && espacio.images.length">
-        <Carousel :images="espacio.images" class="lg:hidden"/>
+        <Carousel :images="espacio.images" class="lg:hidden" :controls="false" />
         <div class="hidden lg:grid lg:grid-cols-8 lg:grid-rows-8 gap-2 py-6 h-[400px]">
           <!-- Imagen grande -->
           <div class="col-span-4 row-span-4 md:row-span-8">
@@ -33,14 +27,14 @@
           </template>
         </div>
         <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
-          <div class="col-span-6 grid grid-cols-3 grid-rows-3 gap-1 sm:gap-4 items-center justify-between p-4">
+          <div class="col-span-6 grid grid-cols-3 grid-rows-3 gap-1 sm:gap-4 items-center justify-between p-4 sm:p-10">
             <div class="col-span-2">
+              <div class="flex items-center mb-4">
+                <div class="text-4xl sm:text-3xl font-bold text-primary">{{ espacio?.name }}</div>
+              </div>
               <p class="text-xl sm:text-2xl font-bold text-gray-800">
                 <font-awesome-icon icon="map-marker-alt" class="mr-1" /> {{
                   espacio.location.split(',')[1]
-                    ?.split(' ')
-                    .slice(2)
-                    .join(' ')
                 }}
               </p>
               <p class="text-xl sm:text-2xl text-gray-500 font-semibold">
