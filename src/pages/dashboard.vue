@@ -1,24 +1,22 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary lexend xl:w-11/12 mx-auto">
-    <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap"/>
+    <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap" />
     <MainHeader />
-    <button class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
+    <button
+      class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
       <font-awesome-icon icon="search" class="text-xs" />
       <span class="lexend">Comenzar búsqueda</span>
     </button>
-    <div class="hidden md:grid md:grid-cols-11 gap-2 sm:gap-4 items-center justify-center overflow-x-auto px-8 lg:px-2 py-2 sm:py-4 shadow-md border-b-2 bg-primary rounded-md">
-      <span
-        class="anton-regular col-span-6 sm:col-span-8 sm:col-start-2 text-3xl lg:text-4xl text-white">
+    <div
+      class="hidden md:grid md:grid-cols-11 gap-2 sm:gap-4 items-center justify-center overflow-visible px-8 lg:px-2 py-2 sm:py-4 shadow-md border-b-2 bg-primary rounded-md">
+      <span class="anton-regular col-span-6 sm:col-span-8 sm:col-start-2 text-3xl lg:text-4xl text-white">
         <font-awesome-icon icon="map-marker-alt" class="text-4xl text-white" />
         Encontrá tu próximo estacionamiento...
       </span>
-      <CustomInputGroup :inputs="[
-        { label: 'Lugar', placeholder: 'Buscar ubicación', modelValue: searchQuery, background: 'white', textColor: 'gray-500' },
-        { label: 'Entrada', placeholder: 'Desde?', modelValue: checkIn, background: 'white', textColor: 'gray-500' },
-        { label: 'Salida', placeholder: 'Hasta?', modelValue: checkOut, background: 'white', textColor: 'gray-500' },
-      ]" :columns="10" :columnSpan="3" :onSearch="buscar" class="bg-white"/>
+      <CustomInputGroup v-model:searchQuery="searchQuery" 
+        v-model:checkIn="checkIn" v-model:checkOut="checkOut" :onSearch="buscar" />
     </div>
-    <div class="flex flex-row justify-between items-center shadow-md sm:rounded-xl bg-white h-16 py-2">
+    <div class="hidden sm:flex flex-row justify-between items-center shadow-md sm:rounded-xl bg-white h-16 py-2">
       <ZoneNavbar />
       <button
         class="hidden sm:flex sm:flex-row items-center gap-2 p-2 rounded-xl sm:mr-4 hover:bg-gray-100 shadow-md h-full border hover:border-black">
@@ -34,17 +32,17 @@
         </div>
         <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">{{
           error }}</div>
-        <div v-for="(espacio, index) in espacios" :key="index">
+        <div v-for="(espacio) in espacios" :key="espacio.id">
           <SpaceCard :espacio="espacio" />
         </div>
       </div>
       <div v-else class="flex-1">
         <CustomGoogleMap class="w-full h-full rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
           :options="mapOptions">
-          <Marker v-for="(espacio, index) in espacios" :key="index" :options="getMarkerOptions(espacio)"
-            @mouseover="() => handleMouseOver(espacio)" @mouseout="handleMouseOut"
+          <Marker v-for="(espacio) in espacios" :key="espacio.id" :options="getMarkerOptions(espacio)"
+            @mouseover="handleMouseOver(espacio)" @mouseout="handleMouseOut"
             @click="() => handleMarkerClick(espacio)" />
-          <InfoWindow v-if="hoveredSpace" :position="{
+          <InfoWindow v-if="hoveredSpace && hoveredSpace.latitude && hoveredSpace.longitude" :position="{
             lat: Number(hoveredSpace.latitude),
             lng: Number(hoveredSpace.longitude)
           }" @closeclick="handleMouseOut">
@@ -71,7 +69,7 @@ import CustomGoogleMap from '../components/GoogleMap.vue';
 import ZoneNavbar from "../components/ZoneNavbar.vue";
 import loadIcon from "../assets/load-icon_primary.svg";
 import SpaceCard from '../components/SpaceCard.vue';
-import { getAllSpaces } from '../services/spaceService';
+import { getAllSpaces, getFilteredSpaces } from '../services/spaceService';
 import MainHeader from '../components/MainHeader.vue';
 import FloatingButton from '../components/FloatingButton.vue';
 import CustomInputGroup from "../components/CustomInputGroup.vue";
@@ -91,7 +89,7 @@ const searchQuery = ref("");
 const checkIn = ref("");
 const checkOut = ref("");
 const rangoTiempo = ref("hora");
-const refSeccionResultados = ref(HTMLElement);
+const refSeccionResultados = ref(null);
 const espacios = ref([]);
 const cargando = ref(true);
 const error = ref(null);
@@ -170,30 +168,31 @@ onMounted(async () => {
 });
 
 const buscar = async () => {
-  // if (!searchQuery.value || !checkIn.value || !checkOut.value) {
-  //   console.error('Debes completar búsqueda y fechas');
-  //   return;
-  // }
-  console.log("Buscando:", searchQuery.value, checkIn.value, checkOut.value);
-
+  cargando.value = true;
   try {
-    const { data } = await axios.get('/spaces/search', {
-      params: {
-        searchQuery: searchQuery?.value,
-        checkIn: checkIn?.value,
-        checkOut: checkOut?.value
-      }
+    const response = await getFilteredSpaces({
+      searchQuery: searchQuery?.value,
+      checkIn: checkIn?.value,
+      checkOut: checkOut?.value,
     });
 
-    espacios.value = data; // Ahora son los espacios ya filtrados
+    console.log(response);
+    espacios.value = response;
     await nextTick();
+    cargando.value = false;
 
     if (refSeccionResultados.value && searchQuery.value) {
       refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
     }
   } catch (error) {
-    console.error('Error al buscar espacios:', error);
+    if (error.response) {
+      error.value = "No se encontraron espacios con esos filtros.";
+      console.error('Error response:', error.response.status, error.response.data);
+    } else {
+      console.error('Error:', error.message);
+    }
   }
+  cargando.value = false;
 };
 
 const toggleMap = () => {

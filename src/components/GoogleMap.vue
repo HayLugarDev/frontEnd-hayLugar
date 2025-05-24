@@ -5,6 +5,7 @@
   class="w-full h-full rounded-lg shadow-md"
   :center="center"
   :zoom="zoom"
+  :options="options"
 >
   <slot />
 </GoogleMap>
@@ -14,11 +15,9 @@
 <script setup>
 import { GoogleMap } from 'vue3-google-map';
 
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
 const props = defineProps({
-  apiKey: {
-    type: String,
-    required: true,
-  },
   center: {
     type: Object,
     required: true,
@@ -27,6 +26,10 @@ const props = defineProps({
     type: Number,
     default: 15,
   },
+  options: {
+    type: Object,
+    default: () => ({}) // ← así evitás errores si no se pasan
+  }
   
   // mapOptions: {
   //   type: Object,

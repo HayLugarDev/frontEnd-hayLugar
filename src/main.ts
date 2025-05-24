@@ -19,7 +19,7 @@ library.add(fas, fab, far);
 const app = createApp(App);
 app.use(VueGoogleMaps, {
     load: {
-      key: 'AIzaSyAmrMZNbht09n3JRbOqQD002iel4JJZV0E',
+      key: process.env.VITE_GOOGLE_MAPS_API_KEY,
       libraries: 'places',
     },
   });

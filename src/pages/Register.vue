@@ -2,7 +2,7 @@
   <div class="flex items-center justify-center min-h-screen bg-secondary">
     <div class="bg-white p-8 rounded-lg shadow-xl w-96">
       <img src="/src/assets/logo.png" alt="HayLugAR Logo" class="mx-auto mb-4 w-24" />
-      <h1 class="text-2xl font-bold text-center text-primary">Registrar nuevo usuario</h1>
+      <h1 class="text-2xl font-bold text-center text-primary">Registrá tu cuenta</h1>
       <div v-if="credentialError" class="bg-red-200 w-full py-1 rounded-md text-center text-red-700 border border-red-700">{{ messaggeError }}</div>
       <form @submit.prevent="register">
         <!-- <select v-model="role" class="w-full mt-4 p-2 border rounded">

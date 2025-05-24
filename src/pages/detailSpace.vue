@@ -1,9 +1,8 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary lexend xl:w-11/12 mx-auto">
     <MainHeader />
-    <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-10/12 mx-auto">
-      <font-awesome-icon icon="fa-angle-left"
-        class="absolute z-50 text-2xl  top-4 right-4 p-2 text-primary rounded-full aspect-square bg-secondary shadow-xl" />
+    <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
+      <BackButton class="lg:hidden" />
       <div v-if="espacio && espacio.images && espacio.images.length">
         <Carousel :images="espacio.images" class="lg:hidden" :controls="false" />
         <div class="hidden lg:grid lg:grid-cols-8 lg:grid-rows-8 gap-2 py-6 h-[400px]">
@@ -58,8 +57,7 @@
               </div>
             </section>
             <div class="col-span-3 w-80 h-90 flex justify-center items-center bg-red-500">
-              <CustomGoogleMap :apiKey="apiKey"
-                :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
+              <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
                 class="w-full h-full rounded-lg overflow-hidden shadow-md">
                 <Marker :options="{
                   position: { lat: Number(espacio.latitude), lng: Number(espacio.longitude) },
@@ -73,31 +71,31 @@
               <span class="col-span-2 flex items-start justify-start text-2xl gap-4 font-semibold">
                 Completá tu reserva
               </span>
+              <MenuDropdown v-model="tipoVehiculo" :options="['Camioneta', 'Auto', 'Motocicleta', 'Bicicleta']"
+                :title="'Seleccioná tu vehículo'" :class="'border border-gray-700 rounded-xl'" />
               <div class="col-span-2 grid grid-cols-2 rounded-xl">
                 <MenuDropdown v-model="tipoPlazoReserva" :options="['Por hora', 'Por día', 'Por mes']"
-                  :title="'Por cuanto tiempo?'" :class="'rounded-t-xl border border-gray-500'" />
+                  :title="'Por cuanto tiempo?'" class="rounded-t-xl border border-gray-500" />
+
+                <!-- CheckIn -->
                 <div
                   class="col-span-1 flex flex-col border border-gray-500 rounded-bl-xl p-2 items-center justify-center text-gray-800 cursor-pointer">
                   <label class="font-semibold">CheckIn</label>
-                  <Datepicker v-if="tipoPlazoReserva === 'Por día'" v-model="tiempoInicial"
-                    :enable-time-picker="true === 'Por día'" placeholder="" />
-                  <Datepicker v-if="tipoPlazoReserva === 'Por hora'" v-model="tiempoInicial"
-                    :enable-time-picker="true === 'Por hora'" time-picker />
+                  <Datepicker v-model="tiempoInicial" :enable-time-picker="tipoPlazoReserva === 'Por hora'" :is24="true"
+                    :model-type="tipoPlazoReserva === 'Por hora' ? 'timestamp' : 'date'" placeholder="" />
                 </div>
+
+                <!-- CheckOut -->
                 <div
                   class="col-span-1 flex flex-col border border-gray-500 rounded-br-xl p-2 items-center justify-center text-gray-800 cursor-pointer">
                   <label class="font-semibold">CheckOut</label>
-                  <Datepicker v-if="tipoPlazoReserva === 'Por día'" v-model="tiempoFinal"
-                    :enable-time-picker="true === 'Por día'" />
-                  <Datepicker v-if="tipoPlazoReserva === 'Por hora'" v-model="tiempoFinal"
-                    :enable-time-picker="true === 'Por hora'" time-picker />
+                  <Datepicker v-model="tiempoFinal" :enable-time-picker="tipoPlazoReserva === 'Por hora'" :is24="true"
+                    :model-type="tipoPlazoReserva === 'Por hora' ? 'timestamp' : 'date'" placeholder="" />
                 </div>
               </div>
-              <MenuDropdown v-model="tipoVehiculo" :options="['Camioneta', 'Auto', 'Motocicleta', 'Bicicleta']"
-                :title="'Seleccioná tu vehículo'" :class="'border border-gray-700 rounded-xl'" />
               <div class="col-span-2 h-14 rounded-xl border border-gray-800 grid grid-cols-3 grid-rows-3">
                 <span class="col-span-1 pl-4 pt-2 text-xs font-semibold">TARIFA:</span>
-                <span class="col-span-3 text-center text-2xl font-bold text-gray-800">$1500</span>
+                <span class="col-span-3 text-center text-2xl font-bold text-gray-800">${{ totalCalculado }}</span>
               </div>
               <button @click="reservar"
                 class="col-span-2 bg-accent text-white px-6 py-3 rounded-lg text-lg font-bold shadow-md hover:shadow-xl">
@@ -140,6 +138,8 @@ import MenuDropdown from "../components/MenuDropdown.vue";
 import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import Carousel from '../components/Carousel.vue';
+import BackButton from '../components/BackButton.vue';
+import api from '../services/apiService';
 
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
@@ -182,12 +182,77 @@ const markerIcon = computed(() => {
   return null;
 });
 
-const reservar = () => {
-  if (espacio.value) {
-    router.push(`/reserva/${espacio.value.id}`);
-    console.log(tipoVehiculo.value);
+const reservar = async () => {
+  if (!espacio.value || !tiempoInicial.value || !tiempoFinal.value) {
+    alert('Faltan completar campos para la reserva');
+    return;
+  }
+
+  const payload = {
+    owner_id: espacio.value.owner_id,
+    space_id: espacio.value.id,
+    start_time: new Date(tiempoInicial.value).toISOString(),
+    end_time: new Date(tiempoFinal.value).toISOString(),
+    total: totalCalculado.value,
+    payment_method: 'mercadopago',
+    payment_data: {
+      invoice_name: 'Juan Pérez',
+      invoice_dni: '12345678',
+      invoice_address: 'Av Siempre Viva 742',
+      invoice_email: 'juan@example.com',
+    },
+  };
+
+  try {
+    console.log(payload);
+    const response = await api.post('/reservations/create', payload);
+
+    const data = await response.json();
+    if (response.ok) {
+      alert('Reserva creada con éxito');
+      router.push('/confirmacion'); // o como manejes redirecciones
+    } else {
+      alert(data.message || 'Error al crear la reserva');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error inesperado');
   }
 };
+
+const totalCalculado = computed(() => {
+  if (!tiempoInicial.value || !tiempoFinal.value || !espacio.value) return 0;
+
+  console.log();
+  const inicio = new Date(tiempoInicial.value);
+  const fin = new Date(tiempoFinal.value);
+
+  console.log(inicio);
+
+  if (isNaN(inicio.getTime()) || isNaN(fin.getTime()) || fin <= inicio) return 0;
+
+  const precioHora = Number(espacio.value.price_per_hour);
+  const diferenciaMs = fin - inicio;
+
+  switch (tipoPlazoReserva.value) {
+    case 'Por hora':
+      const horas = diferenciaMs / (1000 * 60 * 60);
+      console.log(horas)
+      return Math.ceil(horas) * precioHora;
+
+    case 'Por día':
+      const dias = diferenciaMs / (1000 * 60 * 60 * 24);
+      return Math.ceil(dias) * precioHora * 24;
+
+    case 'Por mes':
+      const meses = diferenciaMs / (1000 * 60 * 60 * 24 * 30);
+      return Math.ceil(meses) * precioHora * 24 * 30;
+
+    default:
+      return 0;
+  }
+});
+
 </script>
 
 <style scoped></style>

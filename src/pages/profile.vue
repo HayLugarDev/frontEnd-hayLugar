@@ -6,6 +6,7 @@
         <font-awesome-icon icon="user-circle" class="mr-2" />
         Mi Perfil
       </h1>
+      <BackButton />
     </header>
 
     <!-- Información Personal y Datos Financieros -->
@@ -144,6 +145,7 @@ import { useUserStore } from '../store/userStore';
 import api from '../services/apiService';
 import defaultProfilePicture from '../assets/user_icon.png';
 import loadIcon from "../assets/load-icon_primary.svg";
+import BackButton from '../components/BackButton.vue';
 
 const userStore = useUserStore();
 const inputFoto = ref<HTMLInputElement | null>(null);

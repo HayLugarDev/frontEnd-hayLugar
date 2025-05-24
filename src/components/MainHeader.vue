@@ -21,6 +21,8 @@
             Registrarse</li>
           <li v-if="!isAuthenticated" @click="router.push('/login')"
             class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Iniciar sesión</li>
+          <li v-if="isAuthenticated && userStore.user" @click="verifyToken('/profile')"
+            class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Mi Perfil</li>
           <li @click="verifyToken('/add-space')" class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">
             Publica tu espacio</li>
           <li class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Ayuda</li>
