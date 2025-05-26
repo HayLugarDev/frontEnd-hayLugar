@@ -1,81 +1,87 @@
 <template>
-  <div class="flex flex-col md:flex-row min-h-screen bg-secondary p-6 gap-6">
-    <section class="w-full md:w-2/3 space-y-6">
-      <h1 class="text-3xl font-bold text-primary">Confirmar Pago</h1>
-      <!-- Resumen del Espacio y Reserva -->
-      <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
-        <img 
-          :src="`http://localhost:3000${espacio?.images[0]}`" 
-          alt="Imagen del espacio" 
-          class="w-32 h-32 object-cover rounded-lg shadow-md mr-6" 
-        />
-        <div>
-          <h2 class="text-xl font-bold">{{ espacio?.location }}</h2>
-          <p class="text-gray-600">{{ espacio?.description }}</p>
-          <p class="text-lg text-primary font-semibold mt-2">
-            <font-awesome-icon icon="money-bill-wave" class="mr-1" />
-            Total: ${{ total }}
-          </p>
-          <p class="text-sm text-gray-500" v-if="startTime && endTime">
-            Reserva desde: {{ startTime }} hasta: {{ endTime }}
-          </p>
+  <div class="flex flex-col min-h-screen bg-secondary lexend xl:w-11/12 mx-auto">
+    <MainHeader />
+    <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
+      <BackButton class="lg:hidden" />
+      <section class="w-full md:grid md:grid-cols-9 flex flex-col p-4 gap-2">
+        <h1 class="text-2xl text-center md:text-3xl py-6 col-span-5 row-span-1">Confirmá tu Pago</h1>
+
+        <!-- Resumen del Espacio y Reserva -->
+        <div class="md:col-span-4 md:row-start-2 md:col-start-6">
+          <div class="bg-white p-8 rounded-lg shadow-md flex items-start">
+            <img v-if="espacio && espacio.images && espacio.images[0]"
+              :src="`http://localhost:3000${espacio.images[0]}`" alt="Imagen del espacio"
+              class="w-28 h-28 object-cover rounded-lg shadow-md mr-6" />
+            <div>
+              <h3 class="text-md font-semibold text-gray-800">{{ espacio?.name }}</h3>
+              <p class="text-gray-700 text-sm">{{ espacio?.location }}</p>
+              <div class="flex flex-row items-center gap-1 text-gray-800 text-sm">
+                <span><span class=" text-yellow-600">★</span>4,70</span>
+                <span>(32)</span>
+                <span>Excelente</span>
+              </div>
+            </div>
+          </div>
+          <div class="md:col-span-4 grid grid-cols-2 bg-white p-6 rounded-lg shadow-md items-start border-t-2">
+            <p class="text-xl col-span-2 pb-2 border-b">CONCEPTOS FACTURADOS</p>
+            <p class="text-lg col-span-1 row-start-2 text-gray-600 pt-4">Precio por {{ hours }} horas y {{
+              minutes }} minutos</p>
+            <p class="text-lg col-span-1 col-start-2 text-end text-gray-600 pt-4">$ {{ total }}</p>
+          </div>
+          <div class="col-span-4 grid grid-cols-2 bg-white p-6 rounded-lg shadow-md items-start border-t-2">
+            <p class="text-lg col-span-1 row-start-4">Total a pagar</p>
+            <p class="text-lg col-span-1 row-start-4 text-end">$ {{ total }}</p>
+          </div>
         </div>
-      </div>
 
-      <!-- Datos de Facturación -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-semibold mb-4">Datos de Facturación</h2>
-        <input v-model="nombre" type="text" placeholder="Nombre y Apellido" class="border p-2 rounded w-full mb-2" />
-        <input v-model="dni" type="text" placeholder="DNI" class="border p-2 rounded w-full mb-2" />
-        <input v-model="direccion" type="text" placeholder="Dirección" class="border p-2 rounded w-full mb-2" />
-        <input v-model="email" type="email" placeholder="Correo Electrónico" class="border p-2 rounded w-full mb-2" />
-      </div>
-
-      <!-- Métodos de Pago -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-semibold mb-4">Método de Pago</h2>
-        <div class="flex flex-col space-y-4">
-          <label class="flex items-center gap-3">
-            <input type="radio" v-model="metodoPago" value="tarjeta" class="form-radio" />
-            <font-awesome-icon icon="credit-card" class="text-xl" />
-            <span>Tarjeta de Crédito/Débito</span>
-          </label>
+        <!-- Datos de Facturación -->
+        <div class="bg-white p-6 rounded-lg shadow-md md:col-span-5 flex flex-col justify-around">
+          <h2 class="text-lg font-semibold mb-4">Datos de Facturación</h2>
+          <input v-model="nombre" type="text" placeholder="Nombre y Apellido" class="border p-2 rounded w-full mb-2" />
+          <input v-model="dni" type="text" placeholder="DNI" class="border p-2 rounded w-full mb-2" />
+          <input v-model="direccion" type="text" placeholder="Dirección" class="border p-2 rounded w-full mb-2" />
+          <input v-model="email" type="email" placeholder="Correo Electrónico" class="border p-2 rounded w-full mb-2" />
         </div>
-      </div>
 
-      <!-- Sección de Pago con Tarjeta usando MercadoPago Card Payment Brick -->
-      <div v-if="metodoPago === 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
-        <div id="cardPaymentBrick_container"></div>
-      </div>
+        <!-- Métodos de Pago -->
+        <div class="bg-white p-6 rounded-lg shadow-md col-span-full">
+          <h2 class="text-lg font-semibold mb-4">Método de Pago</h2>
+          <div class="flex flex-col space-y-4">
+            <label class="flex items-center gap-3">
+              <input type="radio" v-model="metodoPago" value="tarjeta" class="form-radio" />
+              <font-awesome-icon icon="credit-card" class="text-xl" />
+              <span>Tarjeta de Crédito/Débito</span>
+            </label>
+          </div>
+        </div>
 
-      <!-- Botón de Confirmación para otros métodos (simulado) -->
-      <div v-if="metodoPago !== 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
-        <button 
-          @click="confirmarPagoSimulado" 
-          class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all"
-        >
-          <font-awesome-icon icon="check-circle" class="mr-2" />
-          Confirmar y Pagar
-        </button>
-      </div>
-    </section>
-    <aside class="w-full md:w-1/3 flex justify-center items-center">
-      <img 
-        :src="`http://localhost:3000${espacio?.images[1]}` || 'https://source.unsplash.com/400x300/?parking,garage'" 
-        alt="Imagen del espacio" 
-        class="rounded-lg shadow-lg max-w-full" 
-      />
-    </aside>
+        <!-- Sección de Pago con Tarjeta usando MercadoPago Card Payment Brick -->
+        <div v-if="metodoPago === 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md md:col-span-full">
+          <div id="cardPaymentBrick_container"></div>
+        </div>
+
+        <!-- Botón de Confirmación para otros métodos (simulado) -->
+        <div v-if="metodoPago !== 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
+          <button @click="confirmarPagoSimulado"
+            class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
+            <font-awesome-icon icon="check-circle" class="mr-2" />
+            Confirmar y Pagar
+          </button>
+        </div>
+      </section>
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, nextTick } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { onMounted, ref, watch, nextTick, computed } from 'vue';
+import { useRouter, useRoute, routeLocationKey } from 'vue-router';
 import api from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
 import { loadMercadoPago } from '@mercadopago/sdk-js';
 import { getSpaceById } from '../services/spaceService';
+import BackButton from '../components/BackButton.vue';
+import MainHeader from "../components/MainHeader.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -87,18 +93,20 @@ const nombre = ref("");
 const dni = ref("");
 const direccion = ref("");
 const email = ref("");
-const totalQuery = Array.isArray(route.query.total) ? route.query.total[0] : route.query.total;
-const total = ref(parseFloat(totalQuery || "0"));
-const startTime = ref(route.query.start_time || "");
-const endTime = ref(route.query.end_time || "");
+const total = computed(() => reserva.value.total || 0);
+const totalDuration = computed(() => reserva.value?.dead_line ?? 0);
+const hours = computed(() => { return totalDuration.value ? Math.floor(totalDuration.value) : 0; });
+const minutes = computed(() => { return totalDuration.value ? Math.round((totalDuration.value - hours.value) * 60) : 0; });
+const startTime = computed(() => reserva.value.start_time);
+const endTime = computed(() => reserva.value.end_time);
 const espacio = ref<any>(null);
 
 // Función para obtener los datos del espacio
 const obtenerEspacio = async () => {
   try {
-    const id = route.query.id;
+    const id = reserva.value.space_id;
+    if (!id) throw new Error("No se encontró el espacio");
     const data = await getSpaceById(Number(id));
-    console.log(data);
     espacio.value = data;
     return data;
   } catch (error) {
@@ -106,8 +114,13 @@ const obtenerEspacio = async () => {
   }
 };
 
+
 onMounted(async () => {
   await obtenerEspacio();
+  if (!reservationStore.reservation.space_id || !reservationStore.reservation.start_time) {
+    console.error('Error en envío de datos.');
+    router.push('/dashboard');
+  }
   if (metodoPago.value === 'tarjeta') {
     await nextTick();
     setTimeout(async () => {
@@ -115,6 +128,8 @@ onMounted(async () => {
     }, 300);
   }
 });
+
+const reserva = computed(() => reservationStore.reservation);
 
 watch(metodoPago, async (newVal) => {
   if (newVal === 'tarjeta') {
@@ -125,11 +140,23 @@ watch(metodoPago, async (newVal) => {
   }
 });
 
+// watch(email, async (newEmail) => {
+//   if (metodoPago.value === 'tarjeta' && newEmail) {
+//     await nextTick();
+//     await initCardBrick();
+//   }
+// });
+
 let cardForm: any = null;
 
 // Inicializa el Brick de MercadoPago
 const initCardBrick = async () => {
   await loadMercadoPago();
+
+  if (total.value <= 0) {
+    alert("El monto a pagar no es válido.");
+    return;
+  }
   const mp = new window.MercadoPago('TEST-f39e0ddb-bc5b-491c-9245-0461fdeccb74', { locale: 'es-AR' });
   const bricksBuilder = mp.bricks();
   const settings = {
@@ -167,6 +194,10 @@ const initCardBrick = async () => {
     },
   };
 
+  if (window.cardPaymentBrickController) {
+    window.cardPaymentBrickController.unmount();
+  }
+
   const container = document.getElementById("cardPaymentBrick_container");
   if (container) {
     container.innerHTML = "";
@@ -179,37 +210,43 @@ const initCardBrick = async () => {
 // Función para confirmar el pago utilizando el Checkout API
 // Ahora se recibe paymentMethodReal
 const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMethodReal: string) => {
+
+  if (!nombre.value || !dni.value || !direccion.value || !email.value) {
+    alert("Por favor, completa todos los datos de facturación antes de pagar.");
+    return;
+  }
+
   // Guardamos el token recibido en una variable local
   const tokenValue = token;
-  
+
   // Actualizamos el store con los datos de facturación
   reservationStore.setReservationData({
     payment_method: metodoPago.value,
-    payment_data: { 
+    payment_data: {
       invoice_name: nombre.value,
       invoice_dni: dni.value,
       invoice_address: direccion.value,
-      invoice_email: email.value 
+      invoice_email: email.value
     }
   });
-  
+
   // Creamos la reserva en estado "pending" y capturamos el resultado
   let reservationResponse;
   try {
     reservationResponse = await reservationStore.submitReservation();
-} catch (error) {
-  console.error("Error al crear la reserva:", error);
-  alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
-  return;
-}
-// Extraemos el id desde axiosResponse.data
-const reservationId = reservationResponse.reservation.id;
-if (!reservationId) {
-  console.error("reservationId no encontrado en la respuesta:", reservationResponse);
-  alert("Error interno: no se pudo obtener el ID de la reserva.");
-  return;
-}
-  
+  } catch (error) {
+    console.error("Error al crear la reserva:", error);
+    alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
+    return;
+  }
+  // Extraemos el id desde axiosResponse.data
+  const reservationId = reservationResponse.reservation.id;
+  if (!reservationId) {
+    console.error("reservationId no encontrado en la respuesta:", reservationResponse);
+    alert("Error interno: no se pudo obtener el ID de la reserva.");
+    return;
+  }
+
   // Construir el payload para enviar a nuestro endpoint que procesa el pago,
   // asegurándonos de incluir el payment_method_id real y otros campos requeridos.
   const payload = {
@@ -230,7 +267,7 @@ if (!reservationId) {
     installments: 1
   };
   console.log("Payload a enviar:", payload);
-  
+
   // Procesamos el pago mediante nuestro endpoint (ejemplo: /payments/create)
   try {
     const response = await api.post('/payments/process_payment', payload);
@@ -253,26 +290,17 @@ const confirmarPagoSimulado = async () => {
     alert("Por favor, completa todos los datos de facturación.");
     return;
   }
-  
+
   reservationStore.setReservationData({
     payment_method: metodoPago.value,
-    payment_data: { 
+    payment_data: {
       invoice_name: nombre.value,
       invoice_dni: dni.value,
       invoice_address: direccion.value,
-      invoice_email: email.value 
+      invoice_email: email.value
     }
   });
-  
-  let reservationResponse;
-  try {
-    reservationResponse = await reservationStore.submitReservation();
-  } catch (error) {
-    console.error("Error al crear la reserva:", error);
-    alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
-    return;
-  }
-  
+
   console.log("Enviando reserva:", reservationStore.reservation);
   try {
     const response = await reservationStore.submitReservation();
@@ -306,10 +334,13 @@ const confirmarPagoSimulado = async () => {
   padding: 1px 2px;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.2s ease;
 }
-.fade-enter-from, .fade-leave-to {
+
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

@@ -139,17 +139,19 @@ import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import Carousel from '../components/Carousel.vue';
 import BackButton from '../components/BackButton.vue';
-import api from '../services/apiService';
+import { useReservationStore } from '../store/reservationStore';
 
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
 const router = useRouter();
 const route = useRoute();
+const reservationStore = useReservationStore();
 const tiempoInicial = ref(null);
 const tiempoFinal = ref(null);
 const tipoVehiculo = ref('');
 const tipoPlazoReserva = ref('Por hora');
 const espacio = ref(null);
+const deadLine = ref(null);
 
 const obtenerEspacio = async () => {
   try {
@@ -193,31 +195,12 @@ const reservar = async () => {
     space_id: espacio.value.id,
     start_time: new Date(tiempoInicial.value).toISOString(),
     end_time: new Date(tiempoFinal.value).toISOString(),
+    dead_line: deadLine.value,
     total: totalCalculado.value,
-    payment_method: 'mercadopago',
-    payment_data: {
-      invoice_name: 'Juan Pérez',
-      invoice_dni: '12345678',
-      invoice_address: 'Av Siempre Viva 742',
-      invoice_email: 'juan@example.com',
-    },
   };
 
-  try {
-    console.log(payload);
-    const response = await api.post('/reservations/create', payload);
-
-    const data = await response.json();
-    if (response.ok) {
-      alert('Reserva creada con éxito');
-      router.push('/confirmacion'); // o como manejes redirecciones
-    } else {
-      alert(data.message || 'Error al crear la reserva');
-    }
-  } catch (err) {
-    console.error(err);
-    alert('Error inesperado');
-  }
+  reservationStore.setReservationData(payload);
+  router.push('/pago'); 
 };
 
 const totalCalculado = computed(() => {
@@ -237,15 +220,16 @@ const totalCalculado = computed(() => {
   switch (tipoPlazoReserva.value) {
     case 'Por hora':
       const horas = diferenciaMs / (1000 * 60 * 60);
-      console.log(horas)
+      deadLine.value = horas;
       return Math.ceil(horas) * precioHora;
 
     case 'Por día':
       const dias = diferenciaMs / (1000 * 60 * 60 * 24);
+      deadLine.value = dias;
       return Math.ceil(dias) * precioHora * 24;
-
     case 'Por mes':
       const meses = diferenciaMs / (1000 * 60 * 60 * 24 * 30);
+      deadLine.value = meses;
       return Math.ceil(meses) * precioHora * 24 * 30;
 
     default:

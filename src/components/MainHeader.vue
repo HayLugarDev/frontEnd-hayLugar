@@ -3,7 +3,7 @@
     class="backdrop:bg-secondary gap-4 hidden md:flex md:flex-row justify-between items-center rounded-b-lg border-b px-4 pt-2 sm:px-10 sm:mx-16">
     <Logo widht="16" />
     <div v-if="authChecked" class="flex flex-row justify-between gap-2">
-      <div class="relative flex flex-row sm:gap-2 items-center max-h-12">
+      <div v-if="route.path !== '/pago'" class="relative flex flex-row sm:gap-2 items-center max-h-12">
         <button @click="verifyToken('/add-space')"
           class="text-gray-800 sm:text-md hover:shadow-lg hover:bg-gray-50 py-2 px-4 rounded-full cursor-pointer h-full">
           Publicá tu espacio
@@ -57,7 +57,7 @@
 import Logo from './Logo.vue';
 import { useUserStore } from '../store/userStore';
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { verifyActiveSession } from '../middleware/verifyToken';
 import SessionExpired from './SessionExpired.vue';
 
@@ -66,6 +66,7 @@ const authChecked = ref(false);
 const activedSession = ref(false);
 const openMenu = ref(false);
 const router = useRouter();
+const route = useRoute();
 
 const isAuthenticated = computed(() => {
   return !!userStore.token;

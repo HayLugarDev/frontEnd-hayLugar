@@ -12,6 +12,7 @@ export const useReservationStore = defineStore('reservation', {
       space_id: null as number | null,
       start_time: null as string | null,
       end_time: null as string | null,
+      dead_line: null as number | null,
       total: 0,
       payment_method: null as string | null, // "tarjeta", "mercadopago", "transferencia"
       payment_data: null as Record<string, any> | null, // Datos de facturación (invoice_name, invoice_dni, invoice_address, invoice_email)
@@ -65,6 +66,7 @@ export const useReservationStore = defineStore('reservation', {
         space_id: null,
         start_time: null,
         end_time: null,
+        dead_line: null,
         total: 0,
         payment_method: null,
         payment_data: null,
