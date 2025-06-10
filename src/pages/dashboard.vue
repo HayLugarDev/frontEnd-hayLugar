@@ -1,58 +1,57 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-secondary lexend xl:w-11/12 mx-auto">
-    <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap" />
-    <MainHeader />
-    <button
-      class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
-      <font-awesome-icon icon="search" class="text-xs" />
-      <span class="lexend">Comenzar búsqueda</span>
-    </button>
-    <div
-      class="hidden md:grid md:grid-cols-11 gap-2 sm:gap-4 items-center justify-center overflow-visible px-8 lg:px-2 py-2 sm:py-4 shadow-md border-b-2 bg-primary rounded-md">
-      <span class="anton-regular col-span-6 sm:col-span-8 sm:col-start-2 text-3xl lg:text-4xl text-white">
-        <font-awesome-icon icon="map-marker-alt" class="text-4xl text-white" />
-        Encontrá tu próximo estacionamiento...
-      </span>
-      <CustomInputGroup v-model:searchQuery="searchQuery" 
-        v-model:checkIn="checkIn" v-model:checkOut="checkOut" :onSearch="buscar" />
-    </div>
-    <div class="hidden sm:flex flex-row justify-between items-center shadow-md sm:rounded-xl bg-white h-16 py-2">
+  <div>
+    <DashboardSkeleton v-if="cargando" />
+    <div v-else class="flex flex-col h-full bg-secondary">
+      <MainHeader />
+      <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap" />
+      <button
+        class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
+        <font-awesome-icon icon="search" class="text-xs" />
+        <span>Comenzar búsqueda</span>
+      </button>
+      <div
+        class="hidden md:grid md:grid-cols-11 gap-2 sm:gap-4 items-center justify-center overflow-visible px-8 lg:px-2 py-2 sm:py-4 shadow-md border-b-2 bg-primary rounded-md">
+        <span class="anton-regular col-span-6 sm:col-span-8 sm:col-start-2 text-3xl lg:text-4xl text-white">
+          <font-awesome-icon icon="map-marker-alt" class="text-4xl text-white" />
+          Encontrá tu próximo estacionamiento...
+        </span>
+        <CustomInputGroup v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
+          :onSearch="buscar" />
+      </div>
+      <!-- <div class="hidden sm:flex flex-row justify-between items-center shadow-md sm:rounded-xl bg-white h-16 py-2">
       <ZoneNavbar />
       <button
         class="hidden sm:flex sm:flex-row items-center gap-2 p-2 rounded-xl sm:mr-4 hover:bg-gray-100 shadow-md h-full border hover:border-black">
         <font-awesome-icon icon="fa-align-left" class="text-gray-500" />
         <span>Filtrar</span>
       </button>
-    </div>
+    </div> -->
 
-    <div ref="refSeccionResultados" class="flex flex-1 p-2 sm:p-6">
-      <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4 gap-2">
-        <div v-if="cargando" class="absolute top-1/4 flex justify-center items-center marker:text-center w-full">
-          <img :src="loadIcon" alt="" class="max-w-10">
+      <div ref="refSeccionResultados" class="flex flex-1 p-2 sm:p-6">
+        <div v-if="!showMap"
+          class="relative flex-1 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
+          <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">{{
+            error }}</div>
+          <SpaceCard v-for="espacio in espacios" :key="espacio.id" :espacio="espacio" />
         </div>
-        <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">{{
-          error }}</div>
-        <div v-for="(espacio) in espacios" :key="espacio.id">
-          <SpaceCard :espacio="espacio" />
+        <div v-else class="flex-1">
+          <CustomGoogleMap class="w-full h-full rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
+            :options="mapOptions">
+            <Marker v-for="(espacio) in espacios" :key="espacio.id" :options="getMarkerOptions(espacio)"
+              @mouseover="handleMouseOver(espacio)" @mouseout="handleMouseOut"
+              @click="() => handleMarkerClick(espacio)" />
+            <InfoWindow v-if="hoveredSpace && hoveredSpace.latitude && hoveredSpace.longitude" :position="{
+              lat: Number(hoveredSpace.latitude),
+              lng: Number(hoveredSpace.longitude)
+            }" @closeclick="handleMouseOut">
+              <div class="p-2">
+                <h3 class="text-lg font-bold">{{ hoveredSpace.name }}</h3>
+                <p class="text-sm">{{ hoveredSpace.location }}</p>
+                <p class="text-sm text-primary">${{ hoveredSpace.price_per_hour }}/hora</p>
+              </div>
+            </InfoWindow>
+          </CustomGoogleMap>
         </div>
-      </div>
-      <div v-else class="flex-1">
-        <CustomGoogleMap class="w-full h-full rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
-          :options="mapOptions">
-          <Marker v-for="(espacio) in espacios" :key="espacio.id" :options="getMarkerOptions(espacio)"
-            @mouseover="handleMouseOver(espacio)" @mouseout="handleMouseOut"
-            @click="() => handleMarkerClick(espacio)" />
-          <InfoWindow v-if="hoveredSpace && hoveredSpace.latitude && hoveredSpace.longitude" :position="{
-            lat: Number(hoveredSpace.latitude),
-            lng: Number(hoveredSpace.longitude)
-          }" @closeclick="handleMouseOut">
-            <div class="p-2">
-              <h3 class="text-lg font-bold">{{ hoveredSpace.name }}</h3>
-              <p class="text-sm">{{ hoveredSpace.location }}</p>
-              <p class="text-sm text-primary">${{ hoveredSpace.price_per_hour }}/hora</p>
-            </div>
-          </InfoWindow>
-        </CustomGoogleMap>
       </div>
     </div>
   </div>
@@ -60,19 +59,17 @@
 
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
-import axios from "axios";
 import { useUserStore } from '../store/userStore';
 import { Marker, InfoWindow } from 'vue3-google-map';
 import { useRouter } from 'vue-router';
 import logoMarker from '../assets/logo.png';
 import CustomGoogleMap from '../components/GoogleMap.vue';
-import ZoneNavbar from "../components/ZoneNavbar.vue";
-import loadIcon from "../assets/load-icon_primary.svg";
 import SpaceCard from '../components/SpaceCard.vue';
 import { getAllSpaces, getFilteredSpaces } from '../services/spaceService';
 import MainHeader from '../components/MainHeader.vue';
 import FloatingButton from '../components/FloatingButton.vue';
 import CustomInputGroup from "../components/CustomInputGroup.vue";
+import DashboardSkeleton from '../components/DashboardSkeleton.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -134,13 +131,18 @@ const obtenerEspacios = async () => {
   try {
     const spaces = await getAllSpaces();
     console.log(spaces);
+
     if (!spaces || spaces.length < 1) {
-      return 'No hay espacios todavía';
+      espacios.value = [];
+      error.value = "Aún no hay espacios creados.";
+    } else {
+      espacios.value = spaces;
     }
-    espacios.value = spaces;
-    cargando.value = false;
+
   } catch (err) {
     error.value = "No se pudieron cargar los espacios.";
+    console.error(err);
+  } finally {
     cargando.value = false;
   }
 };

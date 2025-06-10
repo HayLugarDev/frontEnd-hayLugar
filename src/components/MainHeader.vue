@@ -1,14 +1,23 @@
 <template>
   <header
-    class="backdrop:bg-secondary gap-4 hidden md:flex md:flex-row justify-between items-center rounded-b-lg border-b px-4 pt-2 sm:px-10 sm:mx-16">
-    <Logo widht="16" />
+    class="backdrop:bg-secondary gap-4 hidden md:flex md:flex-row justify-between items-center border-b-2 px-4 pt-2 xl:px-10 xl:mx-16">
+    <Logo widht="16" @click="router.push('/dashboard')" />
     <div v-if="authChecked" class="flex flex-row justify-between gap-2">
-      <div v-if="route.path !== '/pago'" class="relative flex flex-row sm:gap-2 items-center max-h-12">
-        <button @click="verifyToken('/add-space')"
+      <div v-if="route.path === '/add-space'" @click="router.push('/dashboard')">
+        <button class="text-gray-800 border sm:text-md hover:shadow-lg bg-gray-50 py-2 px-4 rounded-full cursor-pointer h-full">
+          Salir
+        </button>
+      </div>
+      <div v-if="route.path === '/dashboard' || route.path.startsWith('/espacio')" class="relative flex flex-row sm:gap-2 items-center max-h-12">
+        <button v-if="route.path !== '/add-space' || !route.path.startsWith('/espacio')" @click="verifyToken('/add-space')"
           class="text-gray-800 sm:text-md hover:shadow-lg hover:bg-gray-50 py-2 px-4 rounded-full cursor-pointer h-full">
           Publicá tu espacio
         </button>
-        <button @click="openUserMenu"
+        <button @click="openLoginMenu" v-if="route.path === '/login'"
+          class="w-11 h-11 rounded-full border-2 bg-gray-200">
+          <font-awesome-icon icon="fa-align-justify" />
+        </button>
+        <button @click="openUserMenu" v-if="route.path !== '/login'"
           class="flex flex-row h-full hover:shadow-lg hover:bg-gray-50 gap-2 pl-4 pr-2 py-1 items-center justify-between rounded-full cursor-pointer">
           <font-awesome-icon v-if="!openMenu" icon="fa-angle-down" class="text-gray-500" />
           <font-awesome-icon v-else icon="fa-angle-up" class="text-gray-500" />
@@ -25,31 +34,14 @@
             class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Mi Perfil</li>
           <li @click="verifyToken('/add-space')" class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">
             Publica tu espacio</li>
+          <li @click="verifyToken('/wallet')" class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">
+            Wallet</li>
           <li class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Ayuda</li>
           <li v-if="isAuthenticated && userStore.user" @click="verifyToken('/quit')"
             class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Cerrar sesión</li>
         </ul>
       </div>
     </div>
-    <!-- <div
-        class="col-span-5 justify-center flex flex-col md:flex-row items-center md:w-auto bg-gray-100 p-3 rounded-full shadow-md">
-        <div class="flex items-center">
-          <font-awesome-icon icon="map-marker-alt" class="text-xl text-primary" />
-          <input v-model="searchQuery" type="text" placeholder="Buscar ubicación"
-            class="flex-1 outline-none px-4 py-2 bg-white rounded-full text-textPrimary shadow-sm" />
-        </div>
-        <input v-model="checkIn" type="date"
-          class="outline-none px-4 py-2 bg-white border-l md:border-none rounded-md shadow-sm" />
-        <input v-model="checkOut" type="date"
-          class="outline-none px-4 py-2 bg-white border-l md:border-none rounded-md shadow-sm" />
-        <select v-model="rangoTiempo"
-          class="outline-none px-4 py-2 bg-white border-l md:border-none rounded-md shadow-sm">
-          <option value="hora">Por Hora</option>
-          <option value="dia">Por Día</option>
-          <option value="semana">Por Semana</option>
-          <option value="mes">Por Mes</option>
-        </select>
-      </div> -->
   </header>
   <SessionExpired :sessionExpired="activedSession" />
 </template>
@@ -60,6 +52,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { verifyActiveSession } from '../middleware/verifyToken';
 import SessionExpired from './SessionExpired.vue';
+import BackButton from "./BackButton.vue";
 
 const userStore = useUserStore();
 const authChecked = ref(false);
@@ -98,6 +91,10 @@ const verifyToken = async (route) => {
 }
 
 const openUserMenu = () => {
+  openMenu.value = !openMenu.value;
+}
+
+const openLoginMenu = () => {
   openMenu.value = !openMenu.value;
 }
 </script>

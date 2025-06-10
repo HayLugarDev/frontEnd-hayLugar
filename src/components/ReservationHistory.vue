@@ -39,7 +39,7 @@ interface Reservation {
   total: number;
 }
 
-const reservations = ref<Reservation[]>([]);
+const reservations = ref([]);
 const userStore = useUserStore();
 
 const fetchReservations = async () => {

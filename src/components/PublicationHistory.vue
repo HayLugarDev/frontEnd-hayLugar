@@ -8,11 +8,11 @@
         <li v-for="(pub, index) in publications" :key="index" class="py-4">
           <p class="flex items-center">
             <font-awesome-icon icon="map-marker-alt" class="mr-2 text-primary" />
-            <strong>Ubicación:</strong> {{ pub.dataValues.location }}
+            <strong>Ubicación:</strong> {{ pub.name }}
           </p>
           <p class="flex items-center">
             <font-awesome-icon icon="calendar-alt" class="mr-2 text-primary" />
-            <strong>Fecha de Publicación:</strong> {{ formatDate(pub.dataValues.created_at) }}
+            <strong>Fecha de Publicación:</strong> {{ formatDate(pub.created_at) }}
           </p>
         </li>
       </ul>
@@ -24,18 +24,11 @@
   import { ref, onMounted } from 'vue';
   import { useUserStore } from '../store/userStore';
   import api from '../services/apiService';
-  
-  interface Publication {
-    dataValues: {
-      location: string;
-      created_at: string;
-    }
-  }
 
-  const publications = ref<Publication[]>([]);
+  const publications = ref([]);
   const userStore = useUserStore();
   
-  const fetchReservations = async () => {
+  const fetchPublications = async () => {
   const userId = userStore.user?.id;
   if (!userId) {
     console.error("No se encontró el ID de usuario en userStore");
@@ -43,15 +36,15 @@
   }
   try {
     const response = await api.get(`spaces/myspaces`);
-    console.log(response);
     publications.value = response.data;
+    console.log(publications.value);
   } catch (error) {
     console.error("Error al obtener historial de publicaciones", error);
   }
 };
 
 onMounted(() => {
-  fetchReservations();
+  fetchPublications();
 });
 
   

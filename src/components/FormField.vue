@@ -1,5 +1,5 @@
 <template>
-    <label class="block">
+    <label class="block mt-4">
     <span class="text-lg font-semibold text-black">{{ label }}</span>
     <input
       :value="modelValue"

@@ -2,16 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-
-.anton-regular {
-    font-family: "Anton", sans-serif;
-    font-weight: 400;
-    font-style: normal;
+/* tailwind.config.js ya debería permitir variantes personalizadas si usas estas */
+.input-field {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200;
 }
 
-.lexend {
-    font-family: "Lexend Deca", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition-all duration-200;
+}
+
+.switch {
+  @apply relative inline-flex items-center cursor-pointer;
+}
+
+.switch input {
+  @apply sr-only;
+}
+
+.switch .slider {
+  @apply w-10 h-6 bg-gray-300 rounded-full transition duration-300;
+}
+
+.switch .slider:before {
+  @apply absolute content-[''] w-4 h-4 bg-white rounded-full left-1 top-1 transition-transform;
+}
+
+.switch input:checked+.slider {
+  @apply bg-green-500;
+}
+
+.switch input:checked+.slider:before {
+  transform: translateX(16px);
+}
+
+/* Transición entre pasos */
+.fade-step-enter-active,
+.fade-step-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-step-enter-from,
+.fade-step-leave-to {
+  opacity: 0;
+}
+
+.fade-step-enter-to,
+.fade-step-leave-from {
+  opacity: 1;
+}
+
+
+.anton-regular {
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.oswald {
+  font-family: "Oswald", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.raleway {
+  font-family: "Raleway", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
 }

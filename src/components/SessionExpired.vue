@@ -12,8 +12,14 @@ const props = defineProps({
 const closeModal = () => {
   userStore.setSessionExpired(false);
   emit('close');
-  router.push('/login'); // Redirige al login
+
+  if (router.currentRoute.value.path === '/login') {
+    window.location.reload(); // fuerza la recarga
+  } else {
+    router.push('/login');
+  }
 };
+
 
 </script>
 

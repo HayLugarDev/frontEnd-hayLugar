@@ -1,177 +1,50 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-light px-4 py-10">
-    <div class="bg-white p-4 sm:p-8 rounded-lg shadow-lg max-w-3xl w-full border border-gray-300">
-      <h1 class="text-4xl font-bold text-center text-primary mb-8">Registrar Nuevo Espacio</h1>
-      <form @submit.prevent="addSpace" class="space-y-6">
-        <FormField 
-          v-model="name" 
-          label="Nombre del espacio:" 
-          type="text" 
-          placeholder="Ej: Casa centro" 
-          required 
-        />
-        <!-- Ubicación con Autocomplete -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">Ubicación:</span>
-          <GMapAutocomplete class="input-field" @place_changed="setPlace" />
-        </label>
-        <!-- Datos básicos de ubicación -->
-        <input v-model="latitude" type="hidden" />
-        <input v-model="longitude" type="hidden" />
-        <input v-model="location" />
-
-        <!-- Detalles Adicionales de Ubicación -->
-        <FormField 
-          v-model="locationDetails" 
-          label="Detalles de Ubicación (edificio, piso, número, subsuelo, etc.):" 
-          type="text" 
-          placeholder="Ej: Edificio A, 3er piso, subsuelo, Nº 15" 
-          required 
-        />
-
-        <!-- Tipos de Vehículos -->
-        <div>
-          <span class="text-lg font-semibold text-black block mb-2">Tipos de vehículos:</span>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('car')" vehicleType="Auto" iconType="car"
-              @click="toggleParkingType('car')" />
-            <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('motorcycle')" vehicleType="Motocicleta"
-              iconType="motorcycle" @click="toggleParkingType('motorcycle')" />
-            <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('bicycle')" vehicleType="Bicicleta"
-              iconType="bicycle" @click="toggleParkingType('bicycle')" />
-            <VehicleTypeButton :isSelected="selectedVehicleTypes.includes('van')" vehicleType="Camioneta"
-              iconType="truck" @click="toggleParkingType('van')" />
+  <MainHeader />
+  <div class="relative w-full h-full mx-auto">
+    <!-- Instrucciones iniciales -->
+    <transition name="fade-step" mode="out-in">
+      <div :key="currentStep">
+        <!-- Paso 0: Instrucciones -->
+        <div v-if="currentStep === 0" class="rounded-lg border-gray-300">
+          <header>
+            <h1 class="text-3xl font-bold text-center text-primary mb-8 border-b md:border-none py-2">Publicá en
+              HayLugar</h1>
+          </header>
+          <div class="grid grid-rows xl:grid-cols-2 w-10/12 items-center mx-auto">
+            <ul class="flex flex-col gap-4 px-4 xl:px-16">
+              <li class="border-b-2 pb-4 text-gray-700">
+                <h1 class="font-semibold text-2xl text-black">Contanos acerca de tu espacio</h1>
+                Informanos la dirección, ubicación, tipos de vehículos permitidos, horarios disponibles, etc.
+              </li>
+              <li class="border-b-2 pb-4 text-gray-700">
+                <h1 class="font-semibold text-2xl text-black">Detalles para el usuario</h1>
+                Subí imágenes, croquis, indicaciones y toda la información útil para los usuarios.
+              </li>
+              <li class="pb-4 text-gray-700">
+                <h1 class="font-semibold text-2xl text-black">Publicar todo</h1>
+                Confirmá el precio, los plazos ofrecidos y ¡listo!
+              </li>
+              <li class="flex justify-end mt-auto">
+                <button @click="nextFirstStep" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                  Comenzar
+                </button>
+              </li>
+            </ul>
+            <img src="../assets/add-space_etapa-1.png"
+              class="w-5/6 hidden xl:block mx-auto rounded-xl shadow-2xl shadow-gray-400/60" alt="Ilustración">
           </div>
         </div>
-
-        <!-- Capacidad -->
-        <FormField 
-          v-model.number="capacity" 
-          label="Capacidad:" 
-          type="number" 
-          placeholder="Ej: 4"
-          required 
-        />
-
-        <!-- Tipo de Estacionamiento -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">Tipo de estacionamiento:</span>
-          <select v-model="type" class="input-field">
-            <option disabled value="">Seleccione una opción</option>
-            <option value="garage">Garage propio</option>
-            <option value="large_space">Espacio grande</option>
-            <option value="private_parking">Estacionamiento privado</option>
-          </select>
-        </label>
-
-        <!-- Superficie de Estacionamiento -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">Superficie de estacionamiento:</span>
-          <select v-model="parking_type" class="input-field">
-            <option disabled value="">Seleccione una opción</option>
-            <option value="cubierto">Cubierto</option>
-            <option value="descubierto">Descubierto</option>
-            <option value="ninguno">Ninguno</option>
-          </select>
-        </label>
-
-        <!-- Descripción -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">Descripción del espacio:</span>
-          <textarea v-model="description" class="input-field" rows="3"
-            placeholder="Ingrese una descripción detallada"></textarea>
-        </label>
-
-        <!-- Tarifa y Duración -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">Tarifa y duración (ARS):</span>
-          <div class="grid grid-cols-2 gap-2 sm:gap-4">
-            <div class="relative">
-              <span class="absolute left-3 top-3 text-gray-600">$</span>
-              <input v-model.number="price" type="number" class="input-field pl-7" placeholder="Ej: 1500" required />
-            </div>
-            <select v-model="price_unit" class="input-field" @change="updateAvailabilityFields">
-              <option value="hour">Por Hora</option>
-              <option value="day">Por Día</option>
-              <option value="week">Por Semana</option>
-              <option value="month">Por Mes</option>
-            </select>
-          </div>
-        </label>
-
-        <!-- Disponibilidad (por hora) -->
-        <fieldset v-if="price_unit === 'hour'" class="border p-4 rounded-lg">
-          <legend class="text-lg font-semibold text-black">Horario de Disponibilidad</legend>
-          <div class="grid grid-cols-2 gap-4">
-            <label>
-              <span>Desde:</span>
-              <input v-model="availability.start" type="time" class="input-field" required />
-            </label>
-            <label>
-              <span>Hasta:</span>
-              <input v-model="availability.end" type="time" class="input-field" required />
-            </label>
-          </div>
-        </fieldset>
-
-        <!-- Disponibilidad (por semana o mes) -->
-        <fieldset v-if="price_unit === 'week' || price_unit === 'month'" class="border p-4 rounded-lg">
-          <legend class="text-lg font-semibold text-black">Selecciona un período</legend>
-          <VueDatePicker v-model="availability.dateRange" range class="input-field" />
-        </fieldset>
-
-        <!-- Métodos de Pago Aceptados -->
-        <fieldset class="border p-4 rounded-lg">
-          <legend class="text-lg font-semibold text-black">Métodos de Pago Aceptados</legend>
-          <div class="grid grid-cols-2 gap-2">
-            <!-- <label class="flex items-center space-x-1">
-              <input type="checkbox" v-model="paymentMethods" value="Efectivo" />
-              <font-awesome-icon :icon="['fas', 'money-bill-wave']" />
-              <span>Efectivo</span>
-            </label> -->
-            <label class="flex items-center">
-              <input type="checkbox" v-model="paymentMethods" value="Mercado Pago" @change="updatePaymentFields" />
-              <font-awesome-icon :icon="['fas', 'credit-card']" />
-              <span>Mercado Pago</span>
-            </label>
-          </div>
-        </fieldset>
-
-        <!-- Datos de Wallet para Mercado Pago -->
-        <fieldset v-if="paymentMethods.includes('Mercado Pago')" class="border p-4 rounded-lg">
-          <legend class="text-lg font-semibold text-black">Datos de Wallet (Mercado Pago)</legend>
-          <label class="block">
-            <span class="text-lg font-semibold text-black">Correo de Mercado Pago:</span>
-            <input v-model="walletDetails.mpEmail" type="email" class="input-field" placeholder="correo@ejemplo.com"
-              required />
-          </label>
-        </fieldset>
-
-        <!-- Toggle para Publicación Activa -->
-        <div class="flex items-center space-x-4">
-          <span class="text-lg font-semibold text-black">Publicación Activa</span>
-          <label class="switch">
-            <input type="checkbox" v-model="isActive" />
-            <span class="slider round"></span>
-          </label>
+        <!-- Formulario por pasos -->
+        <div v-else-if="currentStep === 1" class="">
+          <transition name="fade-step" mode="out-in">
+            <component :is="currentComponent" :key="step" v-model="spaceData" @next="nextStep" @prev="prevStep"
+              @submit="addSpace" />
+          </transition>
         </div>
+      </div>
+    </transition>
 
-        <!-- Imágenes -->
-        <label class="block">
-          <span class="text-lg font-semibold text-black">Imágenes del Espacio:</span>
-          <input type="file" multiple @change="handleFileUpload" class="input-field" />
-          <div class="flex flex-wrap mt-2 gap-2">
-            <img v-for="(img, index) in previewImages" :key="index" :src="img"
-              class="w-20 h-20 object-cover rounded-lg shadow-md" />
-          </div>
-        </label>
-
-        <!-- Botón de envío -->
-        <button type="submit" class="btn-primary">Guardar Espacio</button>
-      </form>
-    </div>
-
-    <!-- Modal de Éxito -->
+    <!-- Modal de éxito -->
     <transition name="fade">
       <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
@@ -179,8 +52,7 @@
             <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
             <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
             <p class="text-lg text-gray-700 text-center mb-6">El espacio se ha guardado correctamente.</p>
-            <button @click="closeSuccesModal"
-              class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+            <button @click="closeSuccesModal" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
               Continuar
             </button>
           </div>
@@ -190,162 +62,155 @@
   </div>
 </template>
 
+
+
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import VueDatePicker from '@vuepic/vue-datepicker';
+import { ref, computed } from 'vue';
 import '@vuepic/vue-datepicker/dist/main.css';
+import MainHeader from '../components/MainHeader.vue';
 import api from '../services/apiService';
-import VehicleTypeButton from "../components/VehicleTypeButton.vue";
-import FormField from '../components/FormField.vue';
+import Etapa1 from '../components/Etapa1.vue';
+import Etapa2 from '../components/Etapa2.vue';
+import Etapa3 from '../components/Etapa3.vue';
+import Etapa4 from '../components/Etapa4.vue';
+import Etapa5 from '../components/Etapa5.vue';
 
-const name = ref('');
-const location = ref('');
-const locationDetails = ref('');
-const latitude = ref(null);
-const longitude = ref(null);
-const price = ref(0);
-const price_unit = ref('hour');
-const availability = ref({ start: '', end: '', dateRange: [] });
-const capacity = ref(0);
-const type = ref(''); // Valor inicial
-const parking_type = ref('');
-const description = ref('');
-const paymentMethods = ref([]);
-const previewImages = ref([]);
-
+const showSuccessModal = ref(false);
+const currentStep = ref(0); // 0 = instrucciones, 1 = formulario
+const step = ref(1);
 const selectedFiles = ref([]);
+const emit = defineEmits(["success"]);
 
-// Datos de la wallet para Mercado Pago
-const walletDetails = ref({
-  mpEmail: ''
+const spaceData = ref({
+  name: '',
+  location: '',
+  locationDetails: '',
+  latitude: 0,
+  longitude: 0,
+  paymentMethods: [],
+  walletDetails: { mpEmail: '' },
+  type: '', // 'garage' | 'large_space' | 'private_parking'
+  vehicle_capacities: [], // [{ type: 'car', capacity: 5, price: 1500 }]
+  parking_type: '', // 'cubierto' | 'descubierto' | 'ninguno'
+  description: '',
+  status: 'active',
+  images: [],
+  availability: { start: '', end: '', dateRange: [] }
 });
 
-
-const isActive = ref(true);
-
-const owner_id = ref(1);
-const status = ref('active');
-
-const router = useRouter();
-const showSuccessModal = ref(false);
-
-const selectedVehicleTypes = ref([]);
-
-const toggleParkingType = (type) => {
-  console.log(selectedVehicleTypes.value);
-  if (selectedVehicleTypes.value.includes(type)) {
-    selectedVehicleTypes.value = selectedVehicleTypes.value.filter(t => t !== type);
-  } else {
-    selectedVehicleTypes.value.push(type);
-  }
+const components = {
+  1: Etapa1,
+  2: Etapa2,
+  3: Etapa3,
+  4: Etapa4,
+  5: Etapa5
 };
 
-const handleFileUpload = (event) => {
-  selectedFiles.value = [...event.target.files];
-  previewImages.value = [];
-  for (let file of selectedFiles.value) {
-    const reader = new FileReader();
-    reader.onload = (e) => previewImages.value.push(e.target.result);
-    reader.readAsDataURL(file);
-    console.log(file);
-  }
+const currentComponent = computed(() => components[step.value])
+
+function nextStep() {
+  if (step.value < 5) step.value++
+  console.log(spaceData.value);
 };
 
-const setPlace = (place) => {
-  const components = place.address_components || [];
-
-  const streetNumber = components.find(c => c.types.includes('street_number'))?.long_name || '';
-  const route = components.find(c => c.types.includes('route'))?.long_name || '';
-  const locality = components.find(c => 
-    c.types.includes('locality') || 
-    c.types.includes('sublocality')
-  )?.long_name || '';
-  const province = components.find(c => c.types.includes('administrative_area_level_1'))?.long_name || '';
-  const country = components.find(c => c.types.includes('country'))?.long_name || '';
-
-  // Armamos cada parte solo si existe
-  const street = [route, streetNumber].filter(Boolean).join(' ');
-
-  const parts = [street, locality, province, country].filter(Boolean);
-
-  location.value = parts.join(', ');
-
-  latitude.value = place.geometry.location.lat();
-  longitude.value = place.geometry.location.lng();
-};
-
-const updateAvailabilityFields = () => {
-  availability.value = { start: '', end: '', dateRange: [] };
-};
-
-const updatePaymentFields = () => {
-  // Aquí  realizar validaciones o ajustes al cambiar métodos de pago
+function prevStep() {
+  if (step.value > 1) step.value--
 };
 
 const addSpace = async () => {
-  console.log(selectedVehicleTypes.value);
-  let price_per_hour = price.value;
-  if (price_unit.value === 'day') {
-    price_per_hour = price.value / 24;
-  } else if (price_unit.value === 'week') {
-    price_per_hour = price.value / (24 * 7);
-  } else if (price_unit.value === 'month') {
-    price_per_hour = price.value / (24 * 30);
+
+  console.log(spaceData.value);
+  // const error = validarFormulario();
+  // if (error) {
+  //   alert(error);
+  //   return;
+  // }
+
+  if (spaceData.value.images.length === 0) {
+    alert('Debe subir al menos una imagen del espacio');
+    return;
   }
-
-  status.value = isActive.value ? 'active' : 'paused';
-
   const formData = new FormData();
+  const payload = { ...spaceData.value }; // Copia para modificar sin afectar el estado reactivo
+  console.log(payload);
 
-  formData.append('owner_id', owner_id.value);
-  formData.append('location', location.value);
-  formData.append('location_details', locationDetails.value);
-  formData.append('latitude', latitude.value);
-  formData.append('longitude', longitude.value);
-  formData.append('price_per_hour', price_per_hour);
-  formData.append('capacity', capacity.value);
-  formData.append('type', type.value);
-  formData.append('parking_type', parking_type.value);
-  formData.append('description', description.value);
-  formData.append('status', status.value);
-  formData.append('name', name.value);
+  // Agregar vehicle_capacities y precio
+  payload.status = 'active';
 
-  formData.append('paymentMethods', JSON.stringify(paymentMethods.value));
+  // Convertimos a JSON y lo agregamos como campo
+  formData.append('data', JSON.stringify(payload));
 
-  selectedVehicleTypes.value.forEach((type, index) => {
-  formData.append(`vehicle_types[${index}]`, type);
-});
-
-  
-  if (paymentMethods.value.includes('Mercado Pago')) {
-    formData.append('walletDetails', JSON.stringify(walletDetails.value));
-  }
-
-  // Agregar imágenes al FormData
-  selectedFiles.value.forEach((file, _index) => {
+  // Agregar imágenes
+  spaceData.value.images.forEach((file, _index) => {
     formData.append('images', file);
   });
-  console.log(parking_type.value);
 
+  console.log(formData);
   try {
     const response = await api.post('/spaces/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     showSuccessModal.value = true;
     console.log(response);
+    emit('success');
+    resetValues();
   } catch (error) {
     console.error('Error en el registro del espacio:', error);
   }
 };
 
+const validarFormulario = () => {
+  if (!space.value.name.trim()) return 'El nombre del espacio es obligatorio';
+  if (!space.value.location) return 'Debe seleccionar una ubicación con Autocomplete';
+  if (selectedVehicleTypes.value.length === 0) return 'Debe seleccionar al menos un tipo de vehículo';
+  if (price.value <= 0) return 'El precio debe ser mayor a 0';
+  if (price_unit.value === 'hour' && (!space.value.availability.start || !space.value.availability.end)) {
+    return 'Debe completar los horarios de disponibilidad';
+  }
+  if ((price_unit.value === 'week' || price_unit.value === 'month') && space.value.availability.dateRange.length !== 2) {
+    return 'Debe seleccionar un rango de fechas válido';
+  }
+  if (space.value.paymentMethods.includes('Mercado Pago') && !space.value.walletDetails.mpEmail) {
+    return 'Debe ingresar el correo de Mercado Pago';
+  }
+  return null;
+};
+
+const resetValues = () => {
+  spaceData.value = {
+    name: '',
+    location: '',
+    locationDetails: '',
+    latitude: 0,
+    longitude: 0,
+    paymentMethods: [],
+    walletDetails: { mpEmail: '' },
+    type: '', // 'garage' | 'large_space' | 'private_parking'
+    vehicle_capacities: [], // [{ type: 'car', capacity: 5, price: 1500 }]
+    parking_type: '', // 'cubierto' | 'descubierto' | 'ninguno'
+    description: '',
+    status: 'active',
+    images: [],
+    availability: { start: '', end: '', dateRange: [] }
+  };
+}
+
+
 const closeSuccesModal = () => {
   showSuccessModal.value = false;
   router.push('/dashboard');
 };
+
+const nextFirstStep = () => {
+  currentStep.value = 1;
+};
 </script>
 
 <style>
+/* .transition-transform {
+  transition: transform 0.7s ease-in-out;
+}
+
 .bg-light {
   background-color: #f8f9fa;
 }
@@ -380,10 +245,10 @@ const closeSuccesModal = () => {
 
 .text-black {
   color: #000;
-}
+} */
 
 /* Estilos para el toggle switch */
-.switch {
+/* .switch {
   position: relative;
   display: inline-block;
   width: 60px;
@@ -432,16 +297,31 @@ input:checked+.slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-}
+} */
 
 /* Modal transitions */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s;
+  transition: all 0.10s ease;
 }
 
-.fade-enter-from,
+.fade-enter-from {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.fade-enter-to {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.fade-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+
 .fade-leave-to {
   opacity: 0;
+  transform: scale(0.9);
 }
 </style>
