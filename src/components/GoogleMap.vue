@@ -1,19 +1,12 @@
 <template>
-  <GoogleMap
-  :apiKey="apiKey"
-  
-  class="w-full h-full rounded-lg shadow-md"
-  :center="center"
-  :zoom="zoom"
-  :options="options"
->
-  <slot />
-</GoogleMap>
+  <GMapMap :center="center" :options="options" :zoom="zoom" map-type-id="roadmap"
+    class="w-full h-[500px] rounded-lg shadow-md">
+    <slot />
+  </GMapMap>
 
 </template>
 
 <script setup>
-import { GoogleMap } from 'vue3-google-map';
 
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -30,11 +23,11 @@ const props = defineProps({
     type: Object,
     default: () => ({}) // ← así evitás errores si no se pasan
   }
-  
+
   // mapOptions: {
   //   type: Object,
   //   default: () => ({
-     
+
   //     styles: [
   //       {
   //         featureType: "all",

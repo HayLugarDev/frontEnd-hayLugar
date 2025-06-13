@@ -67,6 +67,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import '@vuepic/vue-datepicker/dist/main.css';
+import { useRouter } from 'vue-router';
 import MainHeader from '../components/MainHeader.vue';
 import api from '../services/apiService';
 import Etapa1 from '../components/Etapa1.vue';
@@ -75,6 +76,7 @@ import Etapa3 from '../components/Etapa3.vue';
 import Etapa4 from '../components/Etapa4.vue';
 import Etapa5 from '../components/Etapa5.vue';
 
+const router = useRouter();
 const showSuccessModal = ref(false);
 const currentStep = ref(0); // 0 = instrucciones, 1 = formulario
 const step = ref(1);

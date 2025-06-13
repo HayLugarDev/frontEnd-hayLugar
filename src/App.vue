@@ -9,9 +9,12 @@ import MobileMenu from './components/MobileMenu.vue';
     <span class="mt-auto text-center py-4">
       © 2025 HayLugar. All rights reserved
     </span>
-    <MobileMenu />
   </div>
 
+  <!-- Menú fijo en la parte inferior -->
+  <div class="fixed bottom-0 left-0 w-full z-50">
+    <MobileMenu />
+  </div>
 </template>
 
 <style scoped>

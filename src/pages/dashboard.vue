@@ -27,17 +27,17 @@
       </button>
     </div> -->
 
-      <div ref="refSeccionResultados" class="flex flex-1 p-2 sm:p-6">
+      <div ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
         <div v-if="!showMap"
           class="relative flex-1 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
           <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">{{
             error }}</div>
           <SpaceCard v-for="espacio in espacios" :key="espacio.id" :espacio="espacio" />
         </div>
-        <div v-else class="flex-1">
-          <CustomGoogleMap class="w-full h-full rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
+        <div v-else class="w-full h-full">
+          <CustomGoogleMap class="rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
             :options="mapOptions">
-            <Marker v-for="(espacio) in espacios" :key="espacio.id" :options="getMarkerOptions(espacio)"
+            <GMapMarker v-for="(espacio) in espacios" :key="espacio.id" :options="getMarkerOptions(espacio)"
               @mouseover="handleMouseOver(espacio)" @mouseout="handleMouseOut"
               @click="() => handleMarkerClick(espacio)" />
             <InfoWindow v-if="hoveredSpace && hoveredSpace.latitude && hoveredSpace.longitude" :position="{
@@ -199,6 +199,11 @@ const buscar = async () => {
 
 const toggleMap = () => {
   showMap.value = !showMap.value;
+  nextTick(() => {
+    if (!showMap.value && refSeccionResultados.value) {
+      refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
 };
 
 const handleMouseOver = (espacio) => {

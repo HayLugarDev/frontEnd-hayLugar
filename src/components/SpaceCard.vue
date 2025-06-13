@@ -12,7 +12,7 @@
                         {{ espacio.location.split(',')[0] }}
                     </p>
                     <p class="text-gray-800 lg:text-xs">
-                        ${{ espacio.price_per_hour }}/hora
+                        ${{ espacio.vehicle_capacities.price_per_hour }}/hora
                     </p>
                 </div>
                 <!-- <div class="grid grid-cols-4 mt-4">

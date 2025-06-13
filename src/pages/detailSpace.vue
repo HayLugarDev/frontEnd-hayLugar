@@ -8,6 +8,20 @@
         <!-- Carrusel en móviles -->
         <Carousel :images="espacio.images" class="lg:hidden" :controls="false" />
 
+        <!-- Info del anfitrión -->
+        <section v-if="espacio?.host" class="col-span-3 bg-secondary p-6 px-10 rounded-xl shadow-md mt-6 font-normal">
+          <div class="flex flex-row items-center gap-4">
+            <img :src="getHostImage()" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
+            <div class="flex flex-col sm:flex-row sm:justify-around w-full text-gray-800">
+              <p class="text-lg">Anfitrión: {{ espacio.host.name }} {{ espacio.host.last_name }}</p>
+              <p class="text-xl"><font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-800" />
+                +549{{
+                  espacio.host.phone }}</p>
+              <p>Email: {{ espacio.host.email }}</p>
+            </div>
+          </div>
+        </section>
+
         <!-- Título + Favorito -->
         <div class="flex flex-row items-center justify-between mt-4 px-4">
           <h1 class="text-4xl sm:text-3xl font-bold p-2 text-gray-700">{{ espacio.name }}</h1>
@@ -19,7 +33,7 @@
         </div>
 
         <!-- Galería de imágenes grande -->
-        <div class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-2 h-[400px]">
+        <div class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-4 h-[400px]">
           <div class="col-span-4 row-span-8">
             <img :src="getImageUrl(espacio.images[0])" alt="Principal"
               class="h-full w-full object-cover rounded-lg shadow-md border" />
@@ -42,9 +56,15 @@
                 {{ espacio.location.split(',')[1] }}
               </p>
               <p class="text-xl sm:text-2xl text-gray-500 font-semibold">{{ espacio.location.split(',')[0] }}</p>
-              <p class="text-gray-900 font-semibold">
-                <font-awesome-icon icon="money-bill-wave" class="mr-1" /> ${{ espacio.price_per_hour }}/hora
-              </p>
+              <div class="mt-4">
+                <div class="">
+                  <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-2">
+                    <p class="font-semibold">{{ vehicleTypeTranslations[v.type] || v.type }}</p>
+                    <p v-if="v.price_per_hour" class="font-normal">Precio por hora: ${{
+                      v.price_per_hour.toLocaleString() }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="col-start-3 flex flex-col items-end text-2xl">
@@ -59,17 +79,20 @@
               <p class="text-gray-600 font-medium">{{ espacio.description }}</p>
             </section>
 
-            <div class="col-span-3 w-80 h-90 flex justify-center items-center bg-red-500">
+            <div class="col-span-3 flex justify-center items-center h-[350px]">
               <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
                 class="w-full h-full rounded-lg overflow-hidden shadow-md">
-                <Marker
-                  :options="{ position: { lat: Number(espacio.latitude), lng: Number(espacio.longitude) }, icon: carMarker }" />
+                <GMapMarker :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="{
+                  url: carMarker,
+                  scaledSize: { width: 50, height: 50 }
+                }" />
               </CustomGoogleMap>
             </div>
           </div>
 
+
           <!-- Formulario reserva -->
-          <section class="col-span-4 shadow-2xl p-4 xl:p-6 rounded-xl h-max sm:border border-zinc-700">
+          <section ref="reservaRef" :class="['col-span-4 shadow-2xl p-4 xl:p-6 rounded-xl h-max sm:border border-zinc-700 transition-all duration-300', isFixed ? 'fixed top-44 right-40 max-w-[430px] z-50' : 'relative']">
             <h2 class="text-2xl font-semibold mb-4">Completá tu reserva</h2>
             <div class="grid grid-cols-2 gap-4">
               <MenuDropdown v-model="tipoVehiculo" :options="['Camioneta', 'Auto', 'Motocicleta', 'Bicicleta']"
@@ -106,19 +129,6 @@
         </div>
       </div>
     </main>
-
-    <!-- Info del anfitrión -->
-    <section v-if="espacio?.host" class="bg-secondary p-6 px-10 rounded-xl shadow-md mt-6">
-      <div class="flex flex-row items-center gap-4">
-        <img :src="getHostImage()" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
-        <div class="flex flex-col sm:flex-row sm:justify-around w-full text-gray-800">
-          <p class="text-lg font-semibold">Anfitrión: {{ espacio.host.name }} {{ espacio.host.last_name }}</p>
-          <p class="text-xl"><font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-800" /> +549{{
-            espacio.host.phone }}</p>
-          <p>Email: {{ espacio.host.email }}</p>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
@@ -126,7 +136,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { Marker } from 'vue3-google-map';
+import { AdvancedMarker, Marker } from 'vue3-google-map';
 import CustomGoogleMap from '../components/GoogleMap.vue';
 import MainHeader from "../components/MainHeader.vue";
 import carMarker from '../assets/logo.png';
@@ -153,18 +163,24 @@ const deadLine = ref(null);
 const activedFavouriteIcon = ref(false);
 const isAnimating = ref(false);
 const getImageUrl = (img) => `http://localhost:3000${img}`;
+const reservaRef = ref(null);
+const isFixed = ref(false);
 
 const obtenerEspacio = async () => {
   try {
     const id = route.params.id;
     const space = await getSpaceById(id);
+    console.log(space);
     return espacio.value = space;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
   }
 };
 
-onMounted(obtenerEspacio);
+onMounted(() => {
+  obtenerEspacio();
+  window.addEventListener('scroll', handleScroll);
+});
 
 const markerIcon = computed(() => {
   if (espacio.value && espacio.value.vehicle_types) {
@@ -204,38 +220,71 @@ const reservar = async () => {
   router.push('/pago');
 };
 
+const redondearAHoraArriba = (fecha) => {
+  const f = new Date(fecha);
+  if (f.getMinutes() > 0 || f.getSeconds() > 0 || f.getMilliseconds() > 0) {
+    f.setHours(f.getHours() + 1);
+  }
+  f.setMinutes(0, 0, 0);
+  return f;
+};
+
 const totalCalculado = computed(() => {
-  if (!tiempoInicial.value || !tiempoFinal.value || !espacio.value) return 0;
+  if (!tiempoInicial.value || !tiempoFinal.value || !espacio.value || !tipoVehiculo.value) return 0;
 
   const inicio = new Date(tiempoInicial.value);
-  console.log('Inicio: ', inicio);
   const fin = new Date(tiempoFinal.value);
-  console.log('Final: ', fin);
 
   if (isNaN(inicio.getTime()) || isNaN(fin.getTime()) || fin <= inicio) return 0;
 
-  const precioHora = Number(espacio.value.price_per_hour);
+  // Buscar la tarifa del vehículo seleccionado
+  let precioHora = 0;
+  if (Array.isArray(espacio.value.vehicle_capacities)) {
+    const tipoOriginal = reverseVehicleTypeTranslations[tipoVehiculo.value];
+    const vehiculo = espacio.value.vehicle_capacities.find(v => v.type === tipoOriginal);
+    if (vehiculo) {
+      precioHora = Number(vehiculo.price_per_hour);
+    }
+  }
+
+  if (precioHora === 0) return 0;
+
   const diferenciaMs = fin - inicio;
 
   switch (tipoPlazoReserva.value) {
-    case 'Por hora':
+    case 'Por hora': {
       const horas = diferenciaMs / (1000 * 60 * 60);
-      deadLine.value = horas;
-      return Math.ceil(horas) * precioHora;
-
-    case 'Por día':
+      const horasRedondeadas = Math.ceil(horas); // o usar Math.round(horas * 2) / 2 para redondear a medias horas
+      return horasRedondeadas * precioHora;
+    }
+    case 'Por día': {
       const dias = diferenciaMs / (1000 * 60 * 60 * 24);
       deadLine.value = dias;
-      return Math.ceil(dias) * precioHora * 24;
-    case 'Por mes':
-      const meses = diferenciaMs / (1000 * 60 * 60 * 24 * 30);
-      deadLine.value = meses;
-      return Math.ceil(meses) * precioHora * 24 * 30;
-
+      return Math.ceil(dias) * precioHora * 24; // suponiendo 24h * precioHora
+    }
+    case 'Por mes': {
+      const dias = diferenciaMs / (1000 * 60 * 60 * 24);
+      const meses = dias / 30;
+      return Math.ceil(meses) * precioHora * 24 * 30; // aproximación
+    }
     default:
       return 0;
   }
 });
+
+
+const vehicleTypeTranslations = {
+  car: 'Auto',
+  motorcycle: 'Moto',
+  van: 'Camioneta',
+  bicycle: 'Bicicleta',
+  // truck: 'Camión',
+  // suv: 'SUV',
+};
+
+const reverseVehicleTypeTranslations = Object.fromEntries(
+  Object.entries(vehicleTypeTranslations).map(([en, es]) => [es, en])
+);
 
 const getHostImage = () => {
   return espacio.host?.profile_picture || user_icon_primary;
@@ -259,6 +308,17 @@ const toggleFavourite = () => {
   setTimeout(() => {
     isAnimating.value = false;
   }, 400);
+};
+
+const handleScroll = () => {
+  const threshold = 500;
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+
+  if (scrollTop > threshold) {
+    isFixed.value = true;
+  } else {
+    isFixed.value = false;
+  }
 };
 </script>
 
