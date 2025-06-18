@@ -23,7 +23,7 @@
         </section>
 
         <!-- Título + Favorito -->
-        <div class="flex flex-row items-center justify-between mt-4 px-4">
+        <div class="flex flex-row items-center justify-between mt-4 px-8">
           <h1 class="text-4xl sm:text-3xl font-bold p-2 text-gray-700">{{ espacio.name }}</h1>
           <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" :class="[
             activedFavouriteIcon ? 'text-red-500 scale-110' : 'text-gray-700',
@@ -49,20 +49,17 @@
         <!-- Info general + Formulario -->
         <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
           <!-- Información del espacio -->
-          <div class="col-span-6 grid grid-cols-3 grid-rows-2 gap-1 sm:gap-4 p-4 sm:p-10">
+          <div class="col-span-6 grid grid-cols-3 grid-rows-2 gap-1 sm:gap-4 p-10">
             <div class="col-span-2">
-              <p class="text-lg sm:text-xl font-bold text-gray-800">
-                <font-awesome-icon icon="map-marker-alt" class="mr-1" />
-                {{ espacio.location.split(',')[1] }}
+              <p v-if="espacio.location" class="text-xl font-bold text-gray-800">
+                {{ espacio.location.split(',')[1] || '' }}
               </p>
-              <p class="text-xl sm:text-2xl text-gray-500 font-semibold">{{ espacio.location.split(',')[0] }}</p>
-              <div class="mt-4">
-                <div class="">
-                  <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-2">
-                    <p class="font-semibold">{{ vehicleTypeTranslations[v.type] || v.type }}</p>
-                    <p v-if="v.price_per_hour" class="font-normal">Precio por hora: ${{
-                      v.price_per_hour.toLocaleString() }}</p>
-                  </div>
+              <p class="text-lg md:text-2xl text-gray-500 font-semibold">{{ espacio.location.split(',')[0] }}</p>
+              <div class="my-4">
+                <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-2 px-6 border-2 shadow-xl">
+                  <p class="font-semibold text-2xl">{{ vehicleTypeTranslations[v.type] || v.type }}</p>
+                  <p v-if="v.price_per_hour" class="font-normal">Precio por hora: ${{
+                    v.price_per_hour.toLocaleString() }}</p>
                 </div>
               </div>
             </div>
@@ -74,7 +71,7 @@
               <span class="font-serif cursor-pointer hover:underline text-sm sm:text-md">62 Opiniones</span>
             </div>
 
-            <section class="col-span-3 row-start-2 border border-gray-300 p-4 rounded-lg">
+            <section class="col-span-3 border border-gray-300 p-4 rounded-lg text-xl">
               <p class="font-semibold">Descripción:</p>
               <p class="text-gray-600 font-medium">{{ espacio.description }}</p>
             </section>
@@ -84,19 +81,18 @@
                 class="w-full h-full rounded-lg overflow-hidden shadow-md">
                 <GMapMarker :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="{
                   url: carMarker,
-                  scaledSize: { width: 50, height: 50 }
+                  scaledSize: { width: 40, height: 40 }
                 }" />
               </CustomGoogleMap>
             </div>
           </div>
 
-
           <!-- Formulario reserva -->
-          <section ref="reservaRef" :class="['col-span-4 shadow-2xl p-4 xl:p-6 rounded-xl h-max sm:border border-zinc-700 transition-all duration-300', isFixed ? 'fixed top-44 right-40 max-w-[430px] z-50' : 'relative']">
+          <section class="col-span-4 shadow-2xl p-8 md:p-4 xl:p-6 md:rounded-xl h-max sm:border border-zinc-700">
             <h2 class="text-2xl font-semibold mb-4">Completá tu reserva</h2>
             <div class="grid grid-cols-2 gap-4">
-              <MenuDropdown v-model="tipoVehiculo" :options="['Camioneta', 'Auto', 'Motocicleta', 'Bicicleta']"
-                title="Seleccioná tu vehículo" class="border border-gray-700 rounded-xl" />
+              <MenuDropdown v-model="tipoVehiculo" :options="vehicleOptions" title="Seleccioná tu vehículo"
+                class="border border-gray-700 rounded-xl" />
               <MenuDropdown v-model="tipoPlazoReserva" :options="['Por hora', 'Por día', 'Por mes']"
                 title="¿Por cuánto tiempo?" class="border border-gray-500 rounded-xl" />
 
@@ -130,13 +126,13 @@
       </div>
     </main>
   </div>
+  <SessionExpired :sessionExpired="isSessionInvalid" />
 </template>
 
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { AdvancedMarker, Marker } from 'vue3-google-map';
 import CustomGoogleMap from '../components/GoogleMap.vue';
 import MainHeader from "../components/MainHeader.vue";
 import carMarker from '../assets/logo.png';
@@ -150,6 +146,8 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import Carousel from '../components/Carousel.vue';
 import { useReservationStore } from '../store/reservationStore';
 import BackButton from "../components/BackButton.vue";
+import { useVerifyToken } from '../logic/useVerifyToken';
+import SessionExpired from '../components/SessionExpired.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -163,8 +161,8 @@ const deadLine = ref(null);
 const activedFavouriteIcon = ref(false);
 const isAnimating = ref(false);
 const getImageUrl = (img) => `http://localhost:3000${img}`;
-const reservaRef = ref(null);
-const isFixed = ref(false);
+
+const { isSessionInvalid } = useVerifyToken();
 
 const obtenerEspacio = async () => {
   try {
@@ -179,54 +177,46 @@ const obtenerEspacio = async () => {
 
 onMounted(() => {
   obtenerEspacio();
-  window.addEventListener('scroll', handleScroll);
 });
 
-const markerIcon = computed(() => {
-  if (espacio.value && espacio.value.vehicle_types) {
-    const tipo = espacio.value.vehicle_types.toLowerCase().split('"')[1]
-    console.log(tipo)
-    let iconUrl = null;
-    if (tipo === "car") {
-      iconUrl = carMarker;
-    } else if (tipo === "van") {
-      iconUrl = markerIcon;
-    } else if (tipo === "bicycle") {
-      iconUrl = bicycleMarker;
-    } else if (tipo === "motorcycle") {
-      iconUrl = truckMarker;
-    }
-    return { url: iconUrl, scaledSize: { width: 40, height: 40 } };
-  }
-  return null;
-});
+// const markerIcon = computed(() => {
+//   const tipo = espacio.value?.vehicle_types?.[0]?.toLowerCase?.();
+//   switch (tipo) {
+//     case 'car':
+//       return { url: carMarker, scaledSize: { width: 40, height: 40 } };
+//     case 'van':
+//       return { url: truckMarker, scaledSize: { width: 40, height: 40 } };
+//     case 'bicycle':
+//       return { url: bicycleMarker, scaledSize: { width: 40, height: 40 } };
+//     case 'motorcycle':
+//       return { url: truckMarker, scaledSize: { width: 40, height: 40 } };
+//     default:
+//       return null;
+//   }
+// });
 
 const reservar = async () => {
   if (!espacio.value || !tiempoInicial.value || !tiempoFinal.value) {
-    alert('Faltan completar campos para la reserva');
-    return;
+    console.log('Campos incompletos:', {
+      espacio: !!espacio.value,
+      tiempoInicial: !!tiempoInicial.value,
+      tiempoFinal: !!tiempoFinal.value
+    });
+    return alert('Faltan completar campos para la reserva');
   }
 
   const payload = {
     owner_id: espacio.value.owner_id,
     space_id: espacio.value.id,
-    start_time: new Date(tiempoInicial.value).toISOString(),
-    end_time: new Date(tiempoFinal.value).toISOString(),
+    vehicle_type: reverseVehicleTypeTranslations[tipoVehiculo.value],
+    start_time: tiempoInicial.value,
+    end_time: tiempoFinal.value,
     dead_line: deadLine.value,
     total: totalCalculado.value,
   };
-
+  console.log('Payload generado:', payload);
   reservationStore.setReservationData(payload);
   router.push('/pago');
-};
-
-const redondearAHoraArriba = (fecha) => {
-  const f = new Date(fecha);
-  if (f.getMinutes() > 0 || f.getSeconds() > 0 || f.getMilliseconds() > 0) {
-    f.setHours(f.getHours() + 1);
-  }
-  f.setMinutes(0, 0, 0);
-  return f;
 };
 
 const totalCalculado = computed(() => {
@@ -241,9 +231,10 @@ const totalCalculado = computed(() => {
   let precioHora = 0;
   if (Array.isArray(espacio.value.vehicle_capacities)) {
     const tipoOriginal = reverseVehicleTypeTranslations[tipoVehiculo.value];
-    const vehiculo = espacio.value.vehicle_capacities.find(v => v.type === tipoOriginal);
-    if (vehiculo) {
-      precioHora = Number(vehiculo.price_per_hour);
+    const vehicle = espacio.value.vehicle_capacities.find(v => v.type === tipoOriginal);
+    console.log(vehicle);
+    if (vehicle) {
+      precioHora = Number(vehicle.price_per_hour);
     }
   }
 
@@ -254,23 +245,40 @@ const totalCalculado = computed(() => {
   switch (tipoPlazoReserva.value) {
     case 'Por hora': {
       const horas = diferenciaMs / (1000 * 60 * 60);
-      const horasRedondeadas = Math.ceil(horas); // o usar Math.round(horas * 2) / 2 para redondear a medias horas
-      return horasRedondeadas * precioHora;
+      deadLine.value = horas;
+      return Math.ceil(horas) * precioHora;
     }
     case 'Por día': {
       const dias = diferenciaMs / (1000 * 60 * 60 * 24);
       deadLine.value = dias;
-      return Math.ceil(dias) * precioHora * 24; // suponiendo 24h * precioHora
+      return Math.ceil(dias) * precioHora * 24;
     }
     case 'Por mes': {
-      const dias = diferenciaMs / (1000 * 60 * 60 * 24);
-      const meses = dias / 30;
-      return Math.ceil(meses) * precioHora * 24 * 30; // aproximación
+      const meses = diferenciaMs / (1000 * 60 * 60 * 24 * 30);
+      deadLine.value = meses;
+      return Math.ceil(meses) * precioHora * 24 * 30;
     }
     default:
       return 0;
   }
 });
+
+const vehicleOptions = computed(() => {
+  if (!espacio.value?.vehicle_capacities) return [];
+
+  return espacio.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
+});
+
+// Mapeo para mostrar texto más amigable
+function vehicleLabel(type) {
+  switch (type) {
+    case 'car': return 'Auto';
+    case 'van': return 'Camioneta';
+    case 'motorcycle': return 'Moto';
+    case 'bicycle': return 'Bicicleta';
+    default: return type;
+  }
+}
 
 
 const vehicleTypeTranslations = {
@@ -310,16 +318,6 @@ const toggleFavourite = () => {
   }, 400);
 };
 
-const handleScroll = () => {
-  const threshold = 500;
-  const scrollTop = window.scrollY || document.documentElement.scrollTop;
-
-  if (scrollTop > threshold) {
-    isFixed.value = true;
-  } else {
-    isFixed.value = false;
-  }
-};
 </script>
 
 <style scoped></style>

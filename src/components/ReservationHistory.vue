@@ -8,7 +8,7 @@
       <li v-for="(reserva, index) in reservations" :key="index" class="py-4">
         <p class="flex items-center">
           <font-awesome-icon icon="map-marker-alt" class="mr-2 text-primary" />
-          <strong>Ubicación:</strong> {{ reserva.Space.location }}
+          <strong>Ubicación:</strong> {{ reserva.space.location }}
         </p>
         <p class="flex items-center">
           <font-awesome-icon icon="calendar-alt" class="mr-2 text-primary" />

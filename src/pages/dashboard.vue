@@ -55,6 +55,10 @@
       </div>
     </div>
   </div>
+  <!-- Menú fijo en la parte inferior -->
+  <div class="fixed bottom-0 left-0 w-full z-50">
+    <MobileMenu />
+  </div>
 </template>
 
 <script setup>
@@ -70,6 +74,7 @@ import MainHeader from '../components/MainHeader.vue';
 import FloatingButton from '../components/FloatingButton.vue';
 import CustomInputGroup from "../components/CustomInputGroup.vue";
 import DashboardSkeleton from '../components/DashboardSkeleton.vue';
+import MobileMenu from '../components/MobileMenu.vue';
 
 const router = useRouter();
 const userStore = useUserStore();

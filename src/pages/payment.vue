@@ -116,7 +116,8 @@ const obtenerEspacio = async () => {
 
 
 onMounted(async () => {
-  await obtenerEspacio();
+  const dataSpace = await obtenerEspacio();
+  console.log(dataSpace);
   if (!reservationStore.reservation.space_id || !reservationStore.reservation.start_time) {
     console.error('Error en envío de datos.');
     router.push('/dashboard');
