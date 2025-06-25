@@ -9,19 +9,18 @@ export const useUserStore = defineStore('user', {
       email: string;
       last_name?: string;
       dni?: string;
-      phone: string;
-      address: string;
-      role: string;
-      profile_picture: string;
+      phone?: string;
+      address?: string;
+      role?: string;
+      profile_picture?: string;
     },
     loading: false,
     error: null as string | null,
-    sessionExpired: false,
-    token: localStorage.getItem('token') || null,
+    sessionExpired: true,
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.token, // Devuelve true si hay token
+    isAuthenticated: (state) => !!state.user,
   },
 
   actions: {
@@ -29,19 +28,11 @@ export const useUserStore = defineStore('user', {
       this.loading = true;
       this.error = null;
       try {
-        const token = this.token;
-        console.log(token);
-        if (!token) {
-          throw new Error('No hay token en el store');
-        }
-
-        const response = await api.get('/users/profile', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        
+        const response = await api.get('/auth/verify-session', { withCredentials: true });
         this.user = response.data.user;
+        this.sessionExpired = false;
         console.log('Usuario cargado:', this.user);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error en fetchUser:', error);
         if (error.response?.status === 401) {
           this.expireSession();
@@ -52,19 +43,26 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    setToken(token: string | null) {
-      this.token = token;
-      if (token) {
-        localStorage.setItem('token', token);
-      } else {
-        localStorage.removeItem('token');
-      }
+    setUser(user: {
+      id: number;
+      name: string;
+      email: string;
+      last_name?: string;
+      dni?: string;
+      phone?: string;
+      address?: string;
+      role?: string;
+      profile_picture?: string;
+    }) {
+      this.user = user;
+      this.sessionExpired = false;
     },
+
 
     clearUser() {
       this.user = null;
-      this.setToken(null);
       this.error = null;
+      this.sessionExpired = false;
     },
 
     expireSession() {

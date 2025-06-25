@@ -3,8 +3,8 @@
     <MainHeader />
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <BackButton class="lg:hidden" />
-      <section class="w-full md:grid md:grid-cols-9 flex flex-col p-4 gap-2">
-        <h1 class="text-2xl text-center md:text-3xl py-6 col-span-5 row-span-1">Confirmá tu Pago</h1>
+      <section class="w-full md:grid md:grid-cols-9 flex flex-col gap-2">
+        <h1 class="text-2xl text-start md:text-3xl py-6 px-6 col-span-5 row-span-1">Confirmá tu Pago</h1>
 
         <!-- Resumen del Espacio y Reserva -->
         <div class="md:col-span-4 md:row-start-2 md:col-start-6">

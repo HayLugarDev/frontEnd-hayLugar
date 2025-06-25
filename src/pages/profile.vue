@@ -143,7 +143,7 @@ import ReservationHistory from '../components/ReservationHistory.vue';
 import PublicationHistory from '../components/PublicationHistory.vue';
 import { useUserStore } from '../store/userStore';
 import api from '../services/apiService';
-import defaultProfilePicture from '../assets/user_icon.png';
+import defaultProfilePicture from '../assets/user_icon_primary.png';
 import loadIcon from "../assets/load-icon_primary.svg";
 import BackButton from '../components/BackButton.vue';
 
@@ -180,12 +180,12 @@ const cambiarFoto = (): void => {
 };
 
 const guardarTodo = async (): Promise<void> => {
+  console.log(usuario.value);
   try {
     const response = await api.put(`/users/update/${usuario.value.id}`, usuario.value, {
-      headers: { Authorization: `Bearer ${userStore.token}` }
-    });
-    userStore.user = response.data;
-
+      withCredentials: true }
+    );
+    userStore.setUser(response.data);
     showSuccessModal.value = true;
   } catch (error) {
     console.error("Error al guardar los cambios", error);

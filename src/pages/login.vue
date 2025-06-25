@@ -10,7 +10,7 @@
             class="bg-red-200 w-full py-1 rounded-md text-center text-red-700 border border-red-700">{{ messaggeError
             }}
           </div>
-          <h1 class="text-xl text-start my-4">Te damos la bienvenida a Hay Lugar</h1>
+          <h1 class="text-xl text-start my-4">Te damos la bienvenida a HayLugar</h1>
           <form @submit.prevent="login" class="space-y-6 max-w-md mx-auto">
             <!-- Email -->
             <div class="relative">
@@ -48,6 +48,8 @@
               <span class="text-white" v-else>Continuar</span>
             </button>
           </form>
+          <!-- Botón de Google -->
+          <GoogleLogin />
         </div>
         <p class="my-4 text-center text-sm">¿No tienes una cuenta?
           <router-link to="/register" class="text-primary font-bold">Regístrate aquí</router-link>
@@ -64,6 +66,7 @@ import api from '../services/apiService';
 import { useUserStore } from '../store/userStore';
 import loadIcon from "../assets/load-icon_secondary.svg";
 import MainHeader from '../components/MainHeader.vue';
+import GoogleLogin from '../components/GoogleLogin.vue';
 
 const email = ref('');
 const password = ref('');
@@ -71,6 +74,7 @@ const router = useRouter();
 const cargando = ref(false);
 const credentialError = ref(false);
 const messaggeError = ref('');
+
 const isFocused = {
   email: ref(false),
   password: ref(false)
@@ -96,7 +100,7 @@ const login = async () => {
     console.log(response)
     if (response.data.token) {
       const userStore = useUserStore();
-      userStore.setToken(response.data.token);
+      userStore.setUser(response.data.user);
       router.push('/dashboard');
     } else {
       credentialError.value = true;

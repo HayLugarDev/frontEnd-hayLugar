@@ -58,6 +58,10 @@
               <span class="text-white" v-else>Continuar</span>
             </button>
           </form>
+
+          <!-- Botón de Google -->
+          <GoogleLogin />
+
           <p class="mt-4 text-center text-sm">¿Ya tienes una cuenta?
             <router-link to="/login" class="text-primary font-bold">Inicia sesión aquí</router-link>
           </p>
@@ -74,6 +78,7 @@ import api from '../services/apiService';
 import { useUserStore } from '../store/userStore';
 import loadIcon from "../assets/load-icon_secondary.svg";
 import MainHeader from '../components/MainHeader.vue';
+import GoogleLogin from '../components/GoogleLogin.vue';
 
 const name = ref('');
 const email = ref('');
@@ -109,8 +114,10 @@ const register = async () => {
     console.log(response);
     if (response.data.token) {
       const userStore = useUserStore();
-      userStore.setToken(response.data.token);
-      router.push('/dashboard');
+      router.push('/dashboard')
+        .then(() => {
+          window.location.reload();
+        });
     } else {
       credentialError.value = true;
       messaggeError.value = response.data.error || 'Error en el ingreso de datos';

@@ -162,13 +162,12 @@ const activedFavouriteIcon = ref(false);
 const isAnimating = ref(false);
 const getImageUrl = (img) => `http://localhost:3000${img}`;
 
-const { isSessionInvalid } = useVerifyToken();
+const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 const obtenerEspacio = async () => {
   try {
     const id = route.params.id;
     const space = await getSpaceById(id);
-    console.log(space);
     return espacio.value = space;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
@@ -204,6 +203,8 @@ const reservar = async () => {
     });
     return alert('Faltan completar campos para la reserva');
   }
+  
+  verifyToken();
 
   const payload = {
     owner_id: espacio.value.owner_id,
@@ -214,7 +215,6 @@ const reservar = async () => {
     dead_line: deadLine.value,
     total: totalCalculado.value,
   };
-  console.log('Payload generado:', payload);
   reservationStore.setReservationData(payload);
   router.push('/pago');
 };
@@ -232,7 +232,6 @@ const totalCalculado = computed(() => {
   if (Array.isArray(espacio.value.vehicle_capacities)) {
     const tipoOriginal = reverseVehicleTypeTranslations[tipoVehiculo.value];
     const vehicle = espacio.value.vehicle_capacities.find(v => v.type === tipoOriginal);
-    console.log(vehicle);
     if (vehicle) {
       precioHora = Number(vehicle.price_per_hour);
     }
@@ -309,6 +308,8 @@ const imageGridPosition = (index) => {
 };
 
 const toggleFavourite = () => {
+
+  verifyToken();
   activedFavouriteIcon.value = !activedFavouriteIcon.value;
   isAnimating.value = true;
 
@@ -317,7 +318,6 @@ const toggleFavourite = () => {
     isAnimating.value = false;
   }, 400);
 };
-
 </script>
 
 <style scoped></style>

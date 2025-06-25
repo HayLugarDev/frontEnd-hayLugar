@@ -170,8 +170,6 @@ onMounted(async () => {
   }
   await obtenerEspacios();
   await userStore.fetchUser();
-  console.log('Usuario en el store:', userStore.user);
-  console.log('Authenticado: ', userStore.isAuthenticated);
 });
 
 const buscar = async () => {
