@@ -21,8 +21,7 @@
           class="flex flex-row h-full hover:shadow-lg hover:bg-gray-50 gap-2 pl-4 pr-2 py-1 items-center justify-between rounded-full cursor-pointer">
           <font-awesome-icon v-if="!openMenu" icon="fa-angle-down" class="text-gray-500" />
           <font-awesome-icon v-else icon="fa-angle-up" class="text-gray-500" />
-          <img v-if="userStore.user" :src="userStore.user.profile_picture" alt="ProfileIMG" class="w-10 rounded-full">
-          <img v-else src="../assets/user_icon_primary.png" alt="UserIMG" class="w-10">
+          <img :src="getHostImage()" alt="ProfileIMG" class="w-10 rounded-full">
         </button>
         <ul v-if="openMenu"
           class="absolute bg-white rounded-xl flex flex-col py-2 top-14 left-30 z-30 cursor-pointer shadow-xl w-full">
@@ -53,6 +52,7 @@ import { useRoute, useRouter } from 'vue-router';
 import SessionExpired from './SessionExpired.vue';
 import { useHeaderVisibility } from "../logic/useHeaderVisibility";
 import { useVerifyToken } from '../logic/useVerifyToken';
+import user_icon_primary from "../assets/user_icon_primary.png";
 import BackButton from "./BackButton.vue";
 
 const userStore = useUserStore();
@@ -76,4 +76,8 @@ const openUserMenu = () => {
 const openLoginMenu = () => {
   openMenu.value = !openMenu.value;
 }
+
+const getHostImage = () => {
+  return userStore.user?.profile_picture || user_icon_primary;
+};
 </script>

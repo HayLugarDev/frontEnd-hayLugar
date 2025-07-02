@@ -9,29 +9,34 @@ export function useVerifyToken() {
   const router = useRouter();
   const isSessionInvalid = ref(false);
 
-  const verifyToken = async (route: string) => {
+  const verifyToken = async (route?: string) => {
     try {
-      const result = await verifyActiveSession(route, userStore.sessionExpired);
+      const result = await verifyActiveSession();
 
-      console.log('Autenticado? : ', userStore.isAuthenticated);
-      console.log('Autenticado? : ', userStore.sessionExpired);
-
+      // Cierre de sesión explícito
       if (route === '/quit') {
         await api.post('/auth/signout', {}, { withCredentials: true });
         userStore.clearUser();
-        await router.push('/dashboard');
         userStore.expireSession();
+        await router.push('/dashboard');
+        window.location.reload();
         return;
       }
 
+      // Si no está autenticado o token inválido
       if (!result || !userStore.isAuthenticated) {
         userStore.clearUser();
         isSessionInvalid.value = true;
         return;
       }
 
+      // Si está todo OK
       isSessionInvalid.value = false;
-      await router.push(route);
+
+      // Redirigir si hay ruta válida
+      if (route && route !== '/quit') {
+        await router.push(route);
+      }
     } catch (error) {
       console.error('Error verifying session:', error);
       userStore.clearUser();
@@ -39,8 +44,20 @@ export function useVerifyToken() {
     }
   };
 
+  // Validar sin redirección
+  const isSessionValid = async () => {
+    try {
+      const result = await verifyActiveSession();
+      return result && userStore.isAuthenticated;
+    } catch (e) {
+      userStore.clearUser();
+      return false;
+    }
+  };
+
   return {
     verifyToken,
-    isSessionInvalid
+    isSessionInvalid,
+    isSessionValid,
   };
 }

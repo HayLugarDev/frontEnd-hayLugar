@@ -28,7 +28,7 @@ export const useUserStore = defineStore('user', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await api.get('/auth/verify-session', { withCredentials: true });
+        const response = await api.get('/auth/google-session', { withCredentials: true });
         this.user = response.data.user;
         this.sessionExpired = false;
         console.log('Usuario cargado:', this.user);

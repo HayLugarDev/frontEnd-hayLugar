@@ -19,9 +19,8 @@ const userStore = useUserStore();
 
 onMounted(async () => {
   try {
-    const res = await api.get('/auth/verify-session', { withCredentials: true });
+    const res = await api.get('/auth/google-session', { withCredentials: true });
     if (res.data.token) {
-      const userStore = useUserStore();
       userStore.setUser(res.data.user);
       router.push('/dashboard');
     }

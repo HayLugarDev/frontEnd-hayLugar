@@ -136,9 +136,7 @@ import { useRouter, useRoute } from 'vue-router';
 import CustomGoogleMap from '../components/GoogleMap.vue';
 import MainHeader from "../components/MainHeader.vue";
 import carMarker from '../assets/logo.png';
-import bicycleMarker from '../assets/logo.png';
 import user_icon_primary from "../assets/user_icon_primary.png";
-import truckMarker from '../assets/logo.png';
 import { getSpaceById } from '../services/spaceService';
 import MenuDropdown from "../components/MenuDropdown.vue";
 import Datepicker from '@vuepic/vue-datepicker'
@@ -148,7 +146,9 @@ import { useReservationStore } from '../store/reservationStore';
 import BackButton from "../components/BackButton.vue";
 import { useVerifyToken } from '../logic/useVerifyToken';
 import SessionExpired from '../components/SessionExpired.vue';
+import { useUserStore } from '../store/userStore';
 
+const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 const reservationStore = useReservationStore();
@@ -174,8 +174,9 @@ const obtenerEspacio = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   obtenerEspacio();
+  await userStore.fetchUser();
 });
 
 // const markerIcon = computed(() => {
@@ -204,7 +205,9 @@ const reservar = async () => {
     return alert('Faltan completar campos para la reserva');
   }
   
-  verifyToken();
+  await verifyToken();
+
+  if (isSessionInvalid.value) return; // ← no continuar si sesión inválida
 
   const payload = {
     owner_id: espacio.value.owner_id,
@@ -307,17 +310,18 @@ const imageGridPosition = (index) => {
   return `col-span-4 md:col-span-2 row-span-4 ${positions[index] || ''}`;
 };
 
-const toggleFavourite = () => {
+const toggleFavourite = async () => {
+  await verifyToken();
+  if (isSessionInvalid.value) return;
 
-  verifyToken();
   activedFavouriteIcon.value = !activedFavouriteIcon.value;
   isAnimating.value = true;
 
-  // Detener la animación después de que termine (400ms)
   setTimeout(() => {
     isAnimating.value = false;
   }, 400);
 };
+
 </script>
 
 <style scoped></style>
