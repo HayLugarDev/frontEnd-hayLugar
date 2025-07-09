@@ -1,18 +1,23 @@
-FROM node:18-alpine AS build
+# Imagen base oficial de Node con soporte para TypeScript
+FROM node:18
 
-WORKDIR /app
+# Establece el directorio de trabajo
+WORKDIR /usr/src/app
+
+# Copia los archivos de dependencias
 COPY package*.json ./
+
+# Instala las dependencias
 RUN npm install
 
+# Copia el resto del proyecto
 COPY . .
-RUN npm run build
 
-# Servidor estático NGINX
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+# Expone el puerto (ajustalo si usás otro)
+EXPOSE 3000
 
-# Reemplaza configuración si tenés un nginx.conf personalizado:
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Compila TypeScript a JS
+RUN npm run build || true
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Comando para desarrollo con ts-node-dev
+CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "src/server.ts"]
