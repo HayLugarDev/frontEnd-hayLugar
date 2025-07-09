@@ -1,23 +1,20 @@
-# Imagen base oficial de Node con soporte para TypeScript
-FROM node:18
+# Usa una imagen base de Node.js
+FROM node:18-alpine
 
-# Establece el directorio de trabajo
-WORKDIR /usr/src/app
+# Establece el directorio de trabajo dentro del contenedor
+WORKDIR /app
 
-# Copia los archivos de dependencias
-COPY package*.json ./
+# Copia los archivos de configuraci¢n y dependencias
+COPY package.json package-lock.json ./
 
 # Instala las dependencias
 RUN npm install
 
-# Copia el resto del proyecto
+# Copia el resto del c¢digo fuente
 COPY . .
 
-# Expone el puerto (ajustalo si us√°s otro)
-EXPOSE 3000
+# Expone el puerto en el que se ejecutar† la aplicaci¢n
+EXPOSE 5173
 
-# Compila TypeScript a JS
-RUN npm run build || true
-
-# Comando para desarrollo con ts-node-dev
-CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "src/server.ts"]
+# Comando para iniciar la aplicaci¢n
+CMD ["npm", "run", "dev"]
