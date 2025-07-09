@@ -23,7 +23,7 @@ FROM nginx:alpine AS runner
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copiamos una configuración custom si la tenés
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf /etc/nginx/conf.d/default.conf
 
 # Exponemos el puerto típico HTTP
 EXPOSE 5371
