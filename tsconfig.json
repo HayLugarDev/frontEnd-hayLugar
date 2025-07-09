@@ -2,8 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "bundler",
-    "types": ["google.maps"]
+    "moduleResolution": "bundler"
   },
   "include": [
     "src/**/*.ts",
