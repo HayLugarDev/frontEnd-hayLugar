@@ -14,7 +14,9 @@ RUN npm install && \
 COPY . .
 
 # Build del frontend
-RUN npm run build
+#RUN npm run build
+
+RUN echo "VITE_API_BASE_URL=http://haylugar.com.ar/api" > .env && npm run build
 
 # Etapa final con nginx
 FROM nginx:alpine AS runner
