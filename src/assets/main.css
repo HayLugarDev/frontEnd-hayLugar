@@ -35,6 +35,22 @@
   transform: translateX(16px);
 }
 
+/* Transición en iconos */
+.icon-fade-enter-active,
+.icon-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.icon-fade-enter-from,
+.icon-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
+}
+.icon-fade-enter-to,
+.icon-fade-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+
 /* Transición entre pasos */
 .fade-step-enter-active,
 .fade-step-leave-active {
