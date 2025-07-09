@@ -6,10 +6,10 @@ WORKDIR /app
 # Copiamos package.json y lock
 COPY package*.json ./
 
-# Instalamos dependencias y bajamos versión compatible del clusterer
 RUN npm install && \
-    npm install --save @googlemaps/markerclusterer@^1.0.6
-
+    npm install --save @googlemaps/markerclusterer@^1.0.6 && \
+    npm install --save-dev @types/google.maps
+    
 # Copiamos el resto del proyecto
 COPY . .
 
