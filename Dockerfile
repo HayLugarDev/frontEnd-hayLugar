@@ -1,14 +1,19 @@
-# Etapa 1: Build del proyecto
-FROM node:18-alpine as builder
+FROM node:18-alpine AS builder
+
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
+
+# Instalamos dependencias incluyendo los tipos
+RUN npm install && \
+    npm install --save-dev @types/google.maps
+
 COPY . .
+
 RUN npm run build
 
-# Etapa 2: Nginx para servir los archivos
-FROM nginx:alpine
+FROM nginx:alpine AS runner
 COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 5173
 CMD ["nginx", "-g", "daemon off;"]
 
