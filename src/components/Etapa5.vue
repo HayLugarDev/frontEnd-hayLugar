@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col w-1/2 mx-auto p-4 gap-2">
+    <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2">
         <div v-if="showSummary" class="mt-8 space-y-6">
             <h2 class="text-xl font-bold">Resumen antes de publicar</h2>
 

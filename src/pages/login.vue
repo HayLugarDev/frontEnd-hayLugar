@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen bg-secondary flex flex-col">
     <MainHeader />
+    <BackButton class="md:hidden" />
     <div class="flex-grow flex items-start justify-center bg-primary">
       <div
         class="bg-white p-2 md:rounded-xl shadow-2xl border-2 w-full min-h-screen md:min-h-max md:w-2/3 lg:w-1/3 md:mt-20">
@@ -11,45 +12,48 @@
             }}
           </div>
           <h1 class="text-xl text-start my-4">Te damos la bienvenida a HayLugar</h1>
-          <form @submit.prevent="login" class="space-y-6 max-w-md mx-auto">
-            <!-- Email -->
-            <div class="relative">
-              <input v-model="email" type="email" id="email" required @focus="isFocused.email.value = true"
-                @blur="isFocused.email.value = false"
-                class="peer w-full px-4 pt-5 pb-2 border border-gray-300 rounded-md text-base placeholder-transparent focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200" />
-              <label :class="[
-                'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
-                email || isFocused.email.value
-                  ? 'scale-75 -translate-y-1'
-                  : 'scale-100 translate-y-4'
-              ]">
-                Correo electrónico
-              </label>
-            </div>
+          <div class="space-y-6 max-w-md mx-auto">
+            <form @submit.prevent="login" class="space-y-6">
+              <!-- Email -->
+              <div class="relative">
+                <input v-model="email" type="email" id="email" required @focus="isFocused.email.value = true"
+                  @blur="isFocused.email.value = false"
+                  class="peer w-full px-4 pt-5 pb-2 border border-gray-300 rounded-md text-base placeholder-transparent focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200" />
+                <label :class="[
+                  'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
+                  email || isFocused.email.value
+                    ? 'scale-75 -translate-y-1'
+                    : 'scale-100 translate-y-4'
+                ]">
+                  Correo electrónico
+                </label>
+              </div>
 
-            <!-- Contraseña -->
-            <div class="relative">
-              <input v-model="password" type="password" id="password" required @focus="isFocused.password.value = true"
-                @blur="isFocused.password.value = false"
-                class="peer w-full px-4 pt-5 pb-2 border border-gray-300 rounded-md text-base placeholder-transparent focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200" />
-              <label :class="[
-                'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
-                password || isFocused.password.value
-                  ? 'scale-75 -translate-y-1'
-                  : 'scale-100 translate-y-4'
-              ]">
-                Contraseña
-              </label>
-            </div>
+              <!-- Contraseña -->
+              <div class="relative">
+                <input v-model="password" type="password" id="password" required
+                  @focus="isFocused.password.value = true" @blur="isFocused.password.value = false"
+                  class="peer w-full px-4 pt-5 pb-2 border border-gray-300 rounded-md text-base placeholder-transparent focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200" />
+                <label :class="[
+                  'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
+                  password || isFocused.password.value
+                    ? 'scale-75 -translate-y-1'
+                    : 'scale-100 translate-y-4'
+                ]">
+                  Contraseña
+                </label>
+              </div>
 
-            <!-- Botón -->
-            <button type="submit" class="flex justify-center w-full bg-accent text-dark py-2 rounded-md">
-              <img v-if="cargando" :src="loadIcon" alt="Cargando" class="w-6 h-6" />
-              <span class="text-white" v-else>Continuar</span>
-            </button>
-          </form>
-          <!-- Botón de Google -->
-          <GoogleLogin />
+              <!-- Botón -->
+              <button type="submit" class="flex justify-center w-full bg-accent text-dark py-2 rounded-md">
+                <img v-if="cargando" :src="loadIcon" alt="Cargando" class="w-6 h-6" />
+                <span class="text-white" v-else>Continuar</span>
+              </button>
+            </form>
+            
+            <!-- Botón de Google -->
+            <GoogleLogin />
+          </div>
         </div>
         <p class="my-4 text-center text-sm">¿No tienes una cuenta?
           <router-link to="/register" class="text-primary font-bold">Regístrate aquí</router-link>
@@ -67,6 +71,7 @@ import { useUserStore } from '../store/userStore';
 import loadIcon from "../assets/load-icon_secondary.svg";
 import MainHeader from '../components/MainHeader.vue';
 import GoogleLogin from '../components/GoogleLogin.vue';
+import BackButton from '../components/BackButton.vue';
 
 const email = ref('');
 const password = ref('');

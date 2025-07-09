@@ -1,6 +1,7 @@
 <template>
   <MainHeader />
-  <div class="relative w-full h-full mx-auto">
+  <BackButton class="md:hidden" />
+  <div class="relative w-full h-full mx-auto pt-6">
     <!-- Instrucciones iniciales -->
     <transition name="fade-step" mode="out-in">
       <div :key="currentStep">
@@ -75,6 +76,7 @@ import Etapa2 from '../components/Etapa2.vue';
 import Etapa3 from '../components/Etapa3.vue';
 import Etapa4 from '../components/Etapa4.vue';
 import Etapa5 from '../components/Etapa5.vue';
+import BackButton from '../components/BackButton.vue';
 
 const router = useRouter();
 const showSuccessModal = ref(false);

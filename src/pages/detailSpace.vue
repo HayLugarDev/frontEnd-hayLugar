@@ -11,20 +11,29 @@
         <!-- Info del anfitrión -->
         <section v-if="espacio?.host" class="col-span-3 bg-secondary p-6 px-10 rounded-xl shadow-md mt-6 font-normal">
           <div class="flex flex-row items-center gap-4">
-            <img :src="getHostImage()" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
-            <div class="flex flex-col sm:flex-row sm:justify-around w-full text-gray-800">
-              <p class="text-lg">Anfitrión: {{ espacio.host.name }} {{ espacio.host.last_name }}</p>
-              <p class="text-xl"><font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-800" />
-                +549{{
-                  espacio.host.phone }}</p>
-              <p>Email: {{ espacio.host.email }}</p>
+            <img :src="hostImage" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
+            <div class="flex flex-col pl-8 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800">
+              <div class="flex flex-row gap-1 items-center">
+                <p class="text-lg font-semibold">Anfitrión: </p><span>{{ espacio.host.name }} {{ espacio.host.last_name
+                  }}</span>
+              </div>
+              <div class="flex flex-row gap-1 items-center">
+                <p v-if="espacio.host.phone" class="text-xl">
+                  <font-awesome-icon :icon="['fab', 'whatsapp']"
+                    class="text-2xl text-green-800" />
+                    <span>+549{{ espacio.host.phone }}</span>
+                  </p>
+              </div>
+              <div class="flex flex-row gap-1 items-center">
+                <p class="font-semibold">Email: </p><span>{{ espacio.host.email }}</span>
+              </div>
             </div>
           </div>
         </section>
 
         <!-- Título + Favorito -->
-        <div class="flex flex-row items-center justify-between mt-4 px-8">
-          <h1 class="text-4xl sm:text-3xl font-bold p-2 text-gray-700">{{ espacio.name }}</h1>
+        <div class="flex flex-row items-center justify-between mt-4 px-2">
+          <h1 class="text-4xl sm:text-3xl font-bold p-2 text-primary">{{ espacio.name }}</h1>
           <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" :class="[
             activedFavouriteIcon ? 'text-red-500 scale-110' : 'text-gray-700',
             'text-3xl cursor-pointer transition-transform duration-300 ease-in-out',
@@ -175,7 +184,7 @@ const obtenerEspacio = async () => {
 };
 
 onMounted(async () => {
-  obtenerEspacio();
+  await obtenerEspacio();
   await userStore.fetchUser();
 });
 
@@ -204,7 +213,7 @@ const reservar = async () => {
     });
     return alert('Faltan completar campos para la reserva');
   }
-  
+
   await verifyToken();
 
   if (isSessionInvalid.value) return; // ← no continuar si sesión inválida
@@ -296,9 +305,10 @@ const reverseVehicleTypeTranslations = Object.fromEntries(
   Object.entries(vehicleTypeTranslations).map(([en, es]) => [es, en])
 );
 
-const getHostImage = () => {
-  return espacio.host?.profile_picture || user_icon_primary;
-};
+const hostImage = computed(() => {
+  console.log("Host:", espacio.value.host);
+  return espacio.value.host?.profile_picture || user_icon_primary;
+});
 
 const imageGridPosition = (index) => {
   const positions = [

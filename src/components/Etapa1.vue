@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col w-1/2 mx-auto p-4 gap-2">
+    <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2">
         <h1 class="text-4xl font-semibold mb-8">Qué tipo de espacio vas a ofrecer como estacionamiento?</h1>
 
         <FormOption v-model="type" value="garage" title="Casa o inmueble propio"

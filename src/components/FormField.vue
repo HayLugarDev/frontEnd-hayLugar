@@ -1,6 +1,6 @@
 <template>
-    <label class="block mt-4">
-    <span class="text-lg font-semibold text-black">{{ label }}</span>
+    <label class="block mt-4 text-gray-500">
+    <span class="text-md font-semibold text-black">{{ label }}</span>
     <input
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"

@@ -18,14 +18,6 @@
         <CustomInputGroup v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
           :onSearch="buscar" />
       </div>
-      <!-- <div class="hidden sm:flex flex-row justify-between items-center shadow-md sm:rounded-xl bg-white h-16 py-2">
-      <ZoneNavbar />
-      <button
-        class="hidden sm:flex sm:flex-row items-center gap-2 p-2 rounded-xl sm:mr-4 hover:bg-gray-100 shadow-md h-full border hover:border-black">
-        <font-awesome-icon icon="fa-align-left" class="text-gray-500" />
-        <span>Filtrar</span>
-      </button>
-    </div> -->
 
       <div ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
         <div v-if="!showMap"
@@ -57,7 +49,7 @@
   </div>
   <!-- Menú fijo en la parte inferior -->
   <div class="fixed bottom-0 left-0 w-full z-50">
-    <MobileMenu />
+    <MobileMenu @toggle="toggleMap" :showMap="showMap" />
   </div>
 </template>
 
@@ -201,6 +193,7 @@ const buscar = async () => {
 };
 
 const toggleMap = () => {
+  
   showMap.value = !showMap.value;
   nextTick(() => {
     if (!showMap.value && refSeccionResultados.value) {

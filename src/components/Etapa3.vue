@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-1/2 mx-auto p-4 gap-4">
+  <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-4">
     <h1 class="text-4xl font-semibold mb-8">¿Qué tipos de vehículos aceptarás en tu espacio?</h1>
 
     <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value" :title="type.title"

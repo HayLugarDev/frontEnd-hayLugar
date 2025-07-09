@@ -1,8 +1,8 @@
 <template>
-  <section class="bg-white p-8 rounded-lg shadow-lg mb-8">
+  <section class="bg-white p-8 rounded-lg shadow-lg mb-8 md:w-2/3">
     <h2 class="text-2xl font-bold text-primary mb-4 flex items-center">
       <font-awesome-icon icon="history" class="mr-2" />
-      Historial de Reservas
+      Reservas
     </h2>
     <ul v-if="reservations.length" class="divide-y divide-gray-300">
       <li v-for="(reserva, index) in reservations" :key="index" class="py-4">
