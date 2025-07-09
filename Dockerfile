@@ -1,20 +1,13 @@
-# Usa una imagen base de Node.js
-FROM node:18-alpine
-
-# Establece el directorio de trabajo dentro del contenedor
+# Etapa 1: build
+FROM node:18-alpine AS builder
 WORKDIR /app
-
-# Copia los archivos de configuraci¢n y dependencias
-COPY package.json package-lock.json ./
-
-# Instala las dependencias
+COPY package*.json ./
 RUN npm install
-
-# Copia el resto del c¢digo fuente
 COPY . .
+RUN npm run build
 
-# Expone el puerto en el que se ejecutar  la aplicaci¢n
-EXPOSE 5173
-
-# Comando para iniciar la aplicaci¢n
-CMD ["npm", "run", "dev"]
+# Etapa 2: Nginx para servir el frontend
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
