@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// ConfiguraciÃ³n base de Axios
+// Configuración base de Axios
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://haylugar.com.ar/api",
   headers: {
     'Content-Type': 'application/json',
   }
