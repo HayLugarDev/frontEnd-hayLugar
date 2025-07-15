@@ -4,7 +4,7 @@
     <div class="flex transition-transform duration-500" :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
       @touchstart="onTouchStart" @touchend="onTouchEnd">
       <div v-for="(img, index) in props.images" :key="index" class="w-full flex-shrink-0 aspect-square">
-        <img :src="`http://localhost:3000${img}`" class="w-full h-full object-cover" alt="Imagen del carrusel" />
+        <img :src="`${baseURL}${img}`" class="w-full h-full object-cover" alt="Imagen del carrusel" />
       </div>
     </div>
 
@@ -50,6 +50,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import { baseURL } from "../services/apiService";
 
 const props = defineProps({
   controls: Boolean,

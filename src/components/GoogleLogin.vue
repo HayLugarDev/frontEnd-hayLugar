@@ -7,7 +7,9 @@
 </template>
 
 <script setup>
+import { apiBaseUrl } from "../services/apiService";
+
 const loginWithGoogle = () => {
-    window.location.href = 'http://localhost:3000/api/auth/google';
+    window.location.href = `${apiBaseUrl}/auth/google`;
 };
 </script>

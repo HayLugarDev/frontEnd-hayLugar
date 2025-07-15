@@ -156,6 +156,7 @@ import BackButton from "../components/BackButton.vue";
 import { useVerifyToken } from '../logic/useVerifyToken';
 import SessionExpired from '../components/SessionExpired.vue';
 import { useUserStore } from '../store/userStore';
+import { baseURL } from '../services/apiService';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -169,7 +170,7 @@ const espacio = ref(null);
 const deadLine = ref(null);
 const activedFavouriteIcon = ref(false);
 const isAnimating = ref(false);
-const getImageUrl = (img) => `http://localhost:3000${img}`;
+const getImageUrl = (img) => `${baseURL}${img}`;
 
 const { verifyToken, isSessionInvalid } = useVerifyToken();
 

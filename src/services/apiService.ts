@@ -1,9 +1,11 @@
 import axios from 'axios';
-import router from '../router';
 import { useUserStore } from '../store/userStore';
 
+export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+export const baseURL = import.meta.env.VITE_BASE_URL
+
 const api = axios.create({
-  baseURL: process.env.VITE_API_BASE_URL || "http://localhost:3000/api",
+  baseURL: apiBaseUrl || "http://localhost:3000/api",
   headers: {
     'Content-Type': 'application/json',
   },
