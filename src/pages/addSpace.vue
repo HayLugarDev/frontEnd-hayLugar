@@ -1,7 +1,7 @@
 <template>
   <MainHeader />
   <BackButton class="md:hidden" />
-  <div class="relative w-full h-full mx-auto pt-6">
+  <div class="relative w-full h-full mx-auto py-12">
     <!-- Instrucciones iniciales -->
     <transition name="fade-step" mode="out-in">
       <div :key="currentStep">

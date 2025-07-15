@@ -2,10 +2,9 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import login from '../pages/login.vue';
 import dashboard from '../pages/dashboard.vue';
 import register from '../pages/register.vue';
-import GoogleSuccess from '../pages/GoogleSuccess.vue';
+import GoogleSuccess from '../pages/googleSuccess.vue';
 import addSpace from '../pages/addSpace.vue';
 import detailSpace from '../pages/detailSpace.vue';
-import checkout from '../pages/checkout.vue';
 import payment from '../pages/payment.vue';
 import confirmaReserva from '../pages/confirmaReserva.vue';
 import profile from '../pages/profile.vue';
@@ -20,7 +19,6 @@ const routes: RouteRecordRaw[] = [
   { path: '/dashboard', component: dashboard },
   { path: '/add-space', component: addSpace, meta: { requiresAuth: true } },
   { path: '/espacio/:id', component: detailSpace },
-  { path: '/reserva/:id', component: checkout },
   { path: '/pago', component: payment, meta: { requiresAuth: true } },
   { path: '/confirmacion', component: confirmaReserva, meta: { requiresAuth: true } },
   { path: '/profile', component: profile, meta: { requiresAuth: true } },

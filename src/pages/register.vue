@@ -4,13 +4,13 @@
     <BackButton class="md:hidden" />
     <div class="flex-grow flex items-start justify-center bg-primary">
       <div
-        class="bg-white p-2 md:rounded-xl shadow-2xl border-2 w-full min-h-screen md:min-h-max md:w-2/3 lg:w-1/2 xl:w-1/3 md:mt-20">
+        class="bg-white p-2 md:rounded-xl shadow-2xl border-2 w-full min-h-screen md:min-h-max md:w-2/3 lg:w-1/2 xl:w-1/3 md:mt-20 py-12 md:py-2">
         <h1 class="text-md text-center border-b-2 py-2">Registrá tu cuenta</h1>
         <div class="px-8 py-2">
           <div v-if="credentialError"
             class="bg-red-200 w-full py-1 rounded-md text-center text-red-700 border border-red-700">{{ messaggeError }}
           </div>
-          <h1 class="text-xl text-start my-4">Te damos la bienvenida a Hay Lugar</h1>
+          <h1 class="text-xl text-start my-4">Te damos la bienvenida a HayLugar</h1>
           <div class="space-y-6 max-w-md mx-auto">
             <form @submit.prevent="register" class="space-y-6 max-w-md mx-auto">
               <!-- Nombre -->
