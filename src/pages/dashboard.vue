@@ -67,17 +67,10 @@ import FloatingButton from '../components/FloatingButton.vue';
 import CustomInputGroup from "../components/CustomInputGroup.vue";
 import DashboardSkeleton from '../components/DashboardSkeleton.vue';
 import MobileMenu from '../components/MobileMenu.vue';
+import { useGoogleMap } from '../logic/useGoogleMap';
 
 const router = useRouter();
 const userStore = useUserStore();
-const markerIcon = logoMarker;
-
-
-const getMarkerOptions = (espacio) => ({
-  position: { lat: Number(espacio.latitude), lng: Number(espacio.longitude) },
-  icon: { url: markerIcon, scaledSize: { width: 40, height: 40 } }
-});
-
 
 const searchQuery = ref("");
 const checkIn = ref("");
@@ -88,41 +81,18 @@ const espacios = ref([]);
 const cargando = ref(true);
 const error = ref(null);
 const showMap = ref(false);
-const hoveredSpace = ref(null);
-const center = ref({ lat: -26.8333, lng: -65.2167 });
-const zoom = ref(15);
 const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
 
-
-const mapOptions = ref({
-  styles: [
-    { featureType: "all", elementType: "geometry", stylers: [{ color: "#ebe3cd" }] },
-    { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#523735" }] },
-    { featureType: "all", elementType: "labels.text.stroke", stylers: [{ color: "#f5f1e6" }] },
-    { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#c9b2a6" }] },
-    { featureType: "administrative.land_parcel", elementType: "geometry.stroke", stylers: [{ color: "#dcd2be" }] },
-    { featureType: "administrative.land_parcel", elementType: "labels.text.fill", stylers: [{ color: "#ae9e90" }] },
-    { featureType: "landscape.natural", elementType: "geometry", stylers: [{ color: "#dfd2ae" }] },
-    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#dfd2ae" }] },
-    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#93817c" }] },
-    { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#a5b076" }] },
-    { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#447530" }] },
-    { featureType: "road", elementType: "geometry", stylers: [{ color: "#f5f1e6" }] },
-    { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#fdfcf8" }] },
-    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#f8c967" }] },
-    { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#e9bc62" }] },
-    { featureType: "road.highway.controlled_access", elementType: "geometry", stylers: [{ color: "#e98d58" }] },
-    { featureType: "road.highway.controlled_access", elementType: "geometry.stroke", stylers: [{ color: "#db8555" }] },
-    { featureType: "transit", elementType: "geometry", stylers: [{ color: "#dfd2ae" }] },
-    { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#b9d3c2" }] },
-    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#92998d" }] }
-  ],
-  disableDefaultUI: true,
-  zoomControl: true,
-  streetViewControl: false,
-  fullscreenControl: false,
-  mapTypeControl: false,
-});
+const {
+  center,
+  zoom,
+  hoveredSpace,
+  getMarkerOptions,
+  handleMouseOver,
+  handleMouseOut,
+  mapOptions,
+  setCenterToUserLocation
+} = useGoogleMap();
 
 const obtenerEspacios = async () => {
   try {
@@ -145,21 +115,7 @@ const obtenerEspacios = async () => {
 };
 
 onMounted(async () => {
-
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        center.value = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        console.log(position)
-      },
-      (err) => {
-        console.error("Error al obtener geolocalización:", err);
-      }
-    );
-  }
+  setCenterToUserLocation();
   await obtenerEspacios();
   await userStore.fetchUser();
 });
@@ -193,22 +149,13 @@ const buscar = async () => {
 };
 
 const toggleMap = () => {
-  
+
   showMap.value = !showMap.value;
   nextTick(() => {
     if (!showMap.value && refSeccionResultados.value) {
       refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
     }
   });
-};
-
-const handleMouseOver = (espacio) => {
-  console.log("MouseOver en espacio:", espacio);
-  hoveredSpace.value = espacio;
-};
-
-const handleMouseOut = () => {
-  hoveredSpace.value = null;
 };
 
 const handleMarkerClick = (espacio) => {

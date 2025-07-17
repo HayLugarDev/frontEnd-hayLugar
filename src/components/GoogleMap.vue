@@ -8,8 +8,6 @@
 
 <script setup>
 
-const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
 const props = defineProps({
   center: {
     type: Object,
