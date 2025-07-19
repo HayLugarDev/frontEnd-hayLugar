@@ -4,7 +4,7 @@
     <div v-else class="flex flex-col h-full bg-secondary">
       <MainHeader />
       <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap" />
-      <button
+      <button @click="toggleSearchMenu"
         class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
         <font-awesome-icon icon="search" class="text-xs" />
         <span>Comenzar búsqueda</span>
@@ -19,7 +19,16 @@
           :onSearch="buscar" />
       </div>
 
-      <div ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
+      <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
+        <div class="flex flex-col space-y-2 px-4 w-5/6 bg-sacondary text-2xl font-semibold">
+          <h1>Por qué zona buscás?</h1>
+
+        </div>
+        <MenuDropdown v-model="tipoVehiculo" :options="vehicleOptions" title="Seleccioná tu vehículo"
+                class="border border-gray-700 rounded-xl" />
+      </div>
+
+      <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
         <div v-if="!showMap"
           class="relative flex-1 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
           <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">{{
@@ -81,6 +90,7 @@ const espacios = ref([]);
 const cargando = ref(true);
 const error = ref(null);
 const showMap = ref(false);
+const showSearchMenu = ref(false);
 const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
 
 const {
@@ -157,6 +167,10 @@ const toggleMap = () => {
     }
   });
 };
+
+const toggleSearchMenu = () => {
+  return showSearchMenu.value = !showSearchMenu.value;
+}
 
 const handleMarkerClick = (espacio) => {
   router.push(`/espacio/${espacio.id}`);

@@ -17,6 +17,9 @@ export const useUserStore = defineStore('user', {
     loading: false,
     error: null as string | null,
     sessionExpired: true,
+
+    // 🔔 NUEVO: estado para notificaciones
+    notifications: [] as string[],
   }),
 
   getters: {
@@ -31,9 +34,7 @@ export const useUserStore = defineStore('user', {
         const response = await api.get('/auth/google-session', { withCredentials: true });
         this.user = response.data.user;
         this.sessionExpired = false;
-        //console.log('Usuario cargado:', this.user);
       } catch (error: any) {
-        //console.error('Error en fetchUser:', error);
         if (error.response?.status === 401) {
           this.expireSession();
         }
@@ -58,7 +59,6 @@ export const useUserStore = defineStore('user', {
       this.sessionExpired = false;
     },
 
-
     clearUser() {
       this.user = null;
       this.error = null;
@@ -72,6 +72,16 @@ export const useUserStore = defineStore('user', {
 
     setSessionExpired(value: boolean) {
       this.sessionExpired = value;
+    },
+
+    // 🔔 NUEVO: agregar una notificación
+    addNotification(message: string) {
+      this.notifications.push(message);
+    },
+
+    // 🔔 NUEVO: limpiar todas las notificaciones
+    clearNotifications() {
+      this.notifications = [];
     },
   },
 });

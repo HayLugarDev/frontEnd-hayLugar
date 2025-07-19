@@ -1,7 +1,7 @@
 <template>
     <font-awesome-icon
       icon="fa-angle-left"
-      class="z-50 md:hidden block fixed text-3xl lg:bottom-full top-5 right-5 p-2 text-primary rounded-full aspect-square bg-transparent cursor-pointer border"
+      class="z-50 md:hidden block fixed text-2xl lg:bottom-full top-5 right-5 p-3 text-primary rounded-full aspect-square bg-white cursor-pointer border-2"
       @click="goBack"
     />
   </template>

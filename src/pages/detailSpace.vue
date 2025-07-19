@@ -1,7 +1,7 @@
 <template>
   <MainHeader />
   <div class="flex flex-col bg-secondary xl:w-11/12 mx-auto md:gap-4">
-    <BackButton class="md:hidden" />
+    
 
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <div v-if="espacio?.images?.length">
@@ -28,6 +28,7 @@
                 <p class="font-semibold">Email: </p><span>{{ espacio.host.email }}</span>
               </div>
             </div>
+            <BackButton class="md:hidden" />
           </div>
         </section>
 
