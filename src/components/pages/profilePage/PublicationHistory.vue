@@ -22,8 +22,8 @@
   
   <script setup lang="ts">
   import { ref, onMounted } from 'vue';
-  import { useUserStore } from '../store/userStore';
-  import api from '../services/apiService';
+  import { useUserStore } from '../../../store/userStore';
+  import api from '../../../services/apiService';
 
   const publications = ref([]);
   const userStore = useUserStore();

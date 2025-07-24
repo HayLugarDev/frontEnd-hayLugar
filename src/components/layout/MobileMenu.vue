@@ -13,9 +13,9 @@
 <script setup>
 import { useRoute, useRouter } from "vue-router";
 import { computed } from 'vue';
-import { useVerifyToken } from '../logic/useVerifyToken';
-import SessionExpired from "./SessionExpired.vue";
-import { verifyActiveSession } from "../middleware/verifyToken";
+import { useVerifyToken } from '../../logic/useVerifyToken';
+import SessionExpired from "../common/SessionExpired.vue";
+import { verifyActiveSession } from "../../middleware/verifyToken";
 
 const route = useRoute();
 const router = useRouter();

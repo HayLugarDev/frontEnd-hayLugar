@@ -50,7 +50,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { baseURL } from "../services/apiService";
+import { baseURL } from "../../services/apiService";
 
 const props = defineProps({
   controls: Boolean,

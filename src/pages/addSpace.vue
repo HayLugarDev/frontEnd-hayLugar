@@ -69,14 +69,14 @@
 import { ref, computed } from 'vue';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { useRouter } from 'vue-router';
-import MainHeader from '../components/MainHeader.vue';
+import MainHeader from '../components/layout/header/MainHeader.vue';
 import api from '../services/apiService';
-import Etapa1 from '../components/Etapa1.vue';
-import Etapa2 from '../components/Etapa2.vue';
-import Etapa3 from '../components/Etapa3.vue';
-import Etapa4 from '../components/Etapa4.vue';
-import Etapa5 from '../components/Etapa5.vue';
-import BackButton from '../components/BackButton.vue';
+import Etapa1 from '../components/pages/addSpacePage/Etapa1.vue';
+import Etapa2 from '../components/pages/addSpacePage/Etapa2.vue';
+import Etapa3 from '../components/pages/addSpacePage/Etapa3.vue';
+import Etapa4 from '../components/pages/addSpacePage/Etapa4.vue';
+import Etapa5 from '../components/pages/addSpacePage/Etapa5.vue';
+import BackButton from '../components/common/BackButton.vue';
 
 const router = useRouter();
 const showSuccessModal = ref(false);

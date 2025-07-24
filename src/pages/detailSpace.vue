@@ -143,19 +143,19 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import CustomGoogleMap from '../components/GoogleMap.vue';
-import MainHeader from "../components/MainHeader.vue";
+import CustomGoogleMap from '../components/layout/GoogleMap.vue';
+import MainHeader from "../components/layout/header/MainHeader.vue";
 import carMarker from '../assets/logo.png';
 import user_icon_primary from "../assets/user_icon_primary.png";
 import { getSpaceById } from '../services/spaceService';
-import MenuDropdown from "../components/MenuDropdown.vue";
+import MenuDropdown from "../components/layout/MenuDropdown.vue";
 import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-import Carousel from '../components/Carousel.vue';
+import Carousel from '../components/common/Carousel.vue';
 import { useReservationStore } from '../store/reservationStore';
-import BackButton from "../components/BackButton.vue";
+import BackButton from "../components/common/BackButton.vue";
 import { useVerifyToken } from '../logic/useVerifyToken';
-import SessionExpired from '../components/SessionExpired.vue';
+import SessionExpired from '../components/common/SessionExpired.vue';
 import { useUserStore } from '../store/userStore';
 import { baseURL } from '../services/apiService';
 

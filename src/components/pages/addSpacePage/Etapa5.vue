@@ -77,7 +77,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import StatusModal from '../components/StatusModal.vue';
+import StatusModal from '../addSpacePage/StatusModal.vue';
 
 const showSummary = ref(false);
 const props = defineProps(['modelValue']);

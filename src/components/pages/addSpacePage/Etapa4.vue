@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import StatusModal from "../components/StatusModal.vue";
+import StatusModal from "../addSpacePage/StatusModal.vue";
 import { computed, ref } from 'vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
 

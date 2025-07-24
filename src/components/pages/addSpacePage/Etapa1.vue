@@ -23,8 +23,8 @@
 </template>
 
 <script setup>
-import FormOption from './FormOption.vue';
-import StatusModal from "../components/StatusModal.vue";
+import FormOption from '../../forms/FormOption.vue';
+import StatusModal from "../addSpacePage/StatusModal.vue";
 import { computed, ref } from 'vue';
 
 const showErrorModal = ref(false);

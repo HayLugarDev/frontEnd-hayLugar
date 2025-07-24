@@ -36,7 +36,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import StatusModal from './StatusModal.vue';
+import StatusModal from '../addSpacePage/StatusModal.vue';
 
 const props = defineProps(['modelValue']);
 const emit = defineEmits(['update:modelValue', 'next', 'prev']);

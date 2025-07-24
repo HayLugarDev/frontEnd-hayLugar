@@ -40,5 +40,5 @@
 </template>
 
 <script setup>
-import SkeletonSpaceCard from '../components/SkeletonSpaceCard.vue';
+import SkeletonSpaceCard from './SkeletonSpaceCard.vue';
 </script>

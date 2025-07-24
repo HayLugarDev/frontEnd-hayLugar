@@ -37,8 +37,8 @@
     </router-link>
 </template>
 <script setup>
-import Carousel from './Carousel.vue';
-import Logo from './Logo.vue';
+import Carousel from '../../common/Carousel.vue';
+import Logo from '../../layout/Logo.vue';
 import { computed } from 'vue';
 
 const props = defineProps({

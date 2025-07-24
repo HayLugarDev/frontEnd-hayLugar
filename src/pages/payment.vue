@@ -80,8 +80,8 @@ import api, { baseURL } from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
 import { loadMercadoPago } from '@mercadopago/sdk-js';
 import { getSpaceById } from '../services/spaceService';
-import BackButton from '../components/BackButton.vue';
-import MainHeader from "../components/MainHeader.vue";
+import BackButton from '../components/common/BackButton.vue';
+import MainHeader from "../components/layout/header/MainHeader.vue";
 
 const router = useRouter();
 const route = useRoute();

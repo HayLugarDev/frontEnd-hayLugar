@@ -9,31 +9,32 @@
           Salir
         </button>
       </div>
-      <div v-if="route.path === '/dashboard' || route.path.startsWith('/espacio')"
+      <div v-if="route.path !== '/add-space'"
         class="relative flex flex-row sm:gap-2 items-center max-h-12">
+        <NotificationDropdown />
         <!-- Notificaciones -->
-        <div class="relative">
+        <!-- <div class="relative">
           <button @click="userStore.clearNotifications()"
-            class="relative w-10 h-10 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition duration-200">
-            <font-awesome-icon icon="bell" class="text-xl text-gray-700 dark:text-white" />
+            class="relative w-12 h-12 flex items-center justify-center hover:shadow-xl hover:bg-white rounded-full transition duration-200">
+            <font-awesome-icon icon="bell" class="text-xl text-gray-700 dark:text-white" /> -->
 
             <!-- Punto rojo titilante -->
-            <span v-if="userStore.notifications"
-              class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+            <!-- <span v-if="userStore.notifications.length"
+              class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span> -->
 
             <!-- Globo de notificación -->
-            <div v-if="showNotificationBubble"
-              class="absolute -right-20 top-1 bg-red-600 text-white text-xs px-2 py-1 rounded shadow-lg animate-fade-in">
-              Nueva reserva
+            <!-- <div v-if="showNotificationBubble"
+              class="absolute right-10 top-1 bg-red-500 text-white text-xs px-2 py-1 rounded shadow-lg animate-fade-in">
+              Tienes notificaciones!
             </div>
-          </button>
+          </button> -->
 
-          <div v-if="hasUnread"
-            class="absolute top-10 -left-20 bg-yellow-200 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-lg shadow-md animate-fade-in">
-            Nueva Reserva
-            <div class="absolute w-3 h-3 bg-yellow-200 rotate-45 bottom-5 left-20 transform"></div>
-          </div>
-        </div>
+          <!-- <div v-if="showNotificationBubble"
+            class="absolute top-10 -left-20 bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-lg shadow-md animate-fade-in">
+            Nueva reserva!
+            <div class="absolute w-3 h-3 bg-yellow-100 rotate-45 bottom-5 left-20 transform"></div>
+          </div> -->
+        <!-- </div> -->
 
         <button @click="openLoginMenu" v-if="routeConfig.showLoginButton"
           class="w-11 h-11 rounded-full border-2 bg-gray-200">
@@ -69,15 +70,16 @@
 </template>
 
 <script setup>
-import Logo from './Logo.vue';
-import { useUserStore } from '../store/userStore';
+import Logo from '../Logo.vue';
+import { useUserStore } from '../../../store/userStore';
 import { ref, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import SessionExpired from './SessionExpired.vue';
-import { useHeaderVisibility } from "../logic/useHeaderVisibility";
-import { useVerifyToken } from '../logic/useVerifyToken';
-import user_icon_primary from "../assets/user_icon_primary.png";
-import BackButton from "./BackButton.vue";
+import SessionExpired from '../../common/SessionExpired.vue';
+import { useHeaderVisibility } from "../../../logic/useHeaderVisibility";
+import { useVerifyToken } from '../../../logic/useVerifyToken';
+import user_icon_primary from "../../../assets/user_icon_primary.png";
+import BackButton from "../../common/BackButton.vue";
+import NotificationDropdown from './NotificationDropdown.vue';
 
 const userStore = useUserStore();
 const showNotificationBubble = ref(false);

@@ -28,9 +28,9 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import VehicleFormOption from './VehicleFormOption.vue';
-import VehicleModal from './VehicleModal.vue';
-import StatusModal from './StatusModal.vue';
+import VehicleFormOption from '../../forms/VehicleFormOption.vue';
+import VehicleModal from '../addSpacePage/VehicleModal.vue';
+import StatusModal from '../addSpacePage/StatusModal.vue';
 
 const props = defineProps(['modelValue']);
 const emit = defineEmits(['update:modelValue', 'next', 'prev']);

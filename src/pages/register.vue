@@ -79,9 +79,9 @@ import { useRouter } from 'vue-router';
 import api from '../services/apiService';
 import { useUserStore } from '../store/userStore';
 import loadIcon from "../assets/load-icon_secondary.svg";
-import MainHeader from '../components/MainHeader.vue';
-import GoogleLogin from '../components/GoogleLogin.vue';
-import BackButton from '../components/BackButton.vue';
+import MainHeader from '../components/layout/header/MainHeader.vue';
+import GoogleLogin from '../components/layout/GoogleLogin.vue';
+import BackButton from '../components/common/BackButton.vue';
 
 const name = ref('');
 const email = ref('');

@@ -138,17 +138,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import ReservationHistory from '../components/ReservationHistory.vue';
-import PublicationHistory from '../components/PublicationHistory.vue';
+import ReservationHistory from '../components/pages/profilePage/ReservationHistory.vue';
+import PublicationHistory from '../components/pages/profilePage/PublicationHistory.vue';
 import { useUserStore } from '../store/userStore';
 import api from '../services/apiService';
 import defaultProfilePicture from '../assets/user_icon_primary.png';
 import loadIcon from "../assets/load-icon_primary.svg";
-import BackButton from '../components/BackButton.vue';
-import MainHeader from '../components/MainHeader.vue';
-import FormOption from '../components/FormOption.vue';
-import FormField from '../components/FormField.vue';
-import FormFieldAutocomplete from '../components/FormFieldAutocomplete.vue';
+import BackButton from '../components/common/BackButton.vue';
+import MainHeader from '../components/layout/header/MainHeader.vue';
+import FormOption from '../components/forms/FormOption.vue';
+import FormField from '../components/forms/FormField.vue';
+import FormFieldAutocomplete from '../components/forms/FormFieldAutocomplete.vue';
 import { useVerifyToken } from '../logic/useVerifyToken';
 
 const userStore = useUserStore();
