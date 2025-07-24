@@ -34,6 +34,9 @@ export const useUserStore = defineStore('user', {
         const response = await api.get('/auth/google-session', { withCredentials: true });
         this.user = response.data.user;
         this.sessionExpired = false;
+        if (this.notifications.length === 0) {
+          this.addNotification('Reserva nuevita entrando!');
+        }
       } catch (error: any) {
         if (error.response?.status === 401) {
           this.expireSession();
