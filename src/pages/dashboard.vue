@@ -4,7 +4,7 @@
     <div v-else class="flex flex-col h-full bg-secondary">
       <MainHeader />
       <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap" />
-      <button @click="toggleSearchMenu"
+      <button v-if="!showSearchMenu" @click="toggleSearchMenu"
         class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
         <font-awesome-icon icon="search" class="text-xs" />
         <span>Comenzar búsqueda</span>
@@ -20,12 +20,7 @@
       </div>
 
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
-        <div class="flex flex-col space-y-2 px-4 w-5/6 bg-sacondary text-2xl font-semibold">
-          <h1>Por qué zona buscás?</h1>
-
-        </div>
-        <MenuDropdown v-model="tipoVehiculo" :options="vehicleOptions" title="Seleccioná tu vehículo"
-                class="border border-gray-700 rounded-xl" />
+        <AdvancedMobileSearch />
       </div>
 
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
@@ -77,6 +72,7 @@ import CustomInputGroup from "../components/pages/dashboardPage/CustomInputGroup
 import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkeleton.vue';
 import MobileMenu from '../components/layout/MobileMenu.vue';
 import { useGoogleMap } from '../logic/useGoogleMap';
+import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
 
 const router = useRouter();
 const userStore = useUserStore();

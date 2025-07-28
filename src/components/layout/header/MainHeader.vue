@@ -11,31 +11,8 @@
       </div>
       <div v-if="route.path !== '/add-space'"
         class="relative flex flex-row sm:gap-2 items-center max-h-12">
+        <font-awesome-icon icon="fa-regular fa-circle-question" class="p-3 text-gray-500 w-6 h-6 hover:shadow-xl hover:bg-gray-50 rounded-full cursor-pointer"/>
         <NotificationDropdown />
-        <!-- Notificaciones -->
-        <!-- <div class="relative">
-          <button @click="userStore.clearNotifications()"
-            class="relative w-12 h-12 flex items-center justify-center hover:shadow-xl hover:bg-white rounded-full transition duration-200">
-            <font-awesome-icon icon="bell" class="text-xl text-gray-700 dark:text-white" /> -->
-
-            <!-- Punto rojo titilante -->
-            <!-- <span v-if="userStore.notifications.length"
-              class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span> -->
-
-            <!-- Globo de notificación -->
-            <!-- <div v-if="showNotificationBubble"
-              class="absolute right-10 top-1 bg-red-500 text-white text-xs px-2 py-1 rounded shadow-lg animate-fade-in">
-              Tienes notificaciones!
-            </div>
-          </button> -->
-
-          <!-- <div v-if="showNotificationBubble"
-            class="absolute top-10 -left-20 bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-lg shadow-md animate-fade-in">
-            Nueva reserva!
-            <div class="absolute w-3 h-3 bg-yellow-100 rotate-45 bottom-5 left-20 transform"></div>
-          </div> -->
-        <!-- </div> -->
-
         <button @click="openLoginMenu" v-if="routeConfig.showLoginButton"
           class="w-11 h-11 rounded-full border-2 bg-gray-200">
           <font-awesome-icon icon="fa-align-justify" />
@@ -44,7 +21,7 @@
           class="flex flex-row h-full hover:shadow-lg hover:bg-gray-50 gap-2 pl-4 pr-2 py-1 items-center justify-between rounded-full cursor-pointer">
           <font-awesome-icon v-if="!openMenu" icon="fa-angle-down" class="text-gray-500" />
           <font-awesome-icon v-else icon="fa-angle-up" class="text-gray-500" />
-          <img :src="getHostImage()" alt="ProfileIMG" class="w-10 rounded-full">
+          <img :src="getHostImage()" alt="ProfileIMG" class="w-9 rounded-full">
         </button>
         <ul v-if="openMenu"
           class="absolute bg-white rounded-xl flex flex-col py-2 top-14 left-30 z-30 cursor-pointer shadow-xl w-full">

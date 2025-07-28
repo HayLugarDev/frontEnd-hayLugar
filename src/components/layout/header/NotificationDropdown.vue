@@ -1,7 +1,7 @@
 <template>
-    <div class="relative">
+    <div v-if="userStore.user" class="relative">
         <button @click="toggleMenu"
-            class="relative w-12 h-12 flex items-center justify-center hover:shadow-xl hover:bg-white rounded-full transition duration-200">
+            class="relative w-12 h-12 flex items-center justify-center hover:shadow-xl hover:bg-gray-50 rounded-full transition duration-200">
             <font-awesome-icon icon="bell" class="text-xl text-gray-700 dark:text-white" />
             <span v-if="hasNotifications && !viewNotification"
                 class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping">
