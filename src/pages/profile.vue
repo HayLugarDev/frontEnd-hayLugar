@@ -12,6 +12,10 @@
             :class="['w-full py-2 rounded text-center', activeSection === 'datos' ? 'bg-gray-200' : 'hover:bg-gray-200']">
             Datos personales
           </button>
+          <button @click="activeSection = 'vehicles'"
+            :class="['w-full py-2 rounded text-center', activeSection === 'vehicles' ? 'bg-gray-200' : 'hover:bg-gray-200']">
+            Vehículos
+          </button>
           <button @click="activeSection = 'reservas'"
             :class="['w-full py-2 rounded text-center', activeSection === 'reservas' ? 'bg-gray-200' : 'hover:bg-gray-200']">
             Reservaciones
@@ -47,7 +51,8 @@
                   DNI: {{ usuario.dni }}
                 </p>
               </div>
-              <button @click="verifyToken('/quit')" class="p-2 text-red-600 md:hidden border-2 rounded-xl hover:border-red-600">
+              <button @click="verifyToken('/quit')"
+                class="p-2 text-red-600 md:hidden border-2 rounded-xl hover:border-red-600">
                 Cerrar sesión
               </button>
             </div>
@@ -86,6 +91,8 @@
             Guardar Cambios
           </button>
         </section>
+
+        <VehicleSection v-else-if="activeSection === 'vehicles'" key="vehicles" />
 
         <ReservationHistory v-else-if="activeSection === 'reservas'" key="reservas" :reservations="reservas" />
 
@@ -146,10 +153,11 @@ import defaultProfilePicture from '../assets/user_icon_primary.png';
 import loadIcon from "../assets/load-icon_primary.svg";
 import BackButton from '../components/common/BackButton.vue';
 import MainHeader from '../components/layout/header/MainHeader.vue';
-import FormOption from '../components/forms/FormOption.vue';
 import FormField from '../components/forms/FormField.vue';
 import FormFieldAutocomplete from '../components/forms/FormFieldAutocomplete.vue';
 import { useVerifyToken } from '../logic/useVerifyToken';
+import { getAllVehicles } from '../services/vehicleService';
+import VehicleSection from '../components/pages/profilePage/VehicleSection.vue';
 
 const userStore = useUserStore();
 const inputFoto = ref<HTMLInputElement | null>(null);
@@ -170,12 +178,14 @@ const usuario = computed(() => userStore.user || {
 
 const reservas = ref([]);
 const publicaciones = ref([]);
+const vehiculos = ref([]);
 
+const cargando = ref(true);
 const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
 const errorMessage = ref('');
 const router = useRouter();
-const activeSection = ref<'datos' | 'reservas' | 'publicaciones'>('datos');
+const activeSection = ref<'datos' | 'vehicles' | 'reservas' | 'publicaciones'>('datos');
 
 onMounted(async () => {
   await userStore.fetchUser();

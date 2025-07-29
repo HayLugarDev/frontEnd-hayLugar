@@ -1,6 +1,6 @@
 <template>
     <section class="bg-white p-8 rounded-lg shadow-lg mb-8 md:w-2/3">
-      <h2 class="text-2xl font-bold text-primary mb-4 flex items-center">
+      <h2 class="text-2xl font-bold text-primary mb-4 flex space-x-2 items-center">
         <font-awesome-icon icon="file-alt" class="mr-2" />
         Historial de Publicaciones
       </h2>

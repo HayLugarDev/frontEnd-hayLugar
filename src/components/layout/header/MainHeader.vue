@@ -1,6 +1,6 @@
 <template>
   <header
-    class="backdrop:bg-secondary gap-4 hidden md:flex md:flex-row justify-between items-center border-b-2 px-4 pt-2 xl:px-10 xl:mx-16">
+    class="backdrop:bg-secondary gap-4 hidden md:flex md:flex-row justify-between items-center border-b-2 px-10 pt-2 xl:px-2 xl:mx-16">
     <Logo width="16" @click="router.push('/dashboard')" class="transition-transform duration-300 hover:scale-105" />
     <div v-if="authChecked" class="flex flex-row justify-between gap-2">
       <div v-if="routeConfig.showSalirButton" @click="router.push('/dashboard')">
@@ -9,7 +9,7 @@
           Salir
         </button>
       </div>
-      <div v-if="route.path !== '/add-space'"
+      <div v-if="route.path !== '/add-space' && route.path !== '/add-vehicle'"
         class="relative flex flex-row sm:gap-2 items-center max-h-12">
         <font-awesome-icon icon="fa-regular fa-circle-question" class="p-3 text-gray-500 w-6 h-6 hover:shadow-xl hover:bg-gray-50 rounded-full cursor-pointer"/>
         <NotificationDropdown />
@@ -24,7 +24,7 @@
           <img :src="getHostImage()" alt="ProfileIMG" class="w-9 rounded-full">
         </button>
         <ul v-if="openMenu"
-          class="absolute bg-white rounded-xl flex flex-col py-2 top-14 left-30 z-30 cursor-pointer shadow-xl w-full">
+          class="absolute bg-white rounded-xl flex flex-col py-2 top-14 -left-10 z-30 cursor-pointer shadow-xl w-full">
           <li v-if="!userStore.user" @click="router.push('/register')" class="px-4 py-2 w-full hover:bg-gray-100">
             Registrarse</li>
           <li v-if="!userStore.user" @click="router.push('/login')"

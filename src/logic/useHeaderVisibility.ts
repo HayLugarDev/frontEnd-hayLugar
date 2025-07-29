@@ -15,7 +15,7 @@ export function useHeaderVisibility() {
     const path = route.path;
 
     return {
-      showSalirButton: path === '/add-space',
+      showSalirButton: path === '/add-space' || path === '/add-vehicle',
       showPublicarButton: path === '/dashboard' || path.startsWith('/espacio'),
       showLoginButton: path === '/login',
       showUserMenuButton: path !== '/login',

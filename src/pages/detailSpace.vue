@@ -224,8 +224,8 @@ const reservar = async () => {
     owner_id: espacio.value.owner_id,
     space_id: espacio.value.id,
     vehicle_type: reverseVehicleTypeTranslations[tipoVehiculo.value],
-    start_time: tiempoInicial.value,
-    end_time: tiempoFinal.value,
+    start_time: new Date(tiempoInicial.value).toISOString(),
+    end_time: new Date(tiempoFinal.value).toISOString(),
     dead_line: deadLine.value,
     total: totalCalculado.value,
   };

@@ -5,34 +5,63 @@
     <!-- Instrucciones iniciales -->
     <transition name="fade-step" mode="out-in">
       <div :key="currentStep">
-        <!-- Paso 0: Instrucciones -->
+        <!-- Paso 0: Instrucciones para publicar un espacio -->
         <div v-if="currentStep === 0" class="rounded-lg border-gray-300">
           <header>
-            <h1 class="text-3xl font-bold text-center text-primary mb-8 border-b md:border-none py-2">Publicá en
-              HayLugar</h1>
+            <h1 class="text-3xl font-bold text-center text-primary mb-8 border-b md:border-none py-2">
+              Publicá tu espacio en HayLugar
+            </h1>
           </header>
-          <div class="grid grid-rows xl:grid-cols-2 w-10/12 items-center mx-auto">
-            <ul class="flex flex-col gap-4 px-4 xl:px-16">
-              <li class="border-b-2 pb-4 text-gray-700">
-                <h1 class="font-semibold text-2xl text-black">Contanos acerca de tu espacio</h1>
-                Informanos la dirección, ubicación, tipos de vehículos permitidos, horarios disponibles, etc.
-              </li>
-              <li class="border-b-2 pb-4 text-gray-700">
-                <h1 class="font-semibold text-2xl text-black">Detalles para el usuario</h1>
-                Subí imágenes, croquis, indicaciones y toda la información útil para los usuarios.
-              </li>
-              <li class="pb-4 text-gray-700">
-                <h1 class="font-semibold text-2xl text-black">Publicar todo</h1>
-                Confirmá el precio, los plazos ofrecidos y ¡listo!
-              </li>
-              <li class="flex justify-end mt-auto">
-                <button @click="nextFirstStep" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+
+          <div class="grid xl:grid-cols-2 gap-6 items-center w-10/12 mx-auto">
+            <!-- Tarjetas de instrucciones -->
+            <div class="flex flex-col gap-6 px-4 xl:px-12">
+              <!-- Tarjeta 1 -->
+              <div
+                class="flex items-start gap-4 p-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:shadow-md transition">
+                <div class="text-primary text-3xl">📍</div>
+                <div>
+                  <h2 class="font-semibold text-xl text-black mb-1">Contanos sobre tu espacio</h2>
+                  <p class="text-gray-700">Ingresá la dirección, tipo de espacio, tipo de superficie, y qué vehículos
+                    pueden estacionar.</p>
+                </div>
+              </div>
+
+              <!-- Tarjeta 2 -->
+              <div
+                class="flex items-start gap-4 p-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:shadow-md transition">
+                <div class="text-primary text-3xl">🖼️</div>
+                <div>
+                  <h2 class="font-semibold text-xl text-black mb-1">Agregá información útil</h2>
+                  <p class="text-gray-700">Subí fotos, croquis, detalles de disponibilidad y formas de pago para que los
+                    usuarios elijan con confianza.</p>
+                </div>
+              </div>
+
+              <!-- Tarjeta 3 -->
+              <div
+                class="flex items-start gap-4 p-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:shadow-md transition">
+                <div class="text-primary text-3xl">✅</div>
+                <div>
+                  <h2 class="font-semibold text-xl text-black mb-1">Revisá y publicá</h2>
+                  <p class="text-gray-700">Confirmá el precio, revisá los datos ingresados y ¡listo! Tu espacio estará
+                    disponible para miles de usuarios.</p>
+                </div>
+              </div>
+
+              <!-- Botón -->
+              <div class="flex justify-end mt-6">
+                <button @click="nextFirstStep"
+                  class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all">
                   Comenzar
                 </button>
-              </li>
-            </ul>
+              </div>
+            </div>
+
+            <!-- Imagen ilustrativa -->
             <img src="../assets/add-space_etapa-1.png"
-              class="w-5/6 hidden xl:block mx-auto rounded-xl shadow-2xl shadow-gray-400/60" alt="Ilustración">
+              class="w-5/6 hidden xl:block mx-auto rounded-xl shadow-2xl shadow-gray-400/60"
+              alt="Ilustración del espacio de estacionamiento">
           </div>
         </div>
         <!-- Formulario por pasos -->
