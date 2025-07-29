@@ -37,7 +37,7 @@
           </div>
           <div class="flex items-center gap-2">
             <font-awesome-icon icon="id-card" class="text-primary" />
-            <span><strong>Patente:</strong> {{ vehiculo.license_plate }}</span>
+            <span><strong>Patente:</strong> {{ vehiculo.license_plate === null ? 'No aplica' : vehiculo.license_plate }}</span>
           </div>
         </div>
       </div>
