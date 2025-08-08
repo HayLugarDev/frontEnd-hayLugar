@@ -1,7 +1,8 @@
 <template>
   <header
-    class="backdrop:bg-secondary gap-4 hidden md:flex md:flex-row justify-between items-center border-b-2 px-10 pt-2 xl:px-2 xl:mx-16">
-    <Logo width="16" @click="router.push('/dashboard')" class="transition-transform duration-300 hover:scale-105" />
+  class="bg-secondary/80 backdrop-blur-md gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 py-2 xl:px-16 fixed md:static transition-all duration-300 shadow-md md:shadow-none animate-fade-in-down">
+    <Logo width="12" @click="router.push('/dashboard')"
+      class="transition-transform duration-300 hover:scale-105 hidden md:block" />
     <div v-if="authChecked" class="flex flex-row justify-between gap-2">
       <div v-if="routeConfig.showSalirButton" @click="router.push('/dashboard')">
         <button
@@ -11,42 +12,27 @@
       </div>
       <div v-if="route.path !== '/add-space' && route.path !== '/add-vehicle'"
         class="relative flex flex-row sm:gap-2 items-center max-h-12">
-        <font-awesome-icon icon="fa-regular fa-circle-question" class="p-3 text-gray-500 w-6 h-6 hover:shadow-xl hover:bg-gray-50 rounded-full cursor-pointer"/>
-        <NotificationDropdown />
-        <button @click="openLoginMenu" v-if="routeConfig.showLoginButton"
-          class="w-11 h-11 rounded-full border-2 bg-gray-200">
-          <font-awesome-icon icon="fa-align-justify" />
-        </button>
-        <button @click="openUserMenu" v-if="routeConfig.showUserMenuButton"
-          class="flex flex-row h-full hover:shadow-lg hover:bg-gray-50 gap-2 pl-4 pr-2 py-1 items-center justify-between rounded-full cursor-pointer">
-          <font-awesome-icon v-if="!openMenu" icon="fa-angle-down" class="text-gray-500" />
-          <font-awesome-icon v-else icon="fa-angle-up" class="text-gray-500" />
-          <img :src="getHostImage()" alt="ProfileIMG" class="w-9 rounded-full">
-        </button>
-        <ul v-if="openMenu"
-          class="absolute bg-white rounded-xl flex flex-col py-2 top-14 -left-10 z-30 cursor-pointer shadow-xl w-full">
-          <li v-if="!userStore.user" @click="router.push('/register')" class="px-4 py-2 w-full hover:bg-gray-100">
-            Registrarse</li>
-          <li v-if="!userStore.user" @click="router.push('/login')"
-            class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Iniciar sesión</li>
-          <li v-if="userStore.user" @click="verifyToken('/profile')"
-            class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Mi Perfil</li>
-          <li @click="verifyToken('/add-space')" class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">
-            Publica tu espacio</li>
-          <li v-if="userStore.user" @click="verifyToken('/wallet')"
-            class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">
-            Wallet</li>
-          <li class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Ayuda</li>
-          <li v-if="userStore.user" @click="verifyToken('/quit')"
-            class="text-gray-700 px-4 py-2 w-full hover:bg-gray-100">Cerrar sesión</li>
-        </ul>
+        <font-awesome-icon icon="fa-regular fa-circle-question"
+          class="hidden md:block p-3 text-gray-500 w-6 h-6 hover:shadow-xl hover:bg-gray-50 rounded-full cursor-pointer" />
+        <NotificationDropdown class="hidden md:block" v-if="routeConfig.showNotificationButton" />
+        <div>
+          <!-- Botón visible solo en mobile -->
+          <button @click="showMobileMenu = true"
+            class="block md:hidden w-11 h-11 rounded-full border-2 border-gray-300 bg-gray-200">
+            <font-awesome-icon icon="fa-align-justify" />
+          </button>
+
+          <!-- Menú lateral en mobile -->
+          <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
+        </div>
+        <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
       </div>
     </div>
   </header>
   <SessionExpired :sessionExpired="isSessionInvalid" />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Logo from '../Logo.vue';
 import { useUserStore } from '../../../store/userStore';
 import { ref, watch, onMounted } from 'vue';
@@ -54,15 +40,15 @@ import { useRoute, useRouter } from 'vue-router';
 import SessionExpired from '../../common/SessionExpired.vue';
 import { useHeaderVisibility } from "../../../logic/useHeaderVisibility";
 import { useVerifyToken } from '../../../logic/useVerifyToken';
-import user_icon_primary from "../../../assets/user_icon_primary.png";
 import BackButton from "../../common/BackButton.vue";
 import NotificationDropdown from './NotificationDropdown.vue';
+import UserMenu from '../UserMenu.vue';
+import MobileUserMenu from './MobileUserMenu.vue';
 
 const userStore = useUserStore();
 const showNotificationBubble = ref(false);
-
+const showMobileMenu = ref(false)
 const authChecked = ref(false);
-const openMenu = ref(false);
 const hasUnread = ref(true);
 const router = useRouter();
 const route = useRoute();
@@ -88,22 +74,22 @@ watch(
   }
 );
 
-const openUserMenu = () => {
-  openMenu.value = !openMenu.value;
-}
-
-const openLoginMenu = () => {
-  openMenu.value = !openMenu.value;
-}
+const handleNavigate = (path: string) => {
+  if (path === '/quit') {
+    return verifyToken(path);
+  }
+  if (path !== '/add-space') {
+    router.push(path);
+  } else {
+    return verifyToken(path);
+  }
+};
 
 function toggleNotifications() {
   console.log('Mostrar panel de notificaciones');
   hasUnread.value = false;
 }
 
-const getHostImage = () => {
-  return userStore.user?.profile_picture || user_icon_primary;
-};
 </script>
 
 <style scoped>
@@ -116,6 +102,21 @@ const getHostImage = () => {
 .slide-fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.4s ease-out;
 }
 
 @keyframes fadeIn {

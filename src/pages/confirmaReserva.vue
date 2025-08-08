@@ -8,9 +8,8 @@
       <p class="text-gray-600 mt-4">
         Tu reserva ha sido guardada y recibirás un correo con los detalles.
       </p>
-      <div v-if="reservation.id">
+      <div v-if="reservation">
         <p class="mb-2"><strong>ID de Reserva:</strong> {{ reservation.id }}</p>
-        <p class="mb-2"><strong>Espacio ID:</strong> {{ reservation.space_id }}</p>
         <p class="mb-2"><strong>Fecha y Hora de Inicio:</strong> {{ reservation.start_time }}</p>
         <p class="mb-2"><strong>Fecha y Hora de Finalización:</strong> {{ reservation.end_time }}</p>
         <p class="mb-2"><strong>Total a Pagar:</strong> ${{ reservation.total }}</p>
@@ -39,6 +38,7 @@ import { useReservationStore } from '../store/reservationStore';
 
 const reservationStore = useReservationStore();
 const reservation = computed(() => reservationStore.reservation);
+console.log(reservation.value);
 </script>
 
 <style scoped>

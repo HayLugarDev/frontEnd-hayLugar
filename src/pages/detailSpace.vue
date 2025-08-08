@@ -1,7 +1,7 @@
 <template>
   <MainHeader />
-  <div class="flex flex-col bg-secondary xl:w-11/12 mx-auto md:gap-4">
-    
+  <div class="flex flex-col bg-secondary xl:w-11/12 mx-auto md:gap-4 mt-16 md:mt-0">
+
 
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <div v-if="espacio?.images?.length">
@@ -15,14 +15,13 @@
             <div class="flex flex-col pl-8 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800">
               <div class="flex flex-row gap-1 items-center">
                 <p class="text-lg font-semibold">Anfitrión: </p><span>{{ espacio.host.name }} {{ espacio.host.last_name
-                  }}</span>
+                }}</span>
               </div>
               <div class="flex flex-row gap-1 items-center">
                 <p v-if="espacio.host.phone" class="text-xl">
-                  <font-awesome-icon :icon="['fab', 'whatsapp']"
-                    class="text-2xl text-green-800" />
-                    <span>+549{{ espacio.host.phone }}</span>
-                  </p>
+                  <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-800" />
+                  <span>+549{{ espacio.host.phone }}</span>
+                </p>
               </div>
               <div class="flex flex-row gap-1 items-center">
                 <p class="font-semibold">Email: </p><span>{{ espacio.host.email }}</span>
@@ -109,13 +108,15 @@
               <!-- CheckIn -->
               <div class="col-span-1 flex flex-col border border-gray-500 rounded-xl p-2 items-center">
                 <label class="font-semibold">CheckIn</label>
-                <Datepicker v-model="tiempoInicial" :enable-time-picker="true" :is24="true" :model-type="'timestamp'" />
+                <Datepicker v-model="tiempoInicial" :enable-time-picker="tipoPlazoReserva !== 'Por hora' ? false : true" :is24="true" :model-type="'timestamp'"
+                  :min-date="new Date()" placeholder="Entrada" />
               </div>
 
               <!-- CheckOut -->
               <div class="col-span-1 flex flex-col border border-gray-500 rounded-xl p-2 items-center">
                 <label class="font-semibold">CheckOut</label>
-                <Datepicker v-model="tiempoFinal" :enable-time-picker="true" :is24="true" :model-type="'timestamp'" />
+                <Datepicker v-model="tiempoFinal" :enable-time-picker="tipoPlazoReserva !== 'Por hora' ? false : true" :is24="true" :model-type="'timestamp'"
+                  :min-date="tiempoInicial" placeholder="Salida" />
               </div>
 
               <!-- Tarifa -->
@@ -137,6 +138,11 @@
     </main>
   </div>
   <SessionExpired :sessionExpired="isSessionInvalid" />
+
+  <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario"
+    :vehicleType="reverseVehicleTypeTranslations[tipoVehiculo]" @selected="onSelectedVehicle"
+    @close="showVehicleModal = false" />
+
 </template>
 
 
@@ -158,6 +164,9 @@ import { useVerifyToken } from '../logic/useVerifyToken';
 import SessionExpired from '../components/common/SessionExpired.vue';
 import { useUserStore } from '../store/userStore';
 import { baseURL } from '../services/apiService';
+import vehicleLabel from '../logic/useVehicleLabel';
+import { getAllVehicles } from '../services/vehicleService';
+import VehicleSelectModal from '../components/pages/detailSpacePage/VehicleSelectModal.vue';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -171,7 +180,13 @@ const espacio = ref(null);
 const deadLine = ref(null);
 const activedFavouriteIcon = ref(false);
 const isAnimating = ref(false);
+const fetchImages = ref([]);
+const paymentMethods = ref([]);
 const getImageUrl = (img) => `${baseURL}${img}`;
+
+const showVehicleModal = ref(false);
+const vehiculosUsuario = ref([]);
+const vehiculoSeleccionado = ref(null);
 
 const { verifyToken, isSessionInvalid } = useVerifyToken();
 
@@ -179,6 +194,7 @@ const obtenerEspacio = async () => {
   try {
     const id = route.params.id;
     const space = await getSpaceById(id);
+    console.log(space.images)
     return espacio.value = space;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
@@ -207,28 +223,42 @@ onMounted(async () => {
 // });
 
 const reservar = async () => {
-  if (!espacio.value || !tiempoInicial.value || !tiempoFinal.value) {
-    console.log('Campos incompletos:', {
-      espacio: !!espacio.value,
-      tiempoInicial: !!tiempoInicial.value,
-      tiempoFinal: !!tiempoFinal.value
-    });
+  if (!espacio.value || !tiempoInicial.value || !tiempoFinal.value || !tipoVehiculo.value) {
     return alert('Faltan completar campos para la reserva');
   }
 
   await verifyToken();
+  if (isSessionInvalid.value) return;
 
-  if (isSessionInvalid.value) return; // ← no continuar si sesión inválida
+  try {
+    const vehiculos = await getAllVehicles();
+    vehiculosUsuario.value = vehiculos.filter(v => v.type === reverseVehicleTypeTranslations[tipoVehiculo.value]);
 
+    if (vehiculosUsuario.value.length === 0) {
+      return alert('No tenés vehículos registrados para este tipo.');
+    }
+
+    showVehicleModal.value = true;
+  } catch (error) {
+    console.error('Error al traer vehículos', error);
+  }
+};
+
+const onSelectedVehicle = (vehicle) => {
+  vehiculoSeleccionado.value = vehicle;
+  console.log(vehicle);
   const payload = {
     owner_id: espacio.value.owner_id,
     space_id: espacio.value.id,
+    vehicle_id: vehiculoSeleccionado.value.id,
     vehicle_type: reverseVehicleTypeTranslations[tipoVehiculo.value],
     start_time: new Date(tiempoInicial.value).toISOString(),
     end_time: new Date(tiempoFinal.value).toISOString(),
     dead_line: deadLine.value,
     total: totalCalculado.value,
+    user_vehicle_id: vehicle.id
   };
+
   reservationStore.setReservationData(payload);
   router.push('/pago');
 };
@@ -281,18 +311,6 @@ const vehicleOptions = computed(() => {
 
   return espacio.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
 });
-
-// Mapeo para mostrar texto más amigable
-function vehicleLabel(type) {
-  switch (type) {
-    case 'car': return 'Auto';
-    case 'van': return 'Camioneta';
-    case 'motorcycle': return 'Moto';
-    case 'bicycle': return 'Bicicleta';
-    default: return type;
-  }
-}
-
 
 const vehicleTypeTranslations = {
   car: 'Auto',

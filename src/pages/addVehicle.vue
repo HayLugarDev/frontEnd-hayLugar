@@ -37,8 +37,8 @@
                                 </div>
                                 <div>
                                     <h2 class="font-semibold text-xl text-black mb-1">Detalles del vehículo</h2>
-                                    <p class="text-gray-700">Te solicitaremos datos como marca, modelo, color y patente
-                                        (no aplica a bicicletas).</p>
+                                    <p class="text-gray-700">Te solicitaremos datos como patente (no aplica a
+                                        bicicletas), marca, modelo, y color.</p>
                                 </div>
                             </div>
 
@@ -66,7 +66,7 @@
 
                         <!-- Imagen -->
                         <img src="../assets/image-add_vehicle.png"
-                            class="w-5/6 hidden xl:block mx-auto rounded-xl shadow-2xl shadow-gray-400/60"
+                            class="max-w-100 max-w-[29rem] hidden xl:block mx-auto rounded-xl shadow-2xl shadow-gray-400/60"
                             alt="Ilustración de registro de vehículo">
                     </div>
                 </div>
@@ -99,6 +99,40 @@
             </div>
         </transition>
     </div>
+
+    <!-- Modal de Éxito -->
+    <transition name="fade">
+        <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
+                <div class="flex flex-col items-center">
+                    <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
+                    <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
+                    <p class="text-lg text-gray-700 text-center mb-6">Los cambios se han guardado correctamente.</p>
+                    <button @click="closeSuccessModal"
+                        class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                        Continuar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </transition>
+
+    <!-- Modal de Error -->
+    <transition name="fade">
+        <div v-if="showErrorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
+                <div class="flex flex-col items-center">
+                    <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
+                    <h2 class="text-3xl font-bold text-red-600 mb-2">¡Error!</h2>
+                    <p class="text-lg text-gray-700 text-center mb-6">{{ errorMessage }}</p>
+                    <button @click="closeErrorModal"
+                        class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-800 transition">
+                        Intentar de Nuevo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </transition>
 </template>
 
 
@@ -116,10 +150,13 @@ import Etapa4 from '../components/pages/addVehiclePage/Etapa4.vue';
 import BackButton from '../components/common/BackButton.vue';
 
 const router = useRouter();
-const showSuccessModal = ref(false);
 const currentStep = ref(0); // 0 = instrucciones, 1 = formulario
 const step = ref(1);
 const emit = defineEmits(["success"]);
+
+const showSuccessModal = ref(false);
+const showErrorModal = ref(false);
+const errorMessage = ref('');
 
 const vehicleData = ref({
     license_plate: null,
@@ -154,13 +191,23 @@ const addVehicle = async () => {
     console.log(payload);
 
     try {
-        const response = await api.post('/vehicles/create', payload);
-        showSuccessModal.value = true;                         
+        const response = await api.post('/vehicles/create', payload, {
+            withCredentials: true
+        });
+        showSuccessModal.value = true;
         console.log(response);
         emit('success');
         resetValues();
     } catch (error) {
-        console.error('Error en el registro del vehículo:', error);
+        if (error.response && error.response?.data?.message) {
+            console.error('Error al guardar los vehículos', error);
+            errorMessage.value = error.response.data.message;
+            showErrorModal.value = true;
+        } else {
+            console.error('Error al guardar los vehículos', error);
+            errorMessage.value = 'Error al actualizar el vehículo.';
+            showErrorModal.value = true;
+        }
     }
 };
 
@@ -195,6 +242,10 @@ const resetValues = () => {
 const closeSuccesModal = () => {
     showSuccessModal.value = false;
     router.push('/dashboard');
+};
+
+const closeErrorModal = () => {
+  showErrorModal.value = false;
 };
 
 const nextFirstStep = () => {

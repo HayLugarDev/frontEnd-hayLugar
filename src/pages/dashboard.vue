@@ -5,7 +5,7 @@
       <MainHeader />
       <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap" />
       <button v-if="!showSearchMenu" @click="toggleSearchMenu"
-        class="flex flex-row md:hidden items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
+        class="flex flex-row md:hidden mt-20 items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
         <font-awesome-icon icon="search" class="text-xs" />
         <span>Comenzar búsqueda</span>
       </button>
