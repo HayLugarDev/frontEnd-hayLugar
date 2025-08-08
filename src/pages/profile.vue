@@ -18,7 +18,7 @@
           </button>
           <button @click="activeSection = 'reservas'"
             :class="['w-full py-2 rounded text-center', activeSection === 'reservas' ? 'bg-gray-200' : 'hover:bg-gray-200']">
-            Reservaciones
+            Reservas
           </button>
           <button @click="activeSection = 'publicaciones'"
             :class="['w-full py-2 rounded text-center', activeSection === 'publicaciones' ? 'bg-gray-200' : 'hover:bg-gray-200']">

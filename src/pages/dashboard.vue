@@ -18,7 +18,14 @@
         <CustomInputGroup v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
           :onSearch="buscar" />
       </div>
+<div class="flex overflow-x-auto p-4 bg-white shadow-md rounded-lg mt-4">
+      <button @click="router.push('/universidades')"
+  class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
+  🏫 Universidades
+</button>
 
+      <button class="px-4 py-2 text-gray-600 hover:text-primary transition-all">🌳 Estacionamiento Medido</button>
+    </div>
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
         <AdvancedMobileSearch />
       </div>

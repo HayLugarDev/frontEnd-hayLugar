@@ -11,6 +11,7 @@ import profile from '../pages/profile.vue';
 import wallet from '../pages/wallet.vue';
 import { useUserStore } from '../store/userStore';
 import AddVehicle from '../pages/addVehicle.vue';
+import universityDashboard from '../pages/universityDashboard.vue'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', redirect: '/dashboard' },
@@ -25,7 +26,12 @@ const routes: RouteRecordRaw[] = [
   { path: '/profile', component: profile, meta: { requiresAuth: true } },
   { path: '/wallet', component: wallet, meta: { requiresAuth: true } },
   { path: '/add-vehicle', component: AddVehicle, meta: { requiresAuth: true } },
-
+ {
+    path: '/universidades',
+    name: 'Universities',
+    component: universityDashboard,
+    meta: { requiresAuth: false }, // o true si querés protegerla
+  },
 ];
 
 const router = createRouter({

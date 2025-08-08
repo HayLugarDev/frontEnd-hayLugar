@@ -32,20 +32,24 @@ export const getFilteredSpaces = async (filters: {
   }
 };
 
+export const getUniversitySpaces = async () => {
+  try {
+    const response = await api.get("/spaces/getAll", {
+      params: { category: "university" },
+    });
+    const raw = response.data;
+    if (!Array.isArray(raw)) return [];
+    return raw;
+  } catch (error) {
+    console.error("Error al obtener los espacios universitarios:", error);
+    return [];
+  }
+};
+
 export const getSpaceById = async (id: number) => {
   try {
     const response = await api.get(`/spaces/getbyid/${id}`);
     const item = response.data as any;
-
-    // mismo parsing para un solo registro
-    let images: string[] = [];
-    if (typeof item.images === "string") {
-      try {
-        images = JSON.parse(item.images);
-      } catch {
-        images = [];
-      }
-    }
 
     let paymentMethods: string[] = [];
     if (typeof item.paymentMethods === "string") {
@@ -58,7 +62,6 @@ export const getSpaceById = async (id: number) => {
 
     return {
       ...item,
-      images,
       paymentMethods,
     };
   } catch (error) {
