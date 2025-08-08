@@ -8,12 +8,12 @@
         <!-- Paso 0: Instrucciones para publicar un espacio -->
         <div v-if="currentStep === 0" class="rounded-lg border-gray-300">
           <header>
-            <h1 class="text-3xl font-bold text-center text-primary mb-8 border-b md:border-none py-2">
+            <h1 class="text-3xl font-bold text-center text-primary mb-8 mt-4 md:mt-0 border-b md:border-none py-2">
               Publicá tu espacio en HayLugar
             </h1>
           </header>
 
-          <div class="grid xl:grid-cols-2 gap-6 items-center w-10/12 mx-auto">
+          <div class="grid xl:grid-cols-2 gap-6 items-center w-11/12 mx-auto">
             <!-- Tarjetas de instrucciones -->
             <div class="flex flex-col gap-6 px-4 xl:px-12">
               <!-- Tarjeta 1 -->

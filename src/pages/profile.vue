@@ -8,22 +8,8 @@
       <header class="hidden w-full md:w-1/3 md:flex flex-col justify-between items-center">
         <h1 class="w-1/3 text-4xl text-center mb-6 text-primary">Perfil</h1>
         <div class="w-11/12 px-4 space-y-1">
-          <button @click="activeSection = 'datos'"
-            :class="['w-full py-2 rounded text-center', activeSection === 'datos' ? 'bg-gray-200' : 'hover:bg-gray-200']">
-            Datos personales
-          </button>
-          <button @click="activeSection = 'vehicles'"
-            :class="['w-full py-2 rounded text-center', activeSection === 'vehicles' ? 'bg-gray-200' : 'hover:bg-gray-200']">
-            Vehículos
-          </button>
-          <button @click="activeSection = 'reservas'"
-            :class="['w-full py-2 rounded text-center', activeSection === 'reservas' ? 'bg-gray-200' : 'hover:bg-gray-200']">
-            Reservaciones
-          </button>
-          <button @click="activeSection = 'publicaciones'"
-            :class="['w-full py-2 rounded text-center', activeSection === 'publicaciones' ? 'bg-gray-200' : 'hover:bg-gray-200']">
-            Publicaciones
-          </button>
+          <SectionMenu :activeSection="activeSection" :sections="menuSections"
+            @update:activeSection="handleSectionChange" />
         </div>
         <BackButton />
       </header>
@@ -156,8 +142,8 @@ import MainHeader from '../components/layout/header/MainHeader.vue';
 import FormField from '../components/forms/FormField.vue';
 import FormFieldAutocomplete from '../components/forms/FormFieldAutocomplete.vue';
 import { useVerifyToken } from '../logic/useVerifyToken';
-import { getAllVehicles } from '../services/vehicleService';
 import VehicleSection from '../components/pages/profilePage/VehicleSection.vue';
+import SectionMenu from '../components/pages/profilePage/UI/SectionMenu.vue';
 
 const userStore = useUserStore();
 const inputFoto = ref<HTMLInputElement | null>(null);
@@ -178,14 +164,23 @@ const usuario = computed(() => userStore.user || {
 
 const reservas = ref([]);
 const publicaciones = ref([]);
-const vehiculos = ref([]);
-
-const cargando = ref(true);
 const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
 const errorMessage = ref('');
 const router = useRouter();
-const activeSection = ref<'datos' | 'vehicles' | 'reservas' | 'publicaciones'>('datos');
+const activeSection = ref('datos');
+
+// Opciones menú principal
+const menuSections = [
+  { value: 'datos', label: 'Datos personales' },
+  { value: 'vehicles', label: 'Vehículos' },
+  { value: 'reservas', label: 'Reservas' },
+  { value: 'publicaciones', label: 'Publicaciones' },
+];
+
+const handleSectionChange = (val: string) => {
+  activeSection.value = val;
+};
 
 onMounted(async () => {
   await userStore.fetchUser();

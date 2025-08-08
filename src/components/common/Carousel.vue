@@ -61,7 +61,6 @@ const props = defineProps({
 });
 
 const currentSlide = ref(0);
-let intervalId = null;
 
 const startX = ref(0);
 const startY = ref(0);
@@ -77,7 +76,6 @@ const prevSlide = () => {
 };
 
 const handleSwipe = () => {
-  clearInterval(intervalId);
 
   const distance = endX.value - startX.value;
   if (distance > 50) {
@@ -85,13 +83,6 @@ const handleSwipe = () => {
   } else if (distance < -50) {
     nextSlide();
   }
-};
-
-const startAutoSlide = () => {
-  clearInterval(intervalId);
-  intervalId = setInterval(() => {
-    nextSlide();
-  }, 3000);
 };
 
 onMounted(() => {
@@ -125,10 +116,5 @@ onMounted(() => {
   container.addEventListener('touchmove', handleTouchMove, { passive: false });
   container.addEventListener('touchend', handleTouchEnd);
 
-  startAutoSlide();
-});
-
-onUnmounted(() => {
-  clearInterval(intervalId);
 });
 </script>

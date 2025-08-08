@@ -2,7 +2,7 @@
     <label class="block text-gray-500">
     <span class="text-md font-semibold text-black">{{ label }}</span>
     <input
-      :value="modelValue"
+      :value="modelValue === null ? 'No aplica' : modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       :type="type"
       :required="required"

@@ -4,14 +4,13 @@
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <BackButton class="lg:hidden" />
       <section class="w-full md:grid md:grid-cols-9 flex flex-col gap-2">
-        <h1 class="text-2xl text-start md:text-3xl py-6 px-6 col-span-5 row-span-1">Confirmá tu Pago</h1>
+        <h1 class="text-primary text-2xl text-start md:text-3xl py-6 px-6 col-span-5 row-span-1">Confirmá tu Pago</h1>
 
         <!-- Resumen del Espacio y Reserva -->
-        <div class="md:col-span-4 md:row-start-2 md:col-start-6">
+        <div class="md:col-span-4 md:row-start-2 md:col-start-6 h-full">
           <div class="bg-white p-8 rounded-lg shadow-md flex items-start">
-            <img v-if="espacio && espacio.images && espacio.images[0]"
-              :src="`${baseURL}${espacio.images[0]}`" alt="Imagen del espacio"
-              class="w-28 h-28 object-cover rounded-lg shadow-md mr-6" />
+            <img v-if="espacio && espacio.images && espacio.images[0]" :src="`${baseURL}${espacio.images[0]}`"
+              alt="Imagen del espacio" class="w-28 h-28 object-cover rounded-lg shadow-md mr-6" />
             <div>
               <h3 class="text-md font-semibold text-gray-800">{{ espacio?.name }}</h3>
               <p class="text-gray-700 text-sm">{{ espacio?.location }}</p>
@@ -34,17 +33,37 @@
           </div>
         </div>
 
-        <!-- Datos de Facturación -->
-        <div class="bg-white p-6 rounded-lg shadow-md md:col-span-5 flex flex-col justify-around">
-          <h2 class="text-lg font-semibold mb-4">Datos de Facturación</h2>
-          <input v-model="nombre" type="text" placeholder="Nombre y Apellido" class="border p-2 rounded w-full mb-2" />
-          <input v-model="dni" type="text" placeholder="DNI" class="border p-2 rounded w-full mb-2" />
-          <input v-model="direccion" type="text" placeholder="Dirección" class="border p-2 rounded w-full mb-2" />
-          <input v-model="email" type="email" placeholder="Correo Electrónico" class="border p-2 rounded w-full mb-2" />
+        <!-- Datos de Facturación con Vehículo -->
+        <div class="bg-white p-6 rounded-lg shadow-md md:col-span-5 flex flex-col gap-6">
+
+          <!-- Vehículo seleccionado -->
+          <div v-if="reserva.vehicle_type" class="bg-gray-100 p-4 rounded border border-gray-300 shadow-sm">
+            <div class="flex flex-row items-center justify-between">
+              <h3 class="text-md font-semibold text-gray-700 mb-1">Vehículo Seleccionado</h3>
+              <font-awesome-icon
+                :icon="reserva.vehicle_type === 'car' ? 'car' : reserva.vehicle_type === 'motorcycle' ? 'motorcycle' : 'question'"
+                class="text-gray-600 mr-2" />
+            </div>
+            <div v-if="vehiculoSeleccionado">
+              <p>Marca: {{ vehiculoSeleccionado.brand }}</p>
+              <p>Modelo: {{ vehiculoSeleccionado.model }}</p>
+              <p>Patente: {{ vehiculoSeleccionado.license_plate }}</p>
+            </div>
+
+          </div>
+
+          <!-- Formulario de Facturación -->
+          <div class="flex flex-col gap-1">
+            <h2 class="text-lg font-semibold mb-2">Datos de Facturación</h2>
+            <FormField v-model="nombre" placeholder="Nombre completo"/>
+            <FormField v-model="dni" placeholder="Número de documento"/>
+            <FormField v-model="direccion" placeholder="Domicilio"/>
+            <FormField v-model="email" placeholder="Correo electrónico"/>
+          </div>
         </div>
 
         <!-- Métodos de Pago -->
-        <div class="bg-white p-6 rounded-lg shadow-md col-span-full">
+        <!-- <div class="bg-white p-6 rounded-lg shadow-md col-span-full">
           <h2 class="text-lg font-semibold mb-4">Método de Pago</h2>
           <div class="flex flex-col space-y-4">
             <label class="flex items-center gap-3">
@@ -53,7 +72,7 @@
               <span>Tarjeta de Crédito/Débito</span>
             </label>
           </div>
-        </div>
+        </div> -->
 
         <!-- Sección de Pago con Tarjeta usando MercadoPago Card Payment Brick -->
         <div v-if="metodoPago === 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md md:col-span-full">
@@ -82,6 +101,8 @@ import { loadMercadoPago } from '@mercadopago/sdk-js';
 import { getSpaceById } from '../services/spaceService';
 import BackButton from '../components/common/BackButton.vue';
 import MainHeader from "../components/layout/header/MainHeader.vue";
+import { getVehicleById } from '../services/vehicleService';
+import FormField from '../components/forms/FormField.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -100,6 +121,7 @@ const minutes = computed(() => { return totalDuration.value ? Math.round((totalD
 const startTime = computed(() => reserva.value.start_time);
 const endTime = computed(() => reserva.value.end_time);
 const espacio = ref<any>(null);
+const vehiculoSeleccionado = ref(null);
 
 // Función para obtener los datos del espacio
 const obtenerEspacio = async () => {
@@ -127,6 +149,12 @@ onMounted(async () => {
     setTimeout(async () => {
       await initCardBrick();
     }, 300);
+  }
+  const vehicle_id = reservationStore.reservation.vehicle_id;
+  if (vehicle_id) {
+    const vehicleSelect = await getVehicleById(vehicle_id);
+    console.log(vehicleSelect);
+    vehiculoSeleccionado.value = vehicleSelect;
   }
 });
 

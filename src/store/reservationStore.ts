@@ -10,6 +10,7 @@ export const useReservationStore = defineStore('reservation', {
       user_id: null as number | null, 
       owner_id: null as number | null,
       space_id: null as number | null,
+      vehicle_id: null as number | null,
       vehicle_type: null as string | null,
       start_time: null as string | null,
       end_time: null as string | null,
@@ -45,7 +46,8 @@ export const useReservationStore = defineStore('reservation', {
       try {
         console.log("LLEGA?",this.reservation)
         const response = await api.post('/reservations/create', this.reservation);
-        this.reservation.id = response.data.id; // Actualiza el id según la respuesta del backend
+        this.reservation.id = response.data.reservation.id; // Actualiza el id según la respuesta del backend
+        console.log(response.data.reservation.id)
         return response.data;
       } catch (error) {
         this.error = 'Error al crear la reserva';
