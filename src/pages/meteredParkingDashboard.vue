@@ -1,0 +1,379 @@
+<template>
+  <div class="relative min-h-screen bg-secondary">
+    <MainHeader />
+
+    <!-- Encabezado + acciones -->
+    <div class="px-4 pt-4 flex items-center gap-3">
+      <h2 class="text-2xl sm:text-3xl font-bold text-primary">
+        Estacionamiento Medido — San Miguel de Tucumán
+      </h2>
+
+      <div class="ml-auto flex items-center gap-2">
+        <button
+          class="px-3 py-1.5 rounded-full text-sm font-medium border bg-white hover:bg-gray-50 transition"
+          :class="showMap ? 'text-primary border-primary/30' : 'text-gray-700 border-gray-300'"
+          @click="showMap = true"
+        >
+          Mapa
+        </button>
+        <button
+          class="px-3 py-1.5 rounded-full text-sm font-medium border bg-white hover:bg-gray-50 transition"
+          :class="!showMap ? 'text-primary border-primary/30' : 'text-gray-700 border-gray-300'"
+          @click="showMap = false"
+        >
+          Lista
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="px-4 mt-3 flex flex-wrap gap-2 items-center">
+      <button
+        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
+        :class="filterStatus === 'all' ? 'bg-gray-100 text-gray-700 border-gray-300' : 'bg-white text-gray-700 border-gray-300'"
+        @click="filterStatus = 'all'"
+      >
+        Todas
+      </button>
+      <button
+        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
+        :class="filterStatus === 'free' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-white text-gray-700 border-gray-300'"
+        @click="filterStatus = 'free'"
+      >
+        🟢 Libres
+      </button>
+      <button
+        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
+        :class="filterStatus === 'limited' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-white text-gray-700 border-gray-300'"
+        @click="filterStatus = 'limited'"
+      >
+        🟠 Media ocupación
+      </button>
+      <button
+        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
+        :class="filterStatus === 'full' ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-white text-gray-700 border-gray-300'"
+        @click="filterStatus = 'full'"
+      >
+        🔴 Ocupadas
+      </button>
+
+      <span class="ml-auto text-xs text-gray-500">
+        Última actualización: {{ lastUpdatedText }}
+      </span>
+    </div>
+
+    <div class="p-4">
+      <div v-if="error" class="text-red-500 mb-4">{{ error }}</div>
+
+      <!-- MAPA -->
+      <div v-if="showMap" class="w-full h-[70vh] relative rounded-xl overflow-hidden shadow">
+        <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions">
+          <GMapPolyline
+            v-for="blk in snappedBlocksFiltered"
+            :key="'blk-'+(blk.id ?? blk.label)"
+            :path="blk.snappedPath"
+            :options="polylineOptions(blk.status, true)"
+            @click="openMetered(blk)"
+            @mouseover="hovered = blk"
+            @mouseout="hovered = null"
+          />
+        </CustomGoogleMap>
+
+        <!-- Tooltip flotante -->
+        <transition name="fade">
+          <div
+            v-if="hovered"
+            class="absolute left-4 top-4 bg-white/95 backdrop-blur border border-gray-200 rounded-lg shadow p-3 text-xs text-gray-700 max-w-[320px]"
+          >
+            <div class="flex items-center gap-2">
+              <div
+                class="w-2.5 h-2.5 rounded-full"
+                :class="{
+                  'bg-emerald-500': hovered.status==='free',
+                  'bg-amber-500': hovered.status==='limited',
+                  'bg-rose-500': hovered.status==='full'
+                }"
+              />
+              <div class="font-semibold">{{ hovered.label }}</div>
+              <div class="ml-auto text-[11px] text-gray-500">{{ hovered.length }} m</div>
+            </div>
+            <div class="mt-1 text-gray-600">{{ hovered.desc }}</div>
+            <button
+              class="mt-2 w-full bg-primary text-white font-semibold rounded-md py-1.5 hover:bg-primary-dark transition disabled:opacity-60"
+              :disabled="hovered.status==='full'"
+              @click="openMetered(hovered)"
+            >
+              Iniciar estacionamiento
+            </button>
+          </div>
+        </transition>
+      </div>
+
+      <!-- LISTA -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div
+          v-for="blk in snappedBlocksFiltered"
+          :key="'card-'+(blk.id ?? blk.label)"
+          class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition cursor-pointer"
+          @click="openMetered(blk)"
+        >
+          <div class="flex items-center gap-2">
+            <div
+              class="w-2.5 h-2.5 rounded-full"
+              :class="{
+                'bg-emerald-500': blk.status==='free',
+                'bg-amber-500': blk.status==='limited',
+                'bg-rose-500': blk.status==='full'
+              }"
+            />
+            <div class="text-sm text-gray-800 font-medium">
+              {{ blk.label }}
+            </div>
+            <div class="ml-auto text-xs text-gray-500">
+              {{ blk.length }} m aprox
+            </div>
+          </div>
+          <div class="mt-2 text-xs text-gray-600">
+            {{ blk.desc }}
+          </div>
+          <button
+            class="mt-3 w-full bg-primary text-white font-semibold rounded-md py-1.5 hover:bg-primary-dark transition disabled:opacity-60"
+            :disabled="blk.status==='full'"
+          >
+            Iniciar estacionamiento
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menú móvil -->
+    <div class="fixed bottom-0 left-0 w-full z-50">
+      <MobileMenu :showMap="showMap" @toggle="showMap = !showMap" />
+    </div>
+
+    <!-- Modal: Estacionamiento Medido -->
+    <MeteredAccessDialog
+      :open="modalOpen"
+      :zone="selectedZone"
+      @close="modalOpen = false"
+      @success="handleStarted"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import MainHeader from '../components/layout/header/MainHeader.vue'
+import CustomGoogleMap from '../components/layout/GoogleMap.vue'
+import MobileMenu from '../components/layout/MobileMenu.vue'
+import { useUniversityMap } from '../logic/useUniversityMap'
+import MeteredAccessDialog from '../components/meteredAccessDialog.vue'
+import { meteredParkingService } from '../services/meteredParkingService'
+
+const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
+center.value = { lat: -26.8309, lng: -65.2033 }
+zoom.value = 16
+
+const showMap = ref(true)
+const error = ref(null)
+const lastUpdated = ref(new Date())
+const lastUpdatedText = computed(() => lastUpdated.value.toLocaleTimeString())
+const filterStatus = ref('all')
+const hovered = ref(null)
+
+const snappedBlocks = ref([])
+
+/* =========================
+   
+   (El backend trae lat/lng invertidos LPM)
+   ========================= */
+function normalizePoint(p) {
+  let lat = Number(p?.lat)
+  let lng = Number(p?.lng)
+  // Heurística para AR: |lat| ~ 22..55, |lng| ~ 53..73
+  const looksSwapped = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) > 55 && Math.abs(lng) < 55
+  if (looksSwapped) [lat, lng] = [lng, lat]
+  return { lat, lng }
+}
+function normalizePath(raw) {
+  if (!raw || !Array.isArray(raw)) return []
+  return raw.map(normalizePoint).filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lng))
+}
+
+/* =========================
+   Google Directions (snapping)
+   ========================= */
+function waitForGoogle() {
+  return new Promise((resolve, reject) => {
+    let tries = 0
+    const t = setInterval(() => {
+      tries++
+      if (window.google?.maps?.DirectionsService) {
+        clearInterval(t); resolve(true)
+      }
+      if (tries > 200) { clearInterval(t); reject(new Error('Google Maps no cargó')) }
+    }, 100)
+  })
+}
+function getSnappedPath(origin, destination) {
+  return new Promise((resolve, reject) => {
+    const svc = new window.google.maps.DirectionsService()
+    svc.route(
+      {
+        origin,
+        destination,
+        travelMode: window.google.maps.TravelMode.DRIVING
+      },
+      (res, status) => {
+        if (status === 'OK' && res?.routes?.[0]?.overview_path) {
+          const pts = res.routes[0].overview_path.map(p => ({ lat: p.lat(), lng: p.lng() }))
+          resolve(pts)
+        } else {
+          reject(new Error('No se pudo calcular ruta'))
+        }
+      }
+    )
+  })
+}
+
+/* Cache en memoria para evitar recalcular si no cambió el bloque */
+const snapCache = new Map() // key: `${id}:${updated_at}` => path[]
+
+async function snapBlock(dto) {
+  const pathRaw = normalizePath(dto?.geo?.path)
+  if (pathRaw.length < 2) return []
+
+  const key = `${dto.id}:${dto.updated_at ?? ''}`
+  if (snapCache.has(key)) return snapCache.get(key)
+
+  const origin = pathRaw[0]
+  const destination = pathRaw[pathRaw.length - 1]
+
+  try {
+    const snapped = await getSnappedPath(origin, destination)
+    snapCache.set(key, snapped)
+    return snapped
+  } catch {
+    // fallback: línea recta si falla Directions
+    snapCache.set(key, pathRaw)
+    return pathRaw
+  }
+}
+
+/* =========================
+   Carga + mapeo DTO -> UI
+   ========================= */
+async function loadBlocksFromBackend() {
+  try {
+    // 1) Traer datos
+    const resp = await meteredParkingService.getBlocks({
+      country_code: 'AR',
+      admin1: 'Tucumán',
+      city: 'San Miguel de Tucumán',
+      active: true,
+      limit: 500
+    })
+
+    const data = Array.isArray(resp?.data) ? resp.data : Array.isArray(resp) ? resp : []
+
+    // 2) Aseguramos Google antes del snapping
+    await waitForGoogle()
+
+    // 3) Snap secuencial (evita rate limit). Si querés, podés paralelizar de a N.
+    const mapped = []
+    for (const dto of data) {
+      const snappedPath = await snapBlock(dto)
+      const label = `${dto.street}${dto.segment_ref ? ' — ' + dto.segment_ref : ''}`
+      const desc = `${dto.region?.city || ''}${dto.region?.neighborhood ? ' · ' + dto.region.neighborhood : ''}`
+      const length = dto.length_m && dto.length_m > 0
+        ? dto.length_m
+        : Math.max(30, Math.round(polylineLengthMeters(snappedPath)))
+
+      mapped.push({
+        id: dto.id,
+        label,
+        desc,
+        status: dto.status,
+        snappedPath,
+        length,
+        hourly_rate: dto.pricing?.price_per_hour ?? null
+      })
+    }
+
+    snappedBlocks.value = mapped
+    lastUpdated.value = new Date()
+  } catch (e) {
+    console.error(e)
+    error.value = 'No fue posible cargar los bloques de estacionamiento.'
+  }
+}
+
+/* =========================
+   Util long. polyline
+   ========================= */
+function polylineLengthMeters(path) {
+  if (!path || path.length < 2) return 0
+  const R = 6371000, toRad = d => (d * Math.PI) / 180
+  let total = 0
+  for (let i = 1; i < path.length; i++) {
+    const a = path[i - 1], b = path[i]
+    const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng)
+    const la1 = toRad(a.lat), la2 = toRad(b.lat)
+    const x = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(la1) * Math.cos(la2)
+    total += 2 * R * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x))
+  }
+  return total
+}
+
+/* =========================
+   Estilos de línea
+   ========================= */
+const polylineOptions = (status, clickable = false) => {
+  const base = { strokeOpacity: 0.95, strokeWeight: 6, clickable,
+    zIndex: status === 'free' ? 30 : status === 'limited' ? 25 : 20 }
+  if (status === 'free') return { ...base, strokeColor: '#10b981' }
+  if (status === 'limited') return { ...base, strokeColor: '#f59e0b' }
+  return { ...base, strokeColor: '#ef4444' }
+}
+
+/* =========================
+   Filtro UI
+   ========================= */
+const snappedBlocksFiltered = computed(() => {
+  const list = Array.isArray(snappedBlocks.value) ? snappedBlocks.value : []
+  const withPath = list.filter(b => Array.isArray(b.snappedPath) && b.snappedPath.length >= 2)
+  if (filterStatus.value === 'all') return withPath
+  return withPath.filter(b => b.status === filterStatus.value)
+})
+
+/* =========================
+   Modal
+   ========================= */
+const modalOpen = ref(false)
+const selectedZone = ref(null)
+const openMetered = zone => {
+  selectedZone.value = {
+    id: zone.id ?? zone.label ?? Math.random(),
+    label: zone.label ?? zone.labelText ?? 'Zona medida',
+    status: zone.status,
+    hourly_rate: zone.hourly_rate ?? null
+  }
+  modalOpen.value = true
+}
+const handleStarted = () => { modalOpen.value = false }
+
+/* =========================
+   Init
+   ========================= */
+onMounted(async () => {
+  setCenterToLocation(-26.8309, -65.2033)
+  await loadBlocksFromBackend()
+  // cuando conectemos tiempo real, reemplazamos por Socket.IO; mientras, polling si querés:
+  // setInterval(loadBlocksFromBackend, 15000)
+})
+</script>
+
+<style scoped>
+.fade-enter-active,.fade-leave-active{ transition: opacity .15s ease }
+.fade-enter-from,.fade-leave-to{ opacity:0 }
+</style>

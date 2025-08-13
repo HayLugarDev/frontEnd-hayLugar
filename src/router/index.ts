@@ -12,6 +12,7 @@ import wallet from '../pages/wallet.vue';
 import { useUserStore } from '../store/userStore';
 import AddVehicle from '../pages/addVehicle.vue';
 import universityDashboard from '../pages/universityDashboard.vue'
+import meteredParkingDashboard from '../pages/meteredParkingDashboard.vue';
 
 const routes: RouteRecordRaw[] = [
   { path: '/', redirect: '/dashboard' },
@@ -30,6 +31,12 @@ const routes: RouteRecordRaw[] = [
     path: '/universidades',
     name: 'Universities',
     component: universityDashboard,
+    meta: { requiresAuth: false }, // o true si querés protegerla
+  },
+   {
+    path: '/meteredParkingDashboard',
+    name: 'meteredParkingDashboard',
+    component: meteredParkingDashboard,
     meta: { requiresAuth: false }, // o true si querés protegerla
   },
 ];

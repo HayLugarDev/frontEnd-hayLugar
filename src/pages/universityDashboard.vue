@@ -1,226 +1,380 @@
 <template>
   <div class="relative min-h-screen bg-secondary">
     <MainHeader />
-    <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap" />
+
+    <!-- Encabezado + tabs -->
+    <div class="px-4 pt-4 flex items-center gap-3">
+      <h2 class="text-2xl sm:text-3xl font-bold text-primary">
+        Estacionamientos Inteligentes — UTN
+      </h2>
+      <div class="ml-auto flex items-center gap-2">
+        <button
+          class="px-3 py-1.5 rounded-full text-sm font-medium border bg-white hover:bg-gray-50 transition"
+          :class="showMap ? 'text-primary border-primary/30' : 'text-gray-700 border-gray-300'"
+          @click="showMap = true"
+        >
+          Mapa
+        </button>
+        <button
+          class="px-3 py-1.5 rounded-full text-sm font-medium border bg-white hover:bg-gray-50 transition"
+          :class="!showMap ? 'text-primary border-primary/30' : 'text-gray-700 border-gray-300'"
+          @click="showMap = false"
+        >
+          Lista
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="px-4 mt-3 flex flex-wrap gap-2 items-center">
+      <button
+        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
+        :class="filters.groups.students ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-white text-gray-700 border-gray-300'"
+        @click="toggleGroup('students')"
+      >
+        🎓 Alumnos
+      </button>
+      <button
+        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
+        :class="filters.groups.staff ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white text-gray-700 border-gray-300'"
+        @click="toggleGroup('staff')"
+      >
+        🧑‍🏫 Docentes
+      </button>
+      <button
+        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
+        :class="filters.onlyAvailable ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-white text-gray-700 border-gray-300'"
+        @click="filters.onlyAvailable = !filters.onlyAvailable"
+      >
+        ✅ Sólo disponibles
+      </button>
+
+      <span class="ml-auto text-xs text-gray-500">
+        Última actualización: {{ lastUpdatedText }}
+      </span>
+    </div>
 
     <div class="p-4">
-      <h2 class="text-3xl font-bold text-primary mb-2">
-        Estacionamientos Inteligentes - UTN
-      </h2>
-      <p class="text-gray-600 mb-4">
-        Visualizá y accedé a los espacios en tiempo real dentro del campus universitario.
-      </p>
-
       <div v-if="error" class="text-red-500 mb-4">{{ error }}</div>
 
-      <div v-if="showMap" class="w-full h-[600px] relative">
-        <CustomGoogleMap
-          class="rounded-lg overflow-hidden shadow-md"
-          :center="center"
-          :zoom="zoom"
-          :options="mapOptions"
-        >
-          <!-- Zonas visuales -->
+      <!-- MAPA -->
+      <div v-if="showMap" class="w-full h-[68vh] relative rounded-xl overflow-hidden shadow">
+        <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions">
+          <!-- Zonas exactas (polígonos) -->
           <GMapPolygon
-            v-for="(zona, index) in zonas"
-            :key="index"
+            v-for="(zona, i) in zonasFiltradas"
+            :key="'zone-'+i"
             :paths="zona.paths"
-            :options="zona.options"
+            :options="{ ...zona.options, clickable: false, zIndex: 1 }"
           />
 
-          <!-- Marcadores de espacios con colores dinámicos -->
+          <!-- Pin fijo de la Universidad (UTN FRT) -->
           <GMapMarker
-            v-for="(espacio, index) in espacios"
-            :key="index"
+            :position="utnMarkerPosition"
+            :icon="universityIcon"
+            :options="{ zIndex: 3, clickable: false }"
+          />
+
+          <!-- Marcadores con iconos por grupo/estado y clic habilitado -->
+          <GMapMarker
+            v-for="(espacio, idx) in espaciosFiltrados"
+            :key="'mk-'+espacio.id+'-'+idx"
             :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-            :icon="{
-              url: espacio.capacity > 0 ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-            }"
-            @mouseover="handleMouseOver(espacio)"
-            @mouseout="handleMouseOut"
-            @click="handleMarkerClick(espacio)"
+            :icon="getMarkerIcon(espacio)"
+            :options="{ zIndex: 2, clickable: true }"
+            @mouseover="setHovered(espacio)"
+            @mouseout="clearHovered"
+            @click="openAccessModal(espacio)"
           />
         </CustomGoogleMap>
 
-        <!-- Countdown reserva activa -->
-        <div
-          v-if="reservaActiva"
-          class="absolute top-4 right-4 bg-white rounded-lg shadow-xl p-4 w-80 border border-gray-200 z-50 animate-fade-in"
-        >
-          <h3 class="text-lg font-bold text-primary mb-1">⏳ Reserva activa</h3>
-          <p class="text-sm text-gray-700">📍 {{ reservaActiva.espacio.name }}</p>
-          <p class="text-sm text-gray-700 mb-2">{{ reservaActiva.espacio.location }}</p>
-          <p class="text-sm text-gray-600 font-medium">Tiempo restante:</p>
-          <p class="text-lg text-primary font-semibold">{{ tiempoRestante }}</p>
-          <button
-            class="mt-3 w-full bg-red-500 text-white rounded-md py-2 hover:bg-red-600 transition"
-            @click="reservaActiva = null"
+        <!-- Panel lateral (hover) -->
+        <transition name="slide-fade">
+          <div
+            v-if="hoveredSpace"
+            class="absolute right-4 top-4 w-[320px] bg-white border border-gray-200 rounded-xl shadow-lg p-4"
           >
-            Finalizar reserva
-          </button>
-        </div>
+            <div class="flex items-start gap-3">
+              <div
+                class="px-2 py-0.5 rounded text-xs font-semibold"
+                :class="badgeClass(hoveredSpace)"
+              >
+                {{ groupLabel(hoveredSpace) }}
+              </div>
+              <div class="ml-auto text-xs" :class="hoveredSpace.capacity > 0 ? 'text-emerald-600' : 'text-rose-600'">
+                {{ hoveredSpace.capacity > 0 ? 'Disponible' : 'Completo' }}
+              </div>
+            </div>
 
-        <!-- Hover info -->
+            <h3 class="mt-2 text-lg font-semibold text-gray-900 leading-tight">
+              {{ hoveredSpace.name }}
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">📍 {{ hoveredSpace.location }}</p>
+
+            <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+              <div class="p-2 rounded bg-gray-50">
+                <div class="text-gray-500">Capacidad</div>
+                <div class="font-semibold">
+                  {{ hoveredSpace.capacity ?? capacityFromVehicle(hoveredSpace) }}
+                </div>
+              </div>
+              <div class="p-2 rounded bg-gray-50">
+                <div class="text-gray-500">Grupo</div>
+                <div class="font-semibold">{{ groupLabel(hoveredSpace) }}</div>
+              </div>
+            </div>
+
+            <button
+              class="mt-4 w-full bg-primary text-white font-semibold rounded-lg py-2 hover:bg-primary-dark transition"
+              @click="openAccessModal(hoveredSpace)"
+            >
+              Confirmar acceso
+            </button>
+          </div>
+        </transition>
+
+        <!-- Leyenda -->
         <div
-          v-if="hoveredSpace"
-          class="absolute right-4 top-24 bg-white p-4 rounded-xl shadow-lg w-[320px] z-10 animate-fade-in border border-gray-200"
+          class="absolute left-4 bottom-4 bg-white/90 backdrop-blur border border-gray-200 rounded-lg shadow p-3 text-xs text-gray-700"
         >
-          <h3 class="text-xl font-semibold text-primary mb-2">{{ hoveredSpace.name }}</h3>
-          <p class="text-sm text-gray-700 mb-1">📍 {{ hoveredSpace.location }}</p>
-          <p class="text-sm text-gray-700 mb-1">🚗 Tipo: {{ hoveredSpace.type }}</p>
-          <p class="text-sm text-gray-700 mb-2">💵 ${{ hoveredSpace.price_per_hour }}/hora</p>
-          <button
-            class="w-full bg-primary text-white rounded-lg py-2 hover:bg-primary-dark transition font-semibold"
-            @click="router.push(`/espacio/${hoveredSpace.id}`)"
-          >
-            Reservar Ahora
-          </button>
+          <div class="font-semibold mb-2">Leyenda</div>
+
+          <div class="flex items-center gap-2 mb-1">
+            <span class="inline-block w-3 h-3 rounded-full bg-emerald-500"></span>
+            <span>Zona Alumnos</span>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+            <span>Zona Docentes</span>
+          </div>
+
+          <div class="flex items-center gap-2 mb-1">
+            <img :src="icons.students.available" class="w-4 h-4" alt="Alumno disponible" />
+            <span>Alumno — Disponible</span>
+          </div>
+          <div class="flex items-center gap-2 mb-1">
+            <img :src="icons.students.full" class="w-4 h-4" alt="Alumno completo" />
+            <span>Alumno — Completo</span>
+          </div>
+          <div class="flex items-center gap-2 mb-1">
+            <img :src="icons.staff.available" class="w-4 h-4" alt="Docente disponible" />
+            <span>Docente — Disponible</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <img :src="icons.staff.full" class="w-4 h-4" alt="Docente completo" />
+            <span>Docente — Completo</span>
+          </div>
         </div>
       </div>
 
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+      <!-- LISTA -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <SpaceCard
-          v-for="espacio in espacios"
+          v-for="espacio in espaciosFiltrados"
           :key="espacio.id"
           :espacio="espacio"
         />
       </div>
     </div>
 
+    <!-- Menú móvil -->
     <div class="fixed bottom-0 left-0 w-full z-50">
-      <MobileMenu @toggle="toggleMap" :showMap="showMap" />
+      <MobileMenu :showMap="showMap" @toggle="showMap = !showMap" />
     </div>
+
+    <!-- Modal Confirmar Acceso (legajo + patente) -->
+    <ConfirmAccessModal
+      :open="modalOpen"
+      :space="selectedSpace"
+      @close="modalOpen = false"
+      @success="onAccessSuccess"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import MainHeader from '../components/layout/header/MainHeader.vue';
-import CustomGoogleMap from '../components/layout/GoogleMap.vue';
-import FloatingButton from '../components/pages/dashboardPage/FloatingButton.vue';
-import MobileMenu from '../components/layout/MobileMenu.vue';
-import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue';
-import { getUniversitySpaces } from '../services/universityService';
-import { useUniversityMap } from '../logic/useUniversityMap';
+import { ref, computed, onMounted } from 'vue'
+import MainHeader from '../components/layout/header/MainHeader.vue'
+import CustomGoogleMap from '../components/layout/GoogleMap.vue'
+import MobileMenu from '../components/layout/MobileMenu.vue'
+import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue'
+import { getUniversitySpaces } from '../services/universityService'
+import { useUniversityMap } from '../logic/useUniversityMap'
+import ConfirmAccessModal from '../components/confirmAccessDialog.vue'
 
-const router = useRouter();
-const cargando = ref(true);
-const espacios = ref([]);
-const error = ref(null);
-const showMap = ref(true);
-const buttonText = computed(() => (showMap.value ? 'Ver Lista' : 'Ver Mapa'));
+/** ICONOS (SVG en data-URI) */
+const icons = {
+  students: {
+    available:
+      'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23E8F7EF"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%2310B981"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%2322C55E"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%2310B981"/></svg>',
+    full:
+      'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23FDECEC"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%23DC2626"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%23EF4444"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%23DC2626"/></svg>'
+  },
+  staff: {
+    available:
+     'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23E8F7EF"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%2310B981"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%2322C55E"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%2310B981"/></svg>',
+    full:
+     'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23FDECEC"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%23DC2626"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%23EF4444"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%23DC2626"/></svg>'
+  },
+  university:
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQxDogY_QPvIai_GqjWgiHGJVSL7TwaMS4jA&s'
+}
 
-const {
-  center,
-  zoom,
-  hoveredSpace,
-  handleMouseOver,
-  handleMouseOut,
-  mapOptions,
-  setCenterToLocation
-} = useUniversityMap();
+const showMap = ref(true)
+const error = ref(null)
+const espacios = ref([])
+const lastUpdated = ref(new Date())
 
+// Mapa (centrado en UTN) + opciones
+const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
+
+// Marker fijo de la UTN FRT
+const utnMarkerPosition = { lat: -26.817180602149435, lng: -65.19934057381433 }
+const universityIcon = { url: icons.university, scaledSize: { width: 46, height: 46 } }
+
+// Zonas (rectángulos ajustados alrededor de anclas provistas)
 const zonas = ref([
+  // Alumnos (alrededor de -26.81676322927546, -65.19852170727803)
   {
-    nombre: 'Sector A',
+    group: 'students',
     paths: [
-      { lat: -26.8169, lng: -65.1989 },
-      { lat: -26.8169, lng: -65.1981 },
-      { lat: -26.8176, lng: -65.1981 },
-      { lat: -26.8176, lng: -65.1989 }
+      { lat: -26.81690, lng: -65.19866 },
+      { lat: -26.81690, lng: -65.19838 },
+      { lat: -26.81662, lng: -65.19838 },
+      { lat: -26.81662, lng: -65.19866 }
     ],
     options: {
-      fillColor: '#34d399',
-      fillOpacity: 0.3,
-      strokeColor: '#10b981',
+      fillColor: '#10b981',
+      fillOpacity: 0.18,
+      strokeColor: '#059669',
       strokeOpacity: 0.9,
       strokeWeight: 2
     }
   },
+  // Docentes (alrededor de -26.81747062254733, -65.1986508902072)
   {
-    nombre: 'Sector B',
+    group: 'staff',
     paths: [
-      { lat: -26.8177, lng: -65.1989 },
-      { lat: -26.8177, lng: -65.1981 },
-      { lat: -26.8183, lng: -65.1981 },
-      { lat: -26.8183, lng: -65.1989 }
+      { lat: -26.81760, lng: -65.19878 },
+      { lat: -26.81760, lng: -65.19853 },
+      { lat: -26.81735, lng: -65.19853 },
+      { lat: -26.81735, lng: -65.19878 }
     ],
     options: {
-      fillColor: '#f59e0b',
-      fillOpacity: 0.3,
-      strokeColor: '#d97706',
+      fillColor: '#3b82f6',
+      fillOpacity: 0.16,
+      strokeColor: '#2563eb',
       strokeOpacity: 0.9,
       strokeWeight: 2
     }
   }
-]);
+])
 
-const reservaActiva = ref({
-  espacio: {
-    name: 'Estacionamiento Principal',
-    location: 'Av. Independencia 1800'
-  },
-  endTime: new Date(Date.now() + 30 * 60 * 1000) // termina en 30 minutos
-});
+// Filtros
+const filters = ref({
+  groups: { students: true, staff: true },
+  onlyAvailable: false
+})
 
-const tiempoRestante = ref('');
+// Helpers UI/datos
+const lastUpdatedText = computed(() => lastUpdated.value.toLocaleTimeString())
+const badgeClass = (esp) => (esp.access_group === 'staff'
+  ? 'bg-blue-100 text-blue-700'
+  : 'bg-emerald-100 text-emerald-700')
+const groupLabel = (esp) => (esp.access_group === 'staff' ? 'Docentes' : 'Alumnos')
 
-const actualizarCountdown = () => {
-  const now = new Date();
-  const end = new Date(reservaActiva.value.endTime);
-  const diff = end.getTime() - now.getTime();
-  if (diff <= 0) {
-    tiempoRestante.value = 'Finalizado';
-    return;
-  }
-  const minutos = Math.floor((diff / 1000 / 60) % 60);
-  const segundos = Math.floor((diff / 1000) % 60);
-  tiempoRestante.value = `${minutos}m ${segundos}s`;
-};
-
-const obtenerEspaciosUniversitarios = async () => {
+// Capacidad derivada si viene por vehicle_capacities
+const capacityFromVehicle = (esp) => {
   try {
-    const data = await getUniversitySpaces();
-    espacios.value = (data || []).filter(e => e.university_id);
-    if (espacios.value.length === 0) error.value = 'No hay espacios registrados para universidades';
-  } catch (err) {
-    console.error(err);
-    error.value = 'Error al cargar los espacios universitarios';
-  } finally {
-    cargando.value = false;
-  }
-};
+    const caps = typeof esp.vehicle_capacities === 'string'
+      ? JSON.parse(esp.vehicle_capacities)
+      : (esp.vehicle_capacities || [])
+    return caps.reduce((acc, it) => acc + Number(it.capacity || 0), 0)
+  } catch { return 0 }
+}
 
-const toggleMap = () => {
-  showMap.value = !showMap.value;
-};
+// Normalización de access_group (backend puede mandar docentes/teacher/etc.)
+const normalizeGroup = (g) =>
+  (g && ['staff','docentes','teacher','profesor','profesores'].includes(String(g).toLowerCase()))
+    ? 'staff'
+    : 'students'
 
-const handleMarkerClick = (espacio) => {
-  router.push(`/espacio/${espacio.id}`);
-};
+// Filtrado de espacios
+const espaciosFiltrados = computed(() =>
+  (espacios.value || [])
+    .filter(e => !!e.university_id)
+    .filter(e => filters.value.groups[(e.access_group || 'students')])
+    .filter(e => (filters.value.onlyAvailable
+      ? (Number(e.capacity ?? capacityFromVehicle(e)) > 0)
+      : true))
+)
 
-onMounted(async () => {
-  setCenterToLocation(-26.81705174784595, -65.19854513954877);
-  await obtenerEspaciosUniversitarios();
-  setInterval(obtenerEspaciosUniversitarios, 10000);
-  setInterval(actualizarCountdown, 1000);
-});
-</script>
+const zonasFiltradas = computed(() => {
+  const out = []
+  if (filters.value.groups.students) out.push(zonas.value.find(z => z.group === 'students'))
+  if (filters.value.groups.staff) out.push(zonas.value.find(z => z.group === 'staff'))
+  return out.filter(Boolean)
+})
 
-<style scoped>
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+// Hover/panel
+const hoveredSpace = ref(null)
+const setHovered = (esp) => { hoveredSpace.value = esp }
+const clearHovered = () => { hoveredSpace.value = null }
+
+// Icono por grupo/estado (rojo si sin capacidad)
+const getMarkerIcon = (esp) => {
+  const group = esp.access_group === 'staff' ? 'staff' : 'students'
+  const cap = Number(esp.capacity ?? capacityFromVehicle(esp))
+  const url = cap > 0 ? icons[group].available : icons[group].full
+  return { url, scaledSize: { width: 40, height: 40 } }
+}
+
+const toggleGroup = (g) => (filters.value.groups[g] = !filters.value.groups[g])
+
+// Modal Acceso
+const modalOpen = ref(false)
+const selectedSpace = ref(null)
+const openAccessModal = (esp) => {
+  selectedSpace.value = esp
+  modalOpen.value = true
+}
+const onAccessSuccess = (_payload) => {
+  modalOpen.value = false
+  loadSpaces()
+}
+
+// Carga de datos
+const loadSpaces = async () => {
+  try {
+    const data = await getUniversitySpaces()
+    espacios.value = (data || []).map(e => ({
+      ...e,
+      access_group: normalizeGroup(e.access_group),
+      capacity: e.capacity ?? null
+    }))
+    lastUpdated.value = new Date()
+  } catch (e) {
+    console.error(e)
+    error.value = 'Error al cargar espacios universitarios'
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+onMounted(async () => {
+  setCenterToLocation(-26.81705, -65.19855) // centro del campus aprox
+  await loadSpaces()
+  setInterval(loadSpaces, 10000) // refresco “real-time”
+})
+</script>
+
+<style scoped>
+/* Transición panel lateral */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all .18s ease;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
 }
 </style>

@@ -1,0 +1,232 @@
+<template>
+  <transition name="fade">
+    <div v-if="open" class="fixed inset-0 z-[999] flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/40" @click="onClose" />
+      <div class="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-5">
+        <!-- Header -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">P</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Iniciar estacionamiento medido</h3>
+            <p class="text-xs text-gray-500">Cobro por hora según zona</p>
+          </div>
+          <button class="ml-auto text-gray-400 hover:text-gray-600" @click="onClose">✕</button>
+        </div>
+
+        <!-- Zone summary -->
+        <div class="mt-3 p-3 rounded-lg border bg-gray-50">
+          <div class="text-sm font-semibold text-gray-800">{{ zone?.label || 'Zona medida' }}</div>
+          <div class="text-xs text-gray-600">Tarifa: <span class="font-semibold">${{ hourlyRate.toFixed(2) }}</span> / hora</div>
+          <div class="text-[11px] text-gray-500 mt-1">
+            Estado:
+            <span
+              :class="{
+                'text-emerald-600': zone?.status==='free',
+                'text-amber-600': zone?.status==='limited',
+                'text-rose-600': zone?.status==='full'
+              }"
+            >
+              {{ statusLabel }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <form class="mt-4 space-y-3" @submit.prevent="submit">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Patente</label>
+            <input
+              v-model.trim="patente"
+              type="text"
+              class="mt-1 w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary uppercase"
+              placeholder="Ej. ABC123 o AB123CD"
+              @input="patente = patente.toUpperCase()"
+              required
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Duración (hs)</label>
+              <select v-model.number="durationHours" class="mt-1 w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
+                <option :value="1">1 hora</option>
+                <option :value="2">2 horas</option>
+                <option :value="3">3 horas</option>
+                <option :value="4">4 horas</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Método de pago</label>
+              <select v-model="paymentMethod" class="mt-1 w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
+                <option value="mercadopago">MercadoPago</option>
+                <option value="tarjeta">Tarjeta</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Datos de pago mínimos (mock) -->
+          <div v-if="paymentMethod==='tarjeta'" class="grid grid-cols-2 gap-3">
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700">Titular</label>
+              <input v-model.trim="card.name" type="text" class="mt-1 w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary" placeholder="Nombre y Apellido" />
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700">N° de tarjeta</label>
+              <input v-model.trim="card.number" inputmode="numeric" maxlength="19" class="mt-1 w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary" placeholder="0000 0000 0000 0000" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Venc.</label>
+              <input v-model.trim="card.exp" class="mt-1 w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary" placeholder="MM/AA" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">CVV</label>
+              <input v-model.trim="card.cvv" inputmode="numeric" maxlength="4" class="mt-1 w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary" placeholder="***" />
+            </div>
+          </div>
+
+          <!-- Resumen de costo -->
+          <div class="mt-1 p-3 rounded-lg border bg-gray-50 text-sm">
+            <div class="flex items-center">
+              <span class="text-gray-600">Costo estimado:</span>
+              <span class="ml-auto font-semibold">${{ totalCost.toFixed(2) }}</span>
+            </div>
+            <div class="text-[11px] text-gray-500">Se cobrará al iniciar. El exceso se prorratea al finalizar.</div>
+          </div>
+
+          <div v-if="error" class="text-sm text-rose-600">{{ error }}</div>
+
+          <button
+            type="submit"
+            class="w-full bg-primary text-white font-semibold rounded-lg py-2 mt-2 hover:bg-primary-dark transition disabled:opacity-60"
+            :disabled="loading"
+          >
+            <span v-if="!loading">Iniciar estacionamiento</span>
+            <span v-else class="inline-flex items-center gap-2">
+              <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" fill="none" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4A4 4 0 004 12z"/></svg>
+              Procesando…
+            </span>
+          </button>
+        </form>
+
+        <!-- Success -->
+        <div
+          v-if="success"
+          class="mt-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm"
+        >
+          Estacionamiento iniciado. Ticket #{{ success?.session?.id }} — vence aprox. a las {{ success?.session?.end_time_fmt }}.
+        </div>
+      </div>
+    </div>
+  </transition>
+</template>
+
+<script setup lang="ts">
+import { computed, defineEmits, defineProps, ref, watch, onMounted } from 'vue'
+import { useUserStore } from '../store/userStore'
+import { meteredParkingService } from '../services/meteredParkingService'
+
+type ZoneLite = {
+  id: number
+  label: string
+  status?: 'free'|'limited'|'full'
+  hourly_rate?: number|null
+}
+
+const props = defineProps<{
+  open: boolean
+  zone: ZoneLite | null
+}>()
+
+const emits = defineEmits<{
+  (e:'close'): void
+  (e:'success', payload: any): void
+}>()
+
+const userStore = useUserStore()
+
+const patente = ref('')
+const durationHours = ref(2)
+const paymentMethod = ref<'mercadopago'|'tarjeta'>('mercadopago')
+
+const card = ref({ name: '', number: '', exp: '', cvv: '' })
+
+const loading = ref(false)
+const error = ref<string|null>(null)
+const success = ref<any|null>(null)
+
+const open = computed(() => props.open)
+const zone = computed(() => props.zone)
+
+const statusLabel = computed(() => {
+  if (!zone.value?.status) return '—'
+  return zone.value.status === 'free' ? 'Libre' : zone.value.status === 'limited' ? 'Media ocupación' : 'Ocupada'
+})
+
+const hourlyRate = ref<number>( zone.value?.hourly_rate ?? 250 ) // fallback demo
+
+// obtener tarifa real si hay API
+const fetchRate = async () => {
+  if (!zone.value?.id) return
+  try {
+    const t = await meteredParkingService.getTariff(zone.value.id)
+    if (t && typeof t.hourly_rate === 'number') hourlyRate.value = t.hourly_rate
+  } catch {/* demo: ignora */}
+}
+
+watch(open, (val) => {
+  if (val) {
+    error.value = null
+    success.value = null
+    // reset “liviano”
+    if (!hourlyRate.value && zone.value?.hourly_rate) hourlyRate.value = zone.value.hourly_rate
+  }
+})
+
+onMounted(fetchRate)
+
+const totalCost = computed(() => Math.max(0, Number(hourlyRate.value) * Number(durationHours.value || 0)))
+
+const onClose = () => emits('close')
+
+const submit = async () => {
+  if (!zone.value) return
+  error.value = null
+  loading.value = true
+  success.value = null
+
+  try {
+    // 1) Asegurar vehículo por patente (o registrar mínimo)
+    const vehicleId = await meteredParkingService.ensureVehicle(patente.value)
+
+    // 2) Crear sesión/ticket
+    const start = new Date()
+    const end = new Date(start.getTime() + durationHours.value * 60 * 60 * 1000)
+
+    const payload = {
+      user_id: userStore.user.id,
+      zone_id: zone.value.id,
+      start_time: start.toISOString(),
+      end_time: end.toISOString(),
+      estimated_total: totalCost.value,
+      vehicle_id: vehicleId,
+      payment_method: paymentMethod.value,
+      payment_data: paymentMethod.value === 'tarjeta'
+        ? { name: card.value.name, number: card.value.number, exp: card.value.exp, cvv: card.value.cvv }
+        : null
+    }
+
+    const res = await meteredParkingService.createMeteredSession(payload)
+    success.value = res
+    emits('success', res)
+  } catch (e: any) {
+    error.value = e?.response?.data?.message || e?.message || 'No se pudo iniciar el estacionamiento'
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
+<style scoped>
+.fade-enter-active,.fade-leave-active{ transition: opacity .15s ease}
+.fade-enter-from,.fade-leave-to{ opacity:0 }
+</style>
