@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen bg-secondary p-6">
+    <MainHeader />
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
       <h1 class="text-3xl font-bold text-primary">
         <font-awesome-icon icon="check-circle" class="mr-2" />
@@ -25,9 +26,12 @@
       <div v-else>
         <p>No se encontró información de la reserva.</p>
       </div>
-      <router-link to="/" class="mt-6 inline-block bg-accent text-white px-4 py-2 rounded hover:shadow-lg transition-all">
-        Volver al Dashboard
-      </router-link>
+      <div class="flex justify-end mt-8">
+        <button @click="router.push('/')"
+          class="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition duration-300 w-full md:w-auto">
+          Volver al inicio
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -35,12 +39,9 @@
 <script setup>
 import { computed } from 'vue';
 import { useReservationStore } from '../store/reservationStore';
+import router from '../router';
+import MainHeader from '../components/layout/header/MainHeader.vue';
 
 const reservationStore = useReservationStore();
 const reservation = computed(() => reservationStore.reservation);
-console.log(reservation.value);
 </script>
-
-<style scoped>
-/* Agrega estilos adicionales si lo requieres */
-</style>

@@ -2,9 +2,9 @@
   <div class="min-h-screen bg-secondary flex flex-col">
     <MainHeader />
     <BackButton class="md:hidden" />
-    <div class="flex-grow flex items-start justify-center bg-primary">
+    <div class="flex-grow flex items-start justify-center bg-primary py-10">
       <div
-        class="bg-white p-2 md:rounded-xl shadow-2xl border-2 w-full min-h-screen md:min-h-max md:w-2/3 lg:w-1/3 md:mt-20 py-12 md:py-2">
+        class="bg-white p-2 md:rounded-xl shadow-2xl border-2 w-full min-h-screen md:min-h-max md:w-2/3 lg:w-1/2 xl:w-1/3 py-12 md:py-2">
         <h1 class="text-md text-center border-b-2 py-2">Inicia sesión o registrate</h1>
         <div class="px-8 py-2">
           <div v-if="credentialError"

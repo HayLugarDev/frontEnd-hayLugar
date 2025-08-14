@@ -19,7 +19,8 @@ export const useUserStore = defineStore('user', {
     sessionExpired: true,
 
     // 🔔 NUEVO: estado para notificaciones
-    notifications: [] as string[],
+    notifications: [] as { message: string; id?: number }[],
+    reservations: [] as any[],
   }),
 
   getters: {
@@ -33,10 +34,8 @@ export const useUserStore = defineStore('user', {
       try {
         const response = await api.get('/auth/google-session', { withCredentials: true });
         this.user = response.data.user;
+        console.log(response.data.user);
         this.sessionExpired = false;
-        if (this.notifications.length === 0) {
-          this.addNotification('Reserva nuevita entrando!');
-        }
       } catch (error: any) {
         if (error.response?.status === 401) {
           this.expireSession();
@@ -86,5 +85,21 @@ export const useUserStore = defineStore('user', {
     clearNotifications() {
       this.notifications = [];
     },
+
+    setReservations(reservas: any[]) {
+      this.reservations = reservas;
+    },
+
+    checkReservationsForUpcoming() {
+      const ahora = Date.now();
+      this.reservations.forEach((reserva: any) => {
+        const inicio = new Date(reserva.start_time).getTime();
+        const diffMinutos = (inicio - ahora) / (1000 * 60);
+        if (diffMinutos > 0 && diffMinutos <= 10) {
+          this.addNotification(`Tu reserva comienza en ${Math.round(diffMinutos)} minutos`);
+        }
+      });
+    },
+
   },
 });

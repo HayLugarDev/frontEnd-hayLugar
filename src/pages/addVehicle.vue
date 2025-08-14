@@ -8,7 +8,7 @@
                 <!-- Paso 0: Instrucciones -->
                 <div v-if="currentStep === 0" class="rounded-lg border-gray-300">
                     <header>
-                        <h1 class="text-3xl font-bold text-center text-primary mb-8 border-b md:border-none py-2">
+                        <h1 class="text-3xl font-bold text-center text-primary mb-8 border-b md:border-none p-2">
                             Registrá tu vehículo y comenzá a disfrutar de HayLugar
                         </h1>
                     </header>
@@ -56,9 +56,9 @@
                             </div>
 
                             <!-- Botón -->
-                            <div class="flex justify-end mt-6">
+                            <div class="flex justify-end md:mt-6">
                                 <button @click="nextFirstStep"
-                                    class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all">
+                                    class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all w-full md:w-auto">
                                     Comenzar
                                 </button>
                             </div>
@@ -80,24 +80,6 @@
                 </div>
             </div>
         </transition>
-
-        <!-- Modal de éxito -->
-        <transition name="fade">
-            <div v-if="showSuccessModal"
-                class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-                    <div class="flex flex-col items-center">
-                        <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-                        <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
-                        <p class="text-lg text-gray-700 text-center mb-6">El espacio se ha guardado correctamente.</p>
-                        <button @click="closeSuccesModal"
-                            class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-                            Continuar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </transition>
     </div>
 
     <!-- Modal de Éxito -->
@@ -108,7 +90,7 @@
                     <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
                     <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
                     <p class="text-lg text-gray-700 text-center mb-6">Los cambios se han guardado correctamente.</p>
-                    <button @click="closeSuccessModal"
+                    <button @click="closeSuccesModal"
                         class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
                         Continuar
                     </button>

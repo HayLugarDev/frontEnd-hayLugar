@@ -29,16 +29,6 @@ import { ref, onMounted } from 'vue';
 import { useUserStore } from '../../../store/userStore';
 import api from '../../../services/apiService';
 
-interface Space {
-  location: string;
-}
-
-interface Reservation {
-  Space: Space;
-  start_time: string;
-  total: number;
-}
-
 const reservations = ref([]);
 const userStore = useUserStore();
 
@@ -52,14 +42,20 @@ const fetchReservations = async () => {
     const response = await api.get(`reservations/history/${userId}`);
     console.log(response.data);
     reservations.value = response.data;
+    userStore.setReservations(response.data)
+    userStore.checkReservationsForUpcoming();
   } catch (error) {
     console.error("Error al obtener historial de reservas", error);
   }
 };
 
-onMounted(() => {
-  fetchReservations();
+onMounted(async() => {
+  await fetchReservations();
 });
+
+setInterval(() => {
+  userStore.checkReservationsForUpcoming();
+}, 60000);
 
 const formatDate = (value: string): string => {
   const date = new Date(value);

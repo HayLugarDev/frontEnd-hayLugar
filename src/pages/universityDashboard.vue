@@ -54,7 +54,7 @@
       </span>
     </div>
 
-    <div class="p-4">
+    <div class="p-4 z-30">
       <div v-if="error" class="text-red-500 mb-4">{{ error }}</div>
 
       <!-- MAPA -->

@@ -52,7 +52,7 @@
               <!-- Botón -->
               <div class="flex justify-end mt-6">
                 <button @click="nextFirstStep"
-                  class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all">
+                  class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all w-full md:w-auto">
                   Comenzar
                 </button>
               </div>

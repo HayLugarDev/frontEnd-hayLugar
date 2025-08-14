@@ -41,13 +41,14 @@
             <div class="flex flex-row items-center justify-between">
               <h3 class="text-md font-semibold text-gray-700 mb-1">Vehículo Seleccionado</h3>
               <font-awesome-icon
-                :icon="reserva.vehicle_type === 'car' ? 'car' : reserva.vehicle_type === 'motorcycle' ? 'motorcycle' : 'question'"
+                :icon="reserva.vehicle_type === 'car' ? 'car' : reserva.vehicle_type === 'motorcycle' ? 'motorcycle' :
+                  reserva.vehicle_type === 'bicycle' ? 'bicycle' : 'question'"
                 class="text-gray-600 mr-2" />
             </div>
             <div v-if="vehiculoSeleccionado">
               <p>Marca: {{ vehiculoSeleccionado.brand }}</p>
               <p>Modelo: {{ vehiculoSeleccionado.model }}</p>
-              <p>Patente: {{ vehiculoSeleccionado.license_plate }}</p>
+              <p>Patente: {{ vehiculoSeleccionado.license_plate ?? 'No aplica'}}</p>
             </div>
 
           </div>

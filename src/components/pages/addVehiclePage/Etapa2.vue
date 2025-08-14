@@ -1,8 +1,8 @@
 <template>
-    <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2">
-        <h1 class="text-4xl font-semibold mb-8">Completá los detalles de tu vehículo</h1>
+    <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2 min-h-screen">
+        <h1 class="text-primary text-4xl font-semibold mb-8">Completá los detalles de tu vehículo</h1>
 
-        <div class="space-y-6 font-normal">
+        <div class="space-y-6 font-normal flex-1">
             <!-- Modelo -->
             <div>
                 <label class="block text-sm font-semibold text-gray-900">Marca</label>
@@ -30,10 +30,10 @@
         </div>
 
         <!-- Botones de navegación -->
-        <div class="flex justify-between mt-6 space-x-4">
+        <div class="flex justify-between mt-auto space-x-4">
             <button @click="emit('prev')" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">Anterior</button>
             <button @click="brand && model && color ? $emit('next') : (showErrorModal = true)"
-                class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
+                class="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition duration-300">
                 Siguiente
             </button>
         </div>

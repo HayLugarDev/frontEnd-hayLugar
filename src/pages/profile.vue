@@ -1,7 +1,7 @@
 <template>
   <MainHeader />
   <div class="min-h-screen bg-secondary md:p-10" v-if="!userStore.loading">
-    <div class="flex flex-col md:flex-row w-full items-start">
+    <div class="flex flex-col mt-10 md:mt-0 md:flex-row w-full items-start">
       <BackButton class="md:hidden" />
 
       <!-- Encabezado del Perfil -->

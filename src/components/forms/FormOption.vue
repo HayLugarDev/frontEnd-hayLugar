@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 border-2 w-11/12 mx-auto flex flex-col rounded-2xl cursor-pointer transition-colors duration-200"
+  <div class="p-6 border-2 w-full md:w-11/12 mx-auto flex flex-col rounded-2xl cursor-pointer transition-colors duration-200"
     :class="isSelected ? 'border-gray-900 bg-gray-200' : 'border-gray-300 hover:border-gray-500'"
     @click="$emit('update:modelValue', value)">
     <span class="text-2xl text-gray-800">{{ title }}</span>

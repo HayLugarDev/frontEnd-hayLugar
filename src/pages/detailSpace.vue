@@ -58,7 +58,7 @@
         <!-- Info general + Formulario -->
         <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
           <!-- Información del espacio -->
-          <div class="col-span-6 grid grid-cols-3 grid-rows-2 gap-1 sm:gap-4 p-10">
+          <div class="col-span-6 grid grid-cols-3 gap-1 sm:gap-4 p-10">
             <div class="col-span-2">
               <p v-if="espacio.location" class="text-xl font-bold text-gray-800">
                 {{ espacio.location.split(',')[1] || '' }}
@@ -67,80 +67,80 @@
               <div class="my-4">
                 <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-2 px-6 border-2 shadow-xl">
                   <p class="font-semibold text-2xl">{{ vehicleTypeTranslations[v.type] || v.type }}</p>
-                  <p v-if="v.price_per_hour" class="font-normal">Precio por hora: ${{
-                    v.price_per_hour.toLocaleString() }}</p>
+                  <p v-if="v.price_per_hour" class="font-normal">Precio por hora: ${{ v.price_per_hour.toLocaleString()
+                  }}</p>
                 </div>
               </div>
             </div>
 
             <div class="col-start-3 flex flex-col items-end text-2xl">
-              <span class="text-gray-800 font-semibold">
-                <span class="text-yellow-600">★</span> 4,70
+              <span :class="formattedRating ? 'text-yellow-600' : 'text-gray-400'" class="font-semibold">
+                ★ <span class="text-black">{{ formattedRating ?? '0.0' }}</span>
               </span>
-              <span class="font-serif cursor-pointer hover:underline text-sm sm:text-md">62 Opiniones</span>
-            </div>
 
-            <section class="col-span-3 border border-gray-300 p-4 rounded-lg text-xl">
-              <p class="font-semibold">Descripción:</p>
-              <p class="text-gray-600 font-medium">{{ espacio.description }}</p>
-            </section>
-
-            <div class="col-span-3 flex justify-center items-center h-[350px]">
-              <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-                class="w-full h-full rounded-lg overflow-hidden shadow-md">
-                <GMapMarker :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="{
-                  url: carMarker,
-                  scaledSize: { width: 40, height: 40 }
-                }" />
-              </CustomGoogleMap>
+              <span class="font-serif cursor-pointer hover:underline text-sm sm:text-md">
+                {{ opinionesTexto }}
+              </span>
             </div>
           </div>
 
           <!-- Formulario reserva -->
-          <section class="col-span-4 shadow-2xl p-8 md:p-4 xl:p-6 md:rounded-xl h-max sm:border border-zinc-700">
-            <h2 class="text-2xl font-semibold mb-4">Completá tu reserva</h2>
-            <div class="grid grid-cols-2 gap-4">
-              <MenuDropdown v-model="tipoVehiculo" :options="vehicleOptions" title="Seleccioná tu vehículo"
-                class="border border-gray-700 rounded-xl" />
-              <MenuDropdown v-model="tipoPlazoReserva" :options="['Por hora', 'Por día', 'Por mes']"
-                title="¿Por cuánto tiempo?" class="border border-gray-500 rounded-xl" />
+          <FormReservation v-if="!isOwner && isLogged" class="col-span-10 lg:col-span-4 order-5 lg:order-3"
+            :tipoVehiculo="tipoVehiculo" :tipoPlazoReserva="tipoPlazoReserva" :tiempoInicial="tiempoInicial"
+            :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
+            @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
+            @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event"
+            @reservar="reservar" />
 
-              <!-- CheckIn -->
-              <div class="col-span-1 flex flex-col border border-gray-500 rounded-xl p-2 items-center">
-                <label class="font-semibold">CheckIn</label>
-                <Datepicker v-model="tiempoInicial" :enable-time-picker="tipoPlazoReserva !== 'Por hora' ? false : true" :is24="true" :model-type="'timestamp'"
-                  :min-date="new Date()" placeholder="Entrada" />
-              </div>
+          <!-- Botón para dueño -->
+          <div v-else-if="isOwner"
+            class="col-span-10 lg:col-span-4 flex justify-center items-start p-6 order-5 lg:order-3">
+            <button @click="goToEdit"
+              class="px-6 py-3 rounded-full bg-gradient-to-r from-indigo-500 to-primary text-white font-semibold shadow-lg hover:from-indigo-600 hover:to-primary transition-all duration-300">
+              ✏️ Editar publicación
+            </button>
+          </div>
 
-              <!-- CheckOut -->
-              <div class="col-span-1 flex flex-col border border-gray-500 rounded-xl p-2 items-center">
-                <label class="font-semibold">CheckOut</label>
-                <Datepicker v-model="tiempoFinal" :enable-time-picker="tipoPlazoReserva !== 'Por hora' ? false : true" :is24="true" :model-type="'timestamp'"
-                  :min-date="tiempoInicial" placeholder="Salida" />
-              </div>
+          <!-- No logueado -->
+          <div v-else-if="!isLogged"
+            class="col-span-10 lg:col-span-4 flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-lg border border-gray-200 text-center order-5 lg:order-3">
+            <h2 class="text-2xl font-bold text-primary mb-2">¡Inicia sesión para reservar!</h2>
+            <p class="text-gray-600 mb-6">Debes estar autenticado para poder seleccionar un vehículo y completar tu
+              reserva.</p>
+            <router-link to="/login"
+              class="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary-dark transition-all">Iniciar
+              sesión</router-link>
+            <router-link to="/register" class="mt-3 text-primary underline">¿No tienes cuenta? Regístrate
+              aquí</router-link>
+          </div>
 
-              <!-- Tarifa -->
-              <div class="col-span-2 border border-gray-800 rounded-xl px-4 py-2 text-center">
-                <span class="block text-sm font-semibold">TARIFA:</span>
-                <span class="text-2xl font-bold text-gray-800">${{ totalCalculado }}</span>
-              </div>
-
-              <!-- Botón reservar -->
-              <button @click="reservar"
-                class="col-span-2 bg-accent text-white px-6 py-3 rounded-lg text-lg font-bold shadow-md hover:shadow-xl">
-                <font-awesome-icon icon="calendar-check" class="mr-2" />
-                Reservar Ahora
-              </button>
-            </div>
+          <!-- Descripción -->
+          <section class="col-span-10 border border-gray-300 p-4 rounded-lg text-xl order-6">
+            <p class="font-semibold">Descripción:</p>
+            <p class="text-gray-600 font-medium">{{ espacio.description }}</p>
           </section>
+
+          <!-- Mapa -->
+          <div class="col-span-10 flex justify-center items-center h-[350px] order-7">
+            <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
+              class="w-full h-full rounded-lg overflow-hidden shadow-md">
+              <GMapMarker :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="{
+                url: carMarker,
+                scaledSize: { width: 40, height: 40 }
+              }" />
+            </CustomGoogleMap>
+          </div>
         </div>
       </div>
     </main>
   </div>
   <SessionExpired :sessionExpired="isSessionInvalid" />
 
+  <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
+    icon="/src/assets/logo.png" @close="showErrorModal = false" :isHtml="modalIsHtml"/>
+
   <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario"
-    :vehicleType="reverseVehicleTypeTranslations[tipoVehiculo]" @selected="onSelectedVehicle"
+    :vehicleType="reverseVehicleTypeTranslations[tipoVehiculo]" @selected="onSelectedVehicle" :isHtml="modalIsHtml"
     @close="showVehicleModal = false" />
 
 </template>
@@ -167,6 +167,8 @@ import { baseURL } from '../services/apiService';
 import vehicleLabel from '../logic/useVehicleLabel';
 import { getAllVehicles } from '../services/vehicleService';
 import VehicleSelectModal from '../components/pages/detailSpacePage/VehicleSelectModal.vue';
+import FormReservation from '../components/forms/FormReservation.vue';
+import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -188,6 +190,22 @@ const showVehicleModal = ref(false);
 const vehiculosUsuario = ref([]);
 const vehiculoSeleccionado = ref(null);
 
+const isLogged = computed(() => !!userStore.user && !!userStore.user.id);
+
+const showErrorModal = ref(false);
+const errorMessage = ref('');
+const modalIsHtml = ref(false);
+
+const ownerIdFromSpace = computed(() => {
+  if (!espacio.value) return null;
+  return espacio.value.owner_id ?? espacio.value.host?.id ?? espacio.value.host?.user_id ?? null;
+});
+
+const isOwner = computed(() => {
+  if (!isLogged.value || !ownerIdFromSpace.value) return false;
+  return Number(userStore.user.id) === Number(ownerIdFromSpace.value);
+});
+
 const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 const obtenerEspacio = async () => {
@@ -204,6 +222,7 @@ const obtenerEspacio = async () => {
 onMounted(async () => {
   await obtenerEspacio();
   await userStore.fetchUser();
+  console.log(espacio.value);
 });
 
 // const markerIcon = computed(() => {
@@ -223,8 +242,18 @@ onMounted(async () => {
 // });
 
 const reservar = async () => {
+  if (isOwner.value) {
+    errorMessage.value = 'No podés reservar tu propio espacio.';
+    modalIsHtml.value = false;
+    showErrorModal.value = true;
+    return;
+  }
+
   if (!espacio.value || !tiempoInicial.value || !tiempoFinal.value || !tipoVehiculo.value) {
-    return alert('Faltan completar campos para la reserva');
+    errorMessage.value = 'Faltan completar campos para la reserva';
+    modalIsHtml.value = false;
+    showErrorModal.value = true;
+    return;
   }
 
   await verifyToken();
@@ -235,7 +264,11 @@ const reservar = async () => {
     vehiculosUsuario.value = vehiculos.filter(v => v.type === reverseVehicleTypeTranslations[tipoVehiculo.value]);
 
     if (vehiculosUsuario.value.length === 0) {
-      return alert('No tenés vehículos registrados para este tipo.');
+      errorMessage.value = `No tenés vehículos registrados para este tipo.<br/>
+        <a href="/profile" class="text-blue-600 underline hover:text-blue-800">Agrega tu vehículo aquí</a>.`;
+      showErrorModal.value = true;
+      modalIsHtml.value = true;
+      return;
     }
 
     showVehicleModal.value = true;
@@ -246,14 +279,15 @@ const reservar = async () => {
 
 const onSelectedVehicle = (vehicle) => {
   vehiculoSeleccionado.value = vehicle;
+  console.log('Ingreso y entrada: ', formatLocalDateTime(new Date(tiempoInicial.value)), formatLocalDateTime(new Date(tiempoFinal.value)));
   console.log(vehicle);
   const payload = {
     owner_id: espacio.value.owner_id,
     space_id: espacio.value.id,
     vehicle_id: vehiculoSeleccionado.value.id,
     vehicle_type: reverseVehicleTypeTranslations[tipoVehiculo.value],
-    start_time: new Date(tiempoInicial.value).toISOString(),
-    end_time: new Date(tiempoFinal.value).toISOString(),
+    start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
+    end_time: formatLocalDateTime(new Date(tiempoFinal.value)),
     dead_line: deadLine.value,
     total: totalCalculado.value,
     user_vehicle_id: vehicle.id
@@ -269,7 +303,12 @@ const totalCalculado = computed(() => {
   const inicio = new Date(tiempoInicial.value);
   const fin = new Date(tiempoFinal.value);
 
-  if (isNaN(inicio.getTime()) || isNaN(fin.getTime()) || fin <= inicio) return 0;
+  if (isNaN(inicio.getTime()) || isNaN(fin.getTime()) || fin <= inicio) {
+    errorMessage.value = 'Error en las fechas ingresadas'
+    modalIsHtml.value = false;
+    showErrorModal.value = true;
+    return;
+  };
 
   // Buscar la tarifa del vehículo seleccionado
   let precioHora = 0;
@@ -320,6 +359,26 @@ const vehicleTypeTranslations = {
   // truck: 'Camión',
   // suv: 'SUV',
 };
+
+// Formateo de puntuación
+const formattedRating = computed(() => {
+  if (espacio.value?.average_rating == null) {
+    return null;
+  }
+  return Number(espacio.value.average_rating).toFixed(1);
+});
+
+const opinionesTexto = computed(() => {
+  if (!espacio.value?.reviews?.comment) {
+    return 'Sin opiniones';
+  }
+  return `${espacio.value?.reviews?.comment} Opiniones`;
+});
+
+function formatLocalDateTime(date) {
+  const pad = (n) => n.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+}
 
 const reverseVehicleTypeTranslations = Object.fromEntries(
   Object.entries(vehicleTypeTranslations).map(([en, es]) => [es, en])

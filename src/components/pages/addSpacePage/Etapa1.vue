@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2">
-        <h1 class="text-4xl font-semibold mb-8">Qué tipo de espacio vas a ofrecer como estacionamiento?</h1>
+        <h1 class="text-primary text-4xl font-semibold mb-8">Qué tipo de espacio vas a ofrecer como estacionamiento?</h1>
 
         <FormOption v-model="type" value="garage" title="Casa o inmueble propio"
             text="Es el garage de una casa, vivienda, departamento o similar." />
@@ -12,7 +12,7 @@
         <!-- Botones de navegación -->
         <div class="flex justify-end mt-6 space-x-4">
             <button @click="type ? $emit('next') : (showErrorModal = true)"
-                class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
+                class="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition duration-300">
                 Siguiente
             </button>
         </div>

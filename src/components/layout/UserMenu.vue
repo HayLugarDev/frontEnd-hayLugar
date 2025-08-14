@@ -7,7 +7,7 @@
     </button>
 
     <ul v-if="open"
-      class="absolute bg-white rounded-xl flex flex-col py-2 top-14 -left-20 z-30 cursor-pointer shadow-xl min-w-48">
+      class="absolute bg-white rounded-xl flex flex-col py-2 top-14 -left-20 z-50 cursor-pointer shadow-xl min-w-48">
       <UserMenuOptions @navigate="$emit('navigate', $event)" />
     </ul>
   </div>
@@ -27,7 +27,7 @@ const toggleMenu = () => {
 };
 
 const hostImage = computed(() => {
-  return userStore.user?.profile_picture || user_icon_primary;
+  return userStore?.user?.profile_picture || user_icon_primary;
 });
 
 </script>

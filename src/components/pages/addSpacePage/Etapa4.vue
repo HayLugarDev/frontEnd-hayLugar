@@ -80,7 +80,7 @@
         <div class="flex justify-between mt-6 space-x-4">
             <button @click="emit('prev')" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">Anterior</button>
             <button @click="name && parking_type && description ? $emit('next') : (showErrorModal = true)"
-                class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
+                class="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition duration-300">
                 Siguiente
             </button>
         </div>
