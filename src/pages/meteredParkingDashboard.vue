@@ -410,10 +410,6 @@ onMounted(async () => {
     onUpdate: upsertFromRealtime,
     onBulk: (list) => list.forEach(upsertFromRealtime),
   })
-  socket.emit('subscribe', {
-  metered: true,
-  region: { country_code: 'AR', admin1: 'Tucumán', city: 'San Miguel de Tucumán' }
-})
 })
 
 onBeforeUnmount(() => {
