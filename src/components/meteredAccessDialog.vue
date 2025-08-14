@@ -15,15 +15,20 @@
 
         <!-- Zone summary -->
         <div class="mt-3 p-3 rounded-lg border bg-gray-50">
-          <div class="text-sm font-semibold text-gray-800">{{ zone?.label || 'Zona medida' }}</div>
-          <div class="text-xs text-gray-600">Tarifa: <span class="font-semibold">${{ hourlyRate.toFixed(2) }}</span> / hora</div>
+          <div class="text-sm font-semibold text-gray-800">{{ zoneLabel }}</div>
+          <div class="text-xs text-gray-600">
+            Tarifa:
+            <span class="font-semibold">
+              ${{ safeHourlyRate.toFixed(2) }}
+            </span> / hora
+          </div>
           <div class="text-[11px] text-gray-500 mt-1">
             Estado:
             <span
               :class="{
-                'text-emerald-600': zone?.status==='free',
-                'text-amber-600': zone?.status==='limited',
-                'text-rose-600': zone?.status==='full'
+                'text-emerald-600': zoneStatus==='free',
+                'text-amber-600': zoneStatus==='limited',
+                'text-rose-600': zoneStatus==='full'
               }"
             >
               {{ statusLabel }}
@@ -113,7 +118,7 @@
           v-if="success"
           class="mt-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm"
         >
-          Estacionamiento iniciado. Ticket #{{ success?.session?.id }} — vence aprox. a las {{ success?.session?.end_time_fmt }}.
+          Estacionamiento iniciado. Ticket #{{ successSessionId }} — vence aprox. a las {{ successEndTimeText }}.
         </div>
       </div>
     </div>
@@ -154,57 +159,118 @@ const loading = ref(false)
 const error = ref<string|null>(null)
 const success = ref<any|null>(null)
 
-const open = computed(() => props.open)
-const zone = computed(() => props.zone)
+/** Derivados seguros (evitan ?. en template y NPEs) */
+const open = computed(() => !!props.open)
+const zoneId = computed<number | null>(() => (props.zone && typeof props.zone.id !== 'undefined')
+  ? Number(props.zone.id)
+  : null
+)
+const zoneLabel = computed(() => props.zone?.label || 'Zona medida')
+const zoneStatus = computed<ZoneLite['status']>(() => props.zone?.status || 'free')
 
 const statusLabel = computed(() => {
-  if (!zone.value?.status) return '—'
-  return zone.value.status === 'free' ? 'Libre' : zone.value.status === 'limited' ? 'Media ocupación' : 'Ocupada'
+  const s = zoneStatus.value
+  return s === 'free' ? 'Libre' : s === 'limited' ? 'Media ocupación' : 'Ocupada'
 })
 
-const hourlyRate = ref<number>( zone.value?.hourly_rate ?? 250 ) // fallback demo
+/** Tarifa (fallback 250 si no hay backend de tarifa) */
+const hourlyRate = ref<number | null>(props.zone?.hourly_rate ?? null)
+const safeHourlyRate = computed(() => Number(hourlyRate.value ?? 250))
 
-// obtener tarifa real si hay API
+/** Pide tarifa real si existe endpoint; no rompe si falla */
 const fetchRate = async () => {
-  if (!zone.value?.id) return
+  if (!zoneId.value) return
   try {
-    const t = await meteredParkingService.getTariff(zone.value.id)
-    if (t && typeof t.hourly_rate === 'number') hourlyRate.value = t.hourly_rate
-  } catch {/* demo: ignora */}
+    const t = await meteredParkingService.getTariff(zoneId.value) // GET /metered/zone/:id/tariff (si lo tenés)
+    if (t && typeof t.hourly_rate === 'number') {
+      hourlyRate.value = t.hourly_rate
+    } else if (props.zone?.hourly_rate != null) {
+      hourlyRate.value = Number(props.zone.hourly_rate)
+    }
+  } catch {
+    if (props.zone?.hourly_rate != null) {
+      hourlyRate.value = Number(props.zone.hourly_rate)
+    } else {
+      hourlyRate.value = 250
+    }
+  }
 }
 
-watch(open, (val) => {
+/** Reseteos leves al abrir y al cambiar la zone */
+watch(() => props.open, (val) => {
   if (val) {
     error.value = null
     success.value = null
-    // reset “liviano”
-    if (!hourlyRate.value && zone.value?.hourly_rate) hourlyRate.value = zone.value.hourly_rate
+    patente.value = ''
+    if (props.zone?.hourly_rate != null) hourlyRate.value = Number(props.zone.hourly_rate)
+    // intenta refrescar tarifa real al abrir
+    fetchRate()
   }
+})
+
+watch(() => props.zone?.id, () => {
+  // si cambia la zona, refrescamos tarifa y limpiamos estado
+  error.value = null
+  success.value = null
+  if (props.zone?.hourly_rate != null) hourlyRate.value = Number(props.zone.hourly_rate)
+  fetchRate()
 })
 
 onMounted(fetchRate)
 
-const totalCost = computed(() => Math.max(0, Number(hourlyRate.value) * Number(durationHours.value || 0)))
+const totalCost = computed(() =>
+  Math.max(0, Number(safeHourlyRate.value) * Number(durationHours.value || 0))
+)
 
 const onClose = () => emits('close')
 
+/** Campos de success seguros para template */
+const successSessionId = computed(() => success.value?.session?.id ?? success.value?.id ?? '—')
+const successEndTimeText = computed(() => {
+  const s = success.value?.session
+  const iso = s?.end_time ?? s?.end_time_real ?? s?.end_time_expected
+  if (s?.end_time_fmt) return s.end_time_fmt
+  if (iso) {
+    try { return new Date(iso).toLocaleTimeString() } catch { /* ignore */ }
+  }
+  return '—'
+})
+
+/** Enviar start-session */
 const submit = async () => {
-  if (!zone.value) return
   error.value = null
-  loading.value = true
   success.value = null
 
-  try {
-    // 1) Asegurar vehículo por patente (o registrar mínimo)
-    const vehicleId = await meteredParkingService.ensureVehicle(patente.value)
+  if (!zoneId.value) {
+    error.value = 'Zona inválida. Cerrá y volvé a intentar desde el mapa.'
+    return
+  }
 
-    // 2) Crear sesión/ticket
+  const uid = userStore?.user?.id
+  if (!uid) {
+    error.value = 'Debes iniciar sesión para continuar.'
+    return
+  }
+
+  if (!patente.value || patente.value.length < 5) {
+    error.value = 'Ingresá una patente válida.'
+    return
+  }
+
+  loading.value = true
+  try {
+    // 1) Asegurar vehículo
+    const vehicleId = await meteredParkingService.ensureVehicle(patente.value)
+    if (!vehicleId) throw new Error('No se pudo registrar/asegurar el vehículo')
+
+    // 2) Crear sesión/ticket (enviamos block_id; si tu backend espera zone_id lo incluimos también)
     const start = new Date()
     const end = new Date(start.getTime() + durationHours.value * 60 * 60 * 1000)
 
-    const payload = {
-      user_id: userStore.user.id,
-      zone_id: zone.value.id,
+    const payload: any = {
+      user_id: uid,
+      block_id: zoneId.value,           // <- recomendado (backend)
+      zone_id: zoneId.value,            // <- por compatibilidad con tu mock anterior
       start_time: start.toISOString(),
       end_time: end.toISOString(),
       estimated_total: totalCost.value,
