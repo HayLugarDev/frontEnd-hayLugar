@@ -162,13 +162,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import MainHeader from '../components/layout/header/MainHeader.vue'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
 import MobileMenu from '../components/layout/MobileMenu.vue'
 import { useUniversityMap } from '../logic/useUniversityMap'
 import MeteredAccessDialog from '../components/meteredAccessDialog.vue'
 import { meteredParkingService } from '../services/meteredParkingService'
+import { subscribeToMeteredRealtime } from '../services/meteredRealtime' // tiempo real
 
 const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
 center.value = { lat: -26.8309, lng: -65.2033 }
@@ -178,19 +179,18 @@ const showMap = ref(true)
 const error = ref(null)
 const lastUpdated = ref(new Date())
 const lastUpdatedText = computed(() => lastUpdated.value.toLocaleTimeString())
-const filterStatus = ref('all')
+const filterStatus = ref('all') // all | free | limited | full
 const hovered = ref(null)
 
 const snappedBlocks = ref([])
 
 /* =========================
-   
-   (El backend trae lat/lng invertidos LPM)
+   Normalización lat/lng (defensivo)
    ========================= */
 function normalizePoint(p) {
   let lat = Number(p?.lat)
   let lng = Number(p?.lng)
-  // Heurística para AR: |lat| ~ 22..55, |lng| ~ 53..73
+  // Heurística AR: |lat| ~ 22..55, |lng| ~ 53..73
   const looksSwapped = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) > 55 && Math.abs(lng) < 55
   if (looksSwapped) [lat, lng] = [lng, lat]
   return { lat, lng }
@@ -236,7 +236,7 @@ function getSnappedPath(origin, destination) {
   })
 }
 
-/* Cache en memoria para evitar recalcular si no cambió el bloque */
+/* Cache de snapping por bloque y versión de datos */
 const snapCache = new Map() // key: `${id}:${updated_at}` => path[]
 
 async function snapBlock(dto) {
@@ -261,25 +261,22 @@ async function snapBlock(dto) {
 }
 
 /* =========================
-   Carga + mapeo DTO -> UI
+   Carga inicial (DTO -> UI)
    ========================= */
 async function loadBlocksFromBackend() {
   try {
-    // 1) Traer datos
     const resp = await meteredParkingService.getBlocks({
       country_code: 'AR',
       admin1: 'Tucumán',
       city: 'San Miguel de Tucumán',
       active: true,
-      limit: 500
+      limit: 1000
     })
 
     const data = Array.isArray(resp?.data) ? resp.data : Array.isArray(resp) ? resp : []
 
-    // 2) Aseguramos Google antes del snapping
     await waitForGoogle()
 
-    // 3) Snap secuencial (evita rate limit). Si querés, podés paralelizar de a N.
     const mapped = []
     for (const dto of data) {
       const snappedPath = await snapBlock(dto)
@@ -309,7 +306,7 @@ async function loadBlocksFromBackend() {
 }
 
 /* =========================
-   Util long. polyline
+   Longitud aproximada polyline
    ========================= */
 function polylineLengthMeters(path) {
   if (!path || path.length < 2) return 0
@@ -363,13 +360,64 @@ const openMetered = zone => {
 const handleStarted = () => { modalOpen.value = false }
 
 /* =========================
+   Tiempo real (Socket.IO)
+   ========================= */
+let unsubscribe = null
+
+async function upsertFromRealtime(dto) {
+  try {
+    await waitForGoogle()
+    const snappedPath = await snapBlock(dto)
+
+    const label = `${dto.street}${dto.segment_ref ? ' — ' + dto.segment_ref : ''}`
+    const desc = `${dto.region?.city || ''}${dto.region?.neighborhood ? ' · ' + dto.region.neighborhood : ''}`
+    const length = dto.length_m && dto.length_m > 0
+      ? dto.length_m
+      : Math.max(30, Math.round(polylineLengthMeters(snappedPath)))
+
+    const item = {
+      id: dto.id,
+      label,
+      desc,
+      status: dto.status,
+      snappedPath,
+      length,
+      hourly_rate: dto.pricing?.price_per_hour ?? null
+    }
+
+    const i = snappedBlocks.value.findIndex(b => b.id === item.id)
+    if (i >= 0) {
+      snappedBlocks.value[i] = item
+    } else {
+      snappedBlocks.value.unshift(item)
+    }
+    lastUpdated.value = new Date()
+  } catch (e) {
+    console.error('Realtime upsert failed', e)
+  }
+}
+
+/* =========================
    Init
    ========================= */
 onMounted(async () => {
   setCenterToLocation(-26.8309, -65.2033)
   await loadBlocksFromBackend()
-  // cuando conectemos tiempo real, reemplazamos por Socket.IO; mientras, polling si querés:
-  // setInterval(loadBlocksFromBackend, 15000)
+
+  // Suscripción tiempo real (misma región que cargás)
+  unsubscribe = subscribeToMeteredRealtime({
+    region: { country_code: 'AR', admin1: 'Tucumán', city: 'San Miguel de Tucumán' },
+    onUpdate: upsertFromRealtime,
+    onBulk: (list) => list.forEach(upsertFromRealtime),
+  })
+  socket.emit('subscribe', {
+  metered: true,
+  region: { country_code: 'AR', admin1: 'Tucumán', city: 'San Miguel de Tucumán' }
+})
+})
+
+onBeforeUnmount(() => {
+  if (unsubscribe) unsubscribe()
 })
 </script>
 
