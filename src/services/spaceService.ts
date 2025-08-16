@@ -62,20 +62,20 @@ export const getSpaceById = async (id: number) => {
       paymentMethods=item.paymentMethods;
     }
 
-    let images: string[] = [];
-    if (typeof item.images === "string") {
-      try {
-        images = JSON.parse(item.images);
-      } catch {
-        images = [];
-      }
-    } else {
-      images=item.images;
-    }
+    // let images: string[] = [];
+    // if (typeof item.images === "string") {
+    //   try {
+    //     images = JSON.parse(item.images);
+    //   } catch {
+    //     images = [];
+    //   }
+    // } else {
+    //   images=item.images;
+    // }
 
     return {
       ...item,
-      images,
+//      images,
       paymentMethods,
     };
   } catch (error) {
