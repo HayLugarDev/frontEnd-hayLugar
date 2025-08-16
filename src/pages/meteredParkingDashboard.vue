@@ -23,6 +23,13 @@
         >
           Lista
         </button>
+        <button
+          class="px-3 py-1.5 rounded-full text-sm font-medium border bg-white hover:bg-gray-50 transition"
+          @click="showTickets = true"
+        >
+          Mis tickets
+        </button>
+
       </div>
     </div>
 
@@ -158,6 +165,7 @@
       @close="modalOpen = false"
       @success="handleStarted"
     />
+    <MeteredActiveSessions :open="showTickets" @close="showTickets = false" />
   </div>
 </template>
 
@@ -170,6 +178,7 @@ import { useUniversityMap } from '../logic/useUniversityMap'
 import MeteredAccessDialog from '../components/meteredAccessDialog.vue'
 import { meteredParkingService } from '../services/meteredParkingService'
 import { subscribeToMeteredRealtime } from '../services/meteredRealtime' // tiempo real
+import MeteredActiveSessions from '../components/MeteredActiveSessions.vue'
 
 const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
 center.value = { lat: -26.8309, lng: -65.2033 }
@@ -181,7 +190,7 @@ const lastUpdated = ref(new Date())
 const lastUpdatedText = computed(() => lastUpdated.value.toLocaleTimeString())
 const filterStatus = ref('all') // all | free | limited | full
 const hovered = ref(null)
-
+const showTickets = ref(false)
 const snappedBlocks = ref([])
 
 /* =========================

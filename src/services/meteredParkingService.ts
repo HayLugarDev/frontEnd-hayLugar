@@ -1,7 +1,7 @@
-// services/meteredParkingService.ts
+// src/services/meteredParkingService.ts
 import api from './apiService'
 
-// --- Tipos usados por el diálogo (opcionales pero útiles)
+// ---- Tipos (usados por el dashboard y el diálogo)
 export type MeteredStatus = 'free' | 'limited' | 'full' | 'unknown'
 
 export interface MeteredBlockDTO {
@@ -19,7 +19,6 @@ export interface MeteredBlockDTO {
   updated_at: string | Date
 }
 
-// --- filtros que ya usas
 export type ListFilters = Partial<{
   country_code: string
   admin1: string
@@ -29,62 +28,83 @@ export type ListFilters = Partial<{
   status: MeteredStatus
   active: boolean
   limit: number
+  offset: number
 }>
 
-// ⚠️ Mantengo lo que ya tenías y SOLO agrego los stubs que faltan.
-// Si ya tienes getBlocks / updateBlock / updateBlocksBatch / subscribeToRealtime, déjalos igual.
-// Aquí pongo ejemplos mínimos de getBlocks y los mocks nuevos.
+// ---- Helpers
+const normList = (data: any) => (Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [])
+const isAxiosStatus = (e: any, code: number) => (e?.response?.status === code)
 
+// ---- Service
 export const meteredParkingService = {
-  // EXISTENTE: listar bloques
+  /** Bloques/segmentos para pintar en el mapa */
   async getBlocks(filters?: ListFilters): Promise<MeteredBlockDTO[]> {
     const { data } = await api.get('/metered/blocks', { params: filters })
-    // El backend puede devolver {data:[...] } o directamente [...]
-    return Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : []
+    return normList(data)
   },
 
-  // (Opcional) EXISTENTES si los tienes:
-  // async updateBlock(payload: any) { ... }
-  // async updateBlocksBatch(updates: any[]) { ... }
-  // subscribeToRealtime(...) { ... }
-
-  // ============================
-  // 🔹 STUBS para destrabar el front
-  // ============================
-
-  /** Tarifa por bloque/zona. Si el endpoint no existe, devolvemos un valor de fallback. */
-  async getTariff(zone_id: number): Promise<{ hourly_rate: number }> {
+  /**
+   * Tarifa por zona/bloque.
+   * Endpoint esperado (ya creado): GET /metered/zones/:zone_id/tariff -> { hourly_rate, currency? }
+   * Si no estuviera o devuelve 404, devolvemos { hourly_rate: 0 } y la UI aplica fallback.
+   */
+  async getTariff(zone_id: number): Promise<{ hourly_rate: number; currency?: string }> {
     try {
-      // Si más adelante creas el endpoint real, simplemente descomenta:
-      // const { data } = await api.get(`/metered/zone/${zone_id}/tariff`)
-      // return data
-      // MOCK:
-      return Promise.resolve({ hourly_rate: 250 }) // fallback demo
-    } catch {
-      return { hourly_rate: 250 }
+      const { data } = await api.get(`/metered/zones/${zone_id}/tariff`)
+      if (data && typeof data.hourly_rate === 'number') return data
+    } catch (e) {
+      // si tira 404 usamos fallback (la UI ya contempla fallback visual)
+      if (!isAxiosStatus(e, 404)) {
+        // otros códigos: seguimos igualmente al fallback
+      }
     }
+    return { hourly_rate: 0, currency: 'ARS' }
   },
 
-  /** Asegura/crea vehículo por patente. Si no existe endpoint, resolvemos con un id mock. */
-  async ensureVehicle(patente: string): Promise<number> {
+  /**
+   * Asegura/crea vehículo por patente y devuelve su ID.
+   * Flujo:
+   *  A) POST /vehicles/ensure (si existiera)
+   *  B) GET  /vehicles/my  → buscar patente
+   *  C) POST /vehicles/create  → crear
+   */
+  async ensureVehicle(license_plate: string, type: 'car'|'motorcycle'|'bicycle'|'van' = 'car'): Promise<number> {
+    if (!license_plate && type !== 'bicycle') throw new Error('Patente requerida')
+
+    // A) ensure (si existe)
     try {
-      // Endpoint real futuro:
-      // const { data } = await api.post('/vehicles/ensure', { plate: patente })
-      // return data?.id
-      // MOCK simple (hash naive para que sea estable):
-      const id = Math.abs(hashString(patente)) % 100000 + 1000
-      return Promise.resolve(id)
-    } catch {
-      // fallback
-      return Promise.resolve(12345)
+      const { data } = await api.post('/vehicles/ensure', { license_plate, type })
+      if (data?.id) return Number(data.id)
+      if (data?.vehicle?.id) return Number(data.vehicle.id)
+    } catch (e) {
+      if (!isAxiosStatus(e, 404)) {
+        // si no es 404, igual seguimos con fallback
+      }
     }
+
+    // B) buscar en mis vehículos
+    try {
+      const { data } = await api.get('/vehicles/my')
+      const list = normList(data) as Array<{ id: number; license_plate?: string | null }>
+      const found = list.find(v => (v.license_plate || '').toUpperCase() === (license_plate || '').toUpperCase())
+      if (found?.id) return Number(found.id)
+    } catch { /* noop */ }
+
+    // C) crear vehículo
+    const { data } = await api.post('/vehicles/create', { license_plate, type })
+    const id = data?.vehicle?.id ?? data?.id
+    if (!id) throw new Error('No se pudo asegurar/crear el vehículo')
+    return Number(id)
   },
 
-  /** Crea sesión de estacionamiento. Devuelve un payload con forma similar a la real. */
+  /**
+   * Crea sesión de estacionamiento (ticket).
+   * Backend actual montado en /api/meteredS:
+   *  POST /meteredS/sessions  -> { session, ... }
+   */
   async createMeteredSession(payload: {
     user_id: number
-    block_id?: number
-    zone_id?: number
+    zone_id: number
     start_time: string
     end_time: string
     estimated_total: number
@@ -92,60 +112,43 @@ export const meteredParkingService = {
     payment_method: 'mercadopago'|'tarjeta'
     payment_data: any
   }): Promise<any> {
-    try {
-      // Cuando tengas endpoint real:
-      // const { data } = await api.post('/metered/sessions', payload)
-      // return data
-
-      // MOCK consistente con el diálogo:
-      const end = new Date(payload.end_time)
-      const session = {
-        id: Math.floor(Math.random() * 900000) + 100000,
-        user_id: payload.user_id,
-        block_id: payload.block_id ?? payload.zone_id ?? null,
-        start_time: payload.start_time,
-        end_time: payload.end_time,
-        end_time_fmt: end.toLocaleTimeString(),
-        status: 'in_progress',
-        estimated_total: payload.estimated_total,
-        vehicle_id: payload.vehicle_id,
-        payment_method: payload.payment_method,
-      }
-      const payment = {
-        status: 'approved',
-        method: payload.payment_method,
-        amount_authorized: payload.estimated_total,
-      }
-      return Promise.resolve({ session, payment })
-    } catch (e) {
-      // fallback de prueba
-      const now = new Date()
-      const end = new Date(now.getTime() + 60 * 60 * 1000)
-      return {
-        session: {
-          id: Math.floor(Math.random() * 900000) + 100000,
-          user_id: payload.user_id,
-          block_id: payload.block_id ?? payload.zone_id ?? null,
-          start_time: now.toISOString(),
-          end_time: end.toISOString(),
-          end_time_fmt: end.toLocaleTimeString(),
-          status: 'in_progress',
-          estimated_total: payload.estimated_total,
-          vehicle_id: payload.vehicle_id,
-          payment_method: payload.payment_method,
-        },
-        payment: { status: 'approved', method: payload.payment_method, amount_authorized: payload.estimated_total },
-      }
-    }
+    const { data } = await api.post('/meteredS/sessions', payload)
+    return data
   },
-}
 
-// Utilidad local para mock de ensureVehicle
-function hashString(s: string) {
-  let h = 0
-  for (let i = 0; i < s.length; i++) {
-    h = ((h << 5) - h) + s.charCodeAt(i)
-    h |= 0
-  }
-  return h
+  /**
+   * Finaliza una sesión (recalcula prorrata).
+   * POST /meteredS/sessions/:id/complete -> { session, total }
+   */
+  async completeMeteredSession(session_id: number): Promise<{ session: any; total: number }> {
+    const { data } = await api.post(`/meteredS/sessions/${session_id}/complete`)
+    return data
+  },
+
+  /**
+   * Cancela una sesión (opcional).
+   * POST /meteredS/sessions/:id/cancel -> { session }
+   */
+  async cancelMeteredSession(session_id: number): Promise<{ session: any }> {
+    const { data } = await api.post(`/meteredS/sessions/${session_id}/cancel`)
+    return data
+  },
+
+  /**
+   * Listar sesiones activas por usuario.
+   * GET /meteredS/sessions/active?user_id=123 -> { data: [...] }
+   */
+  async listActiveSessionsByUser(user_id: number): Promise<any[]> {
+    const { data } = await api.get('/meteredS/sessions/active', { params: { user_id } })
+    return normList(data)
+  },
+
+  /**
+   * Métrica rápida: cuántas sesiones activas tiene una zona.
+   * GET /meteredS/sessions/zone/:zone_id/active-count -> { zone_id, active_count }
+   */
+  async activeCountByZone(zone_id: number): Promise<{ zone_id: number; active_count: number }> {
+    const { data } = await api.get(`/meteredS/sessions/zone/${zone_id}/active-count`)
+    return data
+  },
 }
