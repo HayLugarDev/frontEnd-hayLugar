@@ -1,5 +1,5 @@
 <template>
-    <div class="absolute w-full bottom-0 bg-gray-900 md:hidden text-3xl flex flex-row items-center justify-around p-4 text-gray-300">
+    <div class="absolute w-full bottom-0 bg-gray-900 md:hidden text-2xl flex flex-row items-center justify-around p-4 text-gray-300">
         <font-awesome-icon :icon="['fas', 'user']" @click.stop="isLogged" />
         <transition name="icon-fade" mode="out-in">
             <font-awesome-icon @click="$emit('toggle')" :key="isMapShown" :icon="['fas', isMapShown ? 'list' : 'map-location-dot']"

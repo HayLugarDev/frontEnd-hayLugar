@@ -1,6 +1,6 @@
 <template>
-    <div class="min-h-screen bg-secondary p-6" v-if="!loading">
-      <MainHeader />
+  <MainHeader />
+    <div class="min-h-screen bg-secondary px-6 py-20 md:py-6" v-if="!loading">
       <div class="md:p-10">
         <section class="bg-white p-6 rounded-lg shadow-lg mb-8">
           <!-- Header -->

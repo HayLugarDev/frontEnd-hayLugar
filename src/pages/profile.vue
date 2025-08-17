@@ -1,7 +1,7 @@
 <template>
   <MainHeader />
   <div class="min-h-screen bg-secondary md:p-10" v-if="!userStore.loading">
-    <div class="flex flex-col mt-10 md:mt-0 md:flex-row w-full items-start">
+    <div class="flex flex-col pt-20 md:pt-0 md:flex-row w-full items-start">
       <BackButton class="md:hidden" />
 
       <!-- Encabezado del Perfil -->
@@ -13,6 +13,12 @@
         </div>
         <BackButton />
       </header>
+
+      <button
+        class="w-full md:hidden items-center justify-center border-2 shadow-md bg-white px-6 py-2 mb-4 rounded-full">
+        <SectionMenu :activeSection="activeSection" :sections="menuSections"
+          @update:activeSection="handleSectionChange" />
+      </button>
 
       <transition name="fade-step" mode="out-in">
         <section v-if="activeSection === 'datos'" key="datos"
@@ -78,6 +84,8 @@
           </button>
         </section>
 
+        <NotificationSection v-else-if="activeSection === 'notifications'" key="notifications" />
+
         <VehicleSection v-else-if="activeSection === 'vehicles'" key="vehicles" />
 
         <ReservationHistory v-else-if="activeSection === 'reservas'" key="reservas" :reservations="reservas" />
@@ -129,8 +137,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import ReservationHistory from '../components/pages/profilePage/ReservationHistory.vue';
 import PublicationHistory from '../components/pages/profilePage/PublicationHistory.vue';
 import { useUserStore } from '../store/userStore';
@@ -144,8 +152,10 @@ import FormFieldAutocomplete from '../components/forms/FormFieldAutocomplete.vue
 import { useVerifyToken } from '../logic/useVerifyToken';
 import VehicleSection from '../components/pages/profilePage/VehicleSection.vue';
 import SectionMenu from '../components/pages/profilePage/UI/SectionMenu.vue';
+import NotificationSection from '../components/pages/profilePage/NotificationSection.vue';
 
 const userStore = useUserStore();
+const route = useRoute();
 const inputFoto = ref<HTMLInputElement | null>(null);
 
 const { verifyToken, isSessionInvalid } = useVerifyToken();
@@ -173,6 +183,7 @@ const activeSection = ref('datos');
 // Opciones menú principal
 const menuSections = [
   { value: 'datos', label: 'Datos personales' },
+  { value: 'notifications', label: 'Notificaciones' },
   { value: 'vehicles', label: 'Vehículos' },
   { value: 'reservas', label: 'Reservas' },
   { value: 'publicaciones', label: 'Publicaciones' },
@@ -180,12 +191,25 @@ const menuSections = [
 
 const handleSectionChange = (val: string) => {
   activeSection.value = val;
+  router.push({ query: { section: val } });
 };
 
 onMounted(async () => {
   await userStore.fetchUser();
-  console.log(usuario.value.profile_picture);
+  const sectionFromUrl = route.query.section as string;
+  if (sectionFromUrl && menuSections.some(s => s.value === sectionFromUrl)) {
+    activeSection.value = sectionFromUrl;
+  }
 });
+
+watch(
+  () => route.query.section,
+  (newSection) => {
+    if (newSection && menuSections.some(s => s.value === newSection)) {
+      activeSection.value = newSection as string;
+    }
+  }
+);
 
 const cambiarFoto = (): void => {
   //inputFoto.value?.click();

@@ -1,6 +1,6 @@
 <template>
+  <MainHeader />
   <div class="flex flex-col items-center justify-center min-h-screen bg-secondary p-6">
-    <MainHeader />
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
       <h1 class="text-3xl font-bold text-primary">
         <font-awesome-icon icon="check-circle" class="mr-2" />

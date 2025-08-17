@@ -3,7 +3,7 @@
     <MainHeader />
 
     <!-- Encabezado + acciones -->
-    <div class="px-4 pt-4 flex items-center gap-3">
+    <div class="px-6 pt-20 md:pt-4 flex items-center gap-3">
       <h2 class="text-2xl sm:text-3xl font-bold text-primary">
         Estacionamiento Medido — San Miguel de Tucumán
       </h2>

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import api from '../services/apiService';
+import { getNotificationsByUserId } from '../services/notificationService';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -17,9 +18,7 @@ export const useUserStore = defineStore('user', {
     loading: false,
     error: null as string | null,
     sessionExpired: true,
-
-    // 🔔 NUEVO: estado para notificaciones
-    notifications: [] as { message: string; id?: number }[],
+    notifications: [] as any[],
     reservations: [] as any[],
   }),
 
@@ -76,14 +75,18 @@ export const useUserStore = defineStore('user', {
       this.sessionExpired = value;
     },
 
-    // 🔔 NUEVO: agregar una notificación
-    addNotification(message: string) {
-      this.notifications.push(message);
+    setNotifications(list: any[]) {
+      this.notifications = list;
     },
-
-    // 🔔 NUEVO: limpiar todas las notificaciones
+    addNotification(notification: any) {
+      this.notifications.unshift(notification);
+    },
     clearNotifications() {
       this.notifications = [];
+    },
+    markAsRead(id: number) {
+      const n = this.notifications.find((n:any) => n.id === id);
+      if (n) n.status = "read";
     },
 
     setReservations(reservas: any[]) {
@@ -95,11 +98,17 @@ export const useUserStore = defineStore('user', {
       this.reservations.forEach((reserva: any) => {
         const inicio = new Date(reserva.start_time).getTime();
         const diffMinutos = (inicio - ahora) / (1000 * 60);
+
         if (diffMinutos > 0 && diffMinutos <= 10) {
-          this.addNotification(`Tu reserva comienza en ${Math.round(diffMinutos)} minutos`);
+          this.addNotification({
+            id: Date.now(),
+            message: `Tu reserva comienza en ${Math.round(diffMinutos)} minutos`,
+            status: "pending",
+            changed_at: new Date(),
+            type: "reminder",
+          });
         }
       });
     },
-
   },
 });
