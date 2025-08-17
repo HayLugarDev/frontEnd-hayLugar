@@ -133,6 +133,10 @@ export const meteredParkingService = {
     const { data } = await api.post(`/meteredS/sessions/${session_id}/cancel`)
     return data
   },
+async completeSession(session_id: number): Promise<any> {
+  const { data } = await api.patch(`/meteredS/sessions/${session_id}/complete`)
+  return data
+},
 
   /**
    * Listar sesiones activas por usuario.
