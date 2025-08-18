@@ -219,13 +219,11 @@ import MainHeader from '../components/layout/header/MainHeader.vue'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
 import MobileMenu from '../components/layout/MobileMenu.vue'
 import { useUniversityMap } from '../logic/useUniversityMap'
-import MeteredAccessDialog from '../components/meteredAccessDialog.vue'
 import MeteredActiveSessions from '../components/MeteredActiveSessions.vue'
 import MeteredCompleteDialog from '../components/MeteredCompleteDialog.vue'
 import { meteredParkingService } from '../services/meteredParkingService'
 import { subscribeToMeteredRealtime } from '../services/meteredRealtime'
 import { useUserStore } from '../store/userStore'
-import MeteredActiveSessions from '../components/MeteredActiveSessions.vue'
 
 const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
 center.value = { lat: -26.8309, lng: -65.2033 }
