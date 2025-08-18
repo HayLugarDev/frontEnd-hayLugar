@@ -3,7 +3,7 @@
     <MainHeader />
 
     <!-- Encabezado + acciones -->
-    <div class="px-4 pt-4 flex items-center gap-3">
+    <div class="px-6 pt-20 md:pt-4 flex items-center gap-3">
       <h2 class="text-2xl sm:text-3xl font-bold text-primary">
         Estacionamiento Medido — San Miguel de Tucumán
       </h2>
@@ -194,6 +194,7 @@
       @close="modalOpen = false"
       @success="handleStarted"
     />
+    <MeteredActiveSessions :open="showTickets" @close="showTickets = false" />
 
     <!-- Modal: mis tickets activos -->
     <MeteredActiveSessions :open="showTickets" @close="showTickets = false" />
@@ -224,6 +225,7 @@ import MeteredCompleteDialog from '../components/MeteredCompleteDialog.vue'
 import { meteredParkingService } from '../services/meteredParkingService'
 import { subscribeToMeteredRealtime } from '../services/meteredRealtime'
 import { useUserStore } from '../store/userStore'
+import MeteredActiveSessions from '../components/MeteredActiveSessions.vue'
 
 const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
 center.value = { lat: -26.8309, lng: -65.2033 }

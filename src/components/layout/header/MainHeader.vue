@@ -15,18 +15,19 @@
         <font-awesome-icon icon="fa-regular fa-circle-question"
           class="hidden md:block p-3 text-gray-500 w-6 h-6 hover:shadow-xl hover:bg-gray-50 rounded-full cursor-pointer" />
         <NotificationDropdown class="hidden md:block" v-if="routeConfig.showNotificationButton" />
-        <div>
+        <div class="">
           <!-- Botón visible solo en mobile -->
           <button @click="showMobileMenu = true"
-            class="block md:hidden w-11 h-11 rounded-full border-2 border-gray-300 bg-gray-200">
+            class="block md:hidden w-11 h-11 rounded-full border-2 border-gray-300 bg-gray-50 shadow-lg">
             <font-awesome-icon icon="fa-align-justify" />
           </button>
-
+          
           <!-- Menú lateral en mobile -->
           <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
         </div>
         <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
       </div>
+      <MapButton :text="buttonText" color="primary" background="gray-50" @click="toggleMap" class="md:hidden"/>
     </div>
   </header>
   <SessionExpired :sessionExpired="isSessionInvalid" />
@@ -35,7 +36,7 @@
 <script setup lang="ts">
 import Logo from '../Logo.vue';
 import { useUserStore } from '../../../store/userStore';
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import SessionExpired from '../../common/SessionExpired.vue';
 import { useHeaderVisibility } from "../../../logic/useHeaderVisibility";
@@ -44,18 +45,24 @@ import BackButton from "../../common/BackButton.vue";
 import NotificationDropdown from './NotificationDropdown.vue';
 import UserMenu from '../UserMenu.vue';
 import MobileUserMenu from './MobileUserMenu.vue';
+import MapButton from '../../pages/dashboardPage/MapButton.vue';
 
 const userStore = useUserStore();
 const showNotificationBubble = ref(false);
 const showMobileMenu = ref(false)
 const authChecked = ref(false);
 const hasUnread = ref(true);
+const showMap = ref(false);
 const router = useRouter();
 const route = useRoute();
+
+const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
 
 const { routeConfig } = useHeaderVisibility();
 
 const { verifyToken, isSessionInvalid } = useVerifyToken();
+
+const emit = defineEmits(['toggle']);
 
 onMounted(async () => {
   authChecked.value = true;
@@ -90,6 +97,10 @@ function toggleNotifications() {
   hasUnread.value = false;
 }
 
+function toggleMap() {
+  showMap.value = !showMap.value;
+  emit('toggle');
+}
 </script>
 
 <style scoped>

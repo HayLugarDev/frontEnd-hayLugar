@@ -18,12 +18,16 @@
             <li v-if="notifications.length === 0" class="p-4 text-center">
                 No hay notificaciones.
             </li>
-            <li v-for="(notification, index) in notifications" :key="index" class="border border-gray-300 bg-gray-200 rounded-xl p-2">
-                <button @click="router.push('/profile')">{{ notification }}</button>
-            </li>
-            <li v-if="notifications.length" @click="clearAll"
-                class="text-center text-blue-600 hover:underline text-sm py-2 cursor-pointer">
-                Limpiar todas
+            <li v-for="notification in notifications" :key="notification.id"
+                class="border border-gray-300 bg-gray-200 rounded-xl p-2 flex justify-between items-start cursor-pointer"
+                @click="openNotification">
+                <div class="flex-1">
+                    <!-- Mostramos solo preview -->
+                    <p class="text-gray-800">{{ truncate(notification.message, 65) }}</p>
+                    <small class="text-gray-500">
+                        {{ new Date(notification.changed_at).toLocaleString() }}
+                    </small>
+                </div>
             </li>
         </ul>
     </div>
@@ -32,8 +36,9 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { useUserStore } from '../../../store/userStore';
-import router from '../../../router';
 import { useNotifications } from '../../../logic/useNotifications';
+import { getNotificationsByUserId } from '../../../services/notificationService';
+import router from '../../../router';
 
 const openMenu = ref(false);
 const userStore = useUserStore();
@@ -46,46 +51,39 @@ const hasNotifications = computed(() => notifications.value.length > 0);
 useNotifications();
 
 watch(
-    () => userStore.notifications.length,
-    (newVal) => {
-        if (newVal > 0) {
-            showNotificationBubble.value = true;
+    () => userStore.user,
+    async (newUser) => {
+        if (newUser?.id) {
+            const notificationsData = await getNotificationsByUserId(newUser.id);
 
-            setTimeout(() => {
-                showNotificationBubble.value = false;
-            }, 4000); // Oculta el globo tras 4 segundos
+            // Guardamos las notificaciones en el store
+            userStore.setNotifications(notificationsData);
+
+            // Determinar si hay notificaciones pendientes
+            notificationsData.some(n => n.status !== 'read');
+            viewNotification.value = false;
         }
     }
 );
 
+
+// Función para recortar texto
+const truncate = (text, length) => {
+    if (!text) return "";
+    return text.length > length ? text.substring(0, length) + "..." : text;
+};
+
 const toggleMenu = () => {
     openMenu.value = !openMenu.value;
+};
+
+// Abrir notificación completa
+const openNotification = () => {
+    //selectedNotification.value = notification;
+    //userStore.markAsRead(notification.id); // se marca como leída recién aquí
     if (!viewNotification.value) {
         viewNotification.value = !viewNotification.value;
     }
+    router.push('/profile?section=notifications');
 };
-
-const clearAll = () => {
-    userStore.clearNotifications();
-    openMenu.value = false;
-};
-
 </script>
-
-<style scoped>
-@keyframes fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fade-in {
-    animation: fade-in 0.2s ease-out;
-}
-</style>

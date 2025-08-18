@@ -1,5 +1,8 @@
 <template>
   <ul class="flex flex-col divide-y divide-gray-200 text-gray-700 text-3xl md:text-base z-50">
+    <li>
+      <MobileNotificationButton @click="$emit('navigate', '/profile?section=notifications')" class="menu-item" />
+    </li>
     <li v-if="route.path !== '/dashboard'" @click="$emit('navigate', '/dashboard')" class="menu-item">
       <font-awesome-icon icon="house" /> <span>Inicio</span>
     </li>
@@ -31,6 +34,7 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { useUserStore } from '../../store/userStore';
+import MobileNotificationButton from './header/MobileNotificationButton.vue';
 const userStore = useUserStore();
 const user = userStore.user;
 

@@ -1,6 +1,5 @@
 // composables/useNotifications.ts
 import { io } from 'socket.io-client';
-import { onMounted, onUnmounted } from 'vue';
 import { useUserStore } from '../store/userStore';
 
 export function useNotifications() {
@@ -17,9 +16,8 @@ export function useNotifications() {
   });
 
   socket.on("notification", (data) => {
-    userStore.addNotification(data.message);
-    console.log("📢 Notificación recibida:", data.message);
+    userStore.addNotification(data);
+    console.log("📢 Notificación recibida:", data);
   });
-
 
 }

@@ -2,8 +2,9 @@
   <div>
     <DashboardSkeleton v-if="cargando" />
     <div v-else class="flex flex-col h-full bg-secondary">
-      <MainHeader />
-      <FloatingButton :text="buttonText" color="white" background="primary" @toggle="toggleMap" />
+      <MainHeader @toggle="toggleMap" />
+      <MapButton :text="buttonText" color="white" background="primary" @toggle="toggleMap"
+        class="hidden md:block md:fixed" />
       <button v-if="!showSearchMenu" @click="toggleSearchMenu"
         class="flex flex-row md:hidden mt-20 items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
         <font-awesome-icon icon="search" class="text-xs" />
@@ -18,14 +19,15 @@
         <CustomInputGroup v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
           :onSearch="buscar" />
       </div>
-<div class="flex overflow-x-auto p-4 bg-white shadow-md rounded-lg mt-4">
-      <button @click="router.push('/universidades')"
-  class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
-  🎓🏛️ Universidades
-</button>
+      <div class="flex overflow-x-auto p-4 bg-white shadow-md rounded-lg md:mt-4">
+        <button @click="router.push('/universidades')"
+          class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
+          🎓🏛️ Universidades
+        </button>
 
-      <button @click="router.push('/meteredParkingDashboard')" class="px-4 py-2 text-gray-600 hover:text-primary transition-all">🅿️ Estacionamiento Medido</button>
-    </div>
+        <button @click="router.push('/meteredParkingDashboard')"
+          class="px-4 py-2 text-gray-600 hover:text-primary transition-all">🅿️ Estacionamiento Medido</button>
+      </div>
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
         <AdvancedMobileSearch />
       </div>
@@ -59,9 +61,9 @@
     </div>
   </div>
   <!-- Menú fijo en la parte inferior -->
-  <div class="fixed bottom-0 left-0 w-full z-50">
+  <!-- <div class="fixed bottom-0 left-0 w-full z-50">
     <MobileMenu @toggle="toggleMap" :showMap="showMap" />
-  </div>
+  </div> -->
 </template>
 
 <script setup>
@@ -74,7 +76,7 @@ import CustomGoogleMap from '../components/layout/GoogleMap.vue';
 import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue';
 import { getAllSpaces, getFilteredSpaces } from '../services/spaceService';
 import MainHeader from '../components/layout/header/MainHeader.vue';
-import FloatingButton from '../components/pages/dashboardPage/FloatingButton.vue';
+import MapButton from '../components/pages/dashboardPage/MapButton.vue';
 import CustomInputGroup from "../components/pages/dashboardPage/CustomInputGroup.vue";
 import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkeleton.vue';
 import MobileMenu from '../components/layout/MobileMenu.vue';
@@ -164,11 +166,11 @@ const buscar = async () => {
 const toggleMap = () => {
 
   showMap.value = !showMap.value;
-  nextTick(() => {
-    if (!showMap.value && refSeccionResultados.value) {
-      refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
+  // nextTick(() => {
+  //   if (!showMap.value && refSeccionResultados.value) {
+  //     refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
+  //   }
+  // });
 };
 
 const toggleSearchMenu = () => {
