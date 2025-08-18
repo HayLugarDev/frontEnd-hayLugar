@@ -29,7 +29,6 @@
         >
           Mis tickets
         </button>
-
       </div>
     </div>
 
@@ -101,7 +100,15 @@
                   'bg-rose-500': hovered.status==='full'
                 }"
               />
-              <div class="font-semibold">{{ hovered.label }}</div>
+              <div class="font-semibold">
+                {{ hovered.label }}
+                <span
+                  v-if="activeSessionsMap[hovered.id]"
+                  class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-700 border border-emerald-200"
+                >
+                  ACTIVO
+                </span>
+              </div>
               <div class="ml-auto text-[11px] text-gray-500">{{ hovered.length }} m</div>
             </div>
             <div class="mt-1 text-gray-600">{{ hovered.desc }}</div>
@@ -111,6 +118,15 @@
               @click="openMetered(hovered)"
             >
               Iniciar estacionamiento
+            </button>
+
+            <!-- Finalizar (si hay ticket activo en esta cuadra) -->
+            <button
+              v-if="activeSessionsMap[hovered.id]"
+              class="mt-2 w-full border border-rose-300 text-rose-700 font-semibold rounded-md py-1.5 hover:bg-rose-50 transition"
+              @click.stop="openFinishForBlock(hovered)"
+            >
+              Finalizar mi estacionamiento
             </button>
           </div>
         </transition>
@@ -135,6 +151,12 @@
             />
             <div class="text-sm text-gray-800 font-medium">
               {{ blk.label }}
+              <span
+                v-if="activeSessionsMap[blk.id]"
+                class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-700 border border-emerald-200"
+              >
+                ACTIVO
+              </span>
             </div>
             <div class="ml-auto text-xs text-gray-500">
               {{ blk.length }} m aprox
@@ -149,6 +171,13 @@
           >
             Iniciar estacionamiento
           </button>
+          <button
+            v-if="activeSessionsMap[blk.id]"
+            class="mt-2 w-full border border-rose-300 text-rose-700 font-semibold rounded-md py-1.5 hover:bg-rose-50 transition"
+            @click.stop="openFinishForBlock(blk)"
+          >
+            Finalizar mi estacionamiento
+          </button>
         </div>
       </div>
     </div>
@@ -158,7 +187,7 @@
       <MobileMenu :showMap="showMap" @toggle="showMap = !showMap" />
     </div>
 
-    <!-- Modal: Estacionamiento Medido -->
+    <!-- Modal: Estacionamiento Medido (iniciar) -->
     <MeteredAccessDialog
       :open="modalOpen"
       :zone="selectedZone"
@@ -166,6 +195,21 @@
       @success="handleStarted"
     />
     <MeteredActiveSessions :open="showTickets" @close="showTickets = false" />
+
+    <!-- Modal: mis tickets activos -->
+    <MeteredActiveSessions :open="showTickets" @close="showTickets = false" />
+
+    <!-- Modal: finalizar ticket -->
+    <MeteredCompleteDialog
+      :open="finishOpen"
+      :session-id="finishSessionId"
+      :zone-label="finishZoneLabel"
+      :tariff="finishTariff"
+      :grace-minutes="finishGrace"
+      :expected-end-i-s-o="finishExpectedEnd"
+      @close="finishOpen=false"
+      @completed="onFinishCompleted"
+    />
   </div>
 </template>
 
@@ -176,8 +220,11 @@ import CustomGoogleMap from '../components/layout/GoogleMap.vue'
 import MobileMenu from '../components/layout/MobileMenu.vue'
 import { useUniversityMap } from '../logic/useUniversityMap'
 import MeteredAccessDialog from '../components/meteredAccessDialog.vue'
+import MeteredActiveSessions from '../components/MeteredActiveSessions.vue'
+import MeteredCompleteDialog from '../components/MeteredCompleteDialog.vue'
 import { meteredParkingService } from '../services/meteredParkingService'
-import { subscribeToMeteredRealtime } from '../services/meteredRealtime' // tiempo real
+import { subscribeToMeteredRealtime } from '../services/meteredRealtime'
+import { useUserStore } from '../store/userStore'
 import MeteredActiveSessions from '../components/MeteredActiveSessions.vue'
 
 const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
@@ -192,6 +239,21 @@ const filterStatus = ref('all') // all | free | limited | full
 const hovered = ref(null)
 const showTickets = ref(false)
 const snappedBlocks = ref([])
+
+const userStore = useUserStore()
+
+// zona_id -> sesión activa del usuario
+const activeSessionsMap = ref(
+  /** @type {Record<number, { id:number; zone_id:number; end_time?:string|null; grace_minutes?:number }>} */ ({})
+)
+
+// diálogo de finalización
+const finishOpen = ref(false)
+const finishSessionId = ref(null)
+const finishZoneLabel = ref('')
+const finishTariff = ref(null)
+const finishGrace = ref(null)
+const finishExpectedEnd = ref(null)
 
 /* =========================
    Normalización lat/lng (defensivo)
@@ -353,7 +415,7 @@ const snappedBlocksFiltered = computed(() => {
 })
 
 /* =========================
-   Modal
+   Modales (iniciar + finalizar)
    ========================= */
 const modalOpen = ref(false)
 const selectedZone = ref(null)
@@ -367,6 +429,45 @@ const openMetered = zone => {
   modalOpen.value = true
 }
 const handleStarted = () => { modalOpen.value = false }
+
+/* =========================
+   Sesiones activas del usuario
+   ========================= */
+async function loadMyActiveSessions() {
+  const uid = userStore?.user?.id
+  if (!uid) return
+  try {
+    const list = await meteredParkingService.listActiveSessionsByUser(uid)
+    const map = {}
+    for (const s of list) {
+      map[Number(s.zone_id)] = s
+    }
+    activeSessionsMap.value = map
+  } catch (e) {
+    console.error('No se pudieron cargar mis sesiones activas', e)
+  }
+}
+
+async function openFinishForBlock(blk) {
+  const s = activeSessionsMap.value[blk.id]
+  if (!s) return
+  finishSessionId.value = s.id
+  finishZoneLabel.value = blk.label
+
+  try {
+    const t = await meteredParkingService.getTariff(blk.id)
+    finishTariff.value = t?.hourly_rate ?? null
+  } catch { finishTariff.value = null }
+
+  finishGrace.value = s?.grace_minutes ?? 5
+  finishExpectedEnd.value = s?.end_time ?? null
+
+  finishOpen.value = true
+}
+
+function onFinishCompleted() {
+  loadMyActiveSessions()
+}
 
 /* =========================
    Tiempo real (Socket.IO)
@@ -401,6 +502,9 @@ async function upsertFromRealtime(dto) {
       snappedBlocks.value.unshift(item)
     }
     lastUpdated.value = new Date()
+
+    // refresca sesiones propias ante cambios
+    await loadMyActiveSessions()
   } catch (e) {
     console.error('Realtime upsert failed', e)
   }
@@ -412,12 +516,16 @@ async function upsertFromRealtime(dto) {
 onMounted(async () => {
   setCenterToLocation(-26.8309, -65.2033)
   await loadBlocksFromBackend()
+  await loadMyActiveSessions()
 
   // Suscripción tiempo real (misma región que cargás)
   unsubscribe = subscribeToMeteredRealtime({
     region: { country_code: 'AR', admin1: 'Tucumán', city: 'San Miguel de Tucumán' },
     onUpdate: upsertFromRealtime,
-    onBulk: (list) => list.forEach(upsertFromRealtime),
+    onBulk: async (list) => {
+      for (const dto of list) await upsertFromRealtime(dto)
+      await loadMyActiveSessions()
+    },
   })
 })
 
