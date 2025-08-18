@@ -188,7 +188,7 @@
     </div>
 
     <!-- Modal: Estacionamiento Medido (iniciar) -->
-    <MeteredAccessDialog
+    <MeteredAccessDialog  
       :open="modalOpen"
       :zone="selectedZone"
       @close="modalOpen = false"
@@ -224,6 +224,7 @@ import MeteredCompleteDialog from '../components/MeteredCompleteDialog.vue'
 import { meteredParkingService } from '../services/meteredParkingService'
 import { subscribeToMeteredRealtime } from '../services/meteredRealtime'
 import { useUserStore } from '../store/userStore'
+import MeteredAccessDialog from '../components/meteredAccessDialog.vue'
 
 const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
 center.value = { lat: -26.8309, lng: -65.2033 }
