@@ -2,7 +2,6 @@
   <MainHeader />
   <div class="flex flex-col bg-secondary xl:w-11/12 mx-auto md:gap-4 mt-16 md:mt-0">
 
-
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <div v-if="espacio?.images?.length">
         <!-- Carrusel en móviles -->
@@ -154,9 +153,6 @@ import MainHeader from "../components/layout/header/MainHeader.vue";
 import carMarker from '../assets/logo.png';
 import user_icon_primary from "../assets/user_icon_primary.png";
 import { getSpaceById } from '../services/spaceService';
-import MenuDropdown from "../components/layout/MenuDropdown.vue";
-import Datepicker from '@vuepic/vue-datepicker'
-import '@vuepic/vue-datepicker/dist/main.css'
 import Carousel from '../components/common/Carousel.vue';
 import { useReservationStore } from '../store/reservationStore';
 import BackButton from "../components/common/BackButton.vue";
@@ -182,8 +178,6 @@ const espacio = ref(null);
 const deadLine = ref(null);
 const activedFavouriteIcon = ref(false);
 const isAnimating = ref(false);
-const fetchImages = ref([]);
-const paymentMethods = ref([]);
 const getImageUrl = (img) => `${baseURL}${img}`;
 
 const showVehicleModal = ref(false);
