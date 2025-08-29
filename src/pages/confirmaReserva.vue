@@ -11,8 +11,8 @@
       </p>
       <div v-if="reservation">
         <p class="mb-2"><strong>ID de Reserva:</strong> {{ reservation.id }}</p>
-        <p class="mb-2"><strong>Fecha y Hora de Inicio:</strong> {{ reservation.start_time }}</p>
-        <p class="mb-2"><strong>Fecha y Hora de Finalización:</strong> {{ reservation.end_time }}</p>
+        <p class="mb-2"><strong>Fecha y Hora de CheckIn:</strong> {{ reservation.start_time }}</p>
+        <p class="mb-2"><strong>Fecha y Hora de CheckOut:</strong> {{ reservation.end_time }}</p>
         <p class="mb-2"><strong>Total a Pagar:</strong> ${{ reservation.total }}</p>
         <p class="mb-2"><strong>Método de Pago:</strong> {{ reservation.payment_method }}</p>
         <div v-if="reservation.payment_data" class="mt-4">
@@ -27,9 +27,9 @@
         <p>No se encontró información de la reserva.</p>
       </div>
       <div class="flex justify-end mt-8">
-        <button @click="router.push('/')"
+        <button @click="router.push('/profile?section=reservas')"
           class="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition duration-300 w-full md:w-auto">
-          Volver al inicio
+          Ir a mi reserva
         </button>
       </div>
     </div>

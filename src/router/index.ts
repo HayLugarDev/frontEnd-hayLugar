@@ -13,6 +13,7 @@ import { useUserStore } from '../store/userStore';
 import AddVehicle from '../pages/addVehicle.vue';
 import universityDashboard from '../pages/universityDashboard.vue'
 import meteredParkingDashboard from '../pages/meteredParkingDashboard.vue';
+import Notifications from '../pages/notifications.vue';
 
 const routes: RouteRecordRaw[] = [
   { path: '/', redirect: '/dashboard' },
@@ -25,6 +26,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/pago', component: payment, meta: { requiresAuth: true } },
   { path: '/confirmacion', component: confirmaReserva, meta: { requiresAuth: true } },
   { path: '/profile', component: profile, meta: { requiresAuth: true } },
+  { path: '/notifications', component: Notifications, meta: { requiresAuth: true } },
   { path: '/wallet', component: wallet, meta: { requiresAuth: true } },
   { path: '/add-vehicle', component: AddVehicle, meta: { requiresAuth: true } },
  {

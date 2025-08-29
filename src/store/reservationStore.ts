@@ -6,8 +6,8 @@ import { useUserStore } from './userStore';
 export const useReservationStore = defineStore('reservation', {
   state: () => ({
     reservation: {
-      id: null as number | null, 
-      user_id: null as number | null, 
+      id: null as number | null,
+      user_id: null as number | null,
       owner_id: null as number | null,
       space_id: null as number | null,
       vehicle_id: null as number | null,
@@ -37,14 +37,12 @@ export const useReservationStore = defineStore('reservation', {
       console.log("Reserva actualizada:", this.reservation);
     },
 
-    /**
-     * Envía la reserva al backend para guardarla en la base de datos.
-     */
+
+    //Envía la reserva al backend para guardarla en la base de datos.
     async submitReservation() {
       this.loading = true;
       this.error = null;
       try {
-        console.log("LLEGA?",this.reservation)
         const response = await api.post('/reservations/create', this.reservation);
         this.reservation.id = response.data.reservation.id; // Actualiza el id según la respuesta del backend
         console.log(response.data.reservation.id)
@@ -58,9 +56,6 @@ export const useReservationStore = defineStore('reservation', {
       }
     },
 
-    /**
-     * Limpia los datos de la reserva para iniciar un nuevo proceso.
-     */
     clearReservation() {
       this.reservation = {
         id: null,

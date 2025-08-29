@@ -11,7 +11,6 @@
 import { ref, computed, watch } from 'vue';
 import { useUserStore } from '../../../store/userStore';
 import router from '../../../router';
-import { useNotifications } from '../../../logic/useNotifications';
 
 const userStore = useUserStore();
 const showNotificationBubble = ref(false);
@@ -19,8 +18,6 @@ const viewNotification = ref(false);
 
 const notifications = computed(() => userStore.notifications);
 const hasNotifications = computed(() => notifications.value.length > 0);
-
-useNotifications();
 
 watch(
     () => userStore.notifications.length,

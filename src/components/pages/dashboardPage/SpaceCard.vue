@@ -2,7 +2,7 @@
     <router-link :to="`/espacio/${espacio.id}`">
         <div class="bg-secondary rounded-xl transition-all h-full lg:h-80 p-2 md:p-0">
             <div v-if="espacio && espacio.images && espacio.images.length" class="aspect-square relative">
-                <Logo :width="'10'" class="absolute right-2 bottom-0 z-30" />
+                <!-- <Logo :width="'10'" class="absolute right-2 bottom-0 z-30" /> -->
                 <Carousel :images="espacio.images" class="w-full h-full rounded-lg" :controls="false" />
             </div>
             <div class="p-1">

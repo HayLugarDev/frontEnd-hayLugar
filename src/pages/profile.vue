@@ -84,9 +84,9 @@
           </button>
         </section>
 
-        <NotificationSection v-else-if="activeSection === 'notifications'" key="notifications" />
-
         <VehicleSection v-else-if="activeSection === 'vehicles'" key="vehicles" />
+
+        <ReservationIncomingHistory v-else-if="activeSection === 'reservas-entrantes'" key="reservas-entrantes" :reservations="reservasEntrantes" />
 
         <ReservationHistory v-else-if="activeSection === 'reservas'" key="reservas" :reservations="reservas" />
 
@@ -137,7 +137,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ReservationHistory from '../components/pages/profilePage/ReservationHistory.vue';
 import PublicationHistory from '../components/pages/profilePage/PublicationHistory.vue';
@@ -152,7 +152,7 @@ import FormFieldAutocomplete from '../components/forms/FormFieldAutocomplete.vue
 import { useVerifyToken } from '../logic/useVerifyToken';
 import VehicleSection from '../components/pages/profilePage/VehicleSection.vue';
 import SectionMenu from '../components/pages/profilePage/UI/SectionMenu.vue';
-import NotificationSection from '../components/pages/profilePage/NotificationSection.vue';
+import ReservationIncomingHistory from '../components/pages/profilePage/ReservationIncomingHistory.vue';
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -173,6 +173,7 @@ const usuario = computed(() => userStore.user || {
 });
 
 const reservas = ref([]);
+const reservasEntrantes = ref([]);
 const publicaciones = ref([]);
 const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
@@ -183,9 +184,9 @@ const activeSection = ref('datos');
 // Opciones menú principal
 const menuSections = [
   { value: 'datos', label: 'Datos personales' },
-  { value: 'notifications', label: 'Notificaciones' },
-  { value: 'vehicles', label: 'Vehículos' },
-  { value: 'reservas', label: 'Reservas' },
+  { value: 'vehicles', label: 'Mis Vehículos' },
+  { value: 'reservas', label: 'Mis Reservas' },
+  { value: 'reservas-entrantes', label: 'Reservas entrantes' },
   { value: 'publicaciones', label: 'Publicaciones' },
 ];
 
@@ -195,21 +196,26 @@ const handleSectionChange = (val: string) => {
 };
 
 onMounted(async () => {
-  await userStore.fetchUser();
   const sectionFromUrl = route.query.section as string;
   if (sectionFromUrl && menuSections.some(s => s.value === sectionFromUrl)) {
     activeSection.value = sectionFromUrl;
   }
 });
 
-watch(
-  () => route.query.section,
-  (newSection) => {
-    if (newSection && menuSections.some(s => s.value === newSection)) {
-      activeSection.value = newSection as string;
+watchEffect(async () => {
+  const section = route.query.section as string | undefined;
+  if (section && menuSections.some(s => s.value === section)) {
+    activeSection.value = section;
+  }
+  if (activeSection.value === 'reservas-entrantes') {
+
+    const userId = userStore.user?.id;
+    if (userId) {
+      const response = await api.get(`/reservations/incoming/${userId}`, { withCredentials: true });
+      reservasEntrantes.value = response.data;
     }
   }
-);
+});
 
 const cambiarFoto = (): void => {
   //inputFoto.value?.click();

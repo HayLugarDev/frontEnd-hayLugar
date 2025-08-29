@@ -1,6 +1,6 @@
 <template>
   <header
-  class="bg-secondary/80 backdrop-blur-md gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 py-2 xl:px-16 fixed md:static transition-all duration-300 shadow-md md:shadow-none animate-fade-in-down">
+    class="bg-secondary/80 backdrop-blur-md gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 py-2 xl:px-16 fixed md:static transition-all duration-300 shadow-md md:shadow-none animate-fade-in-down">
     <Logo width="12" @click="router.push('/dashboard')"
       class="transition-transform duration-300 hover:scale-105 hidden md:block" />
     <div v-if="authChecked" class="flex flex-row justify-between gap-2">
@@ -21,14 +21,28 @@
             class="block md:hidden w-11 h-11 rounded-full border-2 border-gray-300 bg-gray-50 shadow-lg">
             <font-awesome-icon icon="fa-align-justify" />
           </button>
-          
+
           <!-- Menú lateral en mobile -->
           <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
         </div>
         <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
       </div>
-      <MapButton :text="buttonText" color="primary" background="gray-50" @click="toggleMap" class="md:hidden"/>
+      <MapButton :text="buttonText" color="primary" background="gray-50" @click="toggleMap" class="md:hidden" />
     </div>
+    <template v-else>
+      <!-- Skeleton Loader -->
+      <div
+        class="hidden md:flex justify-between items-center border-b-2 px-4 pt-2 xl:px-10 xl:mx-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
+        <!-- Logo placeholder -->
+        <div class="w-16 h-10 bg-gray-400 rounded"></div>
+
+        <!-- Botones de usuario placeholder -->
+        <div class="flex gap-4 items-center">
+          <div class="w-24 h-10 bg-gray-400 rounded-full"></div>
+          <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+        </div>
+      </div>
+    </template>
   </header>
   <SessionExpired :sessionExpired="isSessionInvalid" />
 </template>
@@ -120,6 +134,7 @@ function toggleMap() {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);

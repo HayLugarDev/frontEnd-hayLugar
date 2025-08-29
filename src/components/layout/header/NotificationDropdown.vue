@@ -2,7 +2,7 @@
     <div v-if="userStore.user" class="relative">
         <button @click="toggleMenu"
             class="relative w-12 h-12 flex items-center justify-center hover:shadow-xl hover:bg-gray-50 rounded-full transition duration-200">
-            <font-awesome-icon icon="bell" class="text-xl text-gray-700 dark:text-white" />
+            <font-awesome-icon icon="bell" class="text-xl text-gray-700 " />
             <span v-if="hasNotifications && !viewNotification"
                 class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping">
             </span>
@@ -19,13 +19,19 @@
                 No hay notificaciones.
             </li>
             <li v-for="notification in notifications" :key="notification.id"
-                class="border border-gray-300 bg-gray-200 rounded-xl p-2 flex justify-between items-start cursor-pointer"
+                class="border border-gray-300 bg-gray-200 rounded-xl p-3 flex justify-between items-start cursor-pointer"
                 @click="openNotification">
                 <div class="flex-1">
                     <!-- Mostramos solo preview -->
                     <p class="text-gray-800">{{ truncate(notification.message, 65) }}</p>
                     <small class="text-gray-500">
-                        {{ new Date(notification.changed_at).toLocaleString() }}
+                        {{ new Date().toLocaleDateString('es-AR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) }}
                     </small>
                 </div>
             </li>
@@ -36,7 +42,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { useUserStore } from '../../../store/userStore';
-import { useNotifications } from '../../../logic/useNotifications';
 import { getNotificationsByUserId } from '../../../services/notificationService';
 import router from '../../../router';
 
@@ -47,8 +52,6 @@ const viewNotification = ref(false);
 
 const notifications = computed(() => userStore.notifications);
 const hasNotifications = computed(() => notifications.value.length > 0);
-
-useNotifications();
 
 watch(
     () => userStore.user,
@@ -79,11 +82,12 @@ const toggleMenu = () => {
 
 // Abrir notificación completa
 const openNotification = () => {
-    //selectedNotification.value = notification;
-    //userStore.markAsRead(notification.id); // se marca como leída recién aquí
+    const notification = notifications.value[0]; // Abrimos la primera notificación (la más reciente)
+    if (!notification) return;
+    
     if (!viewNotification.value) {
         viewNotification.value = !viewNotification.value;
     }
-    router.push('/profile?section=notifications');
+    router.push('/notifications');
 };
 </script>

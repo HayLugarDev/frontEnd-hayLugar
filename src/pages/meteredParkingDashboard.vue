@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-screen bg-secondary">
+  <div class="min-h-screen bg-secondary">
     <MainHeader />
 
     <!-- Encabezado + acciones -->

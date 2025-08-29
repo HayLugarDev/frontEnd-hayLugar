@@ -5,7 +5,7 @@
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <div v-if="espacio?.images?.length">
         <!-- Carrusel en móviles -->
-        <Carousel :images="espacio.images" class="lg:hidden" :controls="false" />
+        <Carousel :images="espacio.images" class="w-full h-full rounded-lg" :controls="false" />
 
         <!-- Info del anfitrión -->
         <section v-if="espacio?.host" class="col-span-3 bg-secondary p-6 px-10 rounded-xl shadow-md mt-6 font-normal">
@@ -215,7 +215,6 @@ const obtenerEspacio = async () => {
 
 onMounted(async () => {
   await obtenerEspacio();
-  await userStore.fetchUser();
   console.log(espacio.value);
 });
 
@@ -259,7 +258,7 @@ const reservar = async () => {
 
     if (vehiculosUsuario.value.length === 0) {
       errorMessage.value = `No tenés vehículos registrados para este tipo.<br/>
-        <a href="/profile" class="text-blue-600 underline hover:text-blue-800">Agrega tu vehículo aquí</a>.`;
+        <a href="/profile?section=vehicles" class="text-blue-600 underline hover:text-blue-800">Agrega tu vehículo aquí</a>.`;
       showErrorModal.value = true;
       modalIsHtml.value = true;
       return;
