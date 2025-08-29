@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "types": ["vite/client"],
+    "jsx": "preserve",
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler"

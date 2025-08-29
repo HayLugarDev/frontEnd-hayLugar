@@ -74,14 +74,10 @@
       <!-- MAPA -->
       <div v-if="showMap" class="w-full h-[70vh] relative rounded-xl overflow-hidden shadow">
         <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions">
-          <GMapPolyline
-            v-for="blk in snappedBlocksFiltered"
-            :key="'blk-'+(blk.id ?? blk.label)"
-            :path="blk.snappedPath"
-            :options="polylineOptions(blk.status, true)"
-            @click="openMetered(blk)"
-            @mouseover="hovered = blk"
-            @mouseout="hovered = null"
+          <CurbBandsLayer
+            :blocks="snappedBlocksFiltered"
+            @hover="hovered = $event"
+            @tap="openMetered"
           />
         </CustomGoogleMap>
 
@@ -188,13 +184,12 @@
     </div>
 
     <!-- Modal: Estacionamiento Medido (iniciar) -->
-    <MeteredAccessDialog  
+    <MeteredAccessDialog
       :open="modalOpen"
       :zone="selectedZone"
       @close="modalOpen = false"
       @success="handleStarted"
     />
-    <MeteredActiveSessions :open="showTickets" @close="showTickets = false" />
 
     <!-- Modal: mis tickets activos -->
     <MeteredActiveSessions :open="showTickets" @close="showTickets = false" />
@@ -225,6 +220,7 @@ import { meteredParkingService } from '../services/meteredParkingService'
 import { subscribeToMeteredRealtime } from '../services/meteredRealtime'
 import { useUserStore } from '../store/userStore'
 import MeteredAccessDialog from '../components/meteredAccessDialog.vue'
+import CurbBandsLayer from '../components/curb/CurbBandsLayer.vue'
 
 const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
 center.value = { lat: -26.8309, lng: -65.2033 }
@@ -331,6 +327,58 @@ async function snapBlock(dto) {
 }
 
 /* =========================
+   Longitud aproximada polyline
+   ========================= */
+function polylineLengthMeters(path) {
+  if (!path || path.length < 2) return 0
+  const R = 6371000, toRad = d => (d * Math.PI) / 180
+  let total = 0
+  for (let i = 1; i < path.length; i++) {
+    const a = path[i - 1], b = path[i]
+    const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng)
+    const la1 = toRad(a.lat), la2 = toRad(b.lat)
+    const x = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(la1) * Math.cos(la2)
+    total += 2 * R * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x))
+  }
+  return total
+}
+
+/* =========================
+   Heurística: capacidad & ocupación visual
+   ========================= */
+/**
+ * Deriva capacidad (slots) y ocupación con datos mínimos.
+ * - Usa length real del DTO si existe; si no, estima desde el path.
+ * - occupied: si el backend no lo trae, mapea por status.
+ */
+function deriveCapacityOccupied(dto, snappedPath) {
+  const lengthMeters =
+    (typeof dto.length_m === 'number' && dto.length_m > 0)
+      ? dto.length_m
+      : Math.max(30, Math.round(polylineLengthMeters(snappedPath)))
+
+  // espacio típico por bahía en AR (5.2–5.6 m); usamos 5.4 m
+  const slotSize = 5.4
+  let capacity = Math.max(2, Math.round(lengthMeters / slotSize))
+  capacity = Math.min(capacity, 24)
+
+  const dtoCap = Number(dto?.sensors?.capacity ?? dto?.capacity ?? NaN)
+  const dtoOcc = Number(dto?.sensors?.occupied ?? dto?.occupied ?? NaN)
+  if (Number.isFinite(dtoCap) && dtoCap > 0) capacity = Math.round(dtoCap)
+
+  let occupied
+  if (Number.isFinite(dtoOcc) && dtoOcc >= 0) {
+    occupied = Math.max(0, Math.min(capacity, Math.round(dtoOcc)))
+  } else {
+    if (dto.status === 'full') occupied = capacity
+    else if (dto.status === 'limited') occupied = Math.round(capacity * 0.6)
+    else occupied = Math.round(capacity * 0.15)
+  }
+
+  return { capacity, occupied, lengthMeters }
+}
+
+/* =========================
    Carga inicial (DTO -> UI)
    ========================= */
 async function loadBlocksFromBackend() {
@@ -352,9 +400,8 @@ async function loadBlocksFromBackend() {
       const snappedPath = await snapBlock(dto)
       const label = `${dto.street}${dto.segment_ref ? ' — ' + dto.segment_ref : ''}`
       const desc = `${dto.region?.city || ''}${dto.region?.neighborhood ? ' · ' + dto.region.neighborhood : ''}`
-      const length = dto.length_m && dto.length_m > 0
-        ? dto.length_m
-        : Math.max(30, Math.round(polylineLengthMeters(snappedPath)))
+
+      const { capacity, occupied, lengthMeters } = deriveCapacityOccupied(dto, snappedPath)
 
       mapped.push({
         id: dto.id,
@@ -362,8 +409,10 @@ async function loadBlocksFromBackend() {
         desc,
         status: dto.status,
         snappedPath,
-        length,
-        hourly_rate: dto.pricing?.price_per_hour ?? null
+        length: lengthMeters,
+        hourly_rate: dto.pricing?.price_per_hour ?? null,
+        capacity,
+        occupied
       })
     }
 
@@ -376,24 +425,7 @@ async function loadBlocksFromBackend() {
 }
 
 /* =========================
-   Longitud aproximada polyline
-   ========================= */
-function polylineLengthMeters(path) {
-  if (!path || path.length < 2) return 0
-  const R = 6371000, toRad = d => (d * Math.PI) / 180
-  let total = 0
-  for (let i = 1; i < path.length; i++) {
-    const a = path[i - 1], b = path[i]
-    const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng)
-    const la1 = toRad(a.lat), la2 = toRad(b.lat)
-    const x = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(la1) * Math.cos(la2)
-    total += 2 * R * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x))
-  }
-  return total
-}
-
-/* =========================
-   Estilos de línea
+   Estilos de línea (polylines legacy por si se usan en otro lado)
    ========================= */
 const polylineOptions = (status, clickable = false) => {
   const base = { strokeOpacity: 0.95, strokeWeight: 6, clickable,
@@ -480,9 +512,8 @@ async function upsertFromRealtime(dto) {
 
     const label = `${dto.street}${dto.segment_ref ? ' — ' + dto.segment_ref : ''}`
     const desc = `${dto.region?.city || ''}${dto.region?.neighborhood ? ' · ' + dto.region.neighborhood : ''}`
-    const length = dto.length_m && dto.length_m > 0
-      ? dto.length_m
-      : Math.max(30, Math.round(polylineLengthMeters(snappedPath)))
+
+    const { capacity, occupied, lengthMeters } = deriveCapacityOccupied(dto, snappedPath)
 
     const item = {
       id: dto.id,
@@ -490,8 +521,10 @@ async function upsertFromRealtime(dto) {
       desc,
       status: dto.status,
       snappedPath,
-      length,
-      hourly_rate: dto.pricing?.price_per_hour ?? null
+      length: lengthMeters,
+      hourly_rate: dto.pricing?.price_per_hour ?? null,
+      capacity,
+      occupied
     }
 
     const i = snappedBlocks.value.findIndex(b => b.id === item.id)
