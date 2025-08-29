@@ -1,7 +1,7 @@
 <template>
   <ul class="flex flex-col divide-y divide-gray-200 text-gray-700 text-3xl md:text-base z-50">
     <li>
-      <MobileNotificationButton @click="$emit('navigate', '/profile?section=notifications')" class="menu-item" />
+      <MobileNotificationButton @click="$emit('navigate', '/notifications')" class="menu-item" />
     </li>
     <li v-if="route.path !== '/dashboard'" @click="$emit('navigate', '/dashboard')" class="menu-item">
       <font-awesome-icon icon="house" /> <span>Inicio</span>

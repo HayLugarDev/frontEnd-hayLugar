@@ -1,20 +1,20 @@
 <template>
   <section class="md:bg-white bg-secondary p-8 rounded-2xl shadow-xl w-full md:w-2/3 md:min-h-full min-h-screen">
     <!-- Encabezado -->
-    <div class="flex items-center justify-between mb-6 mt-14 md:mt-0">
-      <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+    <div class="flex flex-col items-start md:flex-row md:items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-primary flex items-center gap-2 w-full">
         <font-awesome-icon :icon="['fas', 'car']" />
         Vehículos Registrados
       </h2>
-      <div class="flex space-x-2">
+      <div class="flex space-x-2 w-full flex-row justify-between md:justify-end mt-4">
         <button @click="router.push('/add-vehicle')"
-          class="bg-primary text-white px-4 py-2 rounded-lg shadow hover:bg-primary/90 transition-all flex items-center gap-2">
+          class="md:bg-primary text-primary md:text-white px-4 py-2 rounded-lg shadow hover:text-white hover:bg-primary/90 transition-all flex items-center gap-2 w-1/2 md:w-auto">
           <font-awesome-icon :icon="['fas', 'circle-plus']" />
           Agregar
         </button>
-        <div class="flex gap-2">
+        <div class="flex gap-2 w-auto flex-row justify-end">
           <button v-if="!modoEdicion" @click="editVehicles"
-            class="bg-yellow-300 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-400 transition-all flex items-center gap-2">
+            class="md:bg-yellow-300 text-yellow-500 md:text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-400 transition-all flex items-center gap-2 w-full md:w-auto">
             <font-awesome-icon :icon="['fas', 'pen-to-square']" />
             Editar
           </button>

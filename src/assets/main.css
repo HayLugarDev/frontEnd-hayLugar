@@ -102,3 +102,11 @@
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
+
+.input-field {
+  @apply w-full py-3 px-5 border border-gray-300 rounded-full text-lg text-gray-500;
+}
+
+.text-area-field {
+  @apply text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4;
+}

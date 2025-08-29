@@ -93,22 +93,22 @@ export const useUserStore = defineStore('user', {
       this.reservations = reservas;
     },
 
-    checkReservationsForUpcoming() {
-      const ahora = Date.now();
-      this.reservations.forEach((reserva: any) => {
-        const inicio = new Date(reserva.start_time).getTime();
-        const diffMinutos = (inicio - ahora) / (1000 * 60);
+    // checkReservationsForUpcoming() {
+    //   const ahora = Date.now();
+    //   this.reservations.forEach((reserva: any) => {
+    //     const inicio = new Date(reserva.start_time).getTime();
+    //     const diffMinutos = (inicio - ahora) / (1000 * 60);
 
-        if (diffMinutos > 0 && diffMinutos <= 10) {
-          this.addNotification({
-            id: Date.now(),
-            message: `Tu reserva comienza en ${Math.round(diffMinutos)} minutos`,
-            status: "pending",
-            changed_at: new Date(),
-            type: "reminder",
-          });
-        }
-      });
-    },
+    //     if (diffMinutos > 0 && diffMinutos <= 10) {
+    //       this.addNotification({
+    //         id: Date.now(),
+    //         message: `Tu reserva comienza en ${Math.round(diffMinutos)} minutos`,
+    //         status: "pending",
+    //         changed_at: new Date(),
+    //         type: "reminder",
+    //       });
+    //     }
+    //   });
+    // },
   },
 });

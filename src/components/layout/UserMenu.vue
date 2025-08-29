@@ -27,7 +27,8 @@ const toggleMenu = () => {
 };
 
 const hostImage = computed(() => {
-  return userStore?.user?.profile_picture || user_icon_primary;
+  const pic = userStore.user?.profile_picture;
+  return pic ? pic : user_icon_primary;
 });
 
 </script>

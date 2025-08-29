@@ -132,7 +132,6 @@ const obtenerEspacios = async () => {
 onMounted(async () => {
   setCenterToUserLocation();
   await obtenerEspacios();
-  await userStore.fetchUser();
 });
 
 const buscar = async () => {

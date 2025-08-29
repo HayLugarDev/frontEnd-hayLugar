@@ -261,7 +261,7 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
   });
 
   // Creamos la reserva en estado "pending" y capturamos el resultado
-  let reservationResponse;
+  let reservationResponse: any;
   try {
     reservationResponse = await reservationStore.submitReservation();
   } catch (error) {
@@ -331,7 +331,6 @@ const confirmarPagoSimulado = async () => {
     }
   });
 
-  console.log("Enviando reserva:", reservationStore.reservation);
   try {
     const response = await reservationStore.submitReservation();
     if (response) {
