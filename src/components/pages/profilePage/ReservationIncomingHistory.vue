@@ -1,10 +1,16 @@
 <template>
     <section class="bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+        <div v-if="loading" class="space-y-4">
+            <ItemSkeleton />
+        </div>
         <ul v-if="reservations.length" class="divide-y divide-gray-300 relative space-y-4">
             <li v-for="(reservation, index) in reservations" :key="index"
                 class="relative border border-yellow-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all bg-gray-50 space-y-3">
-                <div
-                    class="flex flex-col xl:grid xl:grid-cols-4 text-gray-700 font-semibold text-[.8rem] sm:text-[1rem]">
+                <div class="flex flex-col xl:grid xl:grid-cols-4 text-gray-700 font-semibold text-[1rem]">
+                    <div class="col-span-4 flex flex-row gap-1">
+                        <span class="font-bold">Numero de reserva: </span>
+                        <p class="text-gray-500 font-normal">#{{ reservation.id }}</p>
+                    </div>
                     <div class="col-span-2 flex flex-row gap-1">
                         <span class="font-bold">Fecha de solicitud: </span>
                         <p class="text-gray-500 font-normal">{{ formatDate(reservation.created_at) }}</p>
@@ -62,7 +68,7 @@
                 </div>
             </li>
         </ul>
-        <p v-else class="text-gray-500">No tienes reservas entrantes anteriores.</p>
+        <p v-else-if="!loading" class="text-gray-500">No tienes reservas entrantes anteriores.</p>
 
         <!-- Modal de éxito -->
         <transition name="fade">
@@ -100,6 +106,7 @@ import { reservationMessages, ReservationMessageStatus, statusColors } from '../
 import StatusModal from '../addSpacePage/StatusModal.vue';
 import { useRouter } from 'vue-router';
 import ConfirmModal from '../../common/ConfirmModal.vue';
+import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 
 const reservations = ref([]);
 const userStore = useUserStore();
@@ -109,6 +116,7 @@ const showCheckInModal = ref(false);
 const showErrorModal = ref(false);
 const showSuccessModal = ref(false);
 const showConfirmModal = ref(false);
+const loading = ref(true);
 
 const checkInCode = ref("");
 const selectedReservation = ref<any>(null);
@@ -123,19 +131,22 @@ const modalConfig = ref({
 });
 
 const fetchReservations = async () => {
+    loading.value = true;
     const userId = userStore.user?.id;
     if (!userId) {
         console.error("No se encontró el ID de usuario en userStore");
+        loading.value = false;
         return;
     }
     try {
         const response = await api.get(`reservations/incoming/${userId}`, { withCredentials: true });
-        reservations.value = response.data; 
+        reservations.value = response.data;
         userStore.setReservations(response.data)
         //userStore.checkReservationsForUpcoming();
     } catch (error) {
         console.error("Error al obtener historial de reservas", error);
     }
+    loading.value = false;
 };
 
 function confirmApprovedReservation(reservation: any) {
@@ -149,23 +160,23 @@ function confirmApprovedReservation(reservation: any) {
 }
 
 async function approveReservation() {
-  try {
-    await api.put(`/reservations/${selectedReservation.value.id}/status`, { status: 'approved' }, { withCredentials: true });
+    try {
+        await api.put(`/reservations/${selectedReservation.value.id}/status`, { status: 'approved' }, { withCredentials: true });
 
-    // Actualizar localmente el estado de la reserva en el array principal
-    reservations.value = reservations.value.map((r: any) =>
-      r.id === selectedReservation.value.id ? { ...r, status: 'approved' } : r
-    );
+        // Actualizar localmente el estado de la reserva en el array principal
+        reservations.value = reservations.value.map((r: any) =>
+            r.id === selectedReservation.value.id ? { ...r, status: 'approved' } : r
+        );
 
-    selectedReservation.value = null;
-    showErrorModal.value = false;
-    showSuccessModal.value = false;
-    showCheckInModal.value = false;
-    showConfirmModal.value = false;
-  } catch (error: any) {
-    showErrorModal.value = true;
-    errorMessage.value = error.response?.data?.message || "Error al aprobar la reserva";
-  }
+        selectedReservation.value = null;
+        showErrorModal.value = false;
+        showSuccessModal.value = false;
+        showCheckInModal.value = false;
+        showConfirmModal.value = false;
+    } catch (error: any) {
+        showErrorModal.value = true;
+        errorMessage.value = error.response?.data?.message || "Error al aprobar la reserva";
+    }
 };
 
 function confirmRejectReservation(reservation: any) {
@@ -179,22 +190,22 @@ function confirmRejectReservation(reservation: any) {
 }
 
 async function rejectReservation() {
-  try {
-    await api.put(`/reservations/${selectedReservation.value.id}/cancel`, { status: 'cancelled' }, { withCredentials: true });
+    try {
+        await api.put(`/reservations/${selectedReservation.value.id}/cancel`, { status: 'cancelled' }, { withCredentials: true });
 
-    reservations.value = reservations.value.map((r: any) =>
-      r.id === selectedReservation.value.id ? { ...r, status: 'cancelled' } : r
-    );
+        reservations.value = reservations.value.map((r: any) =>
+            r.id === selectedReservation.value.id ? { ...r, status: 'cancelled' } : r
+        );
 
-    selectedReservation.value = null;
-    showErrorModal.value = false;
-    showSuccessModal.value = false;
-    showCheckInModal.value = false;
-    showConfirmModal.value = false;
-  } catch (error: any) {
-    showErrorModal.value = true;
-    errorMessage.value = error.response?.data?.message || "Error al cancelar la reserva";
-  }
+        selectedReservation.value = null;
+        showErrorModal.value = false;
+        showSuccessModal.value = false;
+        showCheckInModal.value = false;
+        showConfirmModal.value = false;
+    } catch (error: any) {
+        showErrorModal.value = true;
+        errorMessage.value = error.response?.data?.message || "Error al cancelar la reserva";
+    }
 };
 
 onMounted(async () => {

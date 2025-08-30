@@ -27,7 +27,7 @@
         </div>
         <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
       </div>
-      <MapButton :text="buttonText" color="primary" background="gray-50" @click="toggleMap" class="md:hidden" />
+      <MapButton :text="buttonText" color="black" background="gray-50" @click="toggleMap" class="md:hidden" />
     </div>
     <template v-else>
       <!-- Skeleton Loader -->

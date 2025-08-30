@@ -18,7 +18,7 @@
                         <div class="flex flex-row justify-start">
                             <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-1 border rounded-xl">
                                 <font-awesome-icon :icon="['fas', `${vehicleTypeTranslations[v.type]}`]"
-                                    class="text-gray-500 text-xl md:text-sm" />
+                                    class="text-gray-700 text-xl md:text-sm" />
                                 <p v-if="v.price_per_hour" class="text-sm font-normal md:hidden">Hora: ${{
                                     v.price_per_hour.toLocaleString() }}</p>
                             </div>

@@ -1,10 +1,12 @@
 <template>
   <section class="bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+    <div v-if="loading" class="space-y-4">
+      <ItemSkeleton />
+    </div>
     <ul v-if="publications?.length" class="divide-y divide-gray-300 relative">
       <li v-for="(publication, index) in publications" :key="index"
         class="border border-yellow-200 rounded-xl p-5 shadow-md hover:shadow-lg transition-all bg-gray-50 space-y-1 text-sm lg:text-lg">
-        <div
-          class="flex flex-col xl:grid xl:grid-cols-4 xl:grid-rows-4 text-gray-700 font-semibold text-[.9rem] sm:text-[1rem]">
+        <div class="flex flex-col xl:grid xl:grid-cols-4 xl:grid-rows-4 text-gray-700 font-semibold text-[1rem]">
           <div class="col-span-2 flex flex-row gap-1">
             <span class="font-bold">Nombre del espacio: </span>
             <p class="text-gray-500 font-normal">{{ publication.name }}</p>
@@ -54,7 +56,7 @@
             Editar
           </button>
 
-          <button @click="deletePublication(publication)"
+          <button @click="openConfirm(publication)"
             class="bg-red-400 text-white px-4 py-2 rounded-lg shadow hover:bg-red-500 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
             <font-awesome-icon :icon="['fas', 'square-xmark']" />
             Eliminar
@@ -63,9 +65,13 @@
         </div>
       </li>
     </ul>
-    <p v-else class="text-gray-500">No tienes publicaciones anteriores.</p>
+    
+    <p v-else-if="!loading" class="text-gray-500">No tienes publicaciones anteriores.</p>
     <EditPublications :visible="openModal" :spaceId="space?.id" @close="openModal = false"
-      @updated="fetchPublications" />
+    @updated="fetchPublications" />
+
+    <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
+      @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
   </section>
 </template>
 
@@ -78,6 +84,7 @@ import { getSpanishState, SpaceStatus } from '../../../utils/SpaceStatusTraslati
 import { SpaceCategory, getSpanishCategory } from '../../../utils/SpaceCategoryTraslation';
 import EditPublications from './UI/EditPublications.vue';
 import { formatDate } from '../../../utils/FormatDate';
+import ConfirmModal from '../../common/ConfirmModal.vue';
 
 export interface VehicleCapacity {
   type: 'car' | 'motorcycle' | 'van' | 'bicycle';
@@ -100,14 +107,38 @@ export interface Publication {
 
 const publications = ref<Publication[]>([]);
 const space = ref<Publication | null>(null);
+const selectedPublication = ref<Publication | null>(null);
 
 const userStore = useUserStore();
+const showConfirmModal = ref(false);
 const openModal = ref(false);
+const loading = ref(true);
+
+const modalConfig = ref({
+  message: '',
+  buttonText: 'Aceptar',
+  onConfirm: () => { }
+});
+
+function openConfirm(publication: any) {
+  selectedPublication.value = publication;
+  console.log(selectedPublication.value);
+
+  modalConfig.value = {
+    message: '¿Eliminar esta publicación?',
+    buttonText: 'Eliminar',
+    onConfirm: () => deletePublication(publication.id)
+  };
+
+  showConfirmModal.value = true;
+}
 
 const fetchPublications = async () => {
+  loading.value = true;
   const userId = userStore.user?.id;
   if (!userId) {
     console.error("No se encontró el ID de usuario en userStore");
+    loading.value = false;
     return;
   }
   try {
@@ -117,6 +148,7 @@ const fetchPublications = async () => {
   } catch (error) {
     console.error("Error al obtener historial de publicaciones", error);
   }
+  loading.value = true;
 };
 
 onMounted(() => {
@@ -128,11 +160,10 @@ const editPublication = (pub: Publication) => {
   openModal.value = true;
 };
 
-const deletePublication = async (pub: Publication) => {
-  if (!confirm(`¿Seguro que deseas eliminar "${pub.name}"?`)) return;
+const deletePublication = async (publication_id) => {
   try {
-    await api.delete(`spaces/${pub.id}`, { withCredentials: true });
-    publications.value = publications.value.filter((p: any) => p.id !== pub.id);
+    await api.delete(`spaces/${publication_id}`, { withCredentials: true });
+    publications.value = publications.value.filter(p => p.id !== publication_id);
   } catch (error) {
     console.error("Error al eliminar publicación", error);
   }

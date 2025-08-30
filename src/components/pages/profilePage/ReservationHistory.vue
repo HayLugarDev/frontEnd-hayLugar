@@ -1,5 +1,8 @@
 <template>
   <section class="bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+    <div v-if="loading" class="space-y-4">
+      <ItemSkeleton />
+    </div>
     <ul v-if="reservations.length" class="divide-y divide-gray-300 relative space-y-4">
       <li v-for="(reservation, index) in reservations" :key="index" :class="[
         'relative border border-yellow-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all space-y-3',
@@ -7,7 +10,7 @@
           ? 'bg-gray-200 opacity-70 pointer-events-none'
           : 'bg-gray-50'
       ]">
-        <div class="flex flex-col xl:grid xl:grid-cols-4 text-gray-700 font-semibold text-[.8rem] sm:text-[1rem]">
+        <div class="flex flex-col xl:grid xl:grid-cols-4 text-gray-700 font-semibold text-[1rem]">
           <div class="col-span-4 flex flex-row gap-1">
             <span class="font-bold">Numero de reserva: </span>
             <p class="text-gray-500 font-normal">#{{ reservation.id }}</p>
@@ -83,7 +86,7 @@
         </div>
       </li>
     </ul>
-    <p v-else class="text-gray-500">No tienes reservas anteriores.</p>
+    <p v-else-if="!loading" class="text-gray-500">No tienes reservas anteriores.</p>
     <!-- Modal CheckIn -->
     <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div class="bg-white rounded-lg shadow-lg p-6 w-96">
@@ -141,6 +144,7 @@ import { reservationMessages, ReservationMessageStatus, statusColors } from '../
 import StatusModal from '../addSpacePage/StatusModal.vue';
 import { useRouter } from 'vue-router';
 import ConfirmModal from '../../common/ConfirmModal.vue';
+import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 
 const reservations = ref([]);
 const userStore = useUserStore();
@@ -150,6 +154,7 @@ const showCheckInModal = ref(false);
 const showErrorModal = ref(false);
 const showSuccessModal = ref(false);
 const showConfirmModal = ref(false);
+const loading = ref(true);
 
 const checkInCode = ref("");
 const selectedReservation = ref<any>(null);
@@ -164,20 +169,22 @@ const modalConfig = ref({
 });
 
 const fetchReservations = async () => {
+  loading.value = true;
   const userId = userStore.user?.id;
   if (!userId) {
     console.error("No se encontró el ID de usuario en userStore");
+    loading.value = false;
     return;
   }
   try {
     const response = await api.get(`reservations/history/${userId}`, { withCredentials: true });
-    console.log(response.data);
     reservations.value = response.data;
     userStore.setReservations(response.data)
     //userStore.checkReservationsForUpcoming();
   } catch (error) {
     console.error("Error al obtener historial de reservas", error);
   }
+  loading.value = false;
 };
 
 onMounted(async () => {
