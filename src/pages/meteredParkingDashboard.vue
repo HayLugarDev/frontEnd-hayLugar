@@ -178,11 +178,6 @@
       </div>
     </div>
 
-    <!-- Menú móvil -->
-    <div class="fixed bottom-0 left-0 w-full z-50">
-      <MobileMenu :showMap="showMap" @toggle="showMap = !showMap" />
-    </div>
-
     <!-- Modal: Estacionamiento Medido (iniciar) -->
     <MeteredAccessDialog
       :open="modalOpen"
@@ -212,7 +207,6 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import MainHeader from '../components/layout/header/MainHeader.vue'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
-import MobileMenu from '../components/layout/MobileMenu.vue'
 import { useUniversityMap } from '../logic/useUniversityMap'
 import MeteredActiveSessions from '../components/MeteredActiveSessions.vue'
 import MeteredCompleteDialog from '../components/MeteredCompleteDialog.vue'

@@ -60,10 +60,6 @@
       </div>
     </div>
   </div>
-  <!-- Menú fijo en la parte inferior -->
-  <!-- <div class="fixed bottom-0 left-0 w-full z-50">
-    <MobileMenu @toggle="toggleMap" :showMap="showMap" />
-  </div> -->
 </template>
 
 <script setup>
@@ -79,7 +75,6 @@ import MainHeader from '../components/layout/header/MainHeader.vue';
 import MapButton from '../components/pages/dashboardPage/MapButton.vue';
 import CustomInputGroup from "../components/pages/dashboardPage/CustomInputGroup.vue";
 import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkeleton.vue';
-import MobileMenu from '../components/layout/MobileMenu.vue';
 import { useGoogleMap } from '../logic/useGoogleMap';
 import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
 
