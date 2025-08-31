@@ -65,9 +65,8 @@
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import { useUserStore } from '../store/userStore';
-import { Marker, InfoWindow } from 'vue3-google-map';
+import { InfoWindow } from 'vue3-google-map';
 import { useRouter } from 'vue-router';
-import logoMarker from '../assets/logo.png';
 import CustomGoogleMap from '../components/layout/GoogleMap.vue';
 import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue';
 import { getAllSpaces, getFilteredSpaces } from '../services/spaceService';
@@ -105,23 +104,22 @@ const {
 } = useGoogleMap();
 
 const obtenerEspacios = async () => {
+  cargando.value = true;
   try {
     const spaces = await getAllSpaces();
-    console.log(spaces);
-
     if (!spaces || spaces.length < 1) {
       espacios.value = [];
       error.value = "Aún no hay espacios creados.";
     } else {
       espacios.value = spaces;
     }
-
   } catch (err) {
     error.value = "No se pudieron cargar los espacios.";
     console.error(err);
   } finally {
     cargando.value = false;
   }
+  cargando.value = false;
 };
 
 onMounted(async () => {

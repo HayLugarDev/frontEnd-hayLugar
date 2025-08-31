@@ -89,10 +89,12 @@
         </div>
       </div>
     </transition>
+
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
+      :message="errorMessage" icon="/src/assets/logo.png"
+      @close="openCheckInModal" />
   </div>
 </template>
-
-
 
 <script setup>
 import { ref, computed } from 'vue';
@@ -106,9 +108,12 @@ import Etapa3 from '../components/pages/addSpacePage/Etapa3.vue';
 import Etapa4 from '../components/pages/addSpacePage/Etapa4.vue';
 import Etapa5 from '../components/pages/addSpacePage/Etapa5.vue';
 import BackButton from '../components/common/BackButton.vue';
+import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 
 const router = useRouter();
 const showSuccessModal = ref(false);
+const showErrorModal = ref(false);
+const errorMessage = ref('');
 const currentStep = ref(0); // 0 = instrucciones, 1 = formulario
 const step = ref(1);
 const selectedFiles = ref([]);
@@ -143,7 +148,6 @@ const currentComponent = computed(() => components[step.value])
 
 function nextStep() {
   if (step.value < 5) step.value++
-  console.log(spaceData.value);
 };
 
 function prevStep() {
@@ -152,7 +156,6 @@ function prevStep() {
 
 const addSpace = async () => {
 
-  console.log(spaceData.value);
   // const error = validarFormulario();
   // if (error) {
   //   alert(error);
@@ -163,14 +166,13 @@ const addSpace = async () => {
     alert('Debe subir al menos una imagen del espacio');
     return;
   }
+
+  // Preparar FormData
   const formData = new FormData();
-  const payload = { ...spaceData.value }; // Copia para modificar sin afectar el estado reactivo
-  console.log(payload);
+  const payload = { ...spaceData.value };
 
   // Agregar vehicle_capacities y precio
   payload.status = 'active';
-
-  // Convertimos a JSON y lo agregamos como campo
   formData.append('data', JSON.stringify(payload));
 
   // Agregar imágenes
@@ -178,7 +180,6 @@ const addSpace = async () => {
     formData.append('images', file);
   });
 
-  console.log(formData);
   try {
     const response = await api.post('/spaces/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -188,6 +189,8 @@ const addSpace = async () => {
     emit('success');
     resetValues();
   } catch (error) {
+    showErrorModal.value = true;
+    errorMessage.value = 'Hubo un error al registrar el espacio. Por favor, intentá nuevamente.';
     console.error('Error en el registro del espacio:', error);
   }
 };
