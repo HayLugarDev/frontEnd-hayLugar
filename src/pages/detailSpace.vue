@@ -43,12 +43,12 @@
         <!-- Galería de imágenes grande -->
         <div class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-4 h-[400px]">
           <div class="col-span-4 row-span-8">
-            <img :src="getImageUrl(espacio.images[0])" alt="Principal"
+            <img :src="espacio.images[0]" alt="Principal"
               class="h-full w-full object-cover rounded-lg shadow-md border" />
           </div>
           <template v-for="(img, index) in espacio.images.slice(1, 5)" :key="index">
             <div :class="imageGridPosition(index)">
-              <img :src="getImageUrl(img)" alt="Espacio"
+              <img :src="img" alt="Espacio"
                 class="h-full w-full object-cover rounded-lg shadow-md border" />
             </div>
           </template>
@@ -159,7 +159,6 @@ import BackButton from "../components/common/BackButton.vue";
 import { useVerifyToken } from '../logic/useVerifyToken';
 import SessionExpired from '../components/common/SessionExpired.vue';
 import { useUserStore } from '../store/userStore';
-import { baseURL } from '../services/apiService';
 import vehicleLabel from '../logic/useVehicleLabel';
 import { getAllVehicles } from '../services/vehicleService';
 import VehicleSelectModal from '../components/pages/detailSpacePage/VehicleSelectModal.vue';
@@ -178,7 +177,6 @@ const espacio = ref(null);
 const deadLine = ref(null);
 const activedFavouriteIcon = ref(false);
 const isAnimating = ref(false);
-const getImageUrl = (img) => `${baseURL}${img}`;
 
 const showVehicleModal = ref(false);
 const vehiculosUsuario = ref([]);
