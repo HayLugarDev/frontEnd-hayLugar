@@ -5,7 +5,7 @@
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <div v-if="espacio?.images?.length">
         <!-- Carrusel en móviles -->
-        <Carousel :images="espacio.images" class="md:hidden w-full h-full rounded-lg" :controls="false" />
+        <Carousel :images="espacio.images" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
 
         <!-- Info del anfitrión -->
         <section v-if="espacio?.host" class="col-span-3 bg-secondary p-6 px-10 rounded-xl shadow-md mt-6 font-normal">
