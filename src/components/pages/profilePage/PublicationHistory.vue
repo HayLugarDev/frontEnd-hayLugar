@@ -1,5 +1,5 @@
 <template>
-  <section class="bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+  <section class="lg:bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
     <div v-if="loading" class="space-y-4">
       <ItemSkeleton />
     </div>
@@ -66,7 +66,7 @@
       </li>
     </ul>
     
-    <p v-else-if="!loading" class="text-gray-500">No tienes publicaciones anteriores.</p>
+    <p v-else-if="!loading && !publications.length" class="text-gray-500">No tienes publicaciones anteriores.</p>
     <EditPublications :visible="openModal" :spaceId="space?.id" @close="openModal = false"
     @updated="fetchPublications" />
 
@@ -122,8 +122,6 @@ const modalConfig = ref({
 
 function openConfirm(publication: any) {
   selectedPublication.value = publication;
-  console.log(selectedPublication.value);
-
   modalConfig.value = {
     message: '¿Eliminar esta publicación?',
     buttonText: 'Eliminar',
