@@ -15,27 +15,6 @@
                         {{ espacio.location.split(',')[0] }}
                     </p>
 
-                    <div class="col-span-2 mb-2">
-                        <div
-                            class="bg-blue-100 border border-blue-300 text-blue-800 rounded-lg px-4 py-2 text-center text-sm font-semibold">
-                            <div v-if="disponibilidad.dateRange && disponibilidad.dateRange.length === 2">
-                                <span class="font-bold">Días disponibles: </span>
-                                <span>
-                                    {{ disponibilidad.dateRange[0] }} al {{ disponibilidad.dateRange[1] }}
-                                </span>
-                            </div>
-                            <div>
-                                <span class="font-bold">Horarios disponibles: </span>
-                                <span v-if="disponibilidad.start && disponibilidad.end">
-                                    {{ disponibilidad.start }} a {{ disponibilidad.end }} hs
-                                </span>
-                                <span v-else>
-                                    No especificados
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="w-full flex flex-row justify-between items-start md:text-xs text-center py-2">
                         <div class="flex flex-row justify-start">
                             <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-1 border rounded-xl">
@@ -50,10 +29,26 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="grid grid-cols-4 mt-4">
-                    <span class="text-end text-gray-800 text-2xl lg:text-lg"><span
-                            class=" text-yellow-600">★</span>4,70</span>
-                </div> -->
+
+                <div class="col-span-2 mb-2">
+                    <div
+                        class="bg-blue-100 text-primary rounded-lg px-4 py-2 text-start text-xs font-semibold">
+                        <div v-if="disponibilidad.dateRange && disponibilidad.dateRange.length === 2">
+                            <span>
+                                {{ disponibilidad.dateRange[0] }} al {{ disponibilidad.dateRange[1] }}
+                            </span>
+                        </div>
+                        <div>
+                            <span>Disponible: </span>
+                            <span v-if="disponibilidad.start && disponibilidad.end">
+                                {{ disponibilidad.start }} a {{ disponibilidad.end }} hs
+                            </span>
+                            <span v-else>
+                                No especificados
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </router-link>
@@ -68,10 +63,10 @@ const props = defineProps({
 });
 
 const disponibilidad = computed(() => {
-  if (!props.espacio?.availability) return {};
-  return typeof props.espacio.availability === 'string'
-    ? JSON.parse(props.espacio.availability)
-    : props.espacio.availability;
+    if (!props.espacio?.availability) return {};
+    return typeof props.espacio.availability === 'string'
+        ? JSON.parse(props.espacio.availability)
+        : props.espacio.availability;
 });
 
 const vehicleOptions = computed(() => {
