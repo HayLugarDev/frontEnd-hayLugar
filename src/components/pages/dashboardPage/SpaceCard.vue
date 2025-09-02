@@ -1,13 +1,13 @@
 <template>
     <router-link :to="`/espacio/${espacio.id}`">
         <div class="bg-secondary rounded-xl transition-all h-full lg:h-80 p-2 md:p-0">
-            <div v-if="espacio && espacio.images && espacio.images.length" class="aspect-square relative">
+            <div v-if="espacio && espacio.images && espacio.images.length" class="aspect-square relative p-2">
                 <!-- <Logo :width="'10'" class="absolute right-2 bottom-0 z-30" /> -->
                 <Carousel :images="espacio.images" class="w-full h-full rounded-lg" :controls="false" />
             </div>
             <div class="p-1">
                 <div class="flex flex-col items-start px-1 md:px-0">
-                    <div class="text-2xl md:text-sm font-bold text-primary">{{ espacio.name }}</div>
+                    <div class="text-2xl md:text-sm font-bold text-primary">{{ capitalizeFirst(espacio.name) }}</div>
                     <p class="text-lg lg:text-xs text-gray-800">
                         {{ espacio.location.split(',')[1] }}
                     </p>
@@ -32,14 +32,14 @@
 
                 <div class="col-span-2 mb-2">
                     <div
-                        class="bg-blue-100 text-primary rounded-lg px-4 py-2 text-start text-xs font-semibold">
+                        class="bg-blue-100 text-primary rounded-lg px-4 py-2 text-start text-xs lg:text-[.6rem] font-semibold">
                         <div v-if="disponibilidad.dateRange && disponibilidad.dateRange.length === 2">
                             <span>
-                                {{ disponibilidad.dateRange[0] }} al {{ disponibilidad.dateRange[1] }}
+                                {{ formatDate(disponibilidad.dateRange[0]) }} al {{ disponibilidad.dateRange[1] }}
                             </span>
                         </div>
                         <div>
-                            <span>Disponible: </span>
+                            <span>Horario: </span>
                             <span v-if="disponibilidad.start && disponibilidad.end">
                                 {{ disponibilidad.start }} a {{ disponibilidad.end }} hs
                             </span>
@@ -54,8 +54,9 @@
     </router-link>
 </template>
 <script setup>
+import { capitalizeFirst } from '../../../utils/capitalizeFirstCharAt';
+import { formatDate } from '../../../utils/FormatDate';
 import Carousel from '../../common/Carousel.vue';
-import Logo from '../../layout/Logo.vue';
 import { computed } from 'vue';
 
 const props = defineProps({
