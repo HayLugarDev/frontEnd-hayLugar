@@ -7,17 +7,14 @@
       <div class="col-span-2 mb-2">
         <div
           class="bg-blue-100 border border-blue-300 text-blue-800 rounded-lg px-4 py-2 text-center text-sm font-semibold">
-          <div>
-            <span class="font-bold">Días disponibles:</span>
-            <span v-if="availability.dateRange && availability.dateRange.length === 2">
+          <div v-if="availability.dateRange && availability.dateRange.length === 2">
+            <span class="font-bold">Días disponibles: </span>
+            <span>
               {{ availability.dateRange[0] }} al {{ availability.dateRange[1] }}
-            </span>
-            <span v-else>
-              No especificados
             </span>
           </div>
           <div>
-            <span class="font-bold">Horarios disponibles:</span>
+            <span class="font-bold">Horarios disponibles: </span>
             <span v-if="availability.start && availability.end">
               {{ availability.start }} a {{ availability.end }} hs
             </span>

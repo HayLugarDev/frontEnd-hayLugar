@@ -11,7 +11,7 @@
         <section v-if="espacio?.host" class="col-span-3 bg-secondary p-6 px-10 rounded-xl shadow-md mt-6 font-normal">
           <div class="flex flex-row items-center gap-4">
             <img :src="hostImage" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
-            <div class="flex flex-col pl-8 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800">
+            <div class="flex flex-col pl-4 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800">
               <div class="flex flex-row gap-1 items-center">
                 <p class="text-lg font-semibold">Anfitrión: </p><span>{{ espacio.host.name }} {{ espacio.host.last_name
                 }}</span>
