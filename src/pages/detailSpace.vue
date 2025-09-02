@@ -31,7 +31,7 @@
         </section>
 
         <!-- Título + Favorito -->
-        <div class="flex flex-row items-center justify-between mt-4 px-2">
+        <div class="flex flex-row items-center justify-between mt-4 px-6 md:px-2">
           <h1 class="text-4xl sm:text-3xl font-bold p-2 text-primary">{{ espacio.name }}</h1>
           <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" :class="[
             activedFavouriteIcon ? 'text-red-500 scale-110' : 'text-gray-700',
@@ -89,7 +89,7 @@
             :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
             @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
             @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event"
-            @reservar="reservar" />
+            @reservar="reservar" :availability="disponibilidad"/>
 
           <!-- Botón para dueño -->
           <div v-else-if="isOwner"
@@ -200,11 +200,19 @@ const isOwner = computed(() => {
 
 const { verifyToken, isSessionInvalid } = useVerifyToken();
 
+// Espacio disponible del espacio
+const disponibilidad = computed(() => {
+  if (!espacio.value?.availability) return {};
+  return typeof espacio.value.availability === 'string'
+    ? JSON.parse(espacio.value.availability)
+    : espacio.value.availability;
+});
+
 const obtenerEspacio = async () => {
   try {
     const id = route.params.id;
     const space = await getSpaceById(id);
-    console.log(space.images)
+    console.log(space);
     return espacio.value = space;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
