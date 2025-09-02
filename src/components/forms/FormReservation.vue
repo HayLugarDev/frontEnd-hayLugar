@@ -36,7 +36,7 @@
         <label class="font-semibold">CheckIn</label>
         <Datepicker :modelValue="tiempoInicial" @update:modelValue="$emit('update:tiempoInicial', $event)"
           :enable-time-picker="tipoPlazoReserva !== 'Por hora' ? false : true" :is24="true" :model-type="'timestamp'"
-          :min-date="availability.dateRange ? availability.dateRange[0] : undefined"
+          :min-date="getMinDate()"
           :min-time="parseTimeString(availability.start)" :max-time="parseTimeString(availability.end)"
           placeholder="Entrada" />
       </div>
@@ -45,11 +45,11 @@
       <div class="col-span-1 flex flex-col border border-gray-500 rounded-xl p-2 items-center">
         <label class="font-semibold">CheckOut</label>
         <Datepicker :modelValue="tiempoFinal" @update:modelValue="$emit('update:tiempoFinal', $event)"
-          :enable-time-picker="tipoPlazoReserva !== 'Por hora' ? false : true" :is24="true" :model-type="'timestamp'"
-          :min-date="availability.dateRange ? availability.dateRange[0] : undefined"
-          :max-date="availability.dateRange ? availability.dateRange[1] : undefined"
-          :min-time="parseTimeString(availability.start)" :max-time="parseTimeString(availability.end)"
-          placeholder="Salida" />
+          :enable-time-picker="tipoPlazoReserva === 'Por hora'" :is24="true" :model-type="'timestamp'"
+          :min-date="tipoPlazoReserva === 'Por hora' && tiempoInicial ? new Date(tiempoInicial) : (availability.dateRange ? availability.dateRange[0] : undefined)"
+          :max-date="tipoPlazoReserva === 'Por hora' && tiempoInicial ? new Date(tiempoInicial) : (availability.dateRange ? availability.dateRange[1] : undefined)"
+          :min-time="tipoPlazoReserva === 'Por hora' && tiempoInicial ? parseTimeString(formatHour(new Date(tiempoInicial))) : parseTimeString(availability.start)"
+          :max-time="parseTimeString(availability.end)" placeholder="Salida" />
       </div>
 
       <!-- Tarifa -->
@@ -72,14 +72,9 @@
 import MenuDropdown from "../layout/MenuDropdown.vue";
 import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
+import { computed, watch } from "vue";
 
-function parseTimeString(timeStr) {
-  if (!timeStr) return undefined;
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  return { hours, minutes };
-}
-
-defineProps({
+const props = defineProps({
   tipoVehiculo: String,
   tipoPlazoReserva: String,
   tiempoInicial: Number,
@@ -92,11 +87,64 @@ defineProps({
   }
 });
 
-defineEmits([
+const emit = defineEmits([
   'update:tipoVehiculo',
   'update:tipoPlazoReserva',
   'update:tiempoInicial',
   'update:tiempoFinal',
   'reservar'
 ]);
+
+function parseTimeString(timeStr) {
+  if (!timeStr) return undefined;
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  return { hours, minutes };
+}
+
+const minCheckOut = computed(() => {
+  if (tipoPlazoReserva === 'Por hora' && tiempoInicial) {
+    // Siguiente minuto después del checkin
+    return new Date(tiempoInicial + 60 * 1000);
+  }
+  return availability.dateRange ? availability.dateRange[0] : undefined;
+});
+
+const maxCheckOut = computed(() => {
+  if (tipoPlazoReserva === 'Por hora' && tiempoInicial) {
+    // Mismo día que checkin, pero con hora máxima del espacio
+    const checkInDate = new Date(tiempoInicial);
+    const [maxHour, maxMinute] = (availability.end || '23:59').split(':').map(Number);
+    const maxDate = new Date(checkInDate);
+    maxDate.setHours(maxHour, maxMinute, 0, 0);
+    return maxDate;
+  }
+  return availability.dateRange ? availability.dateRange[1] : undefined;
+});
+
+watch(
+  () => [props.tipoPlazoReserva, props.tiempoInicial],
+  ([plazo, checkIn]) => {
+    if (plazo === 'Por hora' && checkIn) {
+      // Si el checkout está vacío o es de otro día, lo setea al mismo día
+      const checkInDate = new Date(checkIn);
+      const defaultCheckOut = new Date(checkInDate.getTime() + 60 * 60 * 1000); // +1h
+      emit('update:tiempoFinal', defaultCheckOut.getTime());
+    }
+  }
+);
+
+function getMinDate() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  if (props.availability.dateRange && props.availability.dateRange[0]) {
+    const start = new Date(props.availability.dateRange[0]);
+    return start > today ? start : today;
+  }
+  return today;
+}
+
+function formatHour(date) {
+  return date.toTimeString().slice(0,5);
+}
+
 </script>
