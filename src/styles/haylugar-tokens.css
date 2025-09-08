@@ -1,0 +1,44 @@
+@layer base {
+  :root {
+    /* Brand */
+    --color-primary: #27C1F5;
+    --color-dark: #030405;
+    --color-accent: #FFC01E;
+
+    /* Estados cordón */
+    --band-free: #29C78A;
+    --band-limited: #FFC01E;
+    --band-full: #E23A4E;
+
+    /* Autos */
+    --car-fill: #2B2F33;            /* grafito sólido */
+    --car-stroke: #000000;
+    --car-specular: #FFFFFF;
+
+    /* Intensidades */
+    --op-car-fill: 0.96;
+    --op-car-stroke: 0.30;
+    --op-specular: 0.38;
+    --op-band-fill: 0.94;
+
+    /* Glow hacia fuera */
+    --glow-free: 0.18;
+    --glow-limited: 0.24;
+    --glow-full: 0.28;
+
+    /* Motion */
+    --anim-fast: 120ms;
+    --anim-mid: 180ms;
+    --anim-ease: cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* HUD vítreo reutilizable */
+  .glass {
+    background: color-mix(in srgb, #ffffff 90%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid color-mix(in srgb, #ffffff 65%, transparent);
+    box-shadow: 0 6px 24px rgba(3,4,5,.08);
+    border-radius: 12px;
+  }
+}

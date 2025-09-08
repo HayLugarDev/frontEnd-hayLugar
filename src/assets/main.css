@@ -2,6 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Estilos de HayLugar === */
+
+/* Inputs */
+.input-field {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200;
+}
+
+/* Botón primario */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition-all duration-200;
+}
+
+/* Switch */
+.switch { @apply relative inline-flex items-center cursor-pointer; }
+.switch input { @apply sr-only; }
+.switch .slider { @apply w-10 h-6 bg-gray-300 rounded-full transition duration-300; }
+.switch .slider:before { @apply absolute content-[''] w-4 h-4 bg-white rounded-full left-1 top-1 transition-transform; }
+.switch input:checked + .slider { @apply bg-green-500; }
+.switch input:checked + .slider:before { transform: translateX(16px); }
+
+/* Transiciones */
+.icon-fade-enter-active, .icon-fade-leave-active { transition: opacity 0.3s ease, transform 0.3s ease; }
+.icon-fade-enter-from, .icon-fade-leave-to { opacity: 0; transform: scale(0.8); }
+.icon-fade-enter-to, .icon-fade-leave-from { opacity: 1; transform: scale(1); }
+
+.fade-step-enter-active, .fade-step-leave-active { transition: opacity 0.5s ease; }
+.fade-step-enter-from, .fade-step-leave-to { opacity: 0; }
+.fade-step-enter-to, .fade-step-leave-from { opacity: 1; }
+
+/* Tipografías */
+.anton-regular { font-family: "Anton", sans-serif; font-weight: 400; font-style: normal; }
+.oswald { font-family: "Oswald", sans-serif; font-weight: 300; font-style: normal; }
+.raleway { font-family: "Raleway", sans-serif; font-weight: 600; font-style: normal; }
+
+/* Animaciones */
+@keyframes fade-in {
+  0% { opacity: 0; transform: translateY(-5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
+
+.input-field { @apply w-full py-3 px-5 border border-gray-300 rounded-full text-lg text-gray-500; }
+.text-area-field { @apply text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4; }
+
+/* === Variables de diseño globales === */
+@layer base {
+  :root {
+    --color-primary: #27C1F5;
+    --color-dark: #030405;
+    --color-accent: #FFC01E;
+
+    --band-free: #29C78A;
+    --band-limited: #FFC01E;
+    --band-full: #E23A4E;
+
+    --car-fill: #2B2F33;
+    --car-stroke: #000000;
+    --car-specular: #FFFFFF;
+
+    --op-car-fill: 0.96;
+    --op-car-stroke: 0.30;
+    --op-specular: 0.38;
+    --op-band-fill: 0.94;
+
+    --glow-free: 0.18;
+    --glow-limited: 0.24;
+    --glow-full: 0.28;
+
+    --anim-fast: 120ms;
+    --anim-mid: 180ms;
+    --anim-ease: cubic-bezier(.2,.8,.2,1);
+  }
+
+  .glass {
+    background: color-mix(in srgb, #ffffff 90%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid color-mix(in srgb, #ffffff 65%, transparent);
+    box-shadow: 0 6px 24px rgba(3,4,5,.08);
+    border-radius: 12px;
+  }
+}
+
+
 /* tailwind.config.js ya debería permitir variantes personalizadas si usas estas */
 .input-field {
   @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200;

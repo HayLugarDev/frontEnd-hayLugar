@@ -73,59 +73,69 @@
 
       <!-- MAPA -->
       <div v-if="showMap" class="w-full h-[70vh] relative rounded-xl overflow-hidden shadow">
-        <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions">
-          <CurbBandsLayer
-            :blocks="snappedBlocksFiltered"
-            @hover="hovered = $event"
-            @tap="openMetered"
-          />
-        </CustomGoogleMap>
+    <CustomGoogleMap
+  :center="center"
+  :zoom="zoom"
+  :options="{ ...mapOptions, styles: streetTechStyle }"
+  :debug="true"
+/>
+
+
 
         <!-- Tooltip flotante -->
         <transition name="fade">
-          <div
-            v-if="hovered"
-            class="absolute left-4 top-4 bg-white/95 backdrop-blur border border-gray-200 rounded-lg shadow p-3 text-xs text-gray-700 max-w-[320px]"
-          >
-            <div class="flex items-center gap-2">
               <div
-                class="w-2.5 h-2.5 rounded-full"
-                :class="{
-                  'bg-emerald-500': hovered.status==='free',
-                  'bg-amber-500': hovered.status==='limited',
-                  'bg-rose-500': hovered.status==='full'
-                }"
-              />
-              <div class="font-semibold">
-                {{ hovered.label }}
-                <span
-                  v-if="activeSessionsMap[hovered.id]"
-                  class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-700 border border-emerald-200"
-                >
-                  ACTIVO
-                </span>
-              </div>
-              <div class="ml-auto text-[11px] text-gray-500">{{ hovered.length }} m</div>
-            </div>
-            <div class="mt-1 text-gray-600">{{ hovered.desc }}</div>
-            <button
-              class="mt-2 w-full bg-primary text-white font-semibold rounded-md py-1.5 hover:bg-primary-dark transition disabled:opacity-60"
-              :disabled="hovered.status==='full'"
-              @click="openMetered(hovered)"
-            >
-              Iniciar estacionamiento
-            </button>
+                v-if="hovered"
+                class="absolute left-4 top-4 glass p-3 text-xs text-gray-800 max-w-[340px]"
+              >
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-2.5 h-2.5 rounded-full"
+                    :class="{
+                      'bg-emerald-500': hovered.status==='free',
+                      'bg-amber-500': hovered.status==='limited',
+                      'bg-rose-500': hovered.status==='full'
+                    }"
+                  />
+                  <div class="font-semibold">
+                    {{ hovered.label }}
+                    <span
+                      v-if="activeSessionsMap[hovered.id]"
+                      class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[color-mix(in_srgb,var(--color-primary)_20%,#fff)] text-[#0a3d52] border border-[color-mix(in_srgb,var(--color-primary)_40%,transparent)]"
+                    >
+                      ACTIVO
+                    </span>
+                  </div>
+                  <div class="ml-auto text-[11px] text-gray-500">{{ hovered.length }} m</div>
+                </div>
 
-            <!-- Finalizar (si hay ticket activo en esta cuadra) -->
-            <button
-              v-if="activeSessionsMap[hovered.id]"
-              class="mt-2 w-full border border-rose-300 text-rose-700 font-semibold rounded-md py-1.5 hover:bg-rose-50 transition"
-              @click.stop="openFinishForBlock(hovered)"
-            >
-              Finalizar mi estacionamiento
-            </button>
-          </div>
-        </transition>
+                <div class="mt-2 flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-full text-[11px] bg-gray-900/90 text-white">
+                    AR$ {{ hovered.hourly_rate ?? '—' }}/h
+                  </span>
+                  <span class="px-2 py-0.5 rounded-full text-[11px] bg-gray-200 text-gray-800">
+                    {{ hovered.occupied ?? '—' }}/{{ hovered.capacity ?? '—' }} ocupados
+                  </span>
+                </div>
+
+                <button
+                  class="mt-2 w-full bg-[var(--color-primary)] text-white font-semibold rounded-md py-1.5 hover:brightness-110 transition disabled:opacity-60"
+                  :disabled="hovered.status==='full'"
+                  @click="openMetered(hovered)"
+                >
+                  Iniciar estacionamiento
+                </button>
+
+                <button
+                  v-if="activeSessionsMap[hovered.id]"
+                  class="mt-2 w-full border border-rose-300 text-rose-700 font-semibold rounded-md py-1.5 hover:bg-rose-50 transition"
+                  @click.stop="openFinishForBlock(hovered)"
+                >
+                  Finalizar mi estacionamiento
+                </button>
+              </div>
+            </transition>
+
       </div>
 
       <!-- LISTA -->
@@ -221,6 +231,7 @@ import { subscribeToMeteredRealtime } from '../services/meteredRealtime'
 import { useUserStore } from '../store/userStore'
 import MeteredAccessDialog from '../components/meteredAccessDialog.vue'
 import CurbBandsLayer from '../components/curb/CurbBandsLayer.vue'
+import { streetTechStyle } from '../mapStyles/streetTech'
 
 const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
 center.value = { lat: -26.8309, lng: -65.2033 }

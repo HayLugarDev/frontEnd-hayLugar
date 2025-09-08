@@ -12,6 +12,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons'; // Iconos de marcas
 import { far } from '@fortawesome/free-regular-svg-icons'; // Iconos regulares
 
 
+
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 
