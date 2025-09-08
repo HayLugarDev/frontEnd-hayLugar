@@ -33,7 +33,6 @@ export const useUserStore = defineStore('user', {
       try {
         const response = await api.get('/auth/google-session', { withCredentials: true });
         this.user = response.data.user;
-        console.log(response.data.user);
         this.sessionExpired = false;
       } catch (error: any) {
         if (error.response?.status === 401) {

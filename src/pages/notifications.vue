@@ -1,18 +1,14 @@
 <template>
     <MainHeader />
-    <div class="min-h-screen bg-secondary px-6 py-20 md:py-6">
+    <div class="min-h-screen bg-secondary md:px-6 py-20 md:py-6">
         <BackButton class="md:hidden" />
-        <section class="bg-white p-8 rounded-lg shadow-lg mb-8">
+        <section class="bg-white p-4 md:p-8 rounded-lg shadow-lg mb-8">
             <h2 class="text-2xl font-bold text-primary mb-4 flex space-x-2 items-center">
                 <font-awesome-icon icon="history" class="mr-2" />
                 Notificaciones
             </h2>
             <div v-if="loading" class="space-y-4">
-                <div v-for="i in 3" :key="i" class="animate-pulse flex flex-col space-y-2 p-6 bg-gray-100 rounded-xl">
-                    <div class="h-4 bg-gray-300 rounded w-1/3"></div>
-                    <div class="h-3 bg-gray-200 rounded w-2/3"></div>
-                    <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-                </div>
+                <ItemSkeleton />
             </div>
             <ul v-else-if="notifications.length" class="divide-y divide-gray-300 space-y-2">
                 <li v-for="(notification, index) in notifications" :key="index"
@@ -50,8 +46,9 @@
 
                         <!-- Si ya está aceptada -->
                         <button v-else-if="notification.reservation_status === 'approved' && notification.reservation_role === 'owner'"
-                         class="px-4 py-2 bg-primary text-white rounded-lg">
-                            Reserva aprobada
+                        @click="goToIncomingReservations" 
+                        class="px-4 py-2 bg-primary text-white rounded-lg">
+                            Ir a reserva
                         </button>
 
                         <!-- client -->
@@ -59,14 +56,14 @@
                             v-if="notification.reservation_role === 'client'"
                             @click="goToReservations"
                             class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition">
-                            Ir a detalles de reserva
+                            Ir a reserva
                         </button>
                     </div>
 
                 </li>
             </ul>
 
-            <p v-else class="text-gray-500">No hay notificaciones.</p>
+            <p v-else-if="!loading" class="text-gray-500">No hay notificaciones.</p>
         </section>
 
         <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
@@ -85,6 +82,7 @@ import BackButton from '../components/common/BackButton.vue';
 import ConfirmModal from '../components/common/ConfirmModal.vue';
 import { statusColors } from '../logic/useReservationMessages';
 import loadIcon from "../assets/load-icon_secondary.svg";
+import ItemSkeleton from '../components/layout/skeletons/ItemSkeleton.vue';
 
 const router = useRouter();
 const notifications = ref([]);
@@ -166,6 +164,7 @@ const fetchNotifications = async () => {
     const userId = userStore.user?.id;
     if (!userId) {
         console.error("No se encontró el ID de usuario en userStore");
+        loading.value = false;
         return;
     }
     try {

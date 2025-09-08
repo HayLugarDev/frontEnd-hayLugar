@@ -177,11 +177,6 @@
       </div>
     </div>
 
-    <!-- Menú móvil -->
-    <div class="fixed bottom-0 left-0 w-full z-50">
-      <MobileMenu :showMap="showMap" @toggle="showMap = !showMap" />
-    </div>
-
     <!-- Modal Confirmar Acceso (legajo + patente) -->
     <ConfirmAccessModal
       :open="modalOpen"
@@ -196,7 +191,6 @@
 import { ref, computed, onMounted } from 'vue'
 import MainHeader from '../components/layout/header/MainHeader.vue'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
-import MobileMenu from '../components/layout/MobileMenu.vue'
 import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue'
 import { getUniversitySpaces } from '../services/universityService'
 import { useUniversityMap } from '../logic/useUniversityMap'

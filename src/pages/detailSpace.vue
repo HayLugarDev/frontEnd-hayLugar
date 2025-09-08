@@ -5,13 +5,13 @@
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <div v-if="espacio?.images?.length">
         <!-- Carrusel en móviles -->
-        <Carousel :images="espacio.images" class="w-full h-full rounded-lg" :controls="false" />
+        <Carousel :images="espacio.images" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
 
         <!-- Info del anfitrión -->
         <section v-if="espacio?.host" class="col-span-3 bg-secondary p-6 px-10 rounded-xl shadow-md mt-6 font-normal">
           <div class="flex flex-row items-center gap-4">
             <img :src="hostImage" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
-            <div class="flex flex-col pl-8 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800">
+            <div class="flex flex-col pl-4 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800">
               <div class="flex flex-row gap-1 items-center">
                 <p class="text-lg font-semibold">Anfitrión: </p><span>{{ espacio.host.name }} {{ espacio.host.last_name
                 }}</span>
@@ -31,7 +31,7 @@
         </section>
 
         <!-- Título + Favorito -->
-        <div class="flex flex-row items-center justify-between mt-4 px-2">
+        <div class="flex flex-row items-center justify-between mt-4 px-6 md:px-2">
           <h1 class="text-4xl sm:text-3xl font-bold p-2 text-primary">{{ espacio.name }}</h1>
           <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" :class="[
             activedFavouriteIcon ? 'text-red-500 scale-110' : 'text-gray-700',
@@ -43,12 +43,12 @@
         <!-- Galería de imágenes grande -->
         <div class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-4 h-[400px]">
           <div class="col-span-4 row-span-8">
-            <img :src="getImageUrl(espacio.images[0])" alt="Principal"
+            <img :src="espacio.images[0]" alt="Principal"
               class="h-full w-full object-cover rounded-lg shadow-md border" />
           </div>
           <template v-for="(img, index) in espacio.images.slice(1, 5)" :key="index">
             <div :class="imageGridPosition(index)">
-              <img :src="getImageUrl(img)" alt="Espacio"
+              <img :src="img" alt="Espacio"
                 class="h-full w-full object-cover rounded-lg shadow-md border" />
             </div>
           </template>
@@ -89,7 +89,7 @@
             :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
             @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
             @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event"
-            @reservar="reservar" />
+            @reservar="reservar" :availability="disponibilidad"/>
 
           <!-- Botón para dueño -->
           <div v-else-if="isOwner"
@@ -159,7 +159,6 @@ import BackButton from "../components/common/BackButton.vue";
 import { useVerifyToken } from '../logic/useVerifyToken';
 import SessionExpired from '../components/common/SessionExpired.vue';
 import { useUserStore } from '../store/userStore';
-import { baseURL } from '../services/apiService';
 import vehicleLabel from '../logic/useVehicleLabel';
 import { getAllVehicles } from '../services/vehicleService';
 import VehicleSelectModal from '../components/pages/detailSpacePage/VehicleSelectModal.vue';
@@ -178,7 +177,6 @@ const espacio = ref(null);
 const deadLine = ref(null);
 const activedFavouriteIcon = ref(false);
 const isAnimating = ref(false);
-const getImageUrl = (img) => `${baseURL}${img}`;
 
 const showVehicleModal = ref(false);
 const vehiculosUsuario = ref([]);
@@ -202,11 +200,19 @@ const isOwner = computed(() => {
 
 const { verifyToken, isSessionInvalid } = useVerifyToken();
 
+// Espacio disponible del espacio
+const disponibilidad = computed(() => {
+  if (!espacio.value?.availability) return {};
+  return typeof espacio.value.availability === 'string'
+    ? JSON.parse(espacio.value.availability)
+    : espacio.value.availability;
+});
+
 const obtenerEspacio = async () => {
   try {
     const id = route.params.id;
     const space = await getSpaceById(id);
-    console.log(space.images)
+    console.log(space);
     return espacio.value = space;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
