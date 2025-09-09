@@ -63,18 +63,6 @@
           </div>
         </div>
 
-        <!-- Métodos de Pago -->
-        <!-- <div class="bg-white p-6 rounded-lg shadow-md col-span-full">
-          <h2 class="text-lg font-semibold mb-4">Método de Pago</h2>
-          <div class="flex flex-col space-y-4">
-            <label class="flex items-center gap-3">
-              <input type="radio" v-model="metodoPago" value="tarjeta" class="form-radio" />
-              <font-awesome-icon icon="credit-card" class="text-xl" />
-              <span>Tarjeta de Crédito/Débito</span>
-            </label>
-          </div>
-        </div> -->
-
         <!-- Sección de Pago con Tarjeta usando MercadoPago Card Payment Brick -->
         <div v-if="metodoPago === 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md md:col-span-full">
           <div id="cardPaymentBrick_container"></div>
@@ -187,11 +175,16 @@ const initCardBrick = async () => {
     alert("El monto a pagar no es válido.");
     return;
   }
-  const mp = new window.MercadoPago('TEST-f39e0ddb-bc5b-491c-9245-0461fdeccb74', { locale: 'es-AR' });
+
+  // Clave pública desde ENV con fallback
+  const PUBLIC_KEY = (import.meta as any).env?.VITE_MP_PUBLIC_KEY || 'TEST-f39e0ddb-bc5b-491c-9245-0461fdeccb74';
+
+  const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'es-AR' });
   const bricksBuilder = mp.bricks();
+
   const settings = {
     initialization: {
-      amount: total.value.toString(),
+      amount: Number(total.value), // número
       payer: {
         email: email.value || "",
       },
@@ -212,10 +205,9 @@ const initCardBrick = async () => {
       },
       onSubmit: async (cardFormData: any) => {
         console.log("Datos del Brick:", cardFormData);
-        // Extraer el token, el monto y el payment_method_id real del objeto del Brick
-        const tokenGenerado = cardFormData.token;
-        const monto = cardFormData.transaction_amount;
-        const paymentMethodId = cardFormData.payment_method_id;
+        const tokenGenerado = cardFormData?.token;
+        const monto = Number(cardFormData?.transaction_amount ?? total.value); // fallback
+        const paymentMethodId = cardFormData?.payment_method_id;
         await confirmarPagoMercadoPago(tokenGenerado, monto, paymentMethodId);
       },
       onError: (error: any) => {
@@ -224,21 +216,20 @@ const initCardBrick = async () => {
     },
   };
 
-  if (window.cardPaymentBrickController) {
-    window.cardPaymentBrickController.unmount();
+  if ((window as any).cardPaymentBrickController) {
+    (window as any).cardPaymentBrickController.unmount();
   }
 
   const container = document.getElementById("cardPaymentBrick_container");
   if (container) {
     container.innerHTML = "";
-    window.cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
+    (window as any).cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
   } else {
     console.error("No se encontró el contenedor 'cardPaymentBrick_container'");
   }
 };
 
 // Función para confirmar el pago utilizando el Checkout API
-// Ahora se recibe paymentMethodReal
 const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMethodReal: string) => {
 
   if (!nombre.value || !dni.value || !direccion.value || !email.value) {
@@ -246,7 +237,6 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
     return;
   }
 
-  // Guardamos el token recibido en una variable local
   const tokenValue = token;
 
   // Actualizamos el store con los datos de facturación
@@ -260,7 +250,7 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
     }
   });
 
-  // Creamos la reserva en estado "pending" y capturamos el resultado
+  // Creamos la reserva en estado "pending"
   let reservationResponse: any;
   try {
     reservationResponse = await reservationStore.submitReservation();
@@ -269,24 +259,23 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
     alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
     return;
   }
-  // Extraemos el id desde axiosResponse.data
-  const reservationId = reservationResponse.reservation.id;
+
+  const reservationId = reservationResponse?.reservation?.id || reservationResponse?.data?.reservation?.id;
   if (!reservationId) {
     console.error("reservationId no encontrado en la respuesta:", reservationResponse);
     alert("Error interno: no se pudo obtener el ID de la reserva.");
     return;
   }
 
-  // Construir el payload para enviar a nuestro endpoint que procesa el pago,
-  // asegurándonos de incluir el payment_method_id real y otros campos requeridos.
+  // Payload para el backend
   const payload = {
     reservation_id: reservationId,
     transaction_amount: Number(amount),
     description: `Pago para la reserva #${reservationId}`,
-    email: email.value,  // Debe venir de req.user.email en el backend
-    payment_method_id: paymentMethodReal,  // Ahora se usa el valor real (ej.: "visa")
+    email: email.value,
+    payment_method_id: paymentMethodReal,
     token: tokenValue,
-    issuer_id: 310, // Valor fijo o dinámico según corresponda
+    issuer_id: 310, // si no lo usás en backend, lo ignorará
     payer: {
       email: email.value,
       identification: {
@@ -298,11 +287,11 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
   };
   console.log("Payload a enviar:", payload);
 
-  // Procesamos el pago mediante nuestro endpoint (ejemplo: /payments/create)
+  // ✅ ENDPOINT ACTUALIZADO: HOLD (alias del proceso legacy)
   try {
-    const response = await api.post('/payments/process_payment', payload);
+    const response = await api.post('/payments/hold', payload);
     if (response.status === 201) {
-      console.log("Pago procesado exitosamente");
+      console.log("Hold/Pago procesado exitosamente");
       router.push({
         path: '/confirmacion',
         query: { id: espacio.value.id }
