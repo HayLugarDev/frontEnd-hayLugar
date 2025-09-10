@@ -4,13 +4,19 @@
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <BackButton class="lg:hidden" />
       <section class="w-full md:grid md:grid-cols-9 flex flex-col gap-2">
-        <h1 class="text-primary text-2xl text-start md:text-3xl py-6 px-6 col-span-5 row-span-1">Confirmá tu Pago</h1>
+        <h1 class="text-primary text-2xl text-start md:text-3xl py-6 px-6 col-span-5 row-span-1">
+          Confirmá tu Pago
+        </h1>
 
         <!-- Resumen del Espacio y Reserva -->
         <div class="md:col-span-4 md:row-start-2 md:col-start-6 h-full">
           <div class="bg-white p-8 rounded-lg shadow-md flex items-start">
-            <img v-if="espacio && espacio.images && espacio.images[0]" :src="`${baseURL}${espacio.images[0]}`"
-              alt="Imagen del espacio" class="w-28 h-28 object-cover rounded-lg shadow-md mr-6" />
+            <img
+              v-if="espacio && espacio.images && espacio.images[0]"
+              :src="`${baseURL}${espacio.images[0]}`"
+              alt="Imagen del espacio"
+              class="w-28 h-28 object-cover rounded-lg shadow-md mr-6"
+            />
             <div>
               <h3 class="text-md font-semibold text-gray-800">{{ espacio?.name }}</h3>
               <p class="text-gray-700 text-sm">{{ espacio?.location }}</p>
@@ -21,57 +27,87 @@
               </div>
             </div>
           </div>
-          <div class="md:col-span-4 grid grid-cols-2 bg-white p-6 rounded-lg shadow-md items-start border-t-2">
-            <p class="text-xl col-span-2 pb-2 border-b">CONCEPTOS FACTURADOS</p>
-            <p class="text-lg col-span-1 row-start-2 text-gray-600 pt-4">Precio por {{ hours }} horas y {{
-              minutes }} minutos</p>
-            <p class="text-lg col-span-1 col-start-2 text-end text-gray-600 pt-4">$ {{ total }}</p>
+
+          <!-- CONCEPTOS FACTURADOS (estilo Airbnb) -->
+          <div class="md:col-span-4 bg-white p-6 rounded-lg shadow-md items-start border-t-2">
+            <p class="text-xl pb-2 border-b col-span-2">CONCEPTOS FACTURADOS</p>
+
+            <div class="grid grid-cols-2 gap-y-3 pt-4">
+              <p class="text-lg text-gray-600">
+                Precio por {{ hours }} horas y {{ minutes }} minutos
+              </p>
+              <p class="text-lg text-end text-gray-800 font-medium">
+                {{ formatARS(baseAmount) }}
+              </p>
+
+              <p class="text-lg text-gray-600">
+                Cargo por servicio ({{ Math.round(SERVICE_FEE_PCT * 100) }}%)
+              </p>
+              <p class="text-lg text-end text-gray-800 font-medium">
+                {{ formatARS(serviceFeeAmount) }}
+              </p>
+            </div>
           </div>
-          <div class="col-span-4 grid grid-cols-2 bg-white p-6 rounded-lg shadow-md items-start border-t-2">
-            <p class="text-lg col-span-1 row-start-4">Total a pagar</p>
-            <p class="text-lg col-span-1 row-start-4 text-end">$ {{ total }}</p>
+
+          <div class="col-span-4 grid grid-cols-2 bg-white p-6 rounded-lg shadow-md items-center border-t-2">
+            <p class="text-lg font-semibold">Total a pagar</p>
+            <p class="text-2xl font-bold text-end text-primary">
+              {{ formatARS(totalGuestPays) }}
+            </p>
+            <p class="col-span-2 text-xs text-gray-500 mt-3">
+              * Si el estacionamiento se extiende más allá del horario reservado, podrían aplicarse
+              cargos adicionales por sobretiempo al finalizar (penalidad).
+            </p>
           </div>
         </div>
 
         <!-- Datos de Facturación con Vehículo -->
         <div class="bg-white p-6 rounded-lg shadow-md md:col-span-5 flex flex-col gap-6">
-
           <!-- Vehículo seleccionado -->
           <div v-if="reserva.vehicle_type" class="bg-gray-100 p-4 rounded border border-gray-300 shadow-sm">
             <div class="flex flex-row items-center justify-between">
               <h3 class="text-md font-semibold text-gray-700 mb-1">Vehículo Seleccionado</h3>
               <font-awesome-icon
-                :icon="reserva.vehicle_type === 'car' ? 'car' : reserva.vehicle_type === 'motorcycle' ? 'motorcycle' :
-                  reserva.vehicle_type === 'bicycle' ? 'bicycle' : 'question'"
-                class="text-gray-600 mr-2" />
+                :icon="
+                  reserva.vehicle_type === 'car'
+                    ? 'car'
+                    : reserva.vehicle_type === 'motorcycle'
+                    ? 'motorcycle'
+                    : reserva.vehicle_type === 'bicycle'
+                    ? 'bicycle'
+                    : 'question'
+                "
+                class="text-gray-600 mr-2"
+              />
             </div>
             <div v-if="vehiculoSeleccionado">
               <p>Marca: {{ vehiculoSeleccionado.brand }}</p>
               <p>Modelo: {{ vehiculoSeleccionado.model }}</p>
-              <p>Patente: {{ vehiculoSeleccionado.license_plate ?? 'No aplica'}}</p>
+              <p>Patente: {{ vehiculoSeleccionado.license_plate ?? 'No aplica' }}</p>
             </div>
-
           </div>
 
           <!-- Formulario de Facturación -->
           <div class="flex flex-col gap-1">
             <h2 class="text-lg font-semibold mb-2">Datos de Facturación</h2>
-            <FormField v-model="nombre" placeholder="Nombre completo"/>
-            <FormField v-model="dni" placeholder="Número de documento"/>
-            <FormField v-model="direccion" placeholder="Domicilio"/>
-            <FormField v-model="email" placeholder="Correo electrónico"/>
+            <FormField v-model="nombre" placeholder="Nombre completo" />
+            <FormField v-model="dni" placeholder="Número de documento" />
+            <FormField v-model="direccion" placeholder="Domicilio" />
+            <FormField v-model="email" placeholder="Correo electrónico" />
           </div>
         </div>
 
-        <!-- Sección de Pago con Tarjeta usando MercadoPago Card Payment Brick -->
+        <!-- Pago con Tarjeta (MercadoPago Card Payment Brick) -->
         <div v-if="metodoPago === 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md md:col-span-full">
           <div id="cardPaymentBrick_container"></div>
         </div>
 
         <!-- Botón de Confirmación para otros métodos (simulado) -->
         <div v-if="metodoPago !== 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
-          <button @click="confirmarPagoSimulado"
-            class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
+          <button
+            @click="confirmarPagoSimulado"
+            class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all"
+          >
             <font-awesome-icon icon="check-circle" class="mr-2" />
             Confirmar y Pagar
           </button>
@@ -83,7 +119,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, nextTick, computed } from 'vue';
-import { useRouter, useRoute, routeLocationKey } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import api, { baseURL } from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
 import { loadMercadoPago } from '@mercadopago/sdk-js';
@@ -97,22 +133,47 @@ const router = useRouter();
 const route = useRoute();
 const reservationStore = useReservationStore();
 
-// Datos de facturación y reserva (inputs y query)
+// ===== UI helpers
+const formatARS = (v: number) =>
+  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(Number(v || 0));
+
+// ===== Inputs/estado
 const metodoPago = ref("tarjeta");
 const nombre = ref("");
 const dni = ref("");
 const direccion = ref("");
 const email = ref("");
-const total = computed(() => reserva.value.total || 0);
+
+// Reserva base que viene del store
+const reserva = computed(() => reservationStore.reservation);
+
+// Duración
 const totalDuration = computed(() => reserva.value?.dead_line ?? 0);
-const hours = computed(() => { return totalDuration.value ? Math.floor(totalDuration.value) : 0; });
-const minutes = computed(() => { return totalDuration.value ? Math.round((totalDuration.value - hours.value) * 60) : 0; });
+const hours = computed(() => (totalDuration.value ? Math.floor(totalDuration.value) : 0));
+const minutes = computed(() => (totalDuration.value ? Math.round((totalDuration.value - hours.value) * 60) : 0));
+
+// Precio base publicado por el anfitrión (lo que antes llamabas total)
+const baseAmount = computed(() => Number(reserva.value.total || 0));
+
+// % de cargo por servicio visible al huésped (controlable por .env del front)
+const SERVICE_FEE_PCT =
+  Number((import.meta as any).env?.VITE_SERVICE_FEE_PCT ?? 0.15);
+
+// Monto del cargo de servicio y total a pagar por el huésped
+const serviceFeeAmount = computed(() => {
+  // redondeo a 2 decimales para UI; MercadoPago aceptará el número normalizado
+  return Math.round(baseAmount.value * SERVICE_FEE_PCT * 100) / 100;
+});
+const totalGuestPays = computed(() => {
+  return Math.round((baseAmount.value + serviceFeeAmount.value) * 100) / 100;
+});
+
 const startTime = computed(() => reserva.value.start_time);
 const endTime = computed(() => reserva.value.end_time);
 const espacio = ref<any>(null);
-const vehiculoSeleccionado = ref(null);
+const vehiculoSeleccionado = ref<any>(null);
 
-// Función para obtener los datos del espacio
+// Cargar info espacio
 const obtenerEspacio = async () => {
   try {
     const id = reserva.value.space_id;
@@ -125,29 +186,28 @@ const obtenerEspacio = async () => {
   }
 };
 
-
 onMounted(async () => {
-  const dataSpace = await obtenerEspacio();
-  console.log(dataSpace);
+  await obtenerEspacio();
+
   if (!reservationStore.reservation.space_id || !reservationStore.reservation.start_time) {
     console.error('Error en envío de datos.');
     router.push('/dashboard');
+    return;
   }
+
   if (metodoPago.value === 'tarjeta') {
     await nextTick();
     setTimeout(async () => {
       await initCardBrick();
     }, 300);
   }
+
   const vehicle_id = reservationStore.reservation.vehicle_id;
   if (vehicle_id) {
     const vehicleSelect = await getVehicleById(vehicle_id);
-    console.log(vehicleSelect);
     vehiculoSeleccionado.value = vehicleSelect;
   }
 });
-
-const reserva = computed(() => reservationStore.reservation);
 
 watch(metodoPago, async (newVal) => {
   if (newVal === 'tarjeta') {
@@ -158,61 +218,42 @@ watch(metodoPago, async (newVal) => {
   }
 });
 
-// watch(email, async (newEmail) => {
-//   if (metodoPago.value === 'tarjeta' && newEmail) {
-//     await nextTick();
-//     await initCardBrick();
-//   }
-// });
-
 let cardForm: any = null;
 
-// Inicializa el Brick de MercadoPago
+// ======= MP Brick
 const initCardBrick = async () => {
   await loadMercadoPago();
 
-  if (total.value <= 0) {
+  if (totalGuestPays.value <= 0) {
     alert("El monto a pagar no es válido.");
     return;
   }
 
-  // Clave pública desde ENV con fallback
   const PUBLIC_KEY = (import.meta as any).env?.VITE_MP_PUBLIC_KEY || 'TEST-f39e0ddb-bc5b-491c-9245-0461fdeccb74';
-
   const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'es-AR' });
   const bricksBuilder = mp.bricks();
 
   const settings = {
     initialization: {
-      amount: Number(total.value), // número
+      // ⚠️ Ahora cobramos el TOTAL al huésped (base + fee)
+      amount: Number(totalGuestPays.value),
       payer: {
         email: email.value || "",
       },
     },
     customization: {
-      visual: {
-        style: {
-          theme: 'default',
-        },
-      },
-      paymentMethods: {
-        maxInstallments: 1,
-      },
+      visual: { style: { theme: 'default' } },
+      paymentMethods: { maxInstallments: 1 },
     },
     callbacks: {
-      onReady: () => {
-        console.log("Brick is ready");
-      },
+      onReady: () => { console.log("Brick is ready"); },
       onSubmit: async (cardFormData: any) => {
-        console.log("Datos del Brick:", cardFormData);
         const tokenGenerado = cardFormData?.token;
-        const monto = Number(cardFormData?.transaction_amount ?? total.value); // fallback
+        const monto = Number(cardFormData?.transaction_amount ?? totalGuestPays.value);
         const paymentMethodId = cardFormData?.payment_method_id;
         await confirmarPagoMercadoPago(tokenGenerado, monto, paymentMethodId);
       },
-      onError: (error: any) => {
-        console.error("Error en el Brick:", error);
-      },
+      onError: (error: any) => { console.error("Error en el Brick:", error); },
     },
   };
 
@@ -223,23 +264,23 @@ const initCardBrick = async () => {
   const container = document.getElementById("cardPaymentBrick_container");
   if (container) {
     container.innerHTML = "";
-    (window as any).cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
+    (window as any).cardPaymentBrickController = await bricksBuilder.create(
+      'cardPayment',
+      'cardPaymentBrick_container',
+      settings
+    );
   } else {
     console.error("No se encontró el contenedor 'cardPaymentBrick_container'");
   }
 };
 
-// Función para confirmar el pago utilizando el Checkout API
+// ======= Confirmar pago (crea reserva + hold en backend)
 const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMethodReal: string) => {
-
   if (!nombre.value || !dni.value || !direccion.value || !email.value) {
     alert("Por favor, completa todos los datos de facturación antes de pagar.");
     return;
   }
 
-  const tokenValue = token;
-
-  // Actualizamos el store con los datos de facturación
   reservationStore.setReservationData({
     payment_method: metodoPago.value,
     payment_data: {
@@ -250,7 +291,7 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
     }
   });
 
-  // Creamos la reserva en estado "pending"
+  // 1) crear reserva en pending
   let reservationResponse: any;
   try {
     reservationResponse = await reservationStore.submitReservation();
@@ -267,35 +308,34 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
     return;
   }
 
-  // Payload para el backend
+  // 2) Enviar HOLD (total base + fee) al backend
   const payload = {
     reservation_id: reservationId,
-    transaction_amount: Number(amount),
+    transaction_amount: Number(amount), // total cobrado al huésped
     description: `Pago para la reserva #${reservationId}`,
     email: email.value,
     payment_method_id: paymentMethodReal,
-    token: tokenValue,
-    issuer_id: 310, // si no lo usás en backend, lo ignorará
+    token,
+    issuer_id: 310,
     payer: {
       email: email.value,
-      identification: {
-        type: "DNI",
-        number: dni.value.toString(),
-      },
+      identification: { type: "DNI", number: dni.value.toString() },
     },
-    installments: 1
+    installments: 1,
+    // (Opcional) Enviamos desglose para logging/analítica del BE
+    breakdown: {
+      base_amount: Number(baseAmount.value),
+      service_fee_amount: Number(serviceFeeAmount.value),
+      total: Number(totalGuestPays.value),
+      service_fee_pct: SERVICE_FEE_PCT
+    }
   };
-  console.log("Payload a enviar:", payload);
 
-  // ✅ ENDPOINT ACTUALIZADO: HOLD (alias del proceso legacy)
   try {
     const response = await api.post('/payments/hold', payload);
     if (response.status === 201) {
-      console.log("Hold/Pago procesado exitosamente");
-      router.push({
-        path: '/confirmacion',
-        query: { id: espacio.value.id }
-      });
+      console.log("Hold autorizado correctamente");
+      router.push({ path: '/confirmacion', query: { id: espacio.value.id } });
     }
   } catch (error) {
     console.error("Error al procesar el pago:", error);
@@ -303,7 +343,7 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
   }
 };
 
-// Función para el caso simulado (otros métodos de pago)
+// Otros métodos simulados
 const confirmarPagoSimulado = async () => {
   if (!nombre.value || !dni.value || !direccion.value || !email.value) {
     alert("Por favor, completa todos los datos de facturación.");
@@ -324,10 +364,7 @@ const confirmarPagoSimulado = async () => {
     const response = await reservationStore.submitReservation();
     if (response) {
       alert("Pago confirmado mediante " + metodoPago.value);
-      router.push({
-        path: '/confirmacion',
-        query: { id: espacio.value.id }
-      });
+      router.push({ path: '/confirmacion', query: { id: espacio.value.id } });
     }
     return response.data;
   } catch (error) {
