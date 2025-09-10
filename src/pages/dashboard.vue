@@ -19,14 +19,11 @@
         <CustomInputGroup v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
           :onSearch="buscar" />
       </div>
-      <div class="flex overflow-x-auto p-4 bg-white shadow-md rounded-lg md:mt-4">
-        <button @click="router.push('/universidades')"
-          class="px-4 py-2 text-gray-600 hover:text-primary transition-all">
-          🎓🏛️ Universidades
-        </button>
-
-        <button @click="router.push('/meteredParkingDashboard')"
-          class="px-4 py-2 text-gray-600 hover:text-primary transition-all">🅿️ Estacionamiento Medido</button>
+      <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
+        <ZoneNavbarButton @click="router.push('/universidades')" :text="'🎓🏛️ Universidades'" />
+        <ZoneNavbarButton @click="router.push('/meteredParkingDashboard')" :text="'🅿️ Estacionamiento Medido'" />
+        <ZoneNavbarButton :text="'Motos'" :usedIcon="'motorcycle'" />
+        <ZoneNavbarButton :text="'Garages'" :usedIcon="'car'" />
       </div>
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
         <AdvancedMobileSearch />
@@ -34,7 +31,7 @@
 
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
         <div v-if="!showMap"
-          class="relative flex-1 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
+          class="relative flex-1 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
           <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">{{
             error }}</div>
           <SpaceCard v-for="espacio in espacios" :key="espacio.id" :espacio="espacio" />
@@ -76,6 +73,7 @@ import CustomInputGroup from "../components/pages/dashboardPage/CustomInputGroup
 import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkeleton.vue';
 import { useGoogleMap } from '../logic/useGoogleMap';
 import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
+import ZoneNavbarButton from '../components/pages/dashboardPage/ZoneNavbarButton.vue';
 
 const router = useRouter();
 const userStore = useUserStore();

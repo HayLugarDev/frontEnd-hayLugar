@@ -7,11 +7,11 @@
             </div>
             <div class="p-1">
                 <div class="flex flex-col items-start px-1 md:px-0">
-                    <div class="text-2xl md:text-sm font-bold text-primary">{{ capitalizeFirst(espacio.name) }}</div>
-                    <p class="text-lg lg:text-xs text-gray-800">
+                    <div class="text-sm lg:text-xs font-bold text-primary">{{ capitalizeFirst(espacio.name) }}</div>
+                    <p class="text-sm lg:text-xs text-gray-800">
                         {{ espacio.location.split(',')[1] }}
                     </p>
-                    <p class="text-lg lg:text-xs text-gray-500">
+                    <p class="text-sm lg:text-xs text-gray-500">
                         {{ espacio.location.split(',')[0] }}
                     </p>
 
@@ -19,12 +19,12 @@
                         <div class="flex flex-row justify-start">
                             <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-1 border rounded-xl">
                                 <font-awesome-icon :icon="['fas', `${vehicleTypeTranslations[v.type]}`]"
-                                    class="text-gray-700 text-xl md:text-sm" />
-                                <p v-if="v.price_per_hour" class="text-sm font-normal md:hidden">Hora: ${{
+                                    class="text-gray-700 text-sm md:text-sm" />
+                                <p v-if="v.price_per_hour" class="text-[.6rem] font-normal md:hidden">Hora: ${{
                                     v.price_per_hour.toLocaleString() }}</p>
                             </div>
                         </div>
-                        <div class="text-gray-800 font-semibold text-2xl md:text-sm">
+                        <div class="text-gray-800 font-semibold text-md md:text-sm">
                             <span class="text-yellow-600">★</span> {{ Number(espacio.average_rating).toFixed(1) }}
                         </div>
                     </div>

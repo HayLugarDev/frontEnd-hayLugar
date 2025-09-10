@@ -32,7 +32,7 @@
 
         <!-- Título + Favorito -->
         <div class="flex flex-row items-center justify-between mt-4 px-6 md:px-2">
-          <h1 class="text-4xl sm:text-3xl font-bold p-2 text-primary">{{ espacio.name }}</h1>
+          <h1 class="text-4xl sm:text-3xl font-bold p-2 text-primary">{{ capitalizeFirst(espacio.name) }}</h1>
           <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" :class="[
             activedFavouriteIcon ? 'text-red-500 scale-110' : 'text-gray-700',
             'text-3xl cursor-pointer transition-transform duration-300 ease-in-out',
@@ -164,6 +164,7 @@ import { getAllVehicles } from '../services/vehicleService';
 import VehicleSelectModal from '../components/pages/detailSpacePage/VehicleSelectModal.vue';
 import FormReservation from '../components/forms/FormReservation.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
+import { capitalizeFirst } from '../utils/capitalizeFirstCharAt';
 
 const userStore = useUserStore();
 const router = useRouter();
