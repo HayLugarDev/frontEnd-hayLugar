@@ -70,7 +70,7 @@ const showMap = ref(false);
 const router = useRouter();
 const route = useRoute();
 
-const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
+const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Mapa');
 
 const { routeConfig } = useHeaderVisibility();
 
