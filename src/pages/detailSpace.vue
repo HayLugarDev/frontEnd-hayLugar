@@ -94,7 +94,7 @@
           <!-- Botón para dueño -->
           <div v-else-if="isOwner"
             class="col-span-10 lg:col-span-4 flex justify-center items-start p-6 order-5 lg:order-3">
-            <button @click="goToEdit"
+            <button @click="editPublication()"
               class="px-6 py-3 rounded-full bg-gradient-to-r from-indigo-500 to-primary text-white font-semibold shadow-lg hover:from-indigo-600 hover:to-primary transition-all duration-300">
               ✏️ Editar publicación
             </button>
@@ -133,6 +133,8 @@
       </div>
     </main>
   </div>
+  <EditPublications :visible="openEditModal" :spaceId="route.params.id" @close="openEditModal = false" />
+
   <SessionExpired :sessionExpired="isSessionInvalid" />
 
   <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
@@ -165,6 +167,7 @@ import VehicleSelectModal from '../components/pages/detailSpacePage/VehicleSelec
 import FormReservation from '../components/forms/FormReservation.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import { capitalizeFirst } from '../utils/capitalizeFirstCharAt';
+import EditPublications from '../components/pages/profilePage/UI/EditPublications.vue';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -188,6 +191,7 @@ const isLogged = computed(() => !!userStore.user && !!userStore.user.id);
 const showErrorModal = ref(false);
 const errorMessage = ref('');
 const modalIsHtml = ref(false);
+const openEditModal = ref(false);
 
 const ownerIdFromSpace = computed(() => {
   if (!espacio.value) return null;
@@ -397,6 +401,10 @@ const imageGridPosition = (index) => {
     'col-start-7 row-start-5'
   ];
   return `col-span-4 md:col-span-2 row-span-4 ${positions[index] || ''}`;
+};
+
+const editPublication = () => {
+  openEditModal.value = true;
 };
 
 const toggleFavourite = async () => {

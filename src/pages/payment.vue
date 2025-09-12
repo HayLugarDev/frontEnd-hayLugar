@@ -11,12 +11,8 @@
         <!-- Resumen del Espacio y Reserva -->
         <div class="md:col-span-4 md:row-start-2 md:col-start-6 h-full">
           <div class="bg-white p-8 rounded-lg shadow-md flex items-start">
-            <img
-              v-if="espacio && espacio.images && espacio.images[0]"
-              :src="`${baseURL}${espacio.images[0]}`"
-              alt="Imagen del espacio"
-              class="w-28 h-28 object-cover rounded-lg shadow-md mr-6"
-            />
+            <img v-if="espacio && espacio.images && espacio.images[0]" :src="espacio.images[0]"
+              alt="Imagen del espacio" class="w-28 h-28 object-cover rounded-lg shadow-md mr-6" />
             <div>
               <h3 class="text-md font-semibold text-gray-800">{{ espacio?.name }}</h3>
               <p class="text-gray-700 text-sm">{{ espacio?.location }}</p>
@@ -119,8 +115,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, nextTick, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import api, { baseURL } from '../services/apiService';
+import { useRouter } from 'vue-router';
+import api from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
 import { loadMercadoPago } from '@mercadopago/sdk-js';
 import { getSpaceById } from '../services/spaceService';
@@ -130,7 +126,6 @@ import { getVehicleById } from '../services/vehicleService';
 import FormField from '../components/forms/FormField.vue';
 
 const router = useRouter();
-const route = useRoute();
 const reservationStore = useReservationStore();
 
 // ===== UI helpers
@@ -217,8 +212,6 @@ watch(metodoPago, async (newVal) => {
     }, 300);
   }
 });
-
-let cardForm: any = null;
 
 // ======= MP Brick
 const initCardBrick = async () => {
