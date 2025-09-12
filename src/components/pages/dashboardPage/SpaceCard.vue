@@ -1,17 +1,20 @@
 <template>
     <router-link :to="`/espacio/${espacio.id}`">
-        <div class="bg-secondary rounded-xl transition-all h-full lg:h-80 p-2 md:p-0">
-            <div v-if="espacio && espacio.images && espacio.images.length" class="aspect-square relative p-2">
-                <!-- <Logo :width="'10'" class="absolute right-2 bottom-0 z-30" /> -->
-                <Carousel :images="espacio.images" class="w-full h-full rounded-lg" :controls="false" />
+        <div class="bg-secondary rounded-xl transition-all h-full lg:h-80 min-h-[22rem] p-2 md:p-0">
+            <div class="relative w-full h-48 overflow-hidden rounded-lg">
+                <Carousel :images="espacio.images" class="w-full h-full object-cover" :controls="false" />
             </div>
             <div class="p-1">
                 <div class="flex flex-col items-start px-1 md:px-0">
-                    <div class="text-sm lg:text-xs font-bold text-primary">{{ capitalizeFirst(espacio.name) }}</div>
-                    <p class="text-sm lg:text-xs text-gray-800">
+                    <div class="text-sm lg:text-xs font-bold text-primary line-clamp-1">
+                        {{ capitalizeFirst(espacio.name) }}
+                    </div>
+
+                    <p class="text-xs text-gray-800 line-clamp-1">
                         {{ espacio.location.split(',')[1] }}
                     </p>
-                    <p class="text-sm lg:text-xs text-gray-500">
+
+                    <p class="text-[10px] sm:text-xs text-gray-500 line-clamp-1">
                         {{ espacio.location.split(',')[0] }}
                     </p>
 
@@ -32,13 +35,13 @@
 
                 <div class="col-span-2 mb-2">
                     <div
-                        class="bg-blue-100 text-primary rounded-lg px-4 py-2 text-start text-xs lg:text-[.6rem] font-semibold">
+                        class="bg-blue-100 text-primary rounded-lg px-4 py-2 text-start text-[10px] font-semibold">
                         <div v-if="disponibilidad.dateRange && disponibilidad.dateRange.length === 2">
                             <span>
                                 {{ formatDate(disponibilidad.dateRange[0]) }} al {{ disponibilidad.dateRange[1] }}
                             </span>
                         </div>
-                        <div>
+                        <div class="text-[10px]">
                             <span>Horario: </span>
                             <span v-if="disponibilidad.start && disponibilidad.end">
                                 {{ disponibilidad.start }} a {{ disponibilidad.end }} hs

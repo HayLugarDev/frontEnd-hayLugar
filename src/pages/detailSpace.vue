@@ -2,22 +2,23 @@
   <MainHeader />
   <div class="flex flex-col bg-secondary xl:w-11/12 mx-auto md:gap-4 mt-16 md:mt-0">
 
-    <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
+    <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <div v-if="espacio?.images?.length">
         <!-- Carrusel en móviles -->
         <Carousel :images="espacio.images" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
 
         <!-- Info del anfitrión -->
-        <section v-if="espacio?.host" class="col-span-3 bg-secondary p-6 px-10 rounded-xl shadow-md mt-6 font-normal">
+        <section v-if="espacio?.host"
+          class="col-span-3 bg-secondary p-6 px-10 rounded-xl lg:shadow-md mt-6 font-normal">
           <div class="flex flex-row items-center gap-4">
             <img :src="hostImage" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
-            <div class="flex flex-col pl-4 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800">
+            <div class="flex flex-col pl-4 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800 text-sm">
               <div class="flex flex-row gap-1 items-center">
                 <p class="text-lg font-semibold">Anfitrión: </p><span>{{ espacio.host.name }} {{ espacio.host.last_name
                 }}</span>
               </div>
               <div class="flex flex-row gap-1 items-center">
-                <p v-if="espacio.host.phone" class="text-xl">
+                <p v-if="espacio.host.phone">
                   <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-800" />
                   <span>+549{{ espacio.host.phone }}</span>
                 </p>
@@ -32,7 +33,7 @@
 
         <!-- Título + Favorito -->
         <div class="flex flex-row items-center justify-between mt-4 px-6 md:px-2">
-          <h1 class="text-4xl sm:text-3xl font-bold p-2 text-primary">{{ capitalizeFirst(espacio.name) }}</h1>
+          <h1 class="text-3xl sm:text-2xl font-bold p-2 text-primary">{{ capitalizeFirst(espacio.name) }}</h1>
           <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" :class="[
             activedFavouriteIcon ? 'text-red-500 scale-110' : 'text-gray-700',
             'text-3xl cursor-pointer transition-transform duration-300 ease-in-out',
@@ -48,8 +49,7 @@
           </div>
           <template v-for="(img, index) in espacio.images.slice(1, 5)" :key="index">
             <div :class="imageGridPosition(index)">
-              <img :src="img" alt="Espacio"
-                class="h-full w-full object-cover rounded-lg shadow-md border" />
+              <img :src="img" alt="Espacio" class="h-full w-full object-cover rounded-lg shadow-md border" />
             </div>
           </template>
         </div>
@@ -59,10 +59,10 @@
           <!-- Información del espacio -->
           <div class="col-span-6 grid grid-cols-3 gap-1 sm:gap-4 p-10">
             <div class="col-span-2">
-              <p v-if="espacio.location" class="text-xl font-bold text-gray-800">
+              <p v-if="espacio.location" class="text-md font-bold text-gray-800">
                 {{ espacio.location.split(',')[1] || '' }}
               </p>
-              <p class="text-lg md:text-2xl text-gray-500 font-semibold">{{ espacio.location.split(',')[0] }}</p>
+              <p class="text-sm md:text-2xl text-gray-500 font-semibold">{{ espacio.location.split(',')[0] }}</p>
               <div class="my-4">
                 <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-2 px-6 border-2 shadow-xl">
                   <p class="font-semibold text-2xl">{{ vehicleTypeTranslations[v.type] || v.type }}</p>
@@ -72,12 +72,12 @@
               </div>
             </div>
 
-            <div class="col-start-3 flex flex-col items-end text-2xl">
-              <span :class="formattedRating ? 'text-yellow-600' : 'text-gray-400'" class="font-semibold">
+            <div class="col-start-3 flex flex-col items-end text-xl">
+              <span :class="formattedRating ? 'text-yellow-600' : 'text-gray-400'">
                 ★ <span class="text-black">{{ formattedRating ?? '0.0' }}</span>
               </span>
 
-              <span class="font-serif cursor-pointer hover:underline text-sm sm:text-md">
+              <span class="font-sans cursor-pointer hover:underline text-xs sm:text-md">
                 {{ opinionesTexto }}
               </span>
             </div>
@@ -89,7 +89,7 @@
             :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
             @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
             @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event"
-            @reservar="reservar" :availability="disponibilidad"/>
+            @reservar="reservar" :availability="disponibilidad" />
 
           <!-- Botón para dueño -->
           <div v-else-if="isOwner"
@@ -120,15 +120,16 @@
           </section>
 
           <!-- Mapa -->
-          <div class="col-span-10 flex justify-center items-center h-[350px] order-7">
+          <div class="col-span-10 flex justify-center items-center h-[350px] order-7 relative overflow-hidden">
             <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-              class="w-full h-full rounded-lg overflow-hidden shadow-md">
+              class="absolute inset-0 w-full h-full rounded-lg overflow-hidden shadow-md">
               <GMapMarker :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="{
                 url: carMarker,
                 scaledSize: { width: 40, height: 40 }
               }" />
             </CustomGoogleMap>
           </div>
+
         </div>
       </div>
     </main>
@@ -138,7 +139,7 @@
   <SessionExpired :sessionExpired="isSessionInvalid" />
 
   <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-    icon="/src/assets/logo.png" @close="showErrorModal = false" :isHtml="modalIsHtml"/>
+    icon="/src/assets/logo.png" @close="showErrorModal = false" :isHtml="modalIsHtml" />
 
   <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario"
     :vehicleType="reverseVehicleTypeTranslations[tipoVehiculo]" @selected="onSelectedVehicle" :isHtml="modalIsHtml"
@@ -381,7 +382,7 @@ const opinionesTexto = computed(() => {
 
 function formatLocalDateTime(date) {
   const pad = (n) => n.toString().padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
 }
 
 const reverseVehicleTypeTranslations = Object.fromEntries(
