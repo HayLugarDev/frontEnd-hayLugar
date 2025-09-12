@@ -9,7 +9,7 @@
         <!-- Resumen del Espacio y Reserva -->
         <div class="md:col-span-4 md:row-start-2 md:col-start-6 h-full">
           <div class="bg-white p-8 rounded-lg shadow-md flex items-start">
-            <img v-if="espacio && espacio.images && espacio.images[0]" :src="`${baseURL}${espacio.images[0]}`"
+            <img v-if="espacio && espacio.images && espacio.images[0]" :src="espacio.images[0]"
               alt="Imagen del espacio" class="w-28 h-28 object-cover rounded-lg shadow-md mr-6" />
             <div>
               <h3 class="text-md font-semibold text-gray-800">{{ espacio?.name }}</h3>
@@ -83,8 +83,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, nextTick, computed } from 'vue';
-import { useRouter, useRoute, routeLocationKey } from 'vue-router';
-import api, { baseURL } from '../services/apiService';
+import { useRouter } from 'vue-router';
+import api from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
 import { loadMercadoPago } from '@mercadopago/sdk-js';
 import { getSpaceById } from '../services/spaceService';
@@ -94,7 +94,6 @@ import { getVehicleById } from '../services/vehicleService';
 import FormField from '../components/forms/FormField.vue';
 
 const router = useRouter();
-const route = useRoute();
 const reservationStore = useReservationStore();
 
 // Datos de facturación y reserva (inputs y query)
@@ -107,8 +106,6 @@ const total = computed(() => reserva.value.total || 0);
 const totalDuration = computed(() => reserva.value?.dead_line ?? 0);
 const hours = computed(() => { return totalDuration.value ? Math.floor(totalDuration.value) : 0; });
 const minutes = computed(() => { return totalDuration.value ? Math.round((totalDuration.value - hours.value) * 60) : 0; });
-const startTime = computed(() => reserva.value.start_time);
-const endTime = computed(() => reserva.value.end_time);
 const espacio = ref<any>(null);
 const vehiculoSeleccionado = ref(null);
 
@@ -157,15 +154,6 @@ watch(metodoPago, async (newVal) => {
     }, 300);
   }
 });
-
-// watch(email, async (newEmail) => {
-//   if (metodoPago.value === 'tarjeta' && newEmail) {
-//     await nextTick();
-//     await initCardBrick();
-//   }
-// });
-
-let cardForm: any = null;
 
 // Inicializa el Brick de MercadoPago
 const initCardBrick = async () => {
