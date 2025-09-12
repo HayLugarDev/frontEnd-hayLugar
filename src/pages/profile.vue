@@ -93,6 +93,11 @@
         <PublicationHistory v-else-if="activeSection === 'publicaciones'" key="publicaciones"
           :publications="publicaciones" />
 
+           <PayoutAccounts v-else-if="activeSection === 'cuentas'" key="cuentas"
+          :payout="cuentas" />
+          <AdminWithdrawals v-else-if="activeSection === 'retiros'" key="retiros"
+          :payout="retiros" />
+
       </transition>
 
     </div>
@@ -153,6 +158,8 @@ import { useVerifyToken } from '../logic/useVerifyToken';
 import VehicleSection from '../components/pages/profilePage/VehicleSection.vue';
 import SectionMenu from '../components/pages/profilePage/UI/SectionMenu.vue';
 import ReservationIncomingHistory from '../components/pages/profilePage/ReservationIncomingHistory.vue';
+import PayoutAccounts from './PayoutAccounts.vue';
+import AdminWithdrawals from './AdminWithdrawals.vue';
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -175,6 +182,8 @@ const usuario = computed(() => userStore.user || {
 const reservas = ref([]);
 const reservasEntrantes = ref([]);
 const publicaciones = ref([]);
+const cuentas = ref([]);
+const retiros = ref([]);
 const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
 const errorMessage = ref('');
@@ -188,6 +197,8 @@ const menuSections = [
   { value: 'reservas', label: 'Mis Reservas' },
   { value: 'reservas-entrantes', label: 'Reservas entrantes' },
   { value: 'publicaciones', label: 'Publicaciones' },
+  { value: 'cuentas', label: 'Cuentas' },
+  { value: 'retiros', label: 'Solicitud de Transferencia' },
 ];
 
 const handleSectionChange = (val: string) => {
