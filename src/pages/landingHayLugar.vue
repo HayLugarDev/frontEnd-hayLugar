@@ -9,8 +9,8 @@
         <div class="absolute -left-32 -bottom-40 h-[26rem] w-[26rem] rounded-full bg-accent/20 blur-3xl"></div>
       </div>
 
-      <div class="container mx-auto px-6 pt-20 md:pt-24 pb-10 md:pb-16">
-        <div class="grid md:grid-cols-2 gap-10 items-center">
+      <div class="container mx-auto px-6 pt-10 md:pt-24 pb-10 md:pb-16">
+        <div class="grid lg:grid-cols-2 gap-10 items-center">
    
           <div>
             <div class="flex items-center gap-4 group">
@@ -63,10 +63,10 @@
             </div>
           </div>
           <div>
-            <div class="card glass">
+            <div class="card glass text-primary">
               <div class="flex items-center justify-between">
-                <h3 class="h3 text-white">Disponibilidad en tiempo real</h3>
-                <span class="text-xs text-white/70">Tucumán · demo</span>
+                <h3 class="h3">Disponibilidad en tiempo real</h3>
+                <span class="text-xs">Tucumán · demo</span>
               </div>
 
           
@@ -88,8 +88,8 @@
               </CustomGoogleMap>
 
               <div class="mt-3 flex items-center justify-between">
-                <p class="text-xs text-white/70">* Vista demo. En el dashboard podés filtrar por zona, tipo y precio.</p>
-                <button class="text-xs px-3 py-1 rounded-full border border-white/30 hover:bg-white/10" @click="setCenterToUserLocation">
+                <p class="text-xs">* Vista demo. En el dashboard podés filtrar por zona, tipo y precio.</p>
+                <button class="text-xs px-3 py-1 rounded-full border border-white-70 hover:border-primary" @click="setCenterToUserLocation">
                   Usar mi ubicación
                 </button>
               </div>
