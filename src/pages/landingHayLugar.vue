@@ -45,10 +45,10 @@
             </ul>
 
             <div class="mt-8 flex flex-wrap items-center gap-3">
-              <button class="btn bg-white/10 hover:bg-white/15 text-white border border-white/30" @click="goTo('/buscar')">
+              <button class="btn bg-white/10 hover:bg-white/15 text-white border border-white/30" @click="goTo('/dashboard')">
                 Quiero estacionar
               </button>
-              <button class="btn bg-accent hover:bg-accent/90 text-white" @click="goTo('/ser-anfitrion')">
+              <button class="btn bg-accent hover:bg-accent/90 text-white" @click="goTo('/login')">
                 Quiero ser anfitrión
               </button>
               <button class="btn border border-white/60 text-white hover:bg-white/10" @click="goTo(DASHBOARD_PATH)">
