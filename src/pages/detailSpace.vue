@@ -102,7 +102,7 @@
 
           <!-- No logueado -->
           <div v-else-if="!isLogged"
-            class="col-span-10 lg:col-span-4 flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-lg border border-gray-200 text-center order-5 lg:order-3">
+            class="col-span-10 lg:col-span-4 flex flex-col items-center justify-center p-6 bg-white lg:rounded-xl shadow-lg border border-gray-200 text-center order-5 lg:order-3">
             <h2 class="text-2xl font-bold text-primary mb-2">¡Inicia sesión para reservar!</h2>
             <p class="text-gray-600 mb-6">Debes estar autenticado para poder seleccionar un vehículo y completar tu
               reserva.</p>
@@ -114,15 +114,16 @@
           </div>
 
           <!-- Descripción -->
-          <section class="col-span-10 border border-gray-300 p-4 rounded-lg text-xl order-6">
+          <section class="col-span-10 lg:border border-gray-300 p-4 lg:first-line:rounded-lg text-xl order-6">
             <p class="font-semibold">Descripción:</p>
             <p class="text-gray-600 font-medium">{{ espacio.description }}</p>
           </section>
 
           <!-- Mapa -->
-          <div class="col-span-10 flex justify-center items-center h-[350px] order-7 relative overflow-hidden">
+          <div class="col-span-10 flex flex-col justify-center items-start h-[350px] order-7 relative overflow-hidden p-4 rounded-xl">
+            <p class="px-4 font-semibold">Ubicación en el mapa:</p>
             <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-              class="absolute inset-0 w-full h-full rounded-lg overflow-hidden shadow-md">
+              class="absolute inset-0 w-full h-full rounded-xl overflow-hidden shadow-md">
               <GMapMarker :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="{
                 url: carMarker,
                 scaledSize: { width: 40, height: 40 }

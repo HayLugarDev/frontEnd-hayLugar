@@ -6,8 +6,8 @@
     :zoom="zoomComputed"
     :options="optionsComputed"
     map-type-id="roadmap"
-    @load="onLoadEvent"           <!-- vue3-google-map suele emitir el map -->
-    @tilesloaded="onTilesLoaded"  <!-- @fawmi/vue-google-maps emite cuando está listo -->
+    @load="onLoadEvent"
+    @tilesloaded="onTilesLoaded"
   >
     <slot />
   </GMapMap>

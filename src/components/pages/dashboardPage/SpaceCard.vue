@@ -1,12 +1,12 @@
 <template>
     <router-link :to="`/espacio/${espacio.id}`">
-        <div class="bg-secondary rounded-xl transition-all h-full lg:h-80 min-h-[22rem] p-2 md:p-0">
+        <div class="bg-secondary rounded-xl transition-all h-full lg:h-80 min-h-[22rem] lg:p-2 md:p-0">
             <div class="relative w-full h-48 overflow-hidden rounded-lg">
                 <Carousel :images="espacio.images" class="w-full h-full object-cover" :controls="false" />
             </div>
             <div class="p-1">
                 <div class="flex flex-col items-start px-1 md:px-0">
-                    <div class="text-sm lg:text-xs font-bold text-primary line-clamp-1">
+                    <div class="text-md lg:text-xs font-bold text-primary line-clamp-1">
                         {{ capitalizeFirst(espacio.name) }}
                     </div>
 
