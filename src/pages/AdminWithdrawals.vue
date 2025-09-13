@@ -1,7 +1,5 @@
 <template>
-
-
-  <div class="min-h-screen bg-secondary px-6 py-20 md:py-6">
+  <div class="lg:bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
     <div class="md:p-10 mx-auto max-w-7xl">
       <!-- Header / filtros -->
       <section class="bg-white p-6 md:p-8 rounded-2xl shadow-lg mb-8">
@@ -14,15 +12,11 @@
             <p class="text-gray-500 mt-1">Revisa y gestiona solicitudes de retiro.</p>
           </div>
 
-          <div class="flex items-center gap-2">
-            <input
-              v-model.trim="q"
-              type="text"
-              placeholder="Buscar por ID de retiro / usuario / ref"
-              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none"
-            />
+          <div class="flex flex-col lg:flex-row items-center gap-1 lg:gap-2">
+            <input v-model.trim="q" type="text" placeholder="Buscar por ID de retiro / usuario / ref"
+              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none w-full" />
 
-            <select v-model="status" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm">
+            <select v-model="status" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full">
               <option value="">Todos los estados</option>
               <option value="requested">Pendientes</option>
               <option value="approved">Aprobados</option>
@@ -30,28 +24,19 @@
               <option value="rejected">Rechazados</option>
             </select>
 
-            <input
-              v-model="from"
-              type="date"
-              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-            />
-            <input
-              v-model="to"
-              type="date"
-              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-            />
+            <input v-model="from" type="date"
+              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full" />
+            <input v-model="to" type="date"
+              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full" />
 
-            <select v-model.number="limit" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm">
+            <select v-model.number="limit" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full">
               <option :value="10">10</option>
               <option :value="25">25</option>
               <option :value="50">50</option>
             </select>
 
-            <button
-              @click="load()"
-              class="px-4 py-2 rounded-lg bg-primary text-white shadow hover:shadow-md transition"
-              :disabled="loading"
-            >
+            <button @click="load()" class="px-4 py-2 rounded-lg bg-primary text-white shadow hover:shadow-md transition"
+              :disabled="loading">
               {{ loading ? 'Cargando…' : 'Aplicar' }}
             </button>
           </div>
@@ -79,11 +64,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="w in rows"
-                :key="w.id"
-                class="border-b hover:bg-gray-50"
-              >
+              <tr v-for="w in rows" :key="w.id" class="border-b hover:bg-gray-50">
                 <td class="p-3 font-mono text-xs">{{ w.id }}</td>
                 <td class="p-3">
                   <div class="text-sm text-gray-900">
@@ -111,7 +92,7 @@
                   </div>
                 </td>
                 <td class="p-3 text-right font-semibold">
-                  <span :class="w.status==='rejected' ? 'text-gray-500' : 'text-gray-900'">
+                  <span :class="w.status === 'rejected' ? 'text-gray-500' : 'text-gray-900'">
                     {{ fmtARS(w.amount) }} <span class="text-xs text-gray-400">{{ w.currency || 'ARS' }}</span>
                   </span>
                 </td>
@@ -124,23 +105,17 @@
                   <div class="flex items-center gap-2">
                     <button
                       class="px-3 py-1.5 rounded-lg border text-sm border-primary text-primary hover:bg-primary hover:text-white transition"
-                      :disabled="loadingId===w.id || !canPay(w.status)"
-                      @click="openPay(w)"
-                    >
+                      :disabled="loadingId === w.id || !canPay(w.status)" @click="openPay(w)">
                       Pagar
                     </button>
                     <button
                       class="px-3 py-1.5 rounded-lg border text-sm border-amber-300 text-amber-700 hover:bg-amber-50 transition"
-                      :disabled="loadingId===w.id || !canApprove(w.status)"
-                      @click="approve(w)"
-                    >
+                      :disabled="loadingId === w.id || !canApprove(w.status)" @click="approve(w)">
                       Aprobar
                     </button>
                     <button
                       class="px-3 py-1.5 rounded-lg border text-sm border-rose-300 text-rose-600 hover:bg-rose-50 transition"
-                      :disabled="loadingId===w.id || !canReject(w.status)"
-                      @click="openReject(w)"
-                    >
+                      :disabled="loadingId === w.id || !canReject(w.status)" @click="openReject(w)">
                       Rechazar
                     </button>
                   </div>
@@ -157,74 +132,74 @@
         </div>
 
         <!-- Paginado -->
-        <div class="mt-4 flex items-center justify-between">
-          <div class="text-sm text-gray-500">Mostrando {{ rows.length }} / {{ total }}</div>
-          <div class="flex items-center gap-2">
-            <button class="px-3 py-1.5 rounded-lg border" :disabled="page<=1 || loading" @click="prev()">Anterior</button>
+        <div class="mt-4 flex flex-col lg:flex-row items-center justify-between w-full">
+          <div class="text-xs text-gray-500">Mostrando {{ rows.length }} / {{ total }}</div>
+          <div class="flex flex-row items-center justify-between gap-2 w-full">
+            <button class="px-3 py-1.5 rounded-lg border" :disabled="page <= 1 || loading"
+              @click="prev()">Anterior</button>
             <div class="text-sm">Página {{ page }}</div>
-            <button class="px-3 py-1.5 rounded-lg border" :disabled="rows.length<limit || loading" @click="next()">Siguiente</button>
+            <button class="px-3 py-1.5 rounded-lg border" :disabled="rows.length < limit || loading"
+              @click="next()">Siguiente</button>
           </div>
         </div>
       </section>
     </div>
-  </div>
-
-  <!-- Modal Pagar -->
-  <div v-if="showPay" class="fixed inset-0 z-50 flex items-center justify-center">
-    <div class="absolute inset-0 bg-black/40" @click="closePay()"></div>
-    <div class="relative z-10 bg-white rounded-2xl shadow-2xl w-[95%] md:w-[560px] p-6">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-lg font-semibold text-primary">Pagar retiro #{{ current?.id }}</h3>
-        <button @click="closePay" class="text-gray-500 hover:text-gray-700">✕</button>
-      </div>
-      <div class="space-y-3">
-        <div class="text-sm text-gray-700">
-          Monto: <strong>{{ fmtARS(current?.amount || 0) }}</strong>
-          <span class="text-xs text-gray-500">{{ current?.currency || 'ARS' }}</span>
+    <!-- Modal Pagar -->
+    <div v-if="showPay" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/40" @click="closePay()"></div>
+      <div class="relative z-10 bg-white rounded-2xl shadow-2xl w-[95%] md:w-[560px] p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold text-primary">Pagar retiro #{{ current?.id }}</h3>
+          <button @click="closePay" class="text-gray-500 hover:text-gray-700">✕</button>
         </div>
-        <div class="text-sm text-gray-700">
-          Cuenta: <span class="font-mono">{{ current?.payout_account?.alias_cbu || current?.payout_account_id }}</span>
-        </div>
+        <div class="space-y-3">
+          <div class="text-sm text-gray-700">
+            Monto: <strong>{{ fmtARS(current?.amount || 0) }}</strong>
+            <span class="text-xs text-gray-500">{{ current?.currency || 'ARS' }}</span>
+          </div>
+          <div class="text-sm text-gray-700">
+            Cuenta: <span class="font-mono">{{ current?.payout_account?.alias_cbu || current?.payout_account_id
+              }}</span>
+          </div>
 
-        <label class="block text-sm text-gray-600 mt-2">Referencia/comprobante</label>
-        <input v-model.trim="payRef" type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300" placeholder="Ej. TRF-000123" />
+          <label class="block text-sm text-gray-600 mt-2">Referencia/comprobante</label>
+          <input v-model.trim="payRef" type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300"
+            placeholder="Ej. TRF-000123" />
 
-        <label class="block text-sm text-gray-600 mt-2">Nota interna (opcional)</label>
-        <textarea v-model.trim="payNote" rows="2" class="w-full px-3 py-2 rounded-lg border border-gray-300" />
+          <label class="block text-sm text-gray-600 mt-2">Nota interna (opcional)</label>
+          <textarea v-model.trim="payNote" rows="2" class="w-full px-3 py-2 rounded-lg border border-gray-300" />
 
-        <div class="mt-4 flex items-center justify-end gap-2">
-          <button class="px-4 py-2 rounded-lg border border-gray-300" @click="closePay">Cancelar</button>
-          <button
-            class="px-4 py-2 rounded-lg bg-primary text-white shadow hover:shadow-md transition disabled:opacity-60"
-            :disabled="!payRef || loadingId===current?.id"
-            @click="markPaid()"
-          >
-            Confirmar pago
-          </button>
+          <div class="mt-4 flex items-center justify-end gap-2">
+            <button class="px-4 py-2 rounded-lg border border-gray-300" @click="closePay">Cancelar</button>
+            <button
+              class="px-4 py-2 rounded-lg bg-primary text-white shadow hover:shadow-md transition disabled:opacity-60"
+              :disabled="!payRef || loadingId === current?.id" @click="markPaid()">
+              Confirmar pago
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Modal Rechazar -->
-  <div v-if="showReject" class="fixed inset-0 z-50 flex items-center justify-center">
-    <div class="absolute inset-0 bg-black/40" @click="closeReject()"></div>
-    <div class="relative z-10 bg-white rounded-2xl shadow-2xl w-[95%] md:w-[560px] p-6">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-lg font-semibold text-rose-600">Rechazar retiro #{{ current?.id }}</h3>
-        <button @click="closeReject" class="text-gray-500 hover:text-gray-700">✕</button>
-      </div>
-      <label class="block text-sm text-gray-600">Motivo</label>
-      <textarea v-model.trim="rejectReason" rows="3" class="w-full px-3 py-2 rounded-lg border border-gray-300" placeholder="Explicá el motivo…" />
-      <div class="mt-4 flex items-center justify-end gap-2">
-        <button class="px-4 py-2 rounded-lg border border-gray-300" @click="closeReject">Cancelar</button>
-        <button
-          class="px-4 py-2 rounded-lg bg-rose-600 text-white shadow hover:shadow-md transition disabled:opacity-60"
-          :disabled="!rejectReason || loadingId===current?.id"
-          @click="reject()"
-        >
-          Confirmar rechazo
-        </button>
+    <!-- Modal Rechazar -->
+    <div v-if="showReject" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/40" @click="closeReject()"></div>
+      <div class="relative z-10 bg-white rounded-2xl shadow-2xl w-[95%] md:w-[560px] p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold text-rose-600">Rechazar retiro #{{ current?.id }}</h3>
+          <button @click="closeReject" class="text-gray-500 hover:text-gray-700">✕</button>
+        </div>
+        <label class="block text-sm text-gray-600">Motivo</label>
+        <textarea v-model.trim="rejectReason" rows="3" class="w-full px-3 py-2 rounded-lg border border-gray-300"
+          placeholder="Explicá el motivo…" />
+        <div class="mt-4 flex items-center justify-end gap-2">
+          <button class="px-4 py-2 rounded-lg border border-gray-300" @click="closeReject">Cancelar</button>
+          <button
+            class="px-4 py-2 rounded-lg bg-rose-600 text-white shadow hover:shadow-md transition disabled:opacity-60"
+            :disabled="!rejectReason || loadingId === current?.id" @click="reject()">
+            Confirmar rechazo
+          </button>
+        </div>
       </div>
     </div>
   </div>

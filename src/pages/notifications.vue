@@ -10,7 +10,7 @@
             <div v-if="loading" class="space-y-4">
                 <ItemSkeleton />
             </div>
-            <ul v-else-if="notifications.length" class="divide-y divide-gray-300 space-y-2">
+            <ul v-else-if="notifications.length" class="divide-y divide-gray-300 space-y-2 font-sans text-xs">
                 <li v-for="(notification, index) in notifications" :key="index"
                     class="border border-yellow-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all bg-gray-50 space-y-3">
 
