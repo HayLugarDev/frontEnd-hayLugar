@@ -1,6 +1,4 @@
 <template>
-  <MainHeader />
-
   <div class="min-h-screen bg-secondary px-6 py-20 md:py-6" v-if="!loading">
     <div class="md:p-10 mx-auto max-w-6xl">
       <!-- Card: Resumen -->
@@ -218,7 +216,6 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useUserStore } from '../store/userStore'
 import api from '../services/apiService'
 import loadIcon from '../assets/load-icon_primary.svg'
-import MainHeader from '../components/layout/header/MainHeader.vue'
 import WithdrawModal from '../components/WithdrawModal.vue'
 
 const userStore = useUserStore()

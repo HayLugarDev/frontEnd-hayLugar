@@ -13,30 +13,54 @@
           </div>
 
           <div class="flex flex-col lg:flex-row items-center gap-1 lg:gap-2">
-            <input v-model.trim="q" type="text" placeholder="Buscar por ID de retiro / usuario / ref"
-              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none w-full" />
+            <input
+              v-model.trim="q"
+              type="text"
+              placeholder="Buscar por ID de retiro / usuario / ref"
+              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none w-full"
+            />
 
-            <select v-model="status" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full">
+            <select
+              v-model="status"
+              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full"
+            >
               <option value="">Todos los estados</option>
               <option value="requested">Pendientes</option>
+              <option value="under_review">En revisión</option>
               <option value="approved">Aprobados</option>
+              <option value="scheduled">Programados</option>
+              <option value="processing">Procesando</option>
               <option value="paid">Pagados</option>
               <option value="rejected">Rechazados</option>
+              <option value="failed">Fallidos</option>
+              <option value="canceled">Cancelados</option>
             </select>
 
-            <input v-model="from" type="date"
-              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full" />
-            <input v-model="to" type="date"
-              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full" />
+            <input
+              v-model="from"
+              type="date"
+              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full"
+            />
+            <input
+              v-model="to"
+              type="date"
+              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full"
+            />
 
-            <select v-model.number="limit" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full">
+            <select
+              v-model.number="limit"
+              class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm w-full"
+            >
               <option :value="10">10</option>
               <option :value="25">25</option>
               <option :value="50">50</option>
             </select>
 
-            <button @click="load()" class="px-4 py-2 rounded-lg bg-primary text-white shadow hover:shadow-md transition"
-              :disabled="loading">
+            <button
+              @click="load()"
+              class="px-4 py-2 rounded-lg bg-primary text-white shadow hover:shadow-md transition"
+              :disabled="loading"
+            >
               {{ loading ? 'Cargando…' : 'Aplicar' }}
             </button>
           </div>
@@ -78,13 +102,14 @@
                 <td class="p-3 text-sm text-gray-700 max-w-[260px]">
                   <div v-if="w.payout_account">
                     <div class="font-medium">
-                      {{ w.payout_account.alias_cbu || w.payout_account.alias || '—' }}
+                      {{ w.payout_account.alias_cbu || '—' }}
                     </div>
                     <div class="text-xs text-gray-500">
-                      {{ w.payout_account.bank_name || 'Banco' }} • {{ w.payout_account.account_holder || 'Titular' }}
+                      {{ w.payout_account.bank_name || 'Banco' }} •
+                      {{ w.payout_account.account_holder || 'Titular' }}
                     </div>
                     <div class="font-mono text-xs text-gray-500 truncate">
-                      {{ maskCbu(w.payout_account.cbu || w.payout_account.alias_cbu || '') }}
+                      {{ maskCbu(w.payout_account.alias_cbu || '') }}
                     </div>
                   </div>
                   <div v-else class="text-xs text-gray-500">
@@ -93,7 +118,8 @@
                 </td>
                 <td class="p-3 text-right font-semibold">
                   <span :class="w.status === 'rejected' ? 'text-gray-500' : 'text-gray-900'">
-                    {{ fmtARS(w.amount) }} <span class="text-xs text-gray-400">{{ w.currency || 'ARS' }}</span>
+                    {{ fmtARS(w.amount) }}
+                    <span class="text-xs text-gray-400">{{ w.currency || 'ARS' }}</span>
                   </span>
                 </td>
                 <td class="p-3">
@@ -102,22 +128,51 @@
                   </span>
                 </td>
                 <td class="p-3">
+                  <!-- Acciones condicionadas por estado -->
                   <div class="flex items-center gap-2">
-                    <button
-                      class="px-3 py-1.5 rounded-lg border text-sm border-primary text-primary hover:bg-primary hover:text-white transition"
-                      :disabled="loadingId === w.id || !canPay(w.status)" @click="openPay(w)">
-                      Pagar
-                    </button>
-                    <button
-                      class="px-3 py-1.5 rounded-lg border text-sm border-amber-300 text-amber-700 hover:bg-amber-50 transition"
-                      :disabled="loadingId === w.id || !canApprove(w.status)" @click="approve(w)">
-                      Aprobar
-                    </button>
-                    <button
-                      class="px-3 py-1.5 rounded-lg border text-sm border-rose-300 text-rose-600 hover:bg-rose-50 transition"
-                      :disabled="loadingId === w.id || !canReject(w.status)" @click="openReject(w)">
-                      Rechazar
-                    </button>
+                    <!-- Estados finales: solo Ver detalle -->
+                    <template v-if="isFinalStatus(w.status)">
+                      <button
+                        class="px-3 py-1.5 rounded-lg border text-sm border-gray-300 text-gray-700 hover:bg-gray-50 transition"
+                        @click="openView(w)"
+                      >
+                        Ver detalle
+                      </button>
+                    </template>
+
+                    <!-- Flujos activos -->
+                    <template v-else>
+                      <button
+                        class="px-3 py-1.5 rounded-lg border text-sm border-amber-300 text-amber-700 hover:bg-amber-50 transition"
+                        :disabled="loadingId === w.id || !canApprove(w.status)"
+                        @click="approve(w)"
+                      >
+                        Aprobar
+                      </button>
+
+                      <button
+                        class="px-3 py-1.5 rounded-lg border text-sm border-primary text-primary hover:bg-primary hover:text-white transition"
+                        :disabled="loadingId === w.id || !canPay(w.status)"
+                        @click="openPayIfAllowed(w)"
+                      >
+                        Pagar
+                      </button>
+
+                      <button
+                        class="px-3 py-1.5 rounded-lg border text-sm border-rose-300 text-rose-600 hover:bg-rose-50 transition"
+                        :disabled="loadingId === w.id || !canReject(w.status)"
+                        @click="openReject(w)"
+                      >
+                        Rechazar
+                      </button>
+
+                      <button
+                        class="px-3 py-1.5 rounded-lg border text-sm border-gray-300 text-gray-700 hover:bg-gray-50 transition"
+                        @click="openView(w)"
+                      >
+                        Ver detalle
+                      </button>
+                    </template>
                   </div>
                 </td>
               </tr>
@@ -135,15 +190,18 @@
         <div class="mt-4 flex flex-col lg:flex-row items-center justify-between w-full">
           <div class="text-xs text-gray-500">Mostrando {{ rows.length }} / {{ total }}</div>
           <div class="flex flex-row items-center justify-between gap-2 w-full">
-            <button class="px-3 py-1.5 rounded-lg border" :disabled="page <= 1 || loading"
-              @click="prev()">Anterior</button>
+            <button class="px-3 py-1.5 rounded-lg border" :disabled="page <= 1 || loading" @click="prev()">
+              Anterior
+            </button>
             <div class="text-sm">Página {{ page }}</div>
-            <button class="px-3 py-1.5 rounded-lg border" :disabled="rows.length < limit || loading"
-              @click="next()">Siguiente</button>
+            <button class="px-3 py-1.5 rounded-lg border" :disabled="rows.length < limit || loading" @click="next()">
+              Siguiente
+            </button>
           </div>
         </div>
       </section>
     </div>
+
     <!-- Modal Pagar -->
     <div v-if="showPay" class="fixed inset-0 z-50 flex items-center justify-center">
       <div class="absolute inset-0 bg-black/40" @click="closePay()"></div>
@@ -158,22 +216,37 @@
             <span class="text-xs text-gray-500">{{ current?.currency || 'ARS' }}</span>
           </div>
           <div class="text-sm text-gray-700">
-            Cuenta: <span class="font-mono">{{ current?.payout_account?.alias_cbu || current?.payout_account_id
-              }}</span>
+            Estado: <strong>{{ statusLabel(current?.status || '') }}</strong>
+          </div>
+          <div class="text-sm text-gray-700">
+            Cuenta:
+            <span class="font-mono">
+              {{ current?.payout_account?.alias_cbu || current?.payout_account_id }}
+            </span>
           </div>
 
           <label class="block text-sm text-gray-600 mt-2">Referencia/comprobante</label>
-          <input v-model.trim="payRef" type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300"
-            placeholder="Ej. TRF-000123" />
+          <input
+            v-model.trim="payRef"
+            type="text"
+            class="w-full px-3 py-2 rounded-lg border border-gray-300"
+            placeholder="Ej. TRF-000123"
+          />
 
           <label class="block text-sm text-gray-600 mt-2">Nota interna (opcional)</label>
-          <textarea v-model.trim="payNote" rows="2" class="w-full px-3 py-2 rounded-lg border border-gray-300" />
+          <textarea
+            v-model.trim="payNote"
+            rows="2"
+            class="w-full px-3 py-2 rounded-lg border border-gray-300"
+          />
 
           <div class="mt-4 flex items-center justify-end gap-2">
             <button class="px-4 py-2 rounded-lg border border-gray-300" @click="closePay">Cancelar</button>
             <button
               class="px-4 py-2 rounded-lg bg-primary text-white shadow hover:shadow-md transition disabled:opacity-60"
-              :disabled="!payRef || loadingId === current?.id" @click="markPaid()">
+              :disabled="!payRef || loadingId === current?.id"
+              @click="markPaid()"
+            >
               Confirmar pago
             </button>
           </div>
@@ -190,15 +263,69 @@
           <button @click="closeReject" class="text-gray-500 hover:text-gray-700">✕</button>
         </div>
         <label class="block text-sm text-gray-600">Motivo</label>
-        <textarea v-model.trim="rejectReason" rows="3" class="w-full px-3 py-2 rounded-lg border border-gray-300"
-          placeholder="Explicá el motivo…" />
+        <textarea
+          v-model.trim="rejectReason"
+          rows="3"
+          class="w-full px-3 py-2 rounded-lg border border-gray-300"
+          placeholder="Explicá el motivo…"
+        />
         <div class="mt-4 flex items-center justify-end gap-2">
           <button class="px-4 py-2 rounded-lg border border-gray-300" @click="closeReject">Cancelar</button>
           <button
             class="px-4 py-2 rounded-lg bg-rose-600 text-white shadow hover:shadow-md transition disabled:opacity-60"
-            :disabled="!rejectReason || loadingId === current?.id" @click="reject()">
+            :disabled="!rejectReason || loadingId === current?.id"
+            @click="reject()"
+          >
             Confirmar rechazo
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Ver detalle (solo lectura) -->
+    <div v-if="showView" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/40" @click="closeView()"></div>
+      <div class="relative z-10 bg-white rounded-2xl shadow-2xl w-[95%] md:w-[640px] p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold text-primary">Detalle retiro #{{ current?.id }}</h3>
+          <button @click="closeView" class="text-gray-500 hover:text-gray-700">✕</button>
+        </div>
+
+        <div class="space-y-2 text-sm">
+          <div><span class="text-gray-500">Usuario:</span> {{ current?.user?.name || current?.user_id }}</div>
+          <div><span class="text-gray-500">Email:</span> {{ current?.user?.email || '—' }}</div>
+          <div><span class="text-gray-500">Fecha:</span> {{ fmtDate(current?.created_at || current?.requested_at) }}</div>
+          <div>
+            <span class="text-gray-500">Estado:</span>
+            <span class="px-2 py-0.5 rounded text-xs font-medium" :class="statusClass(current?.status || '')">
+              {{ statusLabel(current?.status || '') }}
+            </span>
+          </div>
+          <div>
+            <span class="text-gray-500">Cuenta:</span>
+            <div class="mt-1">
+              <div class="font-medium">
+                {{ current?.payout_account?.alias_cbu || current?.payout_account_id || '—' }}
+              </div>
+              <div class="text-xs text-gray-500">
+                {{ current?.payout_account?.bank_name || 'Banco' }} •
+                {{ current?.payout_account?.account_holder || 'Titular' }}
+              </div>
+              <div class="font-mono text-xs text-gray-500 truncate">
+                {{ maskCbu(current?.payout_account?.alias_cbu || '') }}
+              </div>
+            </div>
+          </div>
+          <div><span class="text-gray-500">Monto:</span> {{ fmtARS(current?.amount || 0) }} {{ current?.currency || 'ARS' }}</div>
+          <div v-if="current?.admin_note"><span class="text-gray-500">Nota admin:</span> {{ current?.admin_note }}</div>
+          <div v-if="current?.payout_ref"><span class="text-gray-500">Referencia/comprobante:</span> <span class="font-mono">{{ current?.payout_ref }}</span></div>
+          <div v-if="current?.requested_at"><span class="text-gray-500">Solicitado:</span> {{ fmtDate(current?.requested_at) }}</div>
+          <div v-if="current?.reviewed_at"><span class="text-gray-500">Revisado:</span> {{ fmtDate(current?.reviewed_at) }}</div>
+          <div v-if="current?.processed_at"><span class="text-gray-500">Pagado:</span> {{ fmtDate(current?.processed_at) }}</div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end">
+          <button class="px-4 py-2 rounded-lg border border-gray-300" @click="closeView">Cerrar</button>
         </div>
       </div>
     </div>
@@ -206,7 +333,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import api from '../services/apiService'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -218,8 +345,10 @@ type Withdrawal = {
   status: string
   note?: string | null
   admin_note?: string | null
-  reference?: string | null
+  payout_ref?: string | null
   requested_at?: string
+  reviewed_at?: string
+  processed_at?: string
   created_at?: string
   updated_at?: string
   payout_account_id?: number
@@ -227,8 +356,6 @@ type Withdrawal = {
     alias_cbu?: string | null
     bank_name?: string | null
     account_holder?: string | null
-    cbu?: string | null
-    alias?: string | null
   } | null
   user?: { id: number; name?: string; email?: string } | null
 }
@@ -240,19 +367,20 @@ const loadingId = ref<number | null>(null)
 const page = ref(1)
 const limit = ref(25)
 const q = ref('')
-const status = ref<string>('') // '', 'requested', 'approved', 'paid', 'rejected'
+const status = ref<string>('') // filtros: '', 'requested', 'under_review', 'approved', 'paid', ...
 const from = ref<string>('')
 const to = ref<string>('')
 
 // Modales/acciones
 const showPay = ref(false)
 const showReject = ref(false)
+const showView = ref(false)
 const current = ref<Withdrawal | null>(null)
 const payRef = ref('')
 const payNote = ref('')
 const rejectReason = ref('')
 
-// helpers UI
+// helpers
 function fmtARS(n: number) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(Number(n || 0))
 }
@@ -266,28 +394,43 @@ function maskCbu(v: string) {
   if (s.length <= 8) return s
   return s.slice(0, 6) + '••••••••' + s.slice(-4)
 }
+
+// estados UI
 function statusLabel(st: string) {
   if (st === 'requested' || st === 'pending') return 'Pendiente'
+  if (st === 'under_review') return 'En revisión'
   if (st === 'approved') return 'Aprobado'
+  if (st === 'scheduled') return 'Programado'
+  if (st === 'processing') return 'Procesando'
   if (st === 'paid') return 'Pagado'
   if (st === 'rejected') return 'Rechazado'
+  if (st === 'failed') return 'Fallido'
+  if (st === 'canceled') return 'Cancelado'
   return st
 }
 function statusClass(st: string) {
   if (st === 'requested' || st === 'pending') return 'bg-yellow-100 text-yellow-700'
+  if (st === 'under_review') return 'bg-amber-100 text-amber-700'
   if (st === 'approved') return 'bg-blue-100 text-blue-700'
+  if (st === 'scheduled') return 'bg-indigo-100 text-indigo-700'
+  if (st === 'processing') return 'bg-sky-100 text-sky-700'
   if (st === 'paid') return 'bg-green-100 text-green-700'
   if (st === 'rejected') return 'bg-rose-100 text-rose-700'
+  if (st === 'failed') return 'bg-red-100 text-red-700'
+  if (st === 'canceled') return 'bg-gray-200 text-gray-700'
   return 'bg-gray-100 text-gray-700'
 }
+function isFinalStatus(st: string) {
+  return st === 'paid' || st === 'rejected' || st === 'failed' || st === 'canceled'
+}
 function canApprove(st: string) {
-  return st === 'requested' || st === 'pending'
+  return st === 'requested' || st === 'pending' || st === 'under_review'
 }
 function canPay(st: string) {
-  return st === 'requested' || st === 'pending' || st === 'approved'
+  return st === 'approved'
 }
 function canReject(st: string) {
-  return st === 'requested' || st === 'pending' || st === 'approved'
+  return st === 'requested' || st === 'pending' || st === 'under_review' || st === 'approved'
 }
 
 // carga
@@ -304,7 +447,6 @@ async function load() {
       _: Date.now(),
     }
     const res = await api.get('/admin/withdrawals', { params })
-    // Soporta dos formatos: { rows, total } o array plano
     if (Array.isArray(res.data)) {
       rows.value = res.data
       total.value = res.data.length
@@ -332,12 +474,12 @@ function next() {
   load()
 }
 
-// aprobar (no descuenta saldo todavía; deja listo para pagar)
+// aprobar (no descuenta; deja listo para pagar)
 async function approve(w: Withdrawal) {
   if (!canApprove(w.status)) return
   loadingId.value = w.id
   try {
-    await api.patch(`/admin/withdrawals/${w.id}/approve`, {})
+    await api.post(`/admin/withdrawals/${w.id}/approve`, {})
     await load()
   } catch (e) {
     console.error('Error aprobando', e)
@@ -347,7 +489,11 @@ async function approve(w: Withdrawal) {
   }
 }
 
-// pagar (marca pagado y descuenta de la wallet)
+// pagar
+function openPayIfAllowed(w: Withdrawal) {
+  if (!canPay(w.status)) return
+  openPay(w)
+}
 function openPay(w: Withdrawal) {
   current.value = w
   payRef.value = ''
@@ -365,7 +511,7 @@ async function markPaid() {
   if (!payRef.value.trim()) return
   loadingId.value = current.value.id
   try {
-    await api.patch(`/admin/withdrawals/${current.value.id}/mark-paid`, {
+    await api.post(`/admin/withdrawals/${current.value.id}/mark-paid`, {
       reference: payRef.value.trim(),
       admin_note: payNote.value.trim() || null,
     })
@@ -381,6 +527,7 @@ async function markPaid() {
 
 // rechazar
 function openReject(w: Withdrawal) {
+  if (!canReject(w.status)) return
   current.value = w
   rejectReason.value = ''
   showReject.value = true
@@ -395,7 +542,7 @@ async function reject() {
   if (!rejectReason.value.trim()) return
   loadingId.value = current.value.id
   try {
-    await api.patch(`/admin/withdrawals/${current.value.id}/reject`, {
+    await api.post(`/admin/withdrawals/${current.value.id}/reject`, {
       reason: rejectReason.value.trim(),
     })
     closeReject()
@@ -406,6 +553,16 @@ async function reject() {
   } finally {
     loadingId.value = null
   }
+}
+
+// ver detalle
+function openView(w: Withdrawal) {
+  current.value = w
+  showView.value = true
+}
+function closeView() {
+  showView.value = false
+  current.value = null
 }
 
 watch([limit, status], () => { page.value = 1; load() })
