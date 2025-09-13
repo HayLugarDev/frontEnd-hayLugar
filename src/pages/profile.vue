@@ -61,21 +61,6 @@
             <FormFieldAutocomplete v-model="usuario.address" label="DIRECCIÓN" class="md:col-span-2" />
           </div>
 
-          <!-- Datos Financieros -->
-          <div class="mt-8">
-            <div class="flex flex-row items-center justify-between">
-              <h2 class="text-2xl font-bold text-primary flex items-center">
-                <font-awesome-icon icon="wallet" class="mr-2" />
-                Datos Financieros
-              </h2>
-              <img src="../assets/logo-mercadopago.png" alt="" class="w-28">
-            </div>
-            <p class="text-gray-600 mb-4">
-              Coloca el mismo correo que tu cuenta de MercadoPago para activar la wallet
-            </p>
-            <FormField v-model="usuario.email" label="EMAIL MERCADOPAGO" type="text" required />
-          </div>
-
           <!-- Botón para Guardar Todos los Cambios -->
           <button @click="guardarTodo"
             class="w-full bg-accent mt-6 text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
@@ -86,17 +71,16 @@
 
         <VehicleSection v-else-if="activeSection === 'vehicles'" key="vehicles" />
 
-        <ReservationIncomingHistory v-else-if="activeSection === 'reservas-entrantes'" key="reservas-entrantes" :reservations="reservasEntrantes" />
+        <ReservationIncomingHistory v-else-if="activeSection === 'reservas-entrantes'" key="reservas-entrantes"
+          :reservations="reservasEntrantes" />
 
         <ReservationHistory v-else-if="activeSection === 'reservas'" key="reservas" :reservations="reservas" />
 
         <PublicationHistory v-else-if="activeSection === 'publicaciones'" key="publicaciones"
           :publications="publicaciones" />
 
-           <PayoutAccounts v-else-if="activeSection === 'cuentas'" key="cuentas"
-          :payout="cuentas" />
-          <AdminWithdrawals v-else-if="activeSection === 'retiros'" key="retiros"
-          :payout="retiros" />
+        <PayoutAccounts v-else-if="activeSection === 'cuentas'" key="cuentas" :payout="cuentas" />
+        <AdminWithdrawals v-else-if="activeSection === 'retiros'" key="retiros" :payout="retiros" />
 
       </transition>
 

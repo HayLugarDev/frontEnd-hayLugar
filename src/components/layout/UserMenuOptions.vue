@@ -1,5 +1,5 @@
 <template>
-  <ul class="flex flex-col divide-y divide-gray-200 text-gray-700 text-3xl md:text-base z-50">
+  <ul class="flex flex-col divide-y divide-gray-200 text-gray-700 text-2xl md:text-base z-50">
     <li>
       <MobileNotificationButton @click="$emit('navigate', '/notifications')" class="menu-item" />
     </li>

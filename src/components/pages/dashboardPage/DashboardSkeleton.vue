@@ -25,7 +25,7 @@
 
     <!-- Cards o mapa -->
     <div class="flex flex-1 p-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4 w-full">
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4 w-full">
         <SkeletonSpaceCard v-for="n in 14" :key="'skeleton-' + n" />
       </div>
     </div>
