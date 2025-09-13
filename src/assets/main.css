@@ -1,58 +1,105 @@
+/* Tailwind core */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* === Estilos globales de HayLugar === */
+@layer components {
+  /* Inputs */
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg
+      focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
+      transition-all duration-200;
+  }
+  .text-area-field {
+    @apply text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4;
+  }
 
+  /* Botones */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 font-semibold
+      transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:opacity-90 focus-visible:ring-primary/40;
+  }
+  .btn-secondary {
+    @apply bg-accent text-white hover:opacity-90 focus-visible:ring-accent/40;
+  }
+  .btn-outline {
+    @apply border border-primary text-primary bg-white hover:bg-primary/5
+      focus-visible:ring-primary/30;
+  }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+  /* Switch */
+  .switch { @apply relative inline-flex items-center cursor-pointer; }
+  .switch input { @apply sr-only; }
+  .switch .slider { @apply w-10 h-6 bg-gray-300 rounded-full transition duration-300; }
+  .switch .slider:before {
+    @apply absolute content-[''] w-4 h-4 bg-white rounded-full left-1 top-1 transition-transform;
+  }
+  .switch input:checked + .slider { @apply bg-green-500; }
+  .switch input:checked + .slider:before { transform: translateX(16px); }
 
-/* === Estilos de HayLugar === */
+  /* Cards y tipografía */
+  .card { @apply rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 p-6 md:p-8; }
+  .h2 { @apply text-2xl md:text-3xl font-bold text-primary; }
+  .h3 { @apply text-2xl md:text-3xl font-bold text-primary; }
+  .sub { @apply mt-1 text-base md:text-lg text-gray-600; }
+  .ul { @apply space-y-2 text-gray-700 leading-relaxed; }
 
-/* Inputs */
-.input-field {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200;
+  /* Features */
+  .feature { @apply rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 p-6 flex items-start gap-3; }
+  .badge { @apply h-10 w-10 shrink-0 rounded-xl bg-accent/15 flex items-center justify-center font-bold text-accent; }
+  .title { @apply font-semibold text-gray-900; }
+  .desc { @apply mt-1 text-gray-600; }
+
+  /* Chips */
+  .chip { @apply rounded-full border border-gray-200 bg-white/70 px-3 py-1 text-gray-700 backdrop-blur shadow-sm; }
+
+  /* KPIs */
+  .kpi { @apply rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 p-6 text-center; }
+  .kpi-value { @apply text-3xl md:text-4xl font-extrabold text-primary; }
+  .kpi-label { @apply mt-1 text-gray-600; }
+
+  /* Glass effect */
+  .glass {
+    background: color-mix(in srgb, #ffffff 90%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid color-mix(in srgb, #ffffff 65%, transparent);
+    box-shadow: 0 6px 24px rgba(3,4,5,.08);
+    border-radius: 12px;
+  }
 }
 
-/* Botón primario */
-.btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition-all duration-200;
-}
-
-/* Switch */
-.switch { @apply relative inline-flex items-center cursor-pointer; }
-.switch input { @apply sr-only; }
-.switch .slider { @apply w-10 h-6 bg-gray-300 rounded-full transition duration-300; }
-.switch .slider:before { @apply absolute content-[''] w-4 h-4 bg-white rounded-full left-1 top-1 transition-transform; }
-.switch input:checked + .slider { @apply bg-green-500; }
-.switch input:checked + .slider:before { transform: translateX(16px); }
-
-/* Transiciones */
-.icon-fade-enter-active, .icon-fade-leave-active { transition: opacity 0.3s ease, transform 0.3s ease; }
-.icon-fade-enter-from, .icon-fade-leave-to { opacity: 0; transform: scale(0.8); }
-.icon-fade-enter-to, .icon-fade-leave-from { opacity: 1; transform: scale(1); }
-
-.fade-step-enter-active, .fade-step-leave-active { transition: opacity 0.5s ease; }
-.fade-step-enter-from, .fade-step-leave-to { opacity: 0; }
-.fade-step-enter-to, .fade-step-leave-from { opacity: 1; }
-
-/* Tipografías */
-.anton-regular { font-family: "Anton", sans-serif; font-weight: 400; font-style: normal; }
-.oswald { font-family: "Oswald", sans-serif; font-weight: 300; font-style: normal; }
-.raleway { font-family: "Raleway", sans-serif; font-weight: 600; font-style: normal; }
-
-/* Animaciones */
+/* === Animaciones y transiciones === */
 @keyframes fade-in {
   0% { opacity: 0; transform: translateY(-5px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in { animation: fade-in 0.3s ease-out; }
 
-.input-field { @apply w-full py-3 px-5 border border-gray-300 rounded-full text-lg text-gray-500; }
-.text-area-field { @apply text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4; }
+.icon-fade-enter-active,
+.icon-fade-leave-active { transition: opacity 0.3s ease, transform 0.3s ease; }
+.icon-fade-enter-from,
+.icon-fade-leave-to { opacity: 0; transform: scale(0.8); }
+.icon-fade-enter-to,
+.icon-fade-leave-from { opacity: 1; transform: scale(1); }
 
-/* === Variables de diseño globales === */
+.fade-step-enter-active,
+.fade-step-leave-active { transition: opacity 0.5s ease; }
+.fade-step-enter-from,
+.fade-step-leave-to { opacity: 0; }
+.fade-step-enter-to,
+.fade-step-leave-from { opacity: 1; }
+
+/* === Tipografías personalizadas === */
+.anton-regular { font-family: "Anton", sans-serif; font-weight: 400; }
+.oswald { font-family: "Oswald", sans-serif; font-weight: 300; }
+.raleway { font-family: "Raleway", sans-serif; font-weight: 600; }
+
+/* === Variables CSS === */
 @layer base {
   :root {
     --color-primary: #27C1F5;
@@ -80,123 +127,4 @@
     --anim-mid: 180ms;
     --anim-ease: cubic-bezier(.2,.8,.2,1);
   }
-
-  .glass {
-    background: color-mix(in srgb, #ffffff 90%, transparent);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    border: 1px solid color-mix(in srgb, #ffffff 65%, transparent);
-    box-shadow: 0 6px 24px rgba(3,4,5,.08);
-    border-radius: 12px;
-  }
-}
-
-
-/* tailwind.config.js ya debería permitir variantes personalizadas si usas estas */
-.input-field {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200;
-}
-
-.btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition-all duration-200;
-}
-
-.switch {
-  @apply relative inline-flex items-center cursor-pointer;
-}
-
-.switch input {
-  @apply sr-only;
-}
-
-.switch .slider {
-  @apply w-10 h-6 bg-gray-300 rounded-full transition duration-300;
-}
-
-.switch .slider:before {
-  @apply absolute content-[''] w-4 h-4 bg-white rounded-full left-1 top-1 transition-transform;
-}
-
-.switch input:checked+.slider {
-  @apply bg-green-500;
-}
-
-.switch input:checked+.slider:before {
-  transform: translateX(16px);
-}
-
-/* Transición en iconos */
-.icon-fade-enter-active,
-.icon-fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.icon-fade-enter-from,
-.icon-fade-leave-to {
-  opacity: 0;
-  transform: scale(0.8);
-}
-.icon-fade-enter-to,
-.icon-fade-leave-from {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Transición entre pasos */
-.fade-step-enter-active,
-.fade-step-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.fade-step-enter-from,
-.fade-step-leave-to {
-  opacity: 0;
-}
-
-.fade-step-enter-to,
-.fade-step-leave-from {
-  opacity: 1;
-}
-
-
-.anton-regular {
-  font-family: "Anton", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.oswald {
-  font-family: "Oswald", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 300;
-  font-style: normal;
-}
-
-.raleway {
-  font-family: "Raleway", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 600;
-  font-style: normal;
-}
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
-}
-
-.input-field {
-  @apply w-full py-3 px-5 border border-gray-300 rounded-full text-lg text-gray-500;
-}
-
-.text-area-field {
-  @apply text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4;
 }

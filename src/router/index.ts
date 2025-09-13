@@ -14,13 +14,15 @@ import AddVehicle from '../pages/addVehicle.vue';
 import universityDashboard from '../pages/universityDashboard.vue'
 import meteredParkingDashboard from '../pages/meteredParkingDashboard.vue';
 import Notifications from '../pages/notifications.vue';
+import landingHayLugar from '../pages/landingHayLugar.vue';
 
 const routes: RouteRecordRaw[] = [
-  { path: '/', redirect: '/dashboard' },
+  { path: '/', redirect: '/landingHayLugar' },
   { path: '/login', name: 'login', component: login },
   { path: '/register', component: register },
   { path: '/google-success', name: 'GoogleSuccess', component: GoogleSuccess },
   { path: '/dashboard', component: dashboard },
+  { path: '/landingHayLugar', component: landingHayLugar },
   { path: '/add-space', component: addSpace, meta: { requiresAuth: true } },
   { path: '/espacio/:id', component: detailSpace },
   { path: '/pago', component: payment, meta: { requiresAuth: true } },
