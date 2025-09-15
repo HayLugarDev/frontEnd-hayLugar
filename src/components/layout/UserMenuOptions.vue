@@ -18,9 +18,6 @@
     <li @click="$emit('navigate', '/add-space')" class="menu-item">
       <font-awesome-icon icon="plus-circle" /> <span>Publica tu espacio</span>
     </li>
-    <li v-if="user" @click="$emit('navigate', '/wallet')" class="menu-item">
-      <font-awesome-icon icon="wallet" /> <span>Wallet</span>
-    </li>
     <li @click="$emit('navigate', '/help')" class="menu-item">
       <font-awesome-icon icon="circle-question" /> <span>Ayuda</span>
     </li>
