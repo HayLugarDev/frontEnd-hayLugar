@@ -31,7 +31,7 @@
           <section
             v-if="activeSection === 'datos'"
             key="datos"
-            class="w-full md:w-2/3 bg-white p-12 rounded-lg shadow-lg"
+            class="w-full md:w-2/3 bg-white p-12 rounded-lg shadow-lg"           
           >
             <div class="flex flex-col md:flex-row items-center justify-between gap-6">
               <div class="flex items-center justify-around gap-4 flex-wrap">
