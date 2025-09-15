@@ -11,9 +11,6 @@ onMounted(async ()=> userStore.fetchUser());
 <template>
   <div class="flex flex-col min-h-screen raleway">
     <router-view />
-    <span class="hidden md:block mt-auto text-xs text-center py-2">
-      © 2025 HayLugar. All rights reserved
-    </span>
   </div>
 </template>
 

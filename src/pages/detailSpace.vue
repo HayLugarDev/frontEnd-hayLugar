@@ -4,6 +4,7 @@
 
     <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <div v-if="espacio?.images?.length">
+
         <!-- Carrusel en móviles -->
         <Carousel :images="espacio.images" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
 
@@ -45,14 +46,22 @@
         <div class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-4 h-[400px]">
           <div class="col-span-4 row-span-8">
             <img :src="espacio.images[0]" alt="Principal"
-              class="h-full w-full object-cover rounded-lg shadow-md border" />
+              class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer"
+              @click="openImageModal(0)" />
           </div>
           <template v-for="(img, index) in espacio.images.slice(1, 5)" :key="index">
             <div :class="imageGridPosition(index)">
-              <img :src="img" alt="Espacio" class="h-full w-full object-cover rounded-lg shadow-md border" />
+              <img :src="img" alt="Espacio"
+                class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer"
+                @click="openImageModal(index + 1)" />
             </div>
           </template>
         </div>
+
+        <!-- Modal -->
+        <ImageModal :visible="isImageModalOpen" :images="espacio.images" :startIndex="currentImageIndex"
+          @close="isImageModalOpen = false" />
+
 
         <!-- Info general + Formulario -->
         <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
@@ -114,13 +123,14 @@
           </div>
 
           <!-- Descripción -->
-          <section class="col-span-10 lg:border border-gray-300 p-4 lg:first-line:rounded-lg text-xl order-6">
+          <section class="col-span-10 lg:border border-gray-300 p-4 lg:rounded-lg text-xl order-6">
             <p class="font-semibold">Descripción:</p>
             <p class="text-gray-600 font-medium">{{ espacio.description }}</p>
           </section>
 
           <!-- Mapa -->
-          <div class="col-span-10 flex flex-col justify-center items-start h-[350px] order-7 relative overflow-hidden p-4 rounded-xl">
+          <div
+            class="col-span-10 flex flex-col justify-center items-start h-[350px] order-7 relative overflow-hidden p-4 rounded-xl">
             <p class="px-4 font-semibold">Ubicación en el mapa:</p>
             <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
               class="absolute inset-0 w-full h-full rounded-xl overflow-hidden shadow-md">
@@ -170,6 +180,7 @@ import FormReservation from '../components/forms/FormReservation.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import { capitalizeFirst } from '../utils/capitalizeFirstCharAt';
 import EditPublications from '../components/pages/profilePage/UI/EditPublications.vue';
+import ImageModal from '../components/common/ImageModal.vue';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -194,6 +205,9 @@ const showErrorModal = ref(false);
 const errorMessage = ref('');
 const modalIsHtml = ref(false);
 const openEditModal = ref(false);
+
+const isImageModalOpen = ref(false);
+const currentImageIndex = ref(0);
 
 const ownerIdFromSpace = computed(() => {
   if (!espacio.value) return null;
@@ -403,6 +417,11 @@ const imageGridPosition = (index) => {
     'col-start-7 row-start-5'
   ];
   return `col-span-4 md:col-span-2 row-span-4 ${positions[index] || ''}`;
+};
+
+const openImageModal = (index) => {
+  currentImageIndex.value = index;
+  isImageModalOpen.value = true;
 };
 
 const editPublication = () => {

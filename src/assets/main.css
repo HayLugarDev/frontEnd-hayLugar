@@ -128,3 +128,10 @@
     --anim-ease: cubic-bezier(.2,.8,.2,1);
   }
 }
+
+.fixed button {
+  transition: transform 0.2s ease;
+}
+.fixed button:hover {
+  transform: scale(1.2);
+}

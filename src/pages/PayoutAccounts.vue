@@ -1,8 +1,8 @@
 <template>
-  <section class="lg:bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+  <section class="lg:bg-white p-2 md:p-8 rounded-lg w-full md:w-2/3">
     <div class="mx-auto max-w-6xl" v-if="!loadingUser">
       <!-- Header -->
-      <section class="bg-gray-50 p-6 md:p-8 rounded-2xl shadow-lg mb-8">
+      <section class="bg-gray-50 p-6 md:p-8 rounded-2xl shadow-lg">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <h2 class="text-2xl font-semibold text-primary flex items-center gap-2">
