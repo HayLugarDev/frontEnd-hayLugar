@@ -21,8 +21,7 @@
                 class="h-16 w-16 md:h-24 md:w-24 lg:h-28 lg:w-28 xl:h-32 xl:w-32
                        transition-transform duration-300 ease-out
                        motion-reduce:transition-none
-                       motion-safe:group-hover:scale-110
-                       hover:ring-2 hover:ring-white/40"
+                       motion-safe:group-hover:scale-110"
               />
               <h1
                 class="font-extrabold tracking-tight
