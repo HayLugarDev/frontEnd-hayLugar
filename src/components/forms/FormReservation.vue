@@ -1,5 +1,5 @@
 <template>
-  <section class="shadow-2xl p-8 md:p-10 xl:p-6 md:rounded-xl h-max sm:border border-zinc-700">
+  <section class="shadow-2xl p-8 xl:p-12 md:rounded-xl h-max sm:border border-zinc-700">
     <h2 class="text-2xl font-semibold mb-4">Completá tu reserva</h2>
     <div class="grid grid-cols-2 gap-4">
 
