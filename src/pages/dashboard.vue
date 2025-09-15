@@ -1,6 +1,9 @@
 <template>
   <div>
-    <DashboardSkeleton v-if="cargando" />
+    <div v-if="cargando" class="relative flex-1 grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7"
+      :class="espacios.length < 4 ? 'grid-cols-1' : 'grid-cols-2'">
+      <DashboardSkeleton v-for="n in 4" :key="n" />
+    </div>
     <div v-else class="flex flex-col h-full bg-secondary">
       <MainHeader @toggle="toggleMap" />
       <MapButton :text="buttonText" color="white" background="primary" @toggle="toggleMap"
@@ -29,8 +32,8 @@
       </div>
 
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
-        <div v-if="!showMap"
-          class="relative flex-1 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
+        <div v-if="!showMap" class="relative flex-1 grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7"
+          :class="gridCols">
           <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">{{
             error }}</div>
           <SpaceCard v-for="espacio in espacios" :key="espacio.id" :espacio="espacio" />
@@ -88,6 +91,10 @@ const error = ref(null);
 const showMap = ref(false);
 const showSearchMenu = ref(false);
 const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
+
+const gridCols = computed(() => {
+  return espacios.value.length < 4 ? 'grid-cols-1' : 'grid-cols-2';
+});
 
 const {
   center,

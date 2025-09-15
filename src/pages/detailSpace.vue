@@ -156,6 +156,14 @@
     :vehicleType="reverseVehicleTypeTranslations[tipoVehiculo]" @selected="onSelectedVehicle" :isHtml="modalIsHtml"
     @close="showVehicleModal = false" />
 
+  <!-- ✅ Mini Toast -->
+  <transition name="fade">
+    <div v-if="toast.show" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-white"
+      :class="toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'">
+      {{ toast.text }}
+    </div>
+  </transition>
+
 </template>
 
 
@@ -181,6 +189,7 @@ import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import { capitalizeFirst } from '../utils/capitalizeFirstCharAt';
 import EditPublications from '../components/pages/profilePage/UI/EditPublications.vue';
 import ImageModal from '../components/common/ImageModal.vue';
+import { addFavorite, removeFavorite } from '../services/favoriteService';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -243,6 +252,11 @@ const obtenerEspacio = async () => {
 onMounted(async () => {
   await obtenerEspacio();
   console.log(espacio.value);
+
+  if (isLogged.value) {
+    const favs = await getUserFavorites();
+    activedFavouriteIcon.value = favs.data.some(f => f.space_id === espacio.value.id);
+  }
 });
 
 // const markerIcon = computed(() => {
@@ -371,6 +385,7 @@ const vehicleOptions = computed(() => {
   return espacio.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
 });
 
+
 const vehicleTypeTranslations = {
   car: 'Auto',
   motorcycle: 'Moto',
@@ -428,16 +443,41 @@ const editPublication = () => {
   openEditModal.value = true;
 };
 
+const toast = ref({
+  show: false,
+  text: "",
+  type: "success", // "success" o "error"
+});
+
+function showToast(message, type = "success") {
+  toast.value = { show: true, text: message, type };
+  setTimeout(() => {
+    toast.value.show = false;
+  }, 2000); // ⏳ se oculta después de 2 segundos
+}
+
 const toggleFavourite = async () => {
   await verifyToken();
   if (isSessionInvalid.value) return;
 
-  activedFavouriteIcon.value = !activedFavouriteIcon.value;
-  isAnimating.value = true;
+  try {
+    if (!activedFavouriteIcon.value) {
+      // No estaba en favoritos → agregar
+      await addFavorite(espacio.value.id);
+      activedFavouriteIcon.value = true;
+    } else {
+      // Ya estaba en favoritos → eliminar
+      await removeFavorite(espacio.value.id);
+      activedFavouriteIcon.value = false;
+    }
 
-  setTimeout(() => {
-    isAnimating.value = false;
-  }, 400);
+    isAnimating.value = true;
+    setTimeout(() => {
+      isAnimating.value = false;
+    }, 400);
+  } catch (err) {
+    console.error('Error en toggleFavourite', err);
+  }
 };
 
 </script>
