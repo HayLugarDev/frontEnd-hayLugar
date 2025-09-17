@@ -8,62 +8,94 @@
         <h1 class="text-md text-center border-b-2 py-2">Registrá tu cuenta</h1>
         <div class="px-8 py-2">
           <div v-if="credentialError"
-            class="bg-red-200 w-full py-1 rounded-md text-center text-red-700 border border-red-700">{{ messaggeError }}
+               class="bg-red-200 w-full py-1 rounded-md text-center text-red-700 border border-red-700">
+            {{ messaggeError }}
           </div>
+
           <h1 class="text-xl text-start my-4">Te damos la bienvenida a HayLugar</h1>
+
           <div class="space-y-6 max-w-md mx-auto">
             <form @submit.prevent="register" class="space-y-6 max-w-md mx-auto">
               <!-- Nombre -->
               <div class="relative">
-                <input v-model="name" type="text" required @focus="isFocused.name.value = true"
+                <input
+                  v-model="name"
+                  type="text"
+                  required
+                  @focus="isFocused.name.value = true"
                   @blur="isFocused.name.value = false"
                   class="peer w-full px-4 pt-5 pb-2 border border-gray-300 rounded-md text-base placeholder-transparent focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200" />
                 <label :class="[
-                  'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
-                  name || isFocused.name.value
-                    ? 'scale-75 -translate-y-1'
-                    : 'scale-100 translate-y-4'
-                ]">
+                    'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
+                    name || isFocused.name.value
+                      ? 'scale-75 -translate-y-1'
+                      : 'scale-100 translate-y-4'
+                  ]">
                   Nombre
                 </label>
               </div>
+
               <!-- Email -->
               <div class="relative">
-                <input v-model="email" type="email" id="email" required @focus="isFocused.email.value = true"
+                <input
+                  v-model="email"
+                  type="email"
+                  id="email"
+                  required
+                  @focus="isFocused.email.value = true"
                   @blur="isFocused.email.value = false"
                   class="peer w-full px-4 pt-5 pb-2 border border-gray-300 rounded-md text-base placeholder-transparent focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200" />
                 <label :class="[
-                  'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
-                  email || isFocused.email.value
-                    ? 'scale-75 -translate-y-1'
-                    : 'scale-100 translate-y-4'
-                ]">
+                    'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
+                    email || isFocused.email.value
+                      ? 'scale-75 -translate-y-1'
+                      : 'scale-100 translate-y-4'
+                  ]">
                   Correo electrónico
                 </label>
               </div>
+
               <!-- Contraseña -->
               <div class="relative">
-                <input v-model="password_hash" type="password" id="password" required
-                  @focus="isFocused.password_hash.value = true" @blur="isFocused.password_hash.value = false"
+                <input
+                  v-model="password_hash"
+                  type="password"
+                  id="password"
+                  required
+                  @focus="isFocused.password_hash.value = true"
+                  @blur="isFocused.password_hash.value = false"
                   class="peer w-full px-4 pt-5 pb-2 border border-gray-300 rounded-md text-base placeholder-transparent focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200" />
                 <label :class="[
-                  'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
-                  password || isFocused.password_hash.value
-                    ? 'scale-75 -translate-y-1'
-                    : 'scale-100 translate-y-4'
-                ]">
+                    'absolute left-4 text-gray-500 origin-[0] transform transition-all duration-200 pointer-events-none',
+                    password_hash || isFocused.password_hash.value
+                      ? 'scale-75 -translate-y-1'
+                      : 'scale-100 translate-y-4'
+                  ]">
                   Contraseña
                 </label>
               </div>
+
+              <!-- Aceptación de Términos -->
+              <label class="flex items-start gap-2 text-sm">
+                <input type="checkbox" v-model="accepted" required />
+                <span>
+                  Acepto los
+                  <router-link to="/terminos-y-condiciones" target="_blank" class="underline text-primary">
+                    Términos y Condiciones de HayLugar (v1.1)
+                  </router-link>
+                </span>
+              </label>
+
               <button type="submit" class="flex justify-center w-full bg-accent text-dark py-2 rounded-md">
                 <img v-if="cargando" :src="loadIcon" alt="Cargando" class="w-6 h-6" />
                 <span class="text-white" v-else>Continuar</span>
               </button>
             </form>
-            <!-- Botón de Google -->
-            <GoogleLogin />
 
+            <!-- Google -->
+            <GoogleLogin />
           </div>
+
           <p class="mt-4 text-center text-sm">¿Ya tienes una cuenta?
             <router-link to="/login" class="text-primary font-bold">Inicia sesión aquí</router-link>
           </p>
@@ -87,51 +119,61 @@ const name = ref('');
 const email = ref('');
 const password_hash = ref('');
 const role = ref('user');
+const accepted = ref(false);
+
 const router = useRouter();
 const cargando = ref(false);
 const credentialError = ref(false);
 const messaggeError = ref('');
+
 const isFocused = {
   name: ref(false),
   email: ref(false),
   password_hash: ref(false)
-}
+};
 
 const register = async () => {
-  if (!name.value || !email.value || !password_hash.value || !role.value) {
-    messaggeError.value = 'Por favor complete todos los campos';
+  if (!name.value || !email.value || !password_hash.value || !role.value || !accepted.value) {
+    messaggeError.value = 'Por favor complete todos los campos y acepte los Términos';
     credentialError.value = true;
     return;
   }
+
   cargando.value = true;
   credentialError.value = false;
   messaggeError.value = '';
+
   try {
     const response = await api.post('/auth/signup', {
       name: name.value,
       email: email.value,
       password_hash: password_hash.value,
       role: role.value,
+      acceptedTerms: accepted.value
+    }, {
+      validateStatus: (status) => status < 500
     });
 
-    console.log(response);
-    if (response.data.token) {
+    if (response.data?.token) {
+      // guarda token para futuras llamadas protegidas
+      localStorage.setItem('token', response.data.token);
+
       const userStore = useUserStore();
-      router.push('/dashboard')
-        .then(() => {
-          window.location.reload();
-        });
+      userStore.setUser(response.data.user);
+
+      router.push('/dashboard').then(() => {
+        // si tu app requiere “refresh” del layout
+        window.location.reload();
+      });
     } else {
       credentialError.value = true;
-      messaggeError.value = response.data.error || 'Error en el ingreso de datos';
+      messaggeError.value = response.data?.error || 'Error en el ingreso de datos';
     }
   } catch (error) {
     credentialError.value = true;
     if (error.response) {
-      // Error de servidor (500, etc.)
-      messaggeError.value = error.response.data.error || 'Error en el servidor';
+      messaggeError.value = error.response.data?.error || 'Error en el servidor';
     } else if (error.request) {
-
       messaggeError.value = 'No se pudo conectar al servidor';
     } else {
       messaggeError.value = 'Error en la solicitud';
