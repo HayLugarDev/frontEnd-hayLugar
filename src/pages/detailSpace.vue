@@ -189,7 +189,7 @@ import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import { capitalizeFirst } from '../utils/capitalizeFirstCharAt';
 import EditPublications from '../components/pages/profilePage/UI/EditPublications.vue';
 import ImageModal from '../components/common/ImageModal.vue';
-import { addFavorite, removeFavorite } from '../services/favoriteService';
+import { addFavorite, removeFavorite, getUserFavorites } from '../services/favoriteService';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -253,10 +253,10 @@ onMounted(async () => {
   await obtenerEspacio();
   console.log(espacio.value);
 
-  if (isLogged.value) {
-    const favs = await getUserFavorites();
-    activedFavouriteIcon.value = favs.data.some(f => f.space_id === espacio.value.id);
-  }
+  // if (isLogged.value) {
+  //   const favs = await getUserFavorites();
+  //   activedFavouriteIcon.value = favs.data.some(f => f.space_id === espacio.value.id);
+  // }
 });
 
 // const markerIcon = computed(() => {

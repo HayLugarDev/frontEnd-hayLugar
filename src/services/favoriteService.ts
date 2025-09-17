@@ -24,7 +24,7 @@ export const removeFavorite = async (spaceId: number) => {
 
 export const getUserFavorites = async () => {
     try {
-        const response = await api.get('/favorite', { withCredentials: true });
+        const response = await api.get('/favorites', { withCredentials: true });
         console.log(response.data);
         return response.data
     } catch (error) {
