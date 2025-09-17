@@ -25,6 +25,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
+import api from '../services/apiService'     // 👉 cliente Axios con baseURL = VITE_API_BASE_URL
+import axios from 'axios'                    // 👉 instancia default para traer el HTML estático
 
 type Terms = {
   version: string
@@ -46,13 +48,16 @@ async function load() {
   loading.value = true
   error.value = ''
   try {
-    const r = await fetch('/api/terms/active', { credentials: 'include' })
-    if (!r.ok) throw new Error('No hay términos publicados.')
-    terms.value = await r.json()
+    // 1) Traer versión activa (API)
+    const { data } = await api.get<Terms>('/terms/active')
+    terms.value = data
 
-    const res = await fetch(terms.value.documentUrl)
-    if (!res.ok) throw new Error('No se pudo cargar el documento de Términos.')
-    html.value = await res.text()
+    // 2) Traer HTML del documento (estático del front)
+    const res = await axios.get(terms.value.documentUrl, {
+      responseType: 'text',
+      transformResponse: (r) => r,
+    })
+    html.value = res.data as string
   } catch (e: any) {
     error.value = e?.message || 'Error cargando Términos.'
   } finally {

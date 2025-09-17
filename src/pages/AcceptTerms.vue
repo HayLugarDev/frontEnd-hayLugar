@@ -25,7 +25,7 @@
           <button
             class="px-4 py-2 bg-black text-white rounded disabled:opacity-60"
             @click="accept"
-            :disabled="loading || !terms"
+            :disabled="loading || !terms || loadingAccept"
           >
             {{ loadingAccept ? 'Guardando…' : 'Acepto' }}
           </button>
@@ -39,6 +39,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import api from '../services/apiService'          // 👉 cliente Axios con baseURL = VITE_API_BASE_URL
+import axios from 'axios'                         // 👉 instancia default para traer el HTML estático
 
 type Terms = {
   version: string
@@ -59,13 +61,16 @@ async function load() {
   loading.value = true
   error.value = ''
   try {
-    const r = await fetch('/api/terms/active', { credentials: 'include' })
-    if (!r.ok) throw new Error('No hay términos publicados.')
-    terms.value = await r.json()
+    // 1) Traer versión activa (API)
+    const { data } = await api.get<Terms>('/terms/active')
+    terms.value = data
 
-    const res = await fetch(terms.value.documentUrl)
-    if (!res.ok) throw new Error('No se pudo cargar el documento de Términos.')
-    html.value = await res.text()
+    // 2) Traer HTML del documento (estático del front)
+    const res = await axios.get(terms.value.documentUrl, {
+      responseType: 'text',
+      transformResponse: (r) => r, // evitar que Axios intente parsear JSON
+    })
+    html.value = res.data as string
   } catch (e: any) {
     error.value = e?.message || 'Error cargando Términos.'
   } finally {
@@ -78,21 +83,7 @@ async function accept() {
   loadingAccept.value = true
   error.value = ''
   try {
-    const token = localStorage.getItem('token')
-    const r = await fetch('/api/terms/accept', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-      },
-      body: JSON.stringify({ version: terms.value.version }),
-      credentials: 'include'
-    })
-    if (!r.ok) {
-      const body = await r.json().catch(() => ({}))
-      throw new Error(body?.error || 'No se pudo registrar tu aceptación')
-    }
-    // éxito → volvemos al dashboard/home
+    await api.post('/terms/accept', { version: terms.value.version })
     router.push('/dashboard')
   } catch (e: any) {
     error.value = e?.message || 'Error guardando aceptación.'
