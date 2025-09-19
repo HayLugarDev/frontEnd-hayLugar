@@ -155,11 +155,11 @@
   <SessionExpired :sessionExpired="isSessionInvalid" />
 
   <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-    icon="/src/assets/logo.png" @close="showErrorModal = false" :isHtml="modalIsHtml" />
+    icon="/src/assets/logo.png" :isHtml="modalIsHtml" buttonText="Aceptar términos" @close="showErrorModal = false"
+    @confirm="redirigirATerminos" />
 
-  <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario"
-    :vehicleType="getVehicleKey(tipoVehiculo)" @selected="onSelectedVehicle" :isHtml="modalIsHtml"
-    @close="showVehicleModal = false" />
+  <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario" :vehicleType="getVehicleKey(tipoVehiculo)"
+    @selected="onSelectedVehicle" :isHtml="modalIsHtml" @close="showVehicleModal = false" />
 
 </template>
 
@@ -261,6 +261,11 @@ onMounted(async () => {
   }
 });
 
+const redirigirATerminos = () => {
+  showErrorModal.value = false;
+  router.push('/aceptar-terminos');
+};
+
 const reservar = async () => {
   if (isOwner.value) {
     errorMessage.value = 'No podés reservar tu propio espacio.';
@@ -275,6 +280,14 @@ const reservar = async () => {
     showErrorModal.value = true;
     return;
   }
+
+  if (userStore.terms?.mustReaccept) {
+    errorMessage.value = 'Todavía no aceptaste los Términos y Condiciones de HayLugar';
+    modalIsHtml.value = false;
+    showErrorModal.value = true;
+    return;
+  }
+
 
   await verifyToken();
   if (isSessionInvalid.value) return;

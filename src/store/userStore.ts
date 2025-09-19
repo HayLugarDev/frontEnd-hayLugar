@@ -15,6 +15,8 @@ export const useUserStore = defineStore('user', {
       address?: string;
       role?: string;
       profile_picture?: string;
+      termsAccepted: boolean  
+      acceptedTermsVersion: string | null
     },
     loading: false,
     error: null as string | null,
@@ -23,6 +25,11 @@ export const useUserStore = defineStore('user', {
     notificationsLoaded: false, // <- para saber si ya cargamos la primera vez
     reservations: [] as any[],
     toastShown: false, // <- nuevo flag
+    terms: null as null | { //<- estado de términos
+      requiredVersion: string | null;
+      documentUrl: string | null;
+      outdated: boolean;
+    },
   }),
 
   getters: {
@@ -36,12 +43,14 @@ export const useUserStore = defineStore('user', {
       try {
         const response = await api.get('/auth/google-session', { withCredentials: true });
         // Manejo defensivo de la forma de la respuesta
+        console.log(response.data);
         const user = response.data?.user ?? response.data;
         if (!user?.id) {
           throw new Error('No se recibió user desde /auth/google-session');
         }
 
         this.user = user;
+        this.terms = response.data?.terms ?? null; // 👈 guardamos términos
         this.sessionExpired = false;
 
         // Esperamos a que el user esté seteado antes de pedir notificaciones
