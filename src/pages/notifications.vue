@@ -10,7 +10,7 @@
             <div v-if="loading" class="space-y-4">
                 <ItemSkeleton />
             </div>
-            <ul v-else-if="notifications.length" class="divide-y divide-gray-300 space-y-2 font-sans text-xs">
+            <ul v-else-if="notifications.length" class="divide-y divide-gray-300 space-y-2 font-sans text-xs lg:text-lg">
                 <li v-for="(notification, index) in notifications" :key="index"
                     class="border border-yellow-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all bg-gray-50 space-y-3">
 
@@ -98,16 +98,8 @@ const modalConfig = ref({
 
 const selectedNotification = ref<any>(null);
 
-function openConfirm(notification: any, action: 'approve' | 'delete') {
+function openConfirm(notification: any, action: 'delete') {
     selectedNotification.value = notification;
-
-    if (action === 'approve') {
-        modalConfig.value = {
-            message: '¿Estás seguro de que quieres aprobar esta reserva?',
-            buttonText: 'Aceptar',
-            onConfirm: () => approveReservation()
-        };
-    }
 
     if (action === 'delete') {
         modalConfig.value = {
@@ -121,29 +113,6 @@ function openConfirm(notification: any, action: 'approve' | 'delete') {
 }
 
 const getStatusColor = (status: string) => statusColors[status] || 'text-gray-500';
-
-const approveReservation = async () => {
-    if (!selectedNotification.value) return;
-
-    try {
-        await api.put(`/reservations/${selectedNotification.value.reservation_id}/status`,
-            { status: 'approved' },
-            { withCredentials: true }
-        );
-        await api.put(`/notifications/${selectedNotification.value.id}/status`,
-            { status: 'approved' },
-            { withCredentials: true }
-        );
-
-        notifications.value = notifications.value.map(n =>
-            n.id === selectedNotification.value.id ? { ...n, status: 'approved' } : n
-        );
-
-        showConfirmModal.value = false;
-    } catch (error) {
-        console.error("Error al aprobar reserva:", error);
-    }
-};
 
 const deleteNotification = async (notification_id: number) => {
     try {

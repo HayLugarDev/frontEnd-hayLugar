@@ -131,7 +131,9 @@
 
 .fixed button {
   transition: transform 0.2s ease;
+  /* quitar el hover global */
 }
-.fixed button:hover {
+
+/* .fixed button:hover {
   transform: scale(1.2);
-}
+} */

@@ -1,25 +1,29 @@
 import { io, Socket } from 'socket.io-client';
 import { useUserStore } from '../store/userStore';
+import { watch } from 'vue';
 
 let socket: Socket | null = null;
 
 export function useNotifications() {
   const userStore = useUserStore();
 
-  if (!socket) {
-    socket = io(import.meta.env.VITE_BASE_URL || 'http://localhost:3000');
+  watch(
+    () => userStore.user,
+    (user) => {
+      if (user && user.id && !socket) {
+        socket = io(import.meta.env.VITE_BASE_URL || 'http://localhost:3000');
 
-    socket.on("connect", () => {
-      console.log("🔌 Conectado", socket.id);
+        socket.on("connect", () => {
+          console.log("🔌 Conectado", socket.id);
+          socket.emit("subscribe", { user_id: user.id });
+        });
 
-      socket.emit("subscribe", {
-        user_id: userStore.user.id
-      });
-    });
-
-    socket.on("notification", (data) => {
-      userStore.addNotification(data);
-      console.log("📢 Notificación recibida:", data);
-    });
-  }
+        socket.on("notification", (data) => {
+          userStore.addNotification(data);
+          console.log("📢 Notificación recibida:", data);
+        });
+      }
+    },
+    { immediate: true }
+  );
 }

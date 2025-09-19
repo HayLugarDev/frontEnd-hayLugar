@@ -4,10 +4,18 @@ import api from "./apiService";
 export const getNotificationsByUserId = async (id: number) => {
   try {
     const response = await api.get(`/notifications/${id}`, { withCredentials: true });
-    console.log(response.data);
-    return response.data
+    console.log("getNotificationsByUserId:", response.data);
+
+    // Normalizamos: siempre devolver un array
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    if (response.data?.notifications) {
+      return response.data.notifications;
+    }
+    return [];
   } catch (error) {
-    console.error("Error al obtener el ID de la reserva:", error);
+    console.error("Error al obtener las notificaciones:", error);
     return [];
   }
-}
+};
