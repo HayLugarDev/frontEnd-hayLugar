@@ -7,20 +7,29 @@
           <h2 :class="['text-3xl font-bold mb-2', type === 'error' ? 'text-red-600' : 'text-primary']">
             {{ title }}
           </h2>
-          <!-- Contenido HTML o no -->
-          <p
-            v-if="isHtml"
-            class="text-lg text-gray-700 text-center mb-6"
-            v-html="message"
-          ></p>
-          <p
-            v-else
-            class="text-lg text-gray-700 text-center mb-6"
-          >{{ message }}</p>
 
-          <button @click="$emit('close')" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-            {{ buttonText }}
-          </button>
+          <!-- Contenido HTML o no -->
+          <p v-if="isHtml" class="text-lg text-gray-700 text-center mb-6" v-html="message"></p>
+          <p v-else class="text-lg text-gray-700 text-center mb-6">{{ message }}</p>
+
+          <div class="flex gap-4">
+            <!-- Botón principal -->
+            <button
+              @click="$emit('confirm')"
+              class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+            >
+              {{ buttonText }}
+            </button>
+
+            <!-- Botón opcional para cerrar -->
+            <button
+              v-if="showCancel"
+              @click="$emit('close')"
+              class="bg-gray-300 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-400"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -30,33 +39,12 @@
 <script setup>
 defineProps({
   visible: Boolean,
-  type: {
-    type: String,
-    default: 'success', // success | error | info
-  },
+  type: { type: String, default: 'success' }, // success | error | info
   title: String,
   message: String,
   icon: String,
-  buttonText: {
-    type: String,
-    default: 'Aceptar',
-  },
-  isHtml: {
-    type: Boolean,
-    default: false,
-  },
+  buttonText: { type: String, default: 'Aceptar' },
+  isHtml: { type: Boolean, default: false },
+  showCancel: { type: Boolean, default: false }, // 👈 por si querés botón "cancelar"
 });
 </script>
-
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-</style>

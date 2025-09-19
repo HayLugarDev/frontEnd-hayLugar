@@ -2,7 +2,7 @@ import api from "./apiService";
 
 export const addFavorite = async (spaceId: number) => {
     try {
-        const response = await api.get(`/favorites/${spaceId}`, { withCredentials: true });
+        const response = await api.post(`/favorites/${spaceId}`, { withCredentials: true });
         console.log(response.data);
         return response.data
     } catch (error) {

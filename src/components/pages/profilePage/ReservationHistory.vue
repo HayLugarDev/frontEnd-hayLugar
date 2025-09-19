@@ -71,7 +71,7 @@
             <font-awesome-icon :icon="['fas', 'square-xmark']" />
             Iniciar CheckOut
           </button>
-          <div v-else class="w-full flex flex-row items-center lg:justify-end gap-1">
+          <div v-else class="w-full flex flex-row items-center justify-end gap-1">
             <button v-if="reservation.status === 'approved'" @click="checkInInit(reservation)"
               class="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
               <font-awesome-icon :icon="['fas', 'square-xmark']" />

@@ -1,10 +1,10 @@
 <template>
   <ul class="flex flex-col divide-y divide-gray-200 text-gray-700 text-2xl md:text-base z-50">
-    <li>
-      <MobileNotificationButton @click="$emit('navigate', '/notifications')" class="menu-item" />
-    </li>
     <li v-if="route.path !== '/dashboard'" @click="$emit('navigate', '/dashboard')" class="menu-item">
       <font-awesome-icon icon="house" /> <span>Inicio</span>
+    </li>
+    <li v-if="user" @click="$emit('navigate', '/notifications')" class="menu-item">
+      <font-awesome-icon icon="bell" /> <span>Notificaciones</span>
     </li>
     <li v-if="!user" @click="$emit('navigate', '/register')" class="menu-item">
       <font-awesome-icon icon="user-plus" /> <span>Registrarse</span>
@@ -31,7 +31,6 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { useUserStore } from '../../store/userStore';
-import MobileNotificationButton from './header/MobileNotificationButton.vue';
 const userStore = useUserStore();
 const user = userStore.user;
 

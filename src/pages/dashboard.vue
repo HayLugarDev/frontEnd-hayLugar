@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div v-if="cargando" class="relative flex-1 grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7"
-      :class="espacios.length < 4 ? 'grid-cols-1' : 'grid-cols-2'">
-      <DashboardSkeleton v-for="n in 4" :key="n" />
-    </div>
+    <DashboardSkeleton v-if="cargando" />
     <div v-else class="flex flex-col h-full bg-secondary">
       <MainHeader @toggle="toggleMap" />
       <MapButton :text="buttonText" color="white" background="primary" @toggle="toggleMap"
@@ -22,18 +19,19 @@
         <CustomInputGroup v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
           :onSearch="buscar" />
       </div>
+
       <!-- Habilitar Navbar Buttons -->
       <!-- <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
         <ZoneNavbarButton @click="router.push('/universidades')" :text="'🎓🏛️ Universidades'" />
         <ZoneNavbarButton @click="router.push('/meteredParkingDashboard')" :text="'🅿️ Estacionamiento Medido'" />
       </div> -->
+      
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
         <AdvancedMobileSearch />
       </div>
 
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
-        <div v-if="!showMap" class="relative flex-1 grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7"
-          :class="gridCols">
+        <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
           <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">{{
             error }}</div>
           <SpaceCard v-for="espacio in espacios" :key="espacio.id" :espacio="espacio" />
