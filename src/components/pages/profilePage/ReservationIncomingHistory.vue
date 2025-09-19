@@ -95,6 +95,21 @@
               </button>
             </div>
 
+            <!-- VERIFIED (Anfitrión confirma check-in correcto) -->
+            <div v-if="reservation.status === 'verified'"
+              class="flex flex-row items-center justify-end gap-2 w-full md:w-auto mt-4">
+              <button @click="confirmCheckinReservation(reservation)"
+                class="text-yellow-600 px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
+                <font-awesome-icon :icon="['fas', 'check']" />
+                Confirmar Checkin del usuario
+              </button>
+              <button @click="confirmRejectReservation(reservation)"
+                class="text-red-500 px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
+                <font-awesome-icon :icon="['fas', 'xmark']" />
+                Rechazar
+              </button>
+            </div>
+
             <!-- FINALIZAR Y COBRAR (solo si hay hold y ya no es pending) -->
             <div v-else-if="canFinalize(reservation)"
               class="flex flex-col sm:flex-row sm:items-center sm:gap-3 justify-end w-full md:w-auto mt-4">
@@ -286,6 +301,22 @@ async function approveReservation() {
   }
 }
 
+async function inProgressReservation() {
+  try {
+    await api.put(`/reservations/${selectedReservation.value.id}/status`, { status: 'in_progress' }, { withCredentials: true });
+
+    showConfirmModal.value = false;
+    selectedReservation.value = null;
+
+    await fetchReservations();
+    showToast('¡Checkin confirmado!', 'success');
+  } catch (error: any) {
+    showErrorModal.value = true;
+    errorMessage.value = error.response?.data?.message || "Error al confirmar Checkin";
+    showToast('No se pudo confirmar Checkin', 'error');
+  }
+}
+
 function confirmRejectReservation(reservation: any) {
   selectedReservation.value = reservation;
   modalConfig.value = {
@@ -312,6 +343,16 @@ async function rejectReservation() {
   }
 }
 
+function confirmCheckinReservation(reservation: any) {
+  selectedReservation.value = reservation;
+  modalConfig.value = {
+    message: '¿El usuario estaciono y realizo el Checkin correctamente?',
+    buttonText: 'Confirmar',
+    onConfirm: () => inProgressReservation()
+  };
+  showConfirmModal.value = true;
+}
+
 // ================== FINALIZAR Y COBRAR ==================
 const quote = ref<null | {
   reservation_id: number;
@@ -326,11 +367,32 @@ const quote = ref<null | {
 const quoteLoading = ref(false);
 
 async function confirmFinalizeReservation(reservation: any) {
+  selectedReservation.value = reservation;
+
+  // 1) Verificamos si el tiempo ya finalizó
+  const now = new Date().getTime();
+  const end = new Date(reservation.end_time).getTime();
+  const tiempoNoFinalizo = now < end;
+
+  if (tiempoNoFinalizo) {
+    modalConfig.value = {
+      message: `¡Atención! El tiempo de la reserva aún no ha finalizado. ¿Desea finalizar y cobrar igual?`,
+      buttonText: 'Finalizar y cobrar',
+      onConfirm: () => finalizeWithQuote(reservation)
+    };
+    showConfirmModal.value = true;
+    return;
+  }
+
+  // 2) Si ya finalizó, seguimos el flujo normal
+  await finalizeWithQuote(reservation);
+}
+
+// Función que obtiene la quote y abre el modal de confirmación con detalle
+async function finalizeWithQuote(reservation: any) {
   try {
-    selectedReservation.value = reservation;
     quoteLoading.value = true;
 
-    // 1) Pedimos QUOTE al backend
     const { data } = await api.get(`/reservations/${reservation.id}/capture-quote`, { withCredentials: true });
     quote.value = {
       reservation_id: data.reservation_id,
@@ -342,7 +404,6 @@ async function confirmFinalizeReservation(reservation: any) {
       info: data.info,
     };
 
-    // 2) Armamos confirm con el QUOTE
     const base = formatCents(quote.value.base_cents);
     const pen = formatCents(quote.value.penalty_cents);
     const tot = formatCents(quote.value.final_cents);
@@ -351,16 +412,12 @@ async function confirmFinalizeReservation(reservation: any) {
 
     const msg =
       (quote.value.penalty_cents > 0
-        ? `Se capturará el pago retenido con penalidad por sobretiempo.\n\n`
-        : `Se capturará el pago retenido (sin penalidad).\n\n`) +
+        ? `Pago con penalidad por sobretiempo.\n`
+        : `Pago sin penalidad.\n`) +
       `Base: ${base}\n` +
       `Penalidad: ${pen}\n` +
-      `Total a capturar: ${tot}\n` +
-      `Hold retenido: ${hold}\n` +
-      (quote.value.remainder_cents > 0
-        ? `Resto vs hold: ${rest}\n\n` +
-        `Se capturará hasta el hold; el resto quedará pendiente para un cobro adicional.`
-        : `El hold alcanza para cubrir el total.`);
+      `Total a cobrar: ${tot}\n`;
+
 
     modalConfig.value = {
       message: msg,
@@ -377,6 +434,7 @@ async function confirmFinalizeReservation(reservation: any) {
     quoteLoading.value = false;
   }
 }
+
 
 async function finalizeReservation() {
   try {

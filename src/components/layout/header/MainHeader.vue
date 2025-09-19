@@ -1,33 +1,35 @@
 <template>
   <header
-    class="bg-secondary/80 backdrop-blur-md gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 py-2 xl:px-16 fixed md:static transition-all duration-300 shadow-md md:shadow-none animate-fade-in-down">
+    class="bg-secondary gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 py-2 xl:px-16 fixed md:static shadow-md md:shadow-none">
     <Logo width="12" @click="router.push('/dashboard')"
-      class="transition-transform duration-300 hover:scale-105 hidden md:block" />
+      class="hidden md:block" />
     <div v-if="authChecked" class="flex flex-row justify-between gap-2">
       <div v-if="routeConfig.showSalirButton" @click="router.push('/dashboard')">
         <button
-          class="text-gray-800 border sm:text-md hover:shadow-lg bg-gray-50 py-2 px-4 rounded-full cursor-pointer h-full">
+          class="text-gray-800 border sm:text-md bg-gray-50 py-2 px-4 rounded-full cursor-pointer h-full">
           Salir
         </button>
       </div>
       <div v-if="route.path !== '/add-space' && route.path !== '/add-vehicle'"
         class="relative flex flex-row sm:gap-2 items-center max-h-12">
         <font-awesome-icon icon="fa-regular fa-circle-question"
-          class="hidden md:block p-3 text-gray-500 w-6 h-6 hover:shadow-xl hover:bg-gray-50 rounded-full cursor-pointer" />
-        <NotificationDropdown class="hidden md:block" v-if="routeConfig.showNotificationButton" />
+          class="hidden md:block p-3 text-gray-500 w-6 h-6 hover:bg-gray-50 rounded-full cursor-pointer" />
         <div class="">
           <!-- Botón visible solo en mobile -->
           <button @click="showMobileMenu = true"
-            class="block md:hidden w-11 h-11 rounded-full border-2 border-gray-300 bg-gray-50 shadow-lg">
+            class="block md:hidden w-11 h-11 rounded-full border-2 bg-gray-50">
             <font-awesome-icon icon="fa-align-justify" />
           </button>
 
           <!-- Menú lateral en mobile -->
           <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
         </div>
+      </div>
+      <div class="flex flex-row gap-1">
+        <NotificationDropdown v-if="routeConfig.showNotificationButton" />
+        <MapButton :text="buttonText" @click="toggleMap" class="md:hidden" />
         <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
       </div>
-      <MapButton :text="buttonText" color="black" background="gray-50" @click="toggleMap" class="md:hidden" />
     </div>
     <template v-else>
       <!-- Skeleton Loader -->
@@ -55,11 +57,11 @@ import { useRoute, useRouter } from 'vue-router';
 import SessionExpired from '../../common/SessionExpired.vue';
 import { useHeaderVisibility } from "../../../logic/useHeaderVisibility";
 import { useVerifyToken } from '../../../logic/useVerifyToken';
-import BackButton from "../../common/BackButton.vue";
 import NotificationDropdown from './NotificationDropdown.vue';
 import UserMenu from '../UserMenu.vue';
 import MobileUserMenu from './MobileUserMenu.vue';
 import MapButton from '../../pages/dashboardPage/MapButton.vue';
+import { showToast } from '../../../utils/toast';
 
 const userStore = useUserStore();
 const showNotificationBubble = ref(false);
@@ -82,18 +84,14 @@ onMounted(async () => {
   authChecked.value = true;
 });
 
-watch(
-  () => userStore.notifications.length,
-  (newVal) => {
-    if (newVal > 0) {
-      showNotificationBubble.value = true;
-
-      setTimeout(() => {
-        showNotificationBubble.value = false;
-      }, 4000); // Oculta el globo tras 4 segundos
-    }
-  }
-);
+// watch(
+//   () => userStore.notifications,
+//   (newList, oldList) => {
+//     if (newList.length > oldList.length) {
+//       showToast('¡Tienes nuevas notificaciones!', "notification");
+//     }
+//   }
+// );
 
 const handleNavigate = (path: string) => {
   if (path === '/quit') {
@@ -113,6 +111,8 @@ function toggleNotifications() {
 
 function toggleMap() {
   showMap.value = !showMap.value;
+  showMobileMenu.value = false;
+  showNotificationBubble.value = false;
   emit('toggle');
 }
 </script>

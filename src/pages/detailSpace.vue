@@ -3,7 +3,7 @@
   <div class="flex flex-col bg-secondary xl:w-11/12 mx-auto md:gap-4 mt-16 md:mt-0">
 
     <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
-      <div v-if="espacio?.images?.length">
+      <div v-if="espacio?.images">
 
         <!-- Carrusel en móviles -->
         <Carousel :images="espacio.images" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
@@ -15,7 +15,8 @@
             <img :src="hostImage" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
             <div class="flex flex-col pl-4 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800 text-sm">
               <div class="flex flex-row gap-1 items-center">
-                <p class="text-lg font-semibold">Anfitrión: </p><span>{{ espacio.host.name }} {{ espacio.host.last_name
+                <p class="text-lg font-semibold">Anfitrión: </p><span>{{ capitalizeFirst(espacio.host.name) }} {{
+                  capitalizeFirst(espacio.host.last_name)
                 }}</span>
               </div>
               <div class="flex flex-row gap-1 items-center">
@@ -74,10 +75,14 @@
               <p class="text-sm md:text-2xl text-gray-500 font-semibold">{{ espacio.location.split(',')[0] }}</p>
               <div class="my-4">
                 <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-2 px-6 border-2 shadow-xl">
-                  <p class="font-semibold text-2xl">{{ vehicleTypeTranslations[v.type] || v.type }}</p>
-                  <p v-if="v.price_per_hour" class="font-normal">Precio por hora: ${{ v.price_per_hour.toLocaleString()
-                  }}</p>
+                  <p class="font-semibold text-2xl">
+                    {{ getVehicleType(v.type) }}
+                  </p>
+                  <p v-if="v.price_per_hour" class="font-normal">
+                    Precio por hora: ${{ v.price_per_hour.toLocaleString() }}
+                  </p>
                 </div>
+
               </div>
             </div>
 
@@ -153,16 +158,8 @@
     icon="/src/assets/logo.png" @close="showErrorModal = false" :isHtml="modalIsHtml" />
 
   <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario"
-    :vehicleType="reverseVehicleTypeTranslations[tipoVehiculo]" @selected="onSelectedVehicle" :isHtml="modalIsHtml"
+    :vehicleType="getVehicleKey(tipoVehiculo)" @selected="onSelectedVehicle" :isHtml="modalIsHtml"
     @close="showVehicleModal = false" />
-
-  <!-- ✅ Mini Toast -->
-  <transition name="fade">
-    <div v-if="toast.show" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-white"
-      :class="toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'">
-      {{ toast.text }}
-    </div>
-  </transition>
 
 </template>
 
@@ -181,7 +178,7 @@ import BackButton from "../components/common/BackButton.vue";
 import { useVerifyToken } from '../logic/useVerifyToken';
 import SessionExpired from '../components/common/SessionExpired.vue';
 import { useUserStore } from '../store/userStore';
-import vehicleLabel from '../logic/useVehicleLabel';
+import vehicleLabel, { getVehicleKey } from '../logic/useVehicleLabel';
 import { getAllVehicles } from '../services/vehicleService';
 import VehicleSelectModal from '../components/pages/detailSpacePage/VehicleSelectModal.vue';
 import FormReservation from '../components/forms/FormReservation.vue';
@@ -190,6 +187,11 @@ import { capitalizeFirst } from '../utils/capitalizeFirstCharAt';
 import EditPublications from '../components/pages/profilePage/UI/EditPublications.vue';
 import ImageModal from '../components/common/ImageModal.vue';
 import { addFavorite, removeFavorite, getUserFavorites } from '../services/favoriteService';
+import Toast from '../components/common/Toast.vue';
+import { getVehicleType, vehicleTypeTranslations } from '../utils/vehicleTypeIconTraslation';
+import { showToast } from '../utils/toast';
+import { formatLocalDateTime } from '../utils/FormatDate';
+import { imageGridPosition } from '../utils/imageGrid';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -253,27 +255,11 @@ onMounted(async () => {
   await obtenerEspacio();
   console.log(espacio.value);
 
-  // if (isLogged.value) {
-  //   const favs = await getUserFavorites();
-  //   activedFavouriteIcon.value = favs.data.some(f => f.space_id === espacio.value.id);
-  // }
+  if (isLogged.value) {
+    const favs = await getUserFavorites();
+    activedFavouriteIcon.value = favs.some(f => f.space_id === espacio.value.id);
+  }
 });
-
-// const markerIcon = computed(() => {
-//   const tipo = espacio.value?.vehicle_types?.[0]?.toLowerCase?.();
-//   switch (tipo) {
-//     case 'car':
-//       return { url: carMarker, scaledSize: { width: 40, height: 40 } };
-//     case 'van':
-//       return { url: truckMarker, scaledSize: { width: 40, height: 40 } };
-//     case 'bicycle':
-//       return { url: bicycleMarker, scaledSize: { width: 40, height: 40 } };
-//     case 'motorcycle':
-//       return { url: truckMarker, scaledSize: { width: 40, height: 40 } };
-//     default:
-//       return null;
-//   }
-// });
 
 const reservar = async () => {
   if (isOwner.value) {
@@ -295,7 +281,7 @@ const reservar = async () => {
 
   try {
     const vehiculos = await getAllVehicles();
-    vehiculosUsuario.value = vehiculos.filter(v => v.type === reverseVehicleTypeTranslations[tipoVehiculo.value]);
+    vehiculosUsuario.value = vehiculos.filter(v => v.type === getVehicleKey(tipoVehiculo.value));
 
     if (vehiculosUsuario.value.length === 0) {
       errorMessage.value = `No tenés vehículos registrados para este tipo.<br/>
@@ -319,7 +305,7 @@ const onSelectedVehicle = (vehicle) => {
     owner_id: espacio.value.owner_id,
     space_id: espacio.value.id,
     vehicle_id: vehiculoSeleccionado.value.id,
-    vehicle_type: reverseVehicleTypeTranslations[tipoVehiculo.value],
+    vehicle_type: getVehicleKey(tipoVehiculo.value),
     start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
     end_time: formatLocalDateTime(new Date(tiempoFinal.value)),
     dead_line: deadLine.value,
@@ -347,7 +333,7 @@ const totalCalculado = computed(() => {
   // Buscar la tarifa del vehículo seleccionado
   let precioHora = 0;
   if (Array.isArray(espacio.value.vehicle_capacities)) {
-    const tipoOriginal = reverseVehicleTypeTranslations[tipoVehiculo.value];
+    const tipoOriginal = getVehicleKey(tipoVehiculo.value);
     const vehicle = espacio.value.vehicle_capacities.find(v => v.type === tipoOriginal);
     if (vehicle) {
       precioHora = Number(vehicle.price_per_hour);
@@ -385,16 +371,6 @@ const vehicleOptions = computed(() => {
   return espacio.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
 });
 
-
-const vehicleTypeTranslations = {
-  car: 'Auto',
-  motorcycle: 'Moto',
-  van: 'Camioneta',
-  bicycle: 'Bicicleta',
-  // truck: 'Camión',
-  // suv: 'SUV',
-};
-
 // Formateo de puntuación
 const formattedRating = computed(() => {
   if (espacio.value?.average_rating == null) {
@@ -410,29 +386,10 @@ const opinionesTexto = computed(() => {
   return `${espacio.value?.reviews?.comment} Opiniones`;
 });
 
-function formatLocalDateTime(date) {
-  const pad = (n) => n.toString().padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
-}
-
-const reverseVehicleTypeTranslations = Object.fromEntries(
-  Object.entries(vehicleTypeTranslations).map(([en, es]) => [es, en])
-);
-
 const hostImage = computed(() => {
   console.log("Host:", espacio.value.host);
   return espacio.value.host?.profile_picture || user_icon_primary;
 });
-
-const imageGridPosition = (index) => {
-  const positions = [
-    'col-start-5 row-start-1',
-    'col-start-7 row-start-1',
-    'col-start-5 row-start-5',
-    'col-start-7 row-start-5'
-  ];
-  return `col-span-4 md:col-span-2 row-span-4 ${positions[index] || ''}`;
-};
 
 const openImageModal = (index) => {
   currentImageIndex.value = index;
@@ -443,42 +400,31 @@ const editPublication = () => {
   openEditModal.value = true;
 };
 
-const toast = ref({
-  show: false,
-  text: "",
-  type: "success", // "success" o "error"
-});
-
-function showToast(message, type = "success") {
-  toast.value = { show: true, text: message, type };
-  setTimeout(() => {
-    toast.value.show = false;
-  }, 2000); // ⏳ se oculta después de 2 segundos
-}
-
 const toggleFavourite = async () => {
   await verifyToken();
   if (isSessionInvalid.value) return;
 
   try {
     if (!activedFavouriteIcon.value) {
-      // No estaba en favoritos → agregar
       await addFavorite(espacio.value.id);
       activedFavouriteIcon.value = true;
+      showToast("Agregado a mis favoritos", "success");
     } else {
-      // Ya estaba en favoritos → eliminar
       await removeFavorite(espacio.value.id);
       activedFavouriteIcon.value = false;
+      showToast("Eliminado de mis favoritos", "error");
     }
-
+    // animación del corazón
     isAnimating.value = true;
     setTimeout(() => {
       isAnimating.value = false;
     }, 400);
   } catch (err) {
-    console.error('Error en toggleFavourite', err);
+    console.error("Error en toggleFavourite", err);
+    showToast("Ocurrió un error, intenta de nuevo", "error");
   }
 };
+
 
 </script>
 
