@@ -1,10 +1,10 @@
 <template>
-  <div v-if="props.images.length" class="relative w-full overflow-hidden mb-2 lg:rounded-xl">
+  <div v-if="props.images.length" class="relative w-full overflow-hidden mb-2 rounded-xl">
     <!-- Carrusel de imágenes -->
     <div class="flex transition-transform duration-500" :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
       @touchstart="onTouchStart" @touchend="onTouchEnd">
       <div v-for="(img, index) in props.images" :key="index" class="w-full flex-shrink-0 aspect-square">
-        <img :src="img" class="w-full h-full object-cover" alt="Imagen del carrusel" />
+        <img :src="img" class="w-full h-full object-cover" alt="Imagen del carrusel rounded-xl" />
       </div>
     </div>
 
