@@ -155,8 +155,8 @@
   <SessionExpired :sessionExpired="isSessionInvalid" />
 
   <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-    icon="/src/assets/logo.png" :isHtml="modalIsHtml" buttonText="Aceptar términos" @close="showErrorModal = false"
-    @confirm="redirigirATerminos" />
+    icon="/src/assets/logo.png" :isHtml="modalIsHtml" :buttonText="requiresTerms ? 'Aceptar términos' : 'Cerrar'"
+    @close="showErrorModal = false" @confirm="requiresTerms ? redirigirATerminos() : showErrorModal = false" />
 
   <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario" :vehicleType="getVehicleKey(tipoVehiculo)"
     @selected="onSelectedVehicle" :isHtml="modalIsHtml" @close="showVehicleModal = false" />
@@ -216,7 +216,7 @@ const showErrorModal = ref(false);
 const errorMessage = ref('');
 const modalIsHtml = ref(false);
 const openEditModal = ref(false);
-
+const requiresTerms = ref(false);
 const isImageModalOpen = ref(false);
 const currentImageIndex = ref(0);
 
@@ -284,10 +284,10 @@ const reservar = async () => {
   if (userStore.terms?.mustReaccept) {
     errorMessage.value = 'Todavía no aceptaste los Términos y Condiciones de HayLugar';
     modalIsHtml.value = false;
+    requiresTerms.value = true; // 👈 solo en este caso
     showErrorModal.value = true;
     return;
   }
-
 
   await verifyToken();
   if (isSessionInvalid.value) return;
