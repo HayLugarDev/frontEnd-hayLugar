@@ -80,63 +80,73 @@
               Tiempo restante: {{ countdowns[reservation.id] || 'Cargando...' }}
             </div>
 
-            <!-- PENDING: aprobar / rechazar -->
-            <div v-if="isPending(reservation.status)"
-              class="flex flex-row items-center justify-end gap-2 w-full md:w-auto mt-4">
-              <button @click="confirmApprovedReservation(reservation)"
-                class="text-green-500 px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
-                <font-awesome-icon :icon="['fas', 'check']" />
-                Aprobar
-              </button>
-              <button @click="confirmRejectReservation(reservation)"
-                class="text-red-500 px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
-                <font-awesome-icon :icon="['fas', 'xmark']" />
-                Rechazar
-              </button>
-            </div>
+            <!-- Botones inferiores -->
+            <div class="flex flex-row items-center justify-end gap-1 text-xs">
+              <!-- PENDING: aprobar / rechazar -->
+              <div v-if="isPending(reservation.status)"
+                class="flex flex-row items-center justify-end gap-2 w-full md:w-auto mt-4">
+                <button @click="confirmApprovedReservation(reservation)"
+                  class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
+                  <font-awesome-icon :icon="['fas', 'check']" />
+                  Aprobar
+                </button>
+                <button @click="confirmRejectReservation(reservation)"
+                  class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
+                  <font-awesome-icon :icon="['fas', 'xmark']" />
+                  Rechazar
+                </button>
+              </div>
+              <div>
+                <button v-if="!['pending','cancelled', 'completed', 'failed','verified'].includes(reservation.status)" @click="confirmCancelation(reservation)"
+                  class="bg-red-400 text-white px-4 py-2 rounded-lg shadow hover:bg-red-500 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
+                  <font-awesome-icon :icon="['fas', 'square-xmark']" />
+                  Cancelar Reserva
+                </button>
+              </div>
 
-            <!-- VERIFIED (Anfitrión confirma check-in correcto) -->
-            <div v-if="reservation.status === 'verified'"
-              class="flex flex-row items-center justify-end gap-2 w-full md:w-auto mt-4">
-              <button @click="confirmCheckinReservation(reservation)"
-                class="text-yellow-600 px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
-                <font-awesome-icon :icon="['fas', 'check']" />
-                Confirmar Checkin del usuario
-              </button>
-              <button @click="confirmRejectReservation(reservation)"
-                class="text-red-500 px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
-                <font-awesome-icon :icon="['fas', 'xmark']" />
-                Rechazar
-              </button>
-            </div>
+              <!-- VERIFIED (Anfitrión confirma check-in correcto) -->
+              <div v-if="reservation.status === 'verified'"
+                class="flex flex-row items-center justify-end gap-2 w-full md:w-auto mt-4">
+                <button @click="confirmCheckinReservation(reservation)"
+                  class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
+                  <font-awesome-icon :icon="['fas', 'check']" />
+                  Checkin realizado
+                </button>
+                <button @click="confirmRejectReservation(reservation)"
+                  class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2">
+                  <font-awesome-icon :icon="['fas', 'xmark']" />
+                  Rechazar
+                </button>
+              </div>
 
-            <!-- FINALIZAR Y COBRAR (solo si hay hold y ya no es pending) -->
-            <div v-else-if="canFinalize(reservation)"
-              class="flex flex-col sm:flex-row sm:items-center sm:gap-3 justify-end w-full md:w-auto mt-4">
-              <button @click="confirmFinalizeReservation(reservation)"
-                class="text-primary px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                :disabled="quoteLoading && selectedReservation?.id === reservation.id">
-                <font-awesome-icon :icon="['fas', 'money-bill']" />
-                {{ (quoteLoading && selectedReservation?.id === reservation.id) ? 'Calculando…' : 'Finalizar y cobrar'
-                }}
-              </button>
+              <!-- FINALIZAR Y COBRAR (solo si hay hold y ya no es pending) -->
+              <div v-else-if="canFinalize(reservation)"
+                class="flex flex-col sm:flex-row sm:items-center sm:gap-3 justify-end w-full md:w-auto mt-4">
+                <button @click="confirmFinalizeReservation(reservation)"
+                  class="bg-primary text-white px-4 py-2 rounded-lg shadow hover:shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  :disabled="quoteLoading && selectedReservation?.id === reservation.id">
+                  <font-awesome-icon :icon="['fas', 'money-bill']" />
+                  {{ (quoteLoading && selectedReservation?.id === reservation.id) ? 'Calculando…' : 'Finalizar y cobrar'
+                  }}
+                </button>
 
-              <!-- Hint con QUOTE si ya está solicitado para esta card -->
-              <span v-if="quote && selectedReservation?.id === reservation.id"
-                class="text-sm text-gray-600 mt-2 sm:mt-0">
-                Total: {{ formatCents(quote.final_cents) }}
-                <span v-if="quote.penalty_cents > 0">• Penalidad: {{ formatCents(quote.penalty_cents) }}</span>
-                <span v-if="quote.remainder_cents > 0" class="text-amber-600">
-                  • Resto vs hold: {{ formatCents(quote.remainder_cents) }}
+                <!-- Hint con QUOTE si ya está solicitado para esta card -->
+                <span v-if="quote && selectedReservation?.id === reservation.id"
+                  class="text-sm text-gray-600 mt-2 sm:mt-0">
+                  Total: {{ formatCents(quote.final_cents) }}
+                  <span v-if="quote.penalty_cents > 0">• Penalidad: {{ formatCents(quote.penalty_cents) }}</span>
+                  <span v-if="quote.remainder_cents > 0" class="text-amber-600">
+                    • Resto vs hold: {{ formatCents(quote.remainder_cents) }}
+                  </span>
                 </span>
-              </span>
-            </div>
+              </div>
 
-            <!-- Aviso suave si aprobada pero aún sin hold -->
-            <div v-else class="mt-4 text-sm text-gray-500">
-              <span v-if="isApprovedLike(reservation.status)">
-                A la espera de la retención de pago para poder finalizar.
-              </span>
+              <!-- Aviso suave si aprobada pero aún sin hold -->
+              <div v-else class="mt-4 text-sm text-gray-500">
+                <span v-if="isApprovedLike(reservation.status)">
+                  A la espera de la retención de pago para poder finalizar.
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -260,7 +270,7 @@ function isPending(status: string) {
 }
 
 function isApprovedLike(status: string) {
-  return ['approved', 'in_progress', 'verified'].includes(status);
+  return ['in_progress'].includes(status);
 }
 
 function hasHold(reservation: any) {
@@ -300,6 +310,36 @@ async function approveReservation() {
     showToast('No se pudo aprobar la reserva', 'error');
   }
 }
+
+function confirmCancelation(reservation: any) {
+  showConfirmModal.value = true;
+  selectedReservation.value = reservation;
+  modalConfig.value = {
+    message: '¿Cancelar esta reserva?',
+    buttonText: 'Confirmar',
+    onConfirm: () => cancelReservation()
+  };
+}
+
+const cancelReservation = async () => {
+  try {
+    await api.patch(`/reservations/${selectedReservation.value.id}/cancel`, { withCredentials: true });
+
+    // Actualizar localmente el estado de la reserva en el array principal
+    reservations.value = reservations.value.map((r: any) =>
+      r.id === selectedReservation.value.id ? { ...r, status: 'cancelled' } : r
+    );
+
+    selectedReservation.value = null;
+    showErrorModal.value = false;
+    showSuccessModal.value = false;
+    showCheckInModal.value = false;
+    showConfirmModal.value = false;
+  } catch (error: any) {
+    showErrorModal.value = true;
+    errorMessage.value = error.response?.data?.message || "Error al cancelar la reserva";
+  }
+};
 
 async function inProgressReservation() {
   try {
@@ -346,7 +386,7 @@ async function rejectReservation() {
 function confirmCheckinReservation(reservation: any) {
   selectedReservation.value = reservation;
   modalConfig.value = {
-    message: '¿El usuario estaciono y realizo el Checkin correctamente?',
+    message: '¿El usuario estacionó y realizó el Checkin correctamente?',
     buttonText: 'Confirmar',
     onConfirm: () => inProgressReservation()
   };

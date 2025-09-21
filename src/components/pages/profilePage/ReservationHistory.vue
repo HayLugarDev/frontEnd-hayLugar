@@ -93,7 +93,7 @@
         <h2 class="text-lg font-bold mb-4">Verificar Check-In</h2>
 
         <p class="text-sm text-gray-600 mb-2">
-          Ingresa el código de verificación proporcionado por el anfitrión:
+          Ingresa el código de verificación proporcionado por el anfitrión (Solo mayúsculas):
         </p>
 
         <input v-model="checkInCode" type="text" placeholder="Código de verificación"
