@@ -39,8 +39,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '../services/apiService'          // 👉 cliente Axios con baseURL = VITE_API_BASE_URL
-import axios from 'axios'                         // 👉 instancia default para traer el HTML estático
+import api from '../services/apiService'
+import axios from 'axios'                     
 
 type Terms = {
   version: string

@@ -15,6 +15,8 @@ import universityDashboard from '../pages/universityDashboard.vue'
 import meteredParkingDashboard from '../pages/meteredParkingDashboard.vue'
 import Notifications from '../pages/notifications.vue'
 import landingHayLugar from '../pages/landingHayLugar.vue'
+import PlayaDashboard from '../pages/PlayaDashboard.vue'
+import DetailPlaya from '../pages/DetailPlaya.vue'
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -49,6 +51,18 @@ const routes: RouteRecordRaw[] = [
     path: '/meteredParkingDashboard',
     name: 'meteredParkingDashboard',
     component: meteredParkingDashboard,
+    meta: { requiresAuth: false },
+  },
+    {
+    path: '/playas',
+    name: 'playas',
+    component: PlayaDashboard,
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/playa/:id',
+    name: 'DetailPlaya',
+    component: DetailPlaya,
     meta: { requiresAuth: false },
   },
 ]
