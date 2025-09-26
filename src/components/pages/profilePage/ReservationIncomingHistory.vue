@@ -6,7 +6,12 @@
 
     <ul v-if="reservations.length" class="divide-y divide-gray-300 relative space-y-4">
       <li v-for="(reservation, index) in reservations" :key="index"
-        class="relative border border-yellow-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all bg-gray-50 space-y-3">
+        :class="[
+        'relative border border-yellow-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all space-y-3',
+        ['cancelled', 'completed', 'failed'].includes(reservation.status)
+          ? 'bg-gray-200 opacity-70 pointer-events-none'
+          : 'bg-gray-50'
+      ]">
         <div class="flex flex-col xl:grid xl:grid-cols-4 text-gray-700 font-semibold text-[1rem]">
           <div class="col-span-4 flex flex-row gap-1">
             <span class="font-bold">Numero de reserva: </span>
@@ -96,8 +101,10 @@
                   Rechazar
                 </button>
               </div>
-              <div>
-                <button v-if="!['pending','cancelled', 'completed', 'failed','verified'].includes(reservation.status)" @click="confirmCancelation(reservation)"
+
+              <div class="flex flex-row items-center justify-end gap-2 w-full md:w-auto">
+                <button v-if="!['pending', 'cancelled', 'completed', 'failed', 'verified'].includes(reservation.status)"
+                  @click="confirmCancelation(reservation)"
                   class="bg-red-400 text-white px-4 py-2 rounded-lg shadow hover:bg-red-500 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
                   <font-awesome-icon :icon="['fas', 'square-xmark']" />
                   Cancelar Reserva
@@ -155,27 +162,18 @@
 
     <p v-else-if="!loading" class="text-gray-500">No tienes reservas entrantes anteriores.</p>
 
-    <!-- Modal existente -->
-    <transition name="fade">
-      <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-          <div class="flex flex-col items-center">
-            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-            <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
-            <p class="text-lg text-gray-700 text-center mb-6">Verificación exitosa.</p>
-            <button @click="goToReservation" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-              Continuar
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
-
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage || 'Ocurrió un error'"
-      icon="/src/assets/logo.png" @close="openCheckInModal" />
+      icon="/src/assets/logo.png" @confirm="showErrorModal = !showErrorModal" />
+
+    <StatusModal :visible="showSuccessModal" title="¡Éxito!" :message="'Verificación exitosa.'"
+      icon="/src/assets/logo.png" @confirm="goToReservation" />
 
     <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
       @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
+
+    <RatingModal :visible="showRatingModal" :reservationId="selectedReservation?.id" @close="showRatingModal = false"
+      @submit="handleRatingSubmit" />
+
 
     <!-- ✅ Mini Toast -->
     <transition name="fade">
@@ -197,6 +195,7 @@ import StatusModal from '../addSpacePage/StatusModal.vue';
 import { useRouter } from 'vue-router';
 import ConfirmModal from '../../common/ConfirmModal.vue';
 import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
+import RatingModal from '../../common/RatingModal.vue';
 
 const reservations = ref<any[]>([]);
 const userStore = useUserStore();
@@ -206,11 +205,12 @@ const showCheckInModal = ref(false);
 const showErrorModal = ref(false);
 const showSuccessModal = ref(false);
 const showConfirmModal = ref(false);
+const errorMessage = ref("");
 const loading = ref(true);
 
-const checkInCode = ref("");
 const selectedReservation = ref<any>(null);
-const errorMessage = ref("");
+const showRatingModal = ref(false);
+
 
 const countdowns = ref<Record<number, string>>({});
 
@@ -475,7 +475,6 @@ async function finalizeWithQuote(reservation: any) {
   }
 }
 
-
 async function finalizeReservation() {
   try {
     if (!selectedReservation.value || !quote.value) return;
@@ -483,28 +482,51 @@ async function finalizeReservation() {
     const id = selectedReservation.value.id;
     const finalCents = quote.value.final_cents;
 
-    await api.post(
-      `/payments/${id}/capture`,
-      {
-        final_amount_cents: finalCents,
-        reason: quote.value.penalty_cents > 0 ? 'Checkout manual anfitrión (con penalidad)' : 'Checkout manual anfitrión'
-      },
-      { withCredentials: true }
-    );
+    await api.post(`/payments/${id}/capture`, {
+      final_amount_cents: finalCents,
+      reason: quote.value.penalty_cents > 0 ? 'Checkout manual anfitrión (con penalidad)' : 'Checkout manual anfitrión'
+    }, { withCredentials: true });
 
-    // Cierro modal, limpio estado, refetch y toast
+    // ✅ Mostrar modal de calificación después del pago
     showConfirmModal.value = false;
-    selectedReservation.value = null;
-    quote.value = null;
+    showRatingModal.value = true;
 
-    await fetchReservations();
-    showToast('Pago acreditado', 'success');
+    // Limpieza parcial
+    quote.value = null;
   } catch (error: any) {
     showErrorModal.value = true;
     errorMessage.value = error.response?.data?.message || "No se pudo finalizar la reserva";
     showToast('No se pudo capturar el pago', 'error');
   }
 }
+
+// ================== CALIFICAR CLIENTE ==================
+async function handleRatingSubmit(formData: { rating: number; comment?: string }) {
+  if (!selectedReservation.value) return;
+
+  const payload = {
+    authorId: userStore.user?.id,               // quién califica (logueado)
+    targetId: selectedReservation.value.client.id, // quién recibe la review
+    reservationId: selectedReservation.value.id,
+    rating: formData.rating,
+    comment: formData.comment,
+    role: 'owner' // porque sos anfitrión al finalizar
+  };
+
+  try {
+    await api.post(`/users/rate/${payload.targetId}`, payload, { withCredentials: true });
+
+    showRatingModal.value = false;
+    selectedReservation.value = null;
+
+    await fetchReservations();
+    showToast('Calificación enviada con éxito', 'success');
+  } catch (err) {
+    showToast('No se pudo enviar la calificación', 'error');
+  }
+}
+
+
 
 // ================== CICLO VIDA ==================
 onMounted(async () => {

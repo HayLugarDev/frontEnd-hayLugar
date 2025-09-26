@@ -8,41 +8,28 @@
       <header class="hidden w-full md:w-1/3 md:flex flex-col justify-between items-center">
         <h1 class="w-1/3 text-4xl text-center mb-6 text-primary">Perfil</h1>
         <div class="w-11/12 px-4 space-y-1">
-          <SectionMenu
-            :activeSection="activeSection"
-            :sections="menuSectionsComputed"
-            @update:activeSection="handleSectionChange"
-          />
+          <SectionMenu :activeSection="activeSection" :sections="menuSectionsComputed"
+            @update:activeSection="handleSectionChange" />
         </div>
         <BackButton />
       </header>
 
       <!-- Selector móvil (no botón contenedor para evitar eventos raros anidados) -->
       <div class="w-full md:hidden items-center justify-center border-2 shadow-md bg-white px-6 py-2 mb-4 rounded-full">
-        <SectionMenu
-          :activeSection="activeSection"
-          :sections="menuSectionsComputed"
-          @update:activeSection="handleSectionChange"
-        />
+        <SectionMenu :activeSection="activeSection" :sections="menuSectionsComputed"
+          @update:activeSection="handleSectionChange" />
       </div>
 
       <transition name="fade-step" mode="out-in">
         <KeepAlive>
-          <section
-            v-if="activeSection === 'datos'"
-            key="datos"
-            class="w-full md:w-2/3 bg-white p-12 rounded-lg shadow-lg"
-          >
+          <section v-if="activeSection === 'datos'" key="datos"
+            class="w-full md:w-2/3 bg-white p-12 rounded-lg shadow-lg">
             <div class="flex flex-col md:flex-row items-center justify-between gap-6">
               <div class="flex items-center justify-around gap-4 flex-wrap">
                 <button @click="cambiarFoto" class="relative flex items-center px-4 py-2 rounded-full">
                   <font-awesome-icon icon="camera" class="mr-2 absolute bottom-2 right-4 text-primary" />
-                  <img
-                    :src="usuario.profile_picture || defaultProfilePicture"
-                    alt="Foto de perfil"
-                    @click="cambiarFoto"
-                    class="w-24 h-24 object-cover rounded-full shadow-lg"
-                  />
+                  <img :src="usuario.profile_picture || defaultProfilePicture" alt="Foto de perfil" @click="cambiarFoto"
+                    class="w-24 h-24 object-cover rounded-full shadow-lg" />
                 </button>
                 <div class="flex flex-col">
                   <h2 class="text-2xl font-bold">
@@ -79,54 +66,33 @@
             </div>
 
             <!-- Botón para Guardar Todos los Cambios -->
-            <button
-              @click="guardarTodo"
-              class="w-full bg-accent mt-6 text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all"
-            >
+            <button @click="guardarTodo"
+              class="w-full bg-accent mt-6 text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
               <font-awesome-icon icon="save" class="mr-2" />
               Guardar Cambios
             </button>
           </section>
 
-          <VehicleSection
-            v-else-if="activeSection === 'vehicles'"
-            key="vehicles"
-          />
+          <VehicleSection v-else-if="activeSection === 'vehicles'" key="vehicles" />
 
-          <ReservationIncomingHistory
-            v-else-if="activeSection === 'reservas-entrantes'"
-            key="reservas-entrantes"
-            :reservations="reservasEntrantes"
-          />
+          <ReservationIncomingHistory v-else-if="activeSection === 'reservas-entrantes'" key="reservas-entrantes"
+            :reservations="reservasEntrantes" />
 
-          <ReservationHistory
-            v-else-if="activeSection === 'reservas'"
-            key="reservas"
-            :reservations="reservas"
-          />
+          <ReservationHistory v-else-if="activeSection === 'reservas'" key="reservas" :reservations="reservas" />
 
-          <PublicationHistory
-            v-else-if="activeSection === 'publicaciones'"
-            key="publicaciones"
-            :publications="publicaciones"
-          />
+          <PublicationHistory v-else-if="activeSection === 'publicaciones'" key="publicaciones"
+            :publications="publicaciones" />
 
-          <PayoutAccounts
-            v-else-if="activeSection === 'cuentas'"
-            key="cuentas"
-            :payout="cuentas"
-          />
+          <Favorites v-else-if="activeSection === 'favoritos'" key="favorites" :reservations="favoritos" />
+
+          <UserReviews v-else-if="activeSection === 'calificaciones'" key="reviews" />
+
+          <PayoutAccounts v-else-if="activeSection === 'cuentas'" key="cuentas" :payout="cuentas" />
+          
+          <walletProfile v-else-if="activeSection === 'walletP'" key="walletP" />
 
           <!-- Solo admin -->
-          <AdminWithdrawals
-            v-else-if="activeSection === 'pagos' && isAdmin"
-            key="pagos"
-            :payout="pagos"
-          />
-
-         <div v-else-if="activeSection === 'walletP'" key="walletP">
-          <walletProfile />
-        </div>
+          <AdminWithdrawals v-else-if="activeSection === 'pagos' && isAdmin" key="pagos" :payout="pagos" />
 
         </KeepAlive>
       </transition>
@@ -192,6 +158,8 @@ import ReservationIncomingHistory from '../components/pages/profilePage/Reservat
 import PayoutAccounts from './PayoutAccounts.vue';
 import AdminWithdrawals from './AdminWithdrawals.vue';
 import walletProfile from './wallet.vue';
+import UserReviews from '../components/pages/profilePage/UserReviews.vue';
+import Favorites from '../components/pages/profilePage/Favorites.vue';
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -219,6 +187,7 @@ const isAdmin = computed(() => {
 });
 
 const reservas = ref([]);
+const favoritos = ref([]);
 const reservasEntrantes = ref([]);
 const publicaciones = ref([]);
 const cuentas = ref([]);
@@ -226,17 +195,19 @@ const pagos = ref([]);
 const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
 const errorMessage = ref('');
-const activeSection = ref<'datos' | 'vehicles' | 'reservas' | 'reservas-entrantes' | 'publicaciones' | 'walletP' | 'cuentas' | 'pagos'>('datos');
+const activeSection = ref<'datos' | 'vehicles' | 'reservas' | 'reservas-entrantes' | 'publicaciones' | 'favoritos' | 'calificaciones' | 'walletP' | 'cuentas' | 'pagos'>('datos');
 
 // Menú base
 const baseMenuSections = [
-  { value: 'datos',               label: 'Datos personales' },
-  { value: 'vehicles',            label: 'Mis Vehículos' },
-  { value: 'reservas',            label: 'Mis Reservas' },
-  { value: 'reservas-entrantes',  label: 'Reservas entrantes' },
-  { value: 'publicaciones',       label: 'Publicaciones' },
-  { value: 'walletP',              label: 'Wallet' },
-  { value: 'cuentas',             label: 'Cuentas' },
+  { value: 'datos', label: 'Datos personales' },
+  { value: 'vehicles', label: 'Mis Vehículos' },
+  { value: 'reservas', label: 'Mis Reservas' },
+  { value: 'reservas-entrantes', label: 'Reservas entrantes' },
+  { value: 'publicaciones', label: 'Publicaciones' },
+  { value: 'favoritos', label: 'Favoritos' },
+  { value: 'calificaciones', label: 'Calificaciones' },
+  { value: 'walletP', label: 'Wallet' },
+  { value: 'cuentas', label: 'Cuentas' },
 ];
 
 // Menú computado (agrega pagos sólo si admin)
@@ -343,6 +314,7 @@ const closeErrorModal = () => {
 .fade-leave-active {
   transition: opacity 0.3s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
