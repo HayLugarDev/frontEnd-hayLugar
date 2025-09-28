@@ -126,9 +126,13 @@
       </div>
     </transition>
 
-    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
+    <StatusModal :visible="showErrorCheckinModal" type="error" title="¡Atención!"
       message="El código ingresado es incorrecto. Intentá nuevamente" icon="/src/assets/logo.png"
       @close="openCheckInModal" />
+
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
+      message="Ocurrió un error al cancelar la reserva" icon="/src/assets/logo.png"
+      @confirm="showErrorModal = false" />
 
     <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
       @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
@@ -152,6 +156,7 @@ const router = useRouter();
 
 const showCheckInModal = ref(false);
 const showErrorModal = ref(false);
+const showErrorCheckinModal = ref(false);
 const showSuccessModal = ref(false);
 const showConfirmModal = ref(false);
 const loading = ref(true);
@@ -248,6 +253,7 @@ const completeReservation = async () => {
     );
 
     showErrorModal.value = false;
+    showErrorCheckinModal.value = false;
     showSuccessModal.value = false;
     showCheckInModal.value = false;
   } catch (error: any) {
@@ -276,7 +282,7 @@ const cancelReservation = async () => {
     );
 
     selectedReservation.value = null;
-    showErrorModal.value = false;
+    showErrorCheckinModal.value = false;
     showSuccessModal.value = false;
     showCheckInModal.value = false;
     showConfirmModal.value = false;

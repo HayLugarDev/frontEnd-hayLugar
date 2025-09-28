@@ -10,7 +10,7 @@
 
         <div v-else class="space-y-4">
             <div v-for="f in favorites" :key="f.id" class="flex gap-4 border-b p-4 hover:bg-gray-50 cursor-pointer"
-                @click="$router.push(`/espacios/${f.space.id}`)">
+                @click="$router.push(`/espacio/${f.space.id}`)">
 
                 <!-- Imagen -->
                 <img :src="f.space.images?.[0]" class="w-28 h-28 object-cover rounded-lg" />
