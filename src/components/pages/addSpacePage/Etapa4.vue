@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2">
-        <h1 class="text-4xl font-semibold mb-8">Completá los detalles de tu espacio</h1>
+        <h1 class="text-primary text-4xl font-semibold mb-8">Completá los detalles de tu espacio</h1>
 
         <div class="space-y-6 font-normal">
             <!-- Nombre del espacio -->
@@ -43,6 +43,19 @@
                 </select>
             </div>
 
+            <!-- Días de la semana -->
+            <fieldset class="border p-4 rounded-lg">
+                <legend class="text-lg font-semibold text-black">Días de disponibilidad</legend>
+                <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
+                    <label v-for="day in daysOfWeek" :key="day.value" class="flex items-center gap-2">
+                        <input type="checkbox" :value="day.value" v-model="availabilityDays"
+                            class="h-4 w-4 text-primary border-gray-300 rounded" />
+                        <span>{{ day.label }}</span>
+                    </label>
+                </div>
+            </fieldset>
+
+
             <!-- Por hora -->
             <fieldset v-if="price_unit === 'hour'" class="border p-4 rounded-lg">
                 <legend class="text-lg font-semibold text-black">Horario de Disponibilidad</legend>
@@ -66,7 +79,12 @@
 
             <!-- Imágenes -->
             <div>
-                <label class="block text-sm font-semibold text-gray-900">Cargar imágenes</label>
+                <p class="text-gray-700 mb-6 text-sm">
+                    <strong>Atención:</strong> Debes subir al menos 5 imágenes que muestren claramente tu espacio.
+                    Incluye fotos del
+                    frente, el interior, el acceso y cualquier detalle relevante para que los usuarios puedan ubicarlo y
+                    estacionar sin inconvenientes.
+                </p>
                 <input type="file" multiple accept="image/*" @change="handleFileUpload"
                     class="text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4" />
                 <div class="mt-3 flex flex-wrap gap-3">
@@ -78,49 +96,77 @@
 
         <!-- Botones de navegación -->
         <div class="flex justify-between mt-6 space-x-4">
-            <button @click="emit('prev')" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">Anterior</button>
-            <button @click="name && parking_type && description ? $emit('next') : (showErrorModal = true)"
+            <button @click="emit('prev')" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
+                Anterior
+            </button>
+
+            <button @click="handleNext"
                 class="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition duration-300">
                 Siguiente
             </button>
         </div>
-        <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-            message="Por favor, completá todos los campos antes de continuar." icon="/src/assets/logo.png"
-            @close="showErrorModal = false" />
+
+        <!-- Modal de error -->
+        <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
+            icon="/src/assets/logo.png" @close="showErrorModal = false" />
+
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import StatusModal from "../addSpacePage/StatusModal.vue";
 import { computed, ref } from 'vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
+import { getAllDays, WeekDay } from "../../../utils/daysTraslation";
 
+const errorMessage = ref("");
 const showErrorModal = ref(false);
+
 const props = defineProps(['modelValue']);
 const emit = defineEmits(['update:modelValue', 'next', 'prev']);
+
 const selectedFiles = ref([]);
 const previewImages = ref([]);
 const price_unit = ref('hour');
+const daysOfWeek = getAllDays();
 
-const handleFileUpload = (event) => {
-    selectedFiles.value = [...event.target.files];
+const handleNext = () => {
+  if (!name.value || !parking_type.value || !description.value) {
+    errorMessage.value = "Por favor, completá todos los campos antes de continuar.";
+    showErrorModal.value = true;
+    return;
+  }
 
-    const filesArray = Array.from(event.target.files);
-    emit('update:modelValue', { ...props.modelValue, images: filesArray });
+  if (selectedFiles.value.length < 5) {
+    errorMessage.value = "Debes cargar al menos 5 imágenes de tu espacio antes de continuar.";
+    showErrorModal.value = true;
+    return;
+  }
 
-    const fileReaders = filesArray.map(file => {
-        return new Promise(resolve => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.readAsDataURL(file);
-        });
-    });
+  emit("next"); // pasa a la siguiente etapa
+};
 
-    Promise.all(fileReaders).then(results => {
+const handleFileUpload = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+
+    const filesArray = Array.from(input.files);
+    selectedFiles.value = filesArray;
+
+    emit("update:modelValue", { ...props.modelValue, images: filesArray });
+
+    const fileReaders = filesArray.map(
+        (file) =>
+            new Promise<string>((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.readAsDataURL(file);
+            })
+    );
+    Promise.all(fileReaders).then((results) => {
         previewImages.value = results;
     });
 };
-
 const updateAvailabilityFields = () => {
     props.modelValue.availability = { start: '', end: '', dateRange: [] };
 };
@@ -158,6 +204,20 @@ const availabilityEnd = computed({
             availability: {
                 ...props.modelValue.availability,
                 end: val,
+            },
+        });
+    },
+});
+
+// 👉 Aquí conectamos los días seleccionados
+const availabilityDays = computed<WeekDay[]>({
+    get: () => props.modelValue.availability?.days || [],
+    set: (val) => {
+        emit("update:modelValue", {
+            ...props.modelValue,
+            availability: {
+                ...props.modelValue.availability,
+                days: val,
             },
         });
     },

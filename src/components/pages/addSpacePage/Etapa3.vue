@@ -1,6 +1,12 @@
 <template>
-  <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-4">
+  <div class="flex flex-col md:w-1/2 mx-auto p-6 md:py-0 gap-4">
     <h1 class="text-4xl font-semibold mb-8">¿Qué tipos de vehículos aceptarás en tu espacio?</h1>
+
+    <p class="text-gray-700 mb-6 text-sm">
+      <strong>Atención:</strong> No publiques más espacios de los que realmente tenés disponibles.
+      Así nos aseguramos de que cada vehículo cuente con su lugar sin problemas y que ninguna reserva
+      se superponga con otra.
+    </p>
 
     <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value" :title="type.title"
       :text="type.description" :configured="!!vehicleMap[type.value]" :configuration="vehicleMap[type.value]"

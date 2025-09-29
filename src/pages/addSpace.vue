@@ -1,7 +1,7 @@
 <template>
   <MainHeader />
   <BackButton class="md:hidden" />
-  <div class="relative w-full h-full mx-auto py-12">
+  <div class="relative w-full h-full mx-auto py-12 md:py-6">
     <!-- Instrucciones iniciales -->
     <transition name="fade-step" mode="out-in">
       <div :key="currentStep">
@@ -75,24 +75,14 @@
     </transition>
 
     <!-- Modal de éxito -->
-    <transition name="fade">
-      <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-          <div class="flex flex-col items-center">
-            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-            <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
-            <p class="text-lg text-gray-700 text-center mb-6">El espacio se ha guardado correctamente.</p>
-            <button @click="closeSuccesModal" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-              Continuar
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
+    <StatusModal :visible="showSuccessModal" type="success" title="Excelente!"
+      message="Publicaste correctamente tu espacio en HayLugar." icon="/src/assets/logo.png"
+      @confirm="closeSuccesModal" />
 
+    <!-- Modal de error -->
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
       :message="errorMessage" icon="/src/assets/logo.png"
-      @close="openCheckInModal" />
+      @confirm="showErrorModal = false" />
   </div>
 </template>
 
