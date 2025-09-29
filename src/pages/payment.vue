@@ -1,7 +1,6 @@
 <template>
   <div class="flex flex-col min-h-screen bg-secondary lexend xl:w-11/12 mx-auto">
     <MainHeader />
-
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
       <BackButton class="lg:hidden" />
 
@@ -14,12 +13,8 @@
         <!-- Resumen espacio -->
         <div class="md:col-span-4 flex flex-col gap-4">
           <div class="bg-white p-6 rounded-lg shadow-md flex items-start">
-            <img
-              v-if="espacio?.images?.[0]"
-              :src="espacio.images[0]"
-              alt="Imagen del espacio"
-              class="w-28 h-28 object-cover rounded-lg shadow-md mr-6"
-            />
+            <img v-if="espacio?.images?.[0]" :src="espacio.images[0]" alt="Imagen del espacio"
+              class="w-28 h-28 object-cover rounded-lg shadow-md mr-6" />
             <div>
               <h3 class="text-lg font-semibold text-gray-800">{{ espacio?.name }}</h3>
               <p class="text-gray-600 text-sm">{{ espacio?.location }}</p>
@@ -37,7 +32,7 @@
 
             <div class="grid grid-cols-2 gap-y-3 pt-4">
               <p class="text-gray-600">
-                Precio por {{ hours }}h {{ minutes }}m
+                Precio por {{ hours }}:{{ minutes }} hrs
               </p>
               <p class="text-end text-gray-800 font-medium">
                 {{ formatARS(baseAmount) }}
@@ -68,22 +63,16 @@
         <!-- Datos de facturación -->
         <div class="bg-white p-6 rounded-lg shadow-md md:col-span-5 flex flex-col gap-6">
           <!-- Vehículo seleccionado -->
-          <div
-            v-if="reserva.vehicle_type"
-            class="bg-gray-100 p-4 rounded border border-gray-300 shadow-sm"
-          >
+          <div v-if="reserva.vehicle_type" class="bg-gray-100 p-4 rounded border border-gray-300 shadow-sm">
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-md font-semibold text-gray-700">Vehículo Seleccionado</h3>
-              <font-awesome-icon
-                :icon="reserva.vehicle_type === 'car'
-                  ? 'car'
-                  : reserva.vehicle_type === 'motorcycle'
+              <font-awesome-icon :icon="reserva.vehicle_type === 'car'
+                ? 'car'
+                : reserva.vehicle_type === 'motorcycle'
                   ? 'motorcycle'
                   : reserva.vehicle_type === 'bicycle'
-                  ? 'bicycle'
-                  : 'question' "
-                class="text-gray-600"
-              />
+                    ? 'bicycle'
+                    : 'question'" class="text-gray-600" />
             </div>
             <div v-if="vehiculoSeleccionado">
               <p>Marca: {{ vehiculoSeleccionado.brand }}</p>
@@ -102,23 +91,15 @@
           </div>
         </div>
 
-        <!-- Pago con Tarjeta -->
-        <div
-          v-if="metodoPago === 'tarjeta'"
-          class="bg-white p-6 rounded-lg shadow-md md:col-span-full"
-        >
+        <!-- Sección de Pago con Tarjeta usando MercadoPago Card Payment Brick -->
+        <div v-if="metodoPago === 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md md:col-span-full">
           <div id="cardPaymentBrick_container"></div>
         </div>
 
-        <!-- Botón de confirmación para otros métodos -->
-        <div
-          v-if="metodoPago !== 'tarjeta'"
-          class="bg-white p-6 rounded-lg shadow-md sticky bottom-0 md:static"
-        >
-          <button
-            @click="confirmarPagoSimulado"
-            class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all"
-          >
+        <!-- Botón de Confirmación para otros métodos (simulado) -->
+        <div v-if="metodoPago !== 'tarjeta'" class="bg-white p-6 rounded-lg shadow-md">
+          <button @click="confirmarPagoSimulado"
+            class="w-full bg-accent text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
             <font-awesome-icon icon="check-circle" class="mr-2" />
             Confirmar y Pagar
           </button>
@@ -135,29 +116,66 @@ import api from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
 import { loadMercadoPago } from '@mercadopago/sdk-js';
 import { getSpaceById } from '../services/spaceService';
-import { getVehicleById } from '../services/vehicleService';
 import BackButton from '../components/common/BackButton.vue';
 import MainHeader from "../components/layout/header/MainHeader.vue";
+import { getVehicleById } from '../services/vehicleService';
 import FormField from '../components/forms/FormField.vue';
 
 const router = useRouter();
 const reservationStore = useReservationStore();
 
-// ==== Helpers
+// Datos de facturación y reserva (inputs y query)
+const metodoPago = ref("tarjeta");
+const nombre = ref("");
+const dni = ref("");
+const direccion = ref("");
+const email = ref("");
+const total = computed(() => reserva.value.total || 0);
+const totalDuration = computed(() => reserva.value?.dead_line ?? 0);
+const hours = computed(() => { return totalDuration.value ? Math.floor(totalDuration.value) : 0; });
+const minutes = computed(() => { return totalDuration.value ? Math.round((totalDuration.value - hours.value) * 60) : 0; });
+const espacio = ref<any>(null);
+const vehiculoSeleccionado = ref(null);
+
 const formatARS = (v: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(Number(v || 0));
 
-// ==== Inputs
-const metodoPago = ref("tarjeta");
-const nombre = ref(""); const dni = ref(""); const direccion = ref(""); const email = ref("");
+// Función para obtener los datos del espacio
+const obtenerEspacio = async () => {
+  try {
+    const id = reserva.value.space_id;
+    if (!id) throw new Error("No se encontró el espacio");
+    const data = await getSpaceById(Number(id));
+    espacio.value = data;
+    return data;
+  } catch (error) {
+    console.error("Error al obtener el espacio:", error);
+  }
+};
 
-// ==== Reserva del store
+
+onMounted(async () => {
+  const dataSpace = await obtenerEspacio();
+  console.log(dataSpace);
+  if (!reservationStore.reservation.space_id || !reservationStore.reservation.start_time) {
+    console.error('Error en envío de datos.');
+    router.push('/dashboard');
+  }
+  if (metodoPago.value === 'tarjeta') {
+    await nextTick();
+    setTimeout(async () => {
+      await initCardBrick();
+    }, 300);
+  }
+  const vehicle_id = reservationStore.reservation.vehicle_id;
+  if (vehicle_id) {
+    const vehicleSelect = await getVehicleById(vehicle_id);
+    console.log(vehicleSelect);
+    vehiculoSeleccionado.value = vehicleSelect;
+  }
+});
+
 const reserva = computed(() => reservationStore.reservation);
-
-// Duración
-const totalDuration = computed(() => reserva.value?.dead_line ?? 0);
-const hours = computed(() => Math.floor(totalDuration.value));
-const minutes = computed(() => Math.round((totalDuration.value - hours.value) * 60));
 
 // Monto base y fee
 const baseAmount = computed(() => Number(reserva.value.total || 0));
@@ -165,75 +183,61 @@ const SERVICE_FEE_PCT = Number((import.meta as any).env?.VITE_SERVICE_FEE_PCT ??
 const serviceFeeAmount = computed(() => Math.round(baseAmount.value * SERVICE_FEE_PCT * 100) / 100);
 const totalGuestPays = computed(() => Math.round((baseAmount.value + serviceFeeAmount.value) * 100) / 100);
 
-const espacio = ref<any>(null);
-const vehiculoSeleccionado = ref<any>(null);
-
-// ==== Obtener espacio
-const obtenerEspacio = async () => {
-  try {
-    const id = reserva.value.space_id;
-    if (!id) throw new Error("No se encontró el espacio");
-    espacio.value = await getSpaceById(Number(id));
-  } catch (error) {
-    console.error("Error al obtener el espacio:", error);
-  }
-};
-
-onMounted(async () => {
-  await obtenerEspacio();
-
-  if (!reserva.value.space_id || !reserva.value.start_time) {
-    router.push('/dashboard');
-    return;
-  }
-
-  if (metodoPago.value === 'tarjeta') {
-    await nextTick();
-    setTimeout(initCardBrick, 300);
-  }
-
-  if (reserva.value.vehicle_id) {
-    vehiculoSeleccionado.value = await getVehicleById(reserva.value.vehicle_id);
-  }
-});
-
 watch(metodoPago, async (newVal) => {
   if (newVal === 'tarjeta') {
     await nextTick();
-    setTimeout(initCardBrick, 300);
+    setTimeout(async () => {
+      await initCardBrick();
+    }, 300);
   }
 });
 
-// ==== MP Brick
+// Inicializa el Brick de MercadoPago
 const initCardBrick = async () => {
   await loadMercadoPago();
-  if (totalGuestPays.value <= 0) return alert("Monto inválido.");
 
+  if (total.value <= 0) {
+    alert("El monto a pagar no es válido.");
+    return;
+  }
+
+  // Clave pública desde ENV con fallback
   const PUBLIC_KEY = (import.meta as any).env?.VITE_MP_PUBLIC_KEY || 'TEST-f39e0ddb-bc5b-491c-9245-0461fdeccb74';
+
   const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'es-AR' });
   const bricksBuilder = mp.bricks();
 
   const settings = {
     initialization: {
-      amount: Number(totalGuestPays.value), // ⚠️ total huésped
-      payer: { email: email.value || "" },
+      amount: Number(total.value), // número
+      payer: {
+        email: email.value || "",
+      },
     },
     customization: {
-      visual: { style: { theme: 'default' } },
+      visual: {
+        style: {
+          theme: 'default',
+        },
+      },
       paymentMethods: {
         maxInstallments: 1,
-        // Permitimos todos, pero controlamos en onSubmit qué hacer
       },
     },
     callbacks: {
-      onReady: () => console.log("Brick listo"),
-      onSubmit: async (cardFormData: any) => {
-        const token = cardFormData?.token;
-        const monto = Number(cardFormData?.transaction_amount ?? totalGuestPays.value);
-        const method = cardFormData?.payment_method_id;
-        await confirmarPagoMercadoPago(token, monto, method);
+      onReady: () => {
+        console.log("Brick is ready");
       },
-      onError: (error: any) => console.error("Error en el Brick:", error),
+      onSubmit: async (cardFormData: any) => {
+        console.log("Datos del Brick:", cardFormData);
+        const tokenGenerado = cardFormData?.token;
+        const monto = Number(cardFormData?.transaction_amount ?? total.value); // fallback
+        const paymentMethodId = cardFormData?.payment_method_id;
+        await confirmarPagoMercadoPago(tokenGenerado, monto, paymentMethodId);
+      },
+      onError: (error: any) => {
+        console.error("Error en el Brick:", error);
+      },
     },
   };
 
@@ -241,16 +245,26 @@ const initCardBrick = async () => {
     (window as any).cardPaymentBrickController.unmount();
   }
 
-  await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings)
-    .then(ctrl => (window as any).cardPaymentBrickController = ctrl);
+  const container = document.getElementById("cardPaymentBrick_container");
+  if (container) {
+    container.innerHTML = "";
+    (window as any).cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
+  } else {
+    console.error("No se encontró el contenedor 'cardPaymentBrick_container'");
+  }
 };
 
-// ==== Confirmar pago
-const confirmarPagoMercadoPago = async (token: string, amount: number, method: string) => {
+// Función para confirmar el pago utilizando el Checkout API
+const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMethodReal: string) => {
+
   if (!nombre.value || !dni.value || !direccion.value || !email.value) {
-    return alert("Completa los datos de facturación.");
+    alert("Por favor, completa todos los datos de facturación antes de pagar.");
+    return;
   }
 
+  const tokenValue = token;
+
+  // Actualizamos el store con los datos de facturación
   reservationStore.setReservationData({
     payment_method: metodoPago.value,
     payment_data: {
@@ -261,54 +275,64 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, method: s
     }
   });
 
+  // Creamos la reserva en estado "pending"
   let reservationResponse: any;
   try {
     reservationResponse = await reservationStore.submitReservation();
-  } catch {
-    return alert("Error creando la reserva. Intenta nuevamente.");
+  } catch (error) {
+    console.error("Error al crear la reserva:", error);
+    alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
+    return;
   }
 
-  const reservationId = reservationResponse?.reservation?.id;
-  if (!reservationId) return alert("Error interno: reserva sin ID.");
+  const reservationId = reservationResponse?.reservation?.id || reservationResponse?.data?.reservation?.id;
+  if (!reservationId) {
+    console.error("reservationId no encontrado en la respuesta:", reservationResponse);
+    alert("Error interno: no se pudo obtener el ID de la reserva.");
+    return;
+  }
 
-  // 🚨 Fallback: si es débito, pedimos captura inmediata
-  const isDebit = method?.toLowerCase().includes("deb");
-  const payload: any = {
-  reservation_id: reservationId,
-  transaction_amount: Number(amount),
-  description: `Pago para la reserva #${reservationId}`,
-  email: email.value,
-  payment_method_id: method,
-  token,
-  payer: {
+  // Payload para el backend
+  const payload = {
+    reservation_id: reservationId,
+    transaction_amount: Number(amount),
+    description: `Pago para la reserva #${reservationId}`,
     email: email.value,
-    identification: { type: "DNI", number: dni.value.toString() },
-  },
-  installments: 1,
-  breakdown: {
-    service_fee_amount: serviceFeeAmount.value,
-    total: totalGuestPays.value
-  }
-};
+    payment_method_id: paymentMethodReal,
+    token: tokenValue,
+    issuer_id: 310, // si no lo usás en backend, lo ignorará
+    payer: {
+      email: email.value,
+      identification: {
+        type: "DNI",
+        number: dni.value.toString(),
+      },
+    },
+    installments: 1
+  };
+  console.log("Payload a enviar:", payload);
 
-  if (isDebit) {
-    payload.force_capture = true; // el backend lo interpreta como "cobro directo"
-  }
-
+  // ✅ ENDPOINT ACTUALIZADO: HOLD (alias del proceso legacy)
   try {
     const response = await api.post('/payments/hold', payload);
     if (response.status === 201) {
-      router.push({ path: '/confirmacion', query: { id: espacio.value.id } });
+      console.log("Hold/Pago procesado exitosamente");
+      router.push({
+        path: '/confirmacion',
+        query: { id: espacio.value.id }
+      });
     }
-  } catch {
-    alert("Error al procesar el pago. Intenta nuevamente.");
+  } catch (error) {
+    console.error("Error al procesar el pago:", error);
+    alert("Ocurrió un error al procesar el pago. Intenta nuevamente.");
   }
 };
 
-// ==== Otros métodos simulados
+// Función para el caso simulado (otros métodos de pago)
 const confirmarPagoSimulado = async () => {
   if (!nombre.value || !dni.value || !direccion.value || !email.value) {
-    return alert("Completa los datos de facturación.");
+    alert("Por favor, completa todos los datos de facturación.");
+    return;
   }
 
   reservationStore.setReservationData({
@@ -324,20 +348,42 @@ const confirmarPagoSimulado = async () => {
   try {
     const response = await reservationStore.submitReservation();
     if (response) {
-      alert(`Pago confirmado mediante ${metodoPago.value}`);
-      router.push({ path: '/confirmacion', query: { id: espacio.value.id } });
+      alert("Pago confirmado mediante " + metodoPago.value);
+      router.push({
+        path: '/confirmacion',
+        query: { id: espacio.value.id }
+      });
     }
-  } catch {
-    alert("Error al procesar la solicitud. Intenta nuevamente.");
+    return response.data;
+  } catch (error) {
+    console.error("Error al crear la reserva:", error);
+    alert("Ocurrió un error al procesar la solicitud. Por favor, intenta nuevamente más tarde");
   }
 };
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active {
+#form-checkout {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+}
+
+.container {
+  height: 18px;
+  display: inline-block;
+  border: 1px solid rgb(118, 118, 118);
+  border-radius: 2px;
+  padding: 1px 2px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.2s ease;
 }
-.fade-enter-from, .fade-leave-to {
+
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>
