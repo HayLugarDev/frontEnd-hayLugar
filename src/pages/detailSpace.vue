@@ -92,7 +92,7 @@
               </span>
 
               <span class="font-sans cursor-pointer hover:underline text-xs sm:text-md" @click="openReviews">
-                {{ totalReviews > 0 ? `${totalReviews} opiniones` : "Sin opiniones" }}
+                {{ totalReviews > 0 ? `${totalReviews} calificaciones` : "Sin calificaciones" }}
               </span>
             </div>
           </div>
