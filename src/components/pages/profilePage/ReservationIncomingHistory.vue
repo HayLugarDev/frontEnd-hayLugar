@@ -174,14 +174,6 @@
     <RatingModal :visible="showRatingModal" :reservationId="selectedReservation?.id" @close="showRatingModal = false"
       @submit="handleRatingSubmit" />
 
-
-    <!-- ✅ Mini Toast -->
-    <transition name="fade">
-      <div v-if="toast.show" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-white"
-        :class="toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'">
-        {{ toast.text }}
-      </div>
-    </transition>
   </section>
 </template>
 
@@ -196,6 +188,7 @@ import { useRouter } from 'vue-router';
 import ConfirmModal from '../../common/ConfirmModal.vue';
 import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 import RatingModal from '../../common/RatingModal.vue';
+import { showToast } from '../../../utils/toast';
 
 const reservations = ref<any[]>([]);
 const userStore = useUserStore();
@@ -219,17 +212,6 @@ const modalConfig = ref({
   buttonText: 'Aceptar',
   onConfirm: () => { }
 });
-
-/** Mini toast */
-const toast = ref<{ show: boolean; type: 'success' | 'error'; text: string }>({
-  show: false,
-  type: 'success',
-  text: ''
-});
-function showToast(text: string, type: 'success' | 'error' = 'success') {
-  toast.value = { show: true, type, text };
-  setTimeout(() => (toast.value.show = false), 2500);
-}
 
 // ===== formateadores =====
 const formatDate = (value: string): string => {

@@ -6,7 +6,7 @@
     <ul v-if="reservations.length" class="divide-y divide-gray-300 relative space-y-4">
       <li v-for="(reservation, index) in reservations" :key="index" :class="[
         'relative border border-yellow-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all space-y-3',
-        ['cancelled', 'completed', 'failed'].includes(reservation.status)
+        (['cancelled', 'completed', 'failed'].includes(reservation.status) && reservation.hasRating)
           ? 'bg-gray-200 opacity-70 pointer-events-none'
           : 'bg-gray-50'
       ]">
@@ -84,6 +84,14 @@
             </button>
           </div>
         </div>
+        <div class="w-full flex flex-row items-center justify-end">
+          <button v-if="reservation.status === 'completed' && !reservation.hasRating"
+            @click="showRatingModal = true ; selectedReservation = reservation"
+            class="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-600 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
+            <font-awesome-icon :icon="['fas', 'square-xmark']" />
+            Califica tu experiencia
+          </button>
+        </div>
       </li>
     </ul>
     <p v-else-if="!loading" class="text-gray-500">No tienes reservas anteriores.</p>
@@ -111,28 +119,18 @@
     </div>
 
     <!-- Modal de éxito -->
-    <transition name="fade">
-      <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-          <div class="flex flex-col items-center">
-            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-            <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
-            <p class="text-lg text-gray-700 text-center mb-6">Verificación exitosa.</p>
-            <button @click="goToReservation" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-              Continuar
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
+    <StatusModal :visible="showSuccessModal" type="success" title="¡Éxito!" message="Verificación exitosa"
+      icon="/src/assets/logo.png" @close="goToReservation" />
 
     <StatusModal :visible="showErrorCheckinModal" type="error" title="¡Atención!"
       message="El código ingresado es incorrecto. Intentá nuevamente" icon="/src/assets/logo.png"
       @close="openCheckInModal" />
 
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-      message="Ocurrió un error al cancelar la reserva" icon="/src/assets/logo.png"
-      @confirm="showErrorModal = false" />
+      message="Ocurrió un error al cancelar la reserva" icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+
+    <RatingModal :visible="showRatingModal" :reservationId="selectedReservation?.id" @close="showRatingModal = false"
+      @submit="handleRatingSubmit" />
 
     <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
       @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
@@ -149,6 +147,8 @@ import StatusModal from '../addSpacePage/StatusModal.vue';
 import { useRouter } from 'vue-router';
 import ConfirmModal from '../../common/ConfirmModal.vue';
 import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
+import RatingModal from '../../common/RatingModal.vue';
+import { showToast } from '../../../utils/toast';
 
 const reservations = ref([]);
 const userStore = useUserStore();
@@ -164,6 +164,8 @@ const loading = ref(true);
 const checkInCode = ref("");
 const selectedReservation = ref<any>(null);
 const errorMessage = ref("");
+
+const showRatingModal = ref(false);
 
 const countdowns = ref<Record<number, string>>({});
 
@@ -261,6 +263,37 @@ const completeReservation = async () => {
     errorMessage.value = error.response?.data?.message || "Error al finalizar la reserva";
   }
 };
+
+async function handleRatingSubmit(formData: { rating: number; comment?: string }) {
+  if (!selectedReservation.value) return;
+
+  const payload = {
+    authorId: userStore.user?.id,               // quién califica (logueado)
+    targetId: selectedReservation.value.owner.id, // quién recibe la review
+    reservationId: selectedReservation.value.id,
+    rating: formData.rating,
+    comment: formData.comment,
+    role: 'client' // usuario que califica como cliente
+  };
+
+  console.log(payload);
+
+  try {
+    await api.post(`/users/rate/${payload.targetId}`, payload, { withCredentials: true });
+
+    // Marcar localmente que ya fue calificada
+    selectedReservation.value.hasRating = true;
+
+    showRatingModal.value = false;
+    selectedReservation.value = null;
+
+    await fetchReservations();
+    showToast('Calificación enviada con éxito', 'success');
+  } catch (err) {
+    showToast('No se pudo enviar la calificación', 'error');
+  }
+}
+
 
 function confirmCancelation(reservation: any) {
   showConfirmModal.value = true;
