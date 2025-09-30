@@ -88,11 +88,11 @@
 
             <div class="col-start-3 flex flex-col items-end text-xl">
               <span :class="formattedRating ? 'text-yellow-600' : 'text-gray-400'">
-                ★ <span class="text-black">{{ formattedRating ?? '0.0' }}</span>
+                ⭐ <span class="text-black">{{ formattedRating ?? '0.0' }}</span>
               </span>
 
-              <span class="font-sans cursor-pointer hover:underline text-xs sm:text-md">
-                {{ opinionesTexto }}
+              <span class="font-sans cursor-pointer hover:underline text-xs sm:text-md" @click="openReviews">
+                {{ totalReviews > 0 ? `${totalReviews} calificaciones` : "Sin calificaciones" }}
               </span>
             </div>
           </div>
@@ -154,6 +154,9 @@
 
   <SessionExpired :sessionExpired="isSessionInvalid" />
 
+  <ReviewsModal :show="showReviewsModal" :reviews="reviews" :avgRating="avgRating" :totalReviews="totalReviews"
+    @close="showReviewsModal = false" />
+
   <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
     icon="/src/assets/logo.png" :isHtml="modalIsHtml" :buttonText="requiresTerms ? 'Aceptar términos' : 'Cerrar'"
     @close="showErrorModal = false" @confirm="requiresTerms ? redirigirATerminos() : showErrorModal = false" />
@@ -187,11 +190,12 @@ import { capitalizeFirst } from '../utils/capitalizeFirstCharAt';
 import EditPublications from '../components/pages/profilePage/UI/EditPublications.vue';
 import ImageModal from '../components/common/ImageModal.vue';
 import { addFavorite, removeFavorite, getUserFavorites } from '../services/favoriteService';
-import Toast from '../components/common/Toast.vue';
-import { getVehicleType, vehicleTypeTranslations } from '../utils/vehicleTypeIconTraslation';
+import { getVehicleType } from '../utils/vehicleTypeIconTraslation';
 import { showToast } from '../utils/toast';
 import { formatLocalDateTime } from '../utils/FormatDate';
 import { imageGridPosition } from '../utils/imageGrid';
+import { getReviewsBySpace } from "../services/reviewService";
+import ReviewsModal from '../components/common/ReviewsModal.vue';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -219,6 +223,11 @@ const openEditModal = ref(false);
 const requiresTerms = ref(false);
 const isImageModalOpen = ref(false);
 const currentImageIndex = ref(0);
+
+const showReviewsModal = ref(false);
+const reviews = ref([]);
+const avgRating = ref(0);
+const totalReviews = ref(0);
 
 const ownerIdFromSpace = computed(() => {
   if (!espacio.value) return null;
@@ -260,6 +269,19 @@ onMounted(async () => {
     activedFavouriteIcon.value = favs.some(f => f.space_id === espacio.value.id);
   }
 });
+
+const openReviews = async () => {
+  try {
+    const { reviews: r, avgRating: avg, totalReviews: total } = await getReviewsBySpace(espacio.value.id);
+    reviews.value = r;
+    avgRating.value = avg;
+    totalReviews.value = total;
+    showReviewsModal.value = true;
+    console.log(reviews.value);
+  } catch (e) {
+    console.error("Error al cargar opiniones", e);
+  }
+};
 
 const redirigirATerminos = () => {
   showErrorModal.value = false;

@@ -3,7 +3,8 @@
     <div v-if="loading" class="space-y-4">
       <ItemSkeleton />
     </div>
-    <ul v-if="publications?.length" class="divide-y divide-gray-300 relative">
+
+    <ul v-if="publications.length" class="divide-y divide-gray-300 relative">
       <li v-for="(publication, index) in publications" :key="index"
         class="border border-yellow-200 rounded-xl p-5 shadow-md hover:shadow-lg transition-all bg-gray-50 space-y-1 text-sm lg:text-lg">
         <div class="flex flex-col xl:grid xl:grid-cols-4 xl:grid-rows-4 text-gray-700 font-semibold text-[1rem]">
@@ -66,7 +67,8 @@
       </li>
     </ul>
     
-    <p v-else-if="!loading && !publications.length" class="text-gray-500">No tienes publicaciones anteriores.</p>
+    <p v-else-if="!loading" class="text-gray-500">No tienes publicaciones anteriores.</p>
+
     <EditPublications :visible="openModal" :spaceId="space?.id" @close="openModal = false"
     @updated="fetchPublications" />
 
@@ -85,6 +87,7 @@ import { SpaceCategory, getSpanishCategory } from '../../../utils/SpaceCategoryT
 import EditPublications from './UI/EditPublications.vue';
 import { formatDate } from '../../../utils/FormatDate';
 import ConfirmModal from '../../common/ConfirmModal.vue';
+import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 
 export interface VehicleCapacity {
   type: 'car' | 'motorcycle' | 'van' | 'bicycle';
@@ -136,17 +139,19 @@ const fetchPublications = async () => {
   const userId = userStore.user?.id;
   if (!userId) {
     console.error("No se encontró el ID de usuario en userStore");
-    loading.value = false;
+    publications.value = [];
     return;
   }
+  loading.value = false;
   try {
-    const response = await api.get(`spaces/myspaces`);
-    publications.value = response.data;
-    console.log(publications.value);
+    const { data } = await api.get(`spaces/myspaces`, { withCredentials: true });
+    publications.value = data || [];
   } catch (error) {
     console.error("Error al obtener historial de publicaciones", error);
+    publications.value = [];
+  } finally {
+    loading.value = false;
   }
-  loading.value = true;
 };
 
 onMounted(() => {
