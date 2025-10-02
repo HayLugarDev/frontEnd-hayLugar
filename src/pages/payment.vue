@@ -178,8 +178,9 @@ onMounted(async () => {
 const reserva = computed(() => reservationStore.reservation);
 
 // Monto base y fee
+
 const baseAmount = computed(() => Number(reserva.value.total || 0));
-const SERVICE_FEE_PCT = Number((import.meta as any).env?.VITE_SERVICE_FEE_PCT ?? 0.15);
+const SERVICE_FEE_PCT = Number((import.meta as any).env?.VITE_SERVICE_FEE_PCT ?? 0.20);
 const serviceFeeAmount = computed(() => Math.round(baseAmount.value * SERVICE_FEE_PCT * 100) / 100);
 const totalGuestPays = computed(() => Math.round((baseAmount.value + serviceFeeAmount.value) * 100) / 100);
 
@@ -209,7 +210,7 @@ const initCardBrick = async () => {
 
   const settings = {
     initialization: {
-      amount: Number(total.value), // número
+      amount: Number(totalGuestPays.value), // número
       payer: {
         email: email.value || "",
       },
@@ -231,9 +232,10 @@ const initCardBrick = async () => {
       onSubmit: async (cardFormData: any) => {
         console.log("Datos del Brick:", cardFormData);
         const tokenGenerado = cardFormData?.token;
-        const monto = Number(cardFormData?.transaction_amount ?? total.value); // fallback
+        const monto = Number(cardFormData?.transaction_amount ?? Number(totalGuestPays.value)); // fallback
         const paymentMethodId = cardFormData?.payment_method_id;
-        await confirmarPagoMercadoPago(tokenGenerado, monto, paymentMethodId);
+        const paymentTypeId = cardFormData?.payment_type_id;
+        await confirmarPagoMercadoPago(tokenGenerado, monto, paymentMethodId,paymentTypeId );
       },
       onError: (error: any) => {
         console.error("Error en el Brick:", error);
@@ -255,16 +257,19 @@ const initCardBrick = async () => {
 };
 
 // Función para confirmar el pago utilizando el Checkout API
-const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMethodReal: string) => {
-
+// Función para confirmar el pago utilizando el Checkout API
+const confirmarPagoMercadoPago = async (
+  token: string,
+  amount: number,
+  paymentMethodId: string,
+  paymentTypeId?: string
+) => {
   if (!nombre.value || !dni.value || !direccion.value || !email.value) {
     alert("Por favor, completa todos los datos de facturación antes de pagar.");
     return;
   }
 
-  const tokenValue = token;
-
-  // Actualizamos el store con los datos de facturación
+  // 1) Persistir datos de factura en el store
   reservationStore.setReservationData({
     payment_method: metodoPago.value,
     payment_data: {
@@ -275,58 +280,64 @@ const confirmarPagoMercadoPago = async (token: string, amount: number, paymentMe
     }
   });
 
-  // Creamos la reserva en estado "pending"
+  // 2) Crear reserva pending
   let reservationResponse: any;
   try {
     reservationResponse = await reservationStore.submitReservation();
-  } catch (error) {
-    console.error("Error al crear la reserva:", error);
+  } catch (err) {
+    console.error("Error al crear la reserva:", err);
     alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
     return;
   }
 
-  const reservationId = reservationResponse?.reservation?.id || reservationResponse?.data?.reservation?.id;
+  const reservationId =
+    reservationResponse?.reservation?.id ||
+    reservationResponse?.data?.reservation?.id;
+
   if (!reservationId) {
-    console.error("reservationId no encontrado en la respuesta:", reservationResponse);
+    console.error("reservationId no encontrado:", reservationResponse);
     alert("Error interno: no se pudo obtener el ID de la reserva.");
     return;
   }
 
-  // Payload para el backend
+  // 3) Idempotencia simple (ideal: UUID v4)
+  const idemKey = `rsv-${reservationId}-${Date.now()}`;
+
+  // 4) Armar payload
   const payload = {
     reservation_id: reservationId,
-    transaction_amount: Number(amount),
+    transaction_amount: Number(amount), // = base + service fee
     description: `Pago para la reserva #${reservationId}`,
     email: email.value,
-    payment_method_id: paymentMethodReal,
-    token: tokenValue,
-    issuer_id: 310, // si no lo usás en backend, lo ignorará
+    payment_method_id: paymentMethodId,
+    token,
+    installments: 1,
     payer: {
       email: email.value,
-      identification: {
-        type: "DNI",
-        number: dni.value.toString(),
-      },
+      identification: { type: "DNI", number: dni.value.toString() }
     },
-    installments: 1
+    breakdown: {
+      base_amount: Number(baseAmount.value),
+      service_fee_amount: Number(serviceFeeAmount.value),
+      total: Number(totalGuestPays.value),
+      service_fee_pct: SERVICE_FEE_PCT
+    },
+    // ⚡️ Claves nuevas
+    idemKey,
+    force_capture: paymentTypeId === "debit_card" // débito ⇒ captura inmediata
   };
-  console.log("Payload a enviar:", payload);
 
-  // ✅ ENDPOINT ACTUALIZADO: HOLD (alias del proceso legacy)
   try {
     const response = await api.post('/payments/hold', payload);
     if (response.status === 201) {
-      console.log("Hold/Pago procesado exitosamente");
-      router.push({
-        path: '/confirmacion',
-        query: { id: espacio.value.id }
-      });
+      router.push({ path: '/confirmacion', query: { id: espacio.value.id } });
     }
   } catch (error) {
     console.error("Error al procesar el pago:", error);
     alert("Ocurrió un error al procesar el pago. Intenta nuevamente.");
   }
 };
+
 
 // Función para el caso simulado (otros métodos de pago)
 const confirmarPagoSimulado = async () => {
