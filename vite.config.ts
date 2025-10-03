@@ -18,6 +18,7 @@ export default defineConfig({
   resolve: {
     alias: {
       'fast-deep-equal': 'fast-deep-equal/es6',
+      'vue': 'vue/dist/vue.esm-bundler.js',
     },
   },
 });

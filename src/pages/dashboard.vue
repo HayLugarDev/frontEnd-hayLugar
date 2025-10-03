@@ -21,10 +21,10 @@
       </div>
 
       <!-- Habilitar Navbar Buttons -->
-      <!-- <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
+      <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
         <ZoneNavbarButton @click="router.push('/universidades')" :text="'🎓🏛️ Universidades'" />
         <ZoneNavbarButton @click="router.push('/meteredParkingDashboard')" :text="'🅿️ Estacionamiento Medido'" />
-      </div> -->
+      </div>
       
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
         <AdvancedMobileSearch />
@@ -74,6 +74,8 @@ import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkelet
 import { useGoogleMap } from '../logic/useGoogleMap';
 import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
 import ZoneNavbarButton from '../components/pages/dashboardPage/ZoneNavbarButton.vue';
+import KpiCard from '../components/common/KpiCard.vue';
+import StatTile from '../components/StatTile.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
