@@ -12,16 +12,10 @@
                 <li class="flex items-center gap-2">
                     <span class="font-semibold">🏷️ Tipo de espacio:</span> {{ modelValue.parking_type }}
                 </li>
-                <li class="flex items-center gap-2">
-                    <span class="font-semibold">📝 Descripción:</span> {{ modelValue.description }}
+                <li class="flex flex-col items-start gap-2">
+                    <span class="font-semibold">📝 Descripción:</span>
+                    <span class="pl-2 font-semibold">{{ modelValue.description }}</span>
                 </li>
-                <li class="flex items-center gap-2">
-                    <span class="font-semibold">💳 Métodos de pago:</span>
-                    {{ modelValue.paymentMethods.join(", ") }}
-                </li>
-                <!-- <li v-if="paymentMethods.includes('Mercado Pago')" class="flex items-center gap-2">
-                    <span class="font-semibold">📧 Email de wallet:</span> {{ modelValue.walletDetails.mpEmail }}
-                </li> -->
                 <li class="flex items-center gap-2">
                     <span class="font-semibold">📢 Publicar:</span>
                     <span
@@ -32,9 +26,12 @@
                 <li>
                     <span class="font-semibold">🖼️ Imágenes cargadas:</span>
                     <div class="flex flex-wrap gap-2 mt-2">
-                        <img v-for="(img, index) in modelValue.images" :key="index"
-                            :src="typeof img === 'string' ?? img"
-                            class="w-20 h-20 object-cover rounded-lg shadow border" />
+                        <img
+                            v-for="(img, index) in modelValue.images"
+                            :key="index"
+                            :src="getImageSrc(img)"
+                            class="w-20 h-20 object-cover rounded-lg shadow border"
+                        />
                     </div>
                 </li>
             </ul>
@@ -55,15 +52,29 @@
     </div>
 </template>
 
-
-<script setup>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { onUnmounted, ref } from 'vue';
 import loadIcon from '../../../assets/load-icon_secondary.svg';
 
-const props = defineProps(['modelValue']);
-const emit = defineEmits(['update:modelValue', 'next', 'prev']);
+const props = defineProps<{ modelValue: any }>();
+const emit = defineEmits(['update:modelValue', 'next', 'prev', 'submit']);
 
 const cargando = ref(false);
+
+// Función segura para mostrar imágenes
+const getImageSrc = (img: string | File | null | undefined) => {
+    if (!img) return '';
+    return typeof img === 'string' ? img : URL.createObjectURL(img);
+};
+
+onUnmounted(() => {
+  props.modelValue.images.forEach((img: string | File | null | undefined) => {
+    if (img instanceof File) {
+      URL.revokeObjectURL(img as any);
+    }
+  });
+});
+
 
 const submitForm = () => {
     emit('submit');

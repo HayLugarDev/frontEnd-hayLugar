@@ -73,10 +73,12 @@
           </button>
           <div v-else class="w-full flex flex-row items-center justify-end gap-1">
             <button v-if="reservation.status === 'approved'" @click="checkInInit(reservation)"
-              class="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
+              :disabled="!checkInEnabled[reservation.id]"
+              class="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4 disabled:opacity-50 disabled:cursor-not-allowed">
               <font-awesome-icon :icon="['fas', 'square-xmark']" />
               Iniciar CheckIn
             </button>
+
             <button v-if="reservation.status === 'pending'" @click="confirmCancelation(reservation)"
               class="bg-red-400 text-white px-4 py-2 rounded-lg shadow hover:bg-red-500 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
               <font-awesome-icon :icon="['fas', 'square-xmark']" />
@@ -86,7 +88,7 @@
         </div>
         <div class="w-full flex flex-row items-center justify-end">
           <button v-if="reservation.status === 'completed' && !reservation.hasRating"
-            @click="showRatingModal = true ; selectedReservation = reservation"
+            @click="showRatingModal = true; selectedReservation = reservation"
             class="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-600 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
             <font-awesome-icon :icon="['fas', 'square-xmark']" />
             Califica tu experiencia
@@ -161,6 +163,8 @@ const showSuccessModal = ref(false);
 const showConfirmModal = ref(false);
 const loading = ref(true);
 
+const checkInEnabled = ref<Record<number, boolean>>({});
+
 const checkInCode = ref("");
 const selectedReservation = ref<any>(null);
 const errorMessage = ref("");
@@ -193,6 +197,11 @@ const fetchReservations = async () => {
   }
   loading.value = false;
 };
+
+onMounted(() => {
+  updateCheckInEnabled(); // inicial
+  setInterval(updateCheckInEnabled, 1000); // actualización en tiempo real
+});
 
 onMounted(async () => {
   await fetchReservations();
@@ -242,6 +251,20 @@ function checkOutInit(reservation: any) {
     onConfirm: () => completeReservation()
   };
 }
+
+function updateCheckInEnabled() {
+  const now = new Date().getTime();
+
+  reservations.value.forEach((reservation: any) => {
+    const start = new Date(reservation.start_time).getTime();
+    const end = new Date(reservation.end_time).getTime();
+
+    // Habilitado 10 minutos antes del inicio hasta el final de la reserva
+    checkInEnabled.value[reservation.id] = now >= start - 10 * 60 * 1000 && now <= end;
+  });
+}
+
+
 
 const completeReservation = async () => {
   if (!selectedReservation.value) return;
