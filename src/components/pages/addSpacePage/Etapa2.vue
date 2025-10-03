@@ -30,7 +30,7 @@
         <!-- Modal de error -->
         <StatusModal :visible="showErrorModal" type="error" title="Dirección faltante"
             message="Por favor, seleccioná una dirección antes de continuar." icon="/src/assets/logo.png"
-            @close="showErrorModal = false" />
+            @confirm="showErrorModal = false" />
     </div>
 </template>
 
@@ -61,10 +61,10 @@ const handlePlaceChanged = (place) => {
 };
 
 const nextStep = () => {
-    // if (!props.modelValue.location) {
-    //     showErrorModal.value = true;
-    //     return;
-    // }
+    if (!props.modelValue.location) {
+        showErrorModal.value = true;
+        return;
+    }
     emit('next');
 };
 
