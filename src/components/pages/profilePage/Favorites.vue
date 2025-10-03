@@ -13,7 +13,7 @@
                 @click="$router.push(`/espacio/${f.space.id}`)">
 
                 <!-- Imagen -->
-                <img :src="f.space.images?.[0]" class="w-28 h-28 object-cover rounded-lg" />
+                <img :src="f.space.images[0]" class="w-28 h-28 object-cover rounded-lg" />
 
                 <!-- Info -->
                 <div class="flex flex-col justify-between flex-1">
@@ -58,7 +58,6 @@ const loading = ref(true);
 onMounted(async () => {
     try {
         const res = await getUserFavorites();
-        console.log(res);
         favorites.value = res;
         loading.value = false;
     } catch (error) {
