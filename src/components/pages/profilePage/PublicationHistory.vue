@@ -1,79 +1,115 @@
 <template>
   <section class="lg:bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+    <!-- Título -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-primary">📦 Tus publicaciones</h2>
+        <p class="text-sm text-gray-600 px-4">Gestioná tus espacios publicados de forma simple y visual</p>
+      </div>
+    </div>
+
+    <!-- Loading -->
     <div v-if="loading" class="space-y-4">
+      <ItemSkeleton />
       <ItemSkeleton />
     </div>
 
-    <ul v-if="publications.length" class="divide-y divide-gray-300 relative">
-      <li v-for="(publication, index) in publications" :key="index"
-        class="border border-yellow-200 rounded-xl p-5 shadow-md hover:shadow-lg transition-all bg-gray-50 space-y-1 text-sm lg:text-lg">
-        <div class="flex flex-col xl:grid xl:grid-cols-4 xl:grid-rows-4 text-gray-700 font-semibold text-[1rem]">
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Nombre del espacio: </span>
-            <p class="text-gray-500 font-normal">{{ publication.name }}</p>
+    <!-- Publicaciones -->
+    <div v-else-if="publications.length">
+      <div
+        v-for="(publication, index) in publications"
+        :key="index"
+        class="border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden"
+      >
+        <!-- Encabezado -->
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <font-awesome-icon icon="warehouse" class="text-primary" />
+              {{ publication.name }}
+            </h3>
+            <p class="text-xs text-gray-500">{{ publication.location.split(',')[0] }}</p>
           </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Dirección: </span>
-            <p class="text-gray-500 font-normal">{{ publication.location.split(',')[0] }}</p>
-          </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Publicado: </span>
-            <p class="text-gray-500 font-normal">{{ formatDate(publication.created_at) }}</p>
-          </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Tipo: </span>
-            <p class="text-gray-500 font-normal">{{ publication.type.toUpperCase() }}</p>
-          </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Categoría: </span>
-            <p class="text-gray-500 font-normal">{{ getSpanishCategory(publication.category) }}</p>
-          </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Estado: </span>
-            <p class="text-green-800">{{ getSpanishState(publication.status) }}</p>
-          </div>
+          <span
+            :class="[
+              'px-3 py-1 rounded-full text-xs font-semibold',
+              publication.status === 'active'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-gray-100 text-gray-600'
+            ]"
+          >
+            {{ getSpanishState(publication.status) }}
+          </span>
         </div>
-        <div class="flex lg:flex-row flex-col lg:items-center space-x-2 mt-2">
-          <div class="flex flex-row gap-1 items-center">
-            <font-awesome-icon icon="car" class="mr-2 text-primary" />
-            <span class="font-bold">Vehículos aceptados:</span>
+
+        <!-- Cuerpo -->
+        <div class="p-5 space-y-3 text-sm text-gray-700">
+          <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
+            <p><span class="font-semibold">📅 Publicado:</span> {{ formatDate(publication.created_at) }}</p>
+            <p><span class="font-semibold">🏷️ Tipo:</span> {{ publication.type.toUpperCase() }}</p>
+            <p><span class="font-semibold">🧭 Categoría:</span> {{ getSpanishCategory(publication.category) }}</p>
+            <p><span class="font-semibold">🚘 Vehículos:</span> {{ publication.vehicle_capacities.length }}</p>
           </div>
-          <div class="flex flex-wrap gap-2 mt-2 lg:mt-0">
-            <div v-for="v in publication.vehicle_capacities" :key="v.type"
-              class="p-2 border rounded-xl text-center w-28 bg-white shadow-sm hover:shadow-md transition">
-              <font-awesome-icon :icon="['fas', getVehicleIcon(v.type)]" class="text-gray-600 text-xl mb-1" />
-              <p class="text-xs text-gray-700 capitalize">{{ getVehicleType(v.type) }}</p>
-              <p v-if="v.price_per_hour" class="text-sm font-medium text-primary">
-                ${{ v.price_per_hour.toLocaleString() }}/h
-              </p>
+
+          <!-- Vehículos aceptados -->
+          <div class="pt-2">
+            <p class="font-semibold mb-2 text-gray-800 flex items-center gap-1">
+              <font-awesome-icon icon="car" class="text-primary" /> Vehículos aceptados
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <div
+                v-for="v in publication.vehicle_capacities"
+                :key="v.type"
+                class="flex flex-col items-center p-2 border rounded-xl bg-white shadow-sm hover:shadow-md transition-all w-24"
+              >
+                <font-awesome-icon :icon="['fas', getVehicleIcon(v.type)]" class="text-gray-700 text-lg mb-1" />
+                <span class="text-xs capitalize text-gray-600">{{ getVehicleType(v.type) }}</span>
+                <span v-if="v.price_per_hour" class="text-xs font-semibold text-primary">
+                  ${{ v.price_per_hour.toLocaleString() }}/h
+                </span>
+              </div>
             </div>
           </div>
         </div>
-        <div class="flex flex-row items-center justify-end gap-1">
 
-          <button @click="editPublication(publication)"
-            class="bg-yellow-300 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-400 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
-            <font-awesome-icon :icon="['fas', 'pen-to-square']" />
-            Editar
+        <!-- Acciones -->
+        <div class="flex items-center justify-between border-t border-gray-200 p-4 bg-gray-50">
+          <button
+            @click="editPublication(publication)"
+            class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
+          >
+            <font-awesome-icon :icon="['fas', 'pen-to-square']" /> Editar
           </button>
-
-          <button @click="openConfirm(publication)"
-            class="bg-red-400 text-white px-4 py-2 rounded-lg shadow hover:bg-red-500 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
-            <font-awesome-icon :icon="['fas', 'square-xmark']" />
-            Eliminar
+          <button
+            @click="openConfirm(publication)"
+            class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
+          >
+            <font-awesome-icon :icon="['fas', 'trash']" /> Eliminar
           </button>
-
         </div>
-      </li>
-    </ul>
-    
-    <p v-else-if="!loading" class="text-gray-500">No tienes publicaciones anteriores.</p>
+      </div>
+    </div>
 
-    <EditPublications :visible="openModal" :spaceId="space?.id" @close="openModal = false"
-    @updated="fetchPublications" />
+    <!-- Sin publicaciones -->
+    <p v-else class="text-gray-500 text-center py-10 text-sm">
+      No tienes publicaciones aún. <br />
+      <span class="text-primary font-medium">¡Publicá tu primer espacio hoy!</span>
+    </p>
 
-    <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
-      @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
+    <!-- Modales -->
+    <EditPublications
+      :visible="openModal"
+      :spaceId="space?.id"
+      @close="openModal = false"
+      @updated="fetchPublications"
+    />
+    <ConfirmModal
+      :visible="showConfirmModal"
+      :message="modalConfig.message"
+      :button-text="modalConfig.buttonText"
+      @close="showConfirmModal = false"
+      @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }"
+    />
   </section>
 </template>
 
@@ -107,7 +143,6 @@ export interface Publication {
   vehicle_capacities: VehicleCapacity[];
 }
 
-
 const publications = ref<Publication[]>([]);
 const space = ref<Publication | null>(null);
 const selectedPublication = ref<Publication | null>(null);
@@ -120,17 +155,16 @@ const loading = ref(true);
 const modalConfig = ref({
   message: '',
   buttonText: 'Aceptar',
-  onConfirm: () => { }
+  onConfirm: () => {}
 });
 
-function openConfirm(publication: any) {
+function openConfirm(publication: Publication) {
   selectedPublication.value = publication;
   modalConfig.value = {
     message: '¿Eliminar esta publicación?',
     buttonText: 'Eliminar',
     onConfirm: () => deletePublication(publication.id)
   };
-
   showConfirmModal.value = true;
 }
 
@@ -138,16 +172,15 @@ const fetchPublications = async () => {
   loading.value = true;
   const userId = userStore.user?.id;
   if (!userId) {
-    console.error("No se encontró el ID de usuario en userStore");
+    console.error('No se encontró el ID de usuario en userStore');
     publications.value = [];
     return;
   }
-  loading.value = false;
   try {
     const { data } = await api.get(`spaces/myspaces`, { withCredentials: true });
     publications.value = data || [];
   } catch (error) {
-    console.error("Error al obtener historial de publicaciones", error);
+    console.error('Error al obtener publicaciones', error);
     publications.value = [];
   } finally {
     loading.value = false;
@@ -159,16 +192,16 @@ onMounted(() => {
 });
 
 const editPublication = (pub: Publication) => {
-  space.value = pub;  // pasamos la publicación seleccionada
+  space.value = pub;
   openModal.value = true;
 };
 
-const deletePublication = async (publication_id) => {
+const deletePublication = async (id: number) => {
   try {
-    await api.delete(`spaces/${publication_id}`, { withCredentials: true });
-    publications.value = publications.value.filter(p => p.id !== publication_id);
+    await api.delete(`spaces/${id}`, { withCredentials: true });
+    publications.value = publications.value.filter(p => p.id !== id);
   } catch (error) {
-    console.error("Error al eliminar publicación", error);
+    console.error('Error al eliminar publicación', error);
   }
 };
 </script>
