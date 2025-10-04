@@ -1,91 +1,76 @@
 <template>
-  <section class="lg:bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3 flex flex-col gap-4">
-    <!-- Loader -->
-    <div class="min-h-screen flex items-center justify-center" v-if="loading">
-      <img :src="loadIcon" alt="Cargando..." class="w-16 h-16 animate-spin" />
+  <section class="lg:bg-white p-4 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3 border border-gray-200 flex flex-col gap-6">
+
+    <!-- Header y saldo -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+          <font-awesome-icon icon="wallet" />
+          Mi Billetera
+        </h2>
+        <p class="text-gray-500 mt-1">Resumen y movimientos de tu cuenta</p>
+      </div>
+      <div class="md:text-right">
+        <span class="block text-gray-500 text-sm">Saldo actual</span>
+        <span class="text-4xl font-extrabold text-green-600 tracking-tight">{{ formatARS(balance) }}</span>
+      </div>
     </div>
 
-    <div class="p-4 border-b">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div>
-          <h2 class="text-2xl font-semibold text-primary flex items-center gap-2">
-            <font-awesome-icon icon="wallet" />
-            Mi Billetera
-          </h2>
-          <p class="text-gray-500 mt-1">Resumen y movimientos de tu cuenta</p>
-        </div>
+    <!-- Loader -->
+    <div v-if="loading" class="flex flex-col gap-4">
+      <div v-for="i in 3" :key="i" class="h-28 w-full bg-gray-100 animate-pulse rounded-2xl"></div>
+    </div>
 
-        <div class="text-right">
-          <span class="block text-gray-500 text-sm">Saldo actual</span>
-          <span class="text-4xl font-extrabold text-green-600 tracking-tight">
-            {{ formatARS(balance) }}
-          </span>
+    <!-- KPIs rápidos -->
+    <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="rounded-2xl border border-gray-200 p-4 bg-gradient-to-b from-gray-50 to-white shadow-sm hover:shadow-md transition">
+        <div class="text-sm text-gray-500">Ingresos (período)</div>
+        <div class="text-xl font-semibold text-green-600">{{ formatARS(sumIn) }}</div>
+      </div>
+      <div class="rounded-2xl border border-gray-200 p-4 bg-gradient-to-b from-gray-50 to-white shadow-sm hover:shadow-md transition">
+        <div class="text-sm text-gray-500">Egresos (período)</div>
+        <div class="text-xl font-semibold text-red-600">{{ formatARS(Math.abs(sumOut)) }}</div>
+      </div>
+      <div class="rounded-2xl border border-gray-200 p-4 bg-gradient-to-b from-gray-50 to-white shadow-sm hover:shadow-md transition">
+        <div class="text-sm text-gray-500">Neto (período)</div>
+        <div class="text-xl font-semibold" :class="netPeriod >= 0 ? 'text-green-700' : 'text-red-700'">
+          {{ formatARS(netPeriod) }}
         </div>
       </div>
+    </div>
 
-      <!-- Controles -->
-      <div class="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div class="flex items-center gap-2 flex-wrap">
-          <button v-for="f in filters" :key="f.value" @click="activeFilter = f.value"
-            class="px-3 py-1.5 rounded-full text-sm font-medium transition border" :class="activeFilter === f.value
-              ? 'bg-primary text-white border-transparent'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'">
-            {{ f.label }}
-          </button>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <label class="text-sm text-gray-600">Período:</label>
-          <select v-model="days"
-            class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 text-sm focus:outline-none">
-            <option :value="7">Últimos 7 días</option>
-            <option :value="30">Últimos 30 días</option>
-            <option :value="90">Últimos 90 días</option>
-          </select>
-
-          <label class="text-sm text-gray-600">Mostrar:</label>
-          <select v-model="limit"
-            class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 text-sm focus:outline-none">
-            <option :value="10">10</option>
-            <option :value="25">25</option>
-            <option :value="50">50</option>
-          </select>
-        </div>
+    <!-- Controles y filtros -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-4">
+      <div class="flex flex-wrap gap-2">
+        <button v-for="f in filters" :key="f.value" @click="activeFilter = f.value"
+          class="px-3 py-1.5 rounded-full text-sm font-medium transition border"
+          :class="activeFilter === f.value
+            ? 'bg-primary text-white border-transparent'
+            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'">
+          {{ f.label }}
+        </button>
       </div>
-
-      <!-- KPIs rápidos -->
-      <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="rounded-xl border border-gray-200 p-4 bg-gray-50">
-          <div class="text-sm text-gray-500">Ingresos (período)</div>
-          <div class="text-xl font-semibold text-green-600">
-            {{ formatARS(sumIn) }}
-          </div>
-        </div>
-        <div class="rounded-xl border border-gray-200 p-4 bg-gray-50">
-          <div class="text-sm text-gray-500">Egresos (período)</div>
-          <div class="text-xl font-semibold text-red-600">
-            {{ formatARS(Math.abs(sumOut)) }}
-          </div>
-        </div>
-        <div class="rounded-xl border border-gray-200 p-4 bg-gray-50">
-          <div class="text-sm text-gray-500">Neto (período)</div>
-          <div class="text-xl font-semibold" :class="netPeriod >= 0 ? 'text-green-700' : 'text-red-700'">
-            {{ formatARS(netPeriod) }}
-          </div>
-        </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <label class="text-sm text-gray-600">Período:</label>
+        <select v-model="days" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 text-sm focus:outline-none">
+          <option :value="7">Últimos 7 días</option>
+          <option :value="30">Últimos 30 días</option>
+          <option :value="90">Últimos 90 días</option>
+        </select>
+        <label class="text-sm text-gray-600">Mostrar:</label>
+        <select v-model="limit" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 text-sm focus:outline-none">
+          <option :value="10">10</option>
+          <option :value="25">25</option>
+          <option :value="50">50</option>
+        </select>
       </div>
     </div>
 
     <!-- Movimientos -->
-    <div class="mx-auto max-w-6xl">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-semibold text-primary">Movimientos</h3>
-
-        <button @click="withdrawFunds"
-          class="hidden md:flex items-center bg-accent text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition">
-          <font-awesome-icon icon="arrow-down" class="mr-2" />
-          Retirar fondos
-        </button>
+    <div class="mt-6">
+      <h3 class="text-xl font-semibold text-primary mb-2">Movimientos</h3>
+      <div v-if="filteredTx.length === 0" class="p-6 text-center text-gray-500 rounded-2xl border bg-gray-50">
+        Sin movimientos para los filtros seleccionados
       </div>
 
       <!-- Desktop table -->
@@ -96,28 +81,21 @@
               <th class="p-3 text-sm font-semibold text-gray-600">Fecha</th>
               <th class="p-3 text-sm font-semibold text-gray-600">Tipo</th>
               <th class="p-3 text-sm font-semibold text-gray-600">Descripción</th>
-              <th class="p-3 text-sm font-semibold text-gray-600">Ref</th>
+              <!-- <th class="p-3 text-sm font-semibold text-gray-600">Ref</th> -->
               <th class="p-3 text-sm font-semibold text-gray-600 text-right">Monto</th>
               <th class="p-3 text-sm font-semibold text-gray-600">Estado</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="tx in filteredTx" :key="tx.id || tx.reference_id || tx.created_at"
-              class="border-b hover:bg-gray-50 transition">
-              <td class="p-3 whitespace-nowrap">{{ formatDate(txDate(tx)) }}</td>
+            <tr v-for="tx in filteredTx" :key="tx.id || tx.reference_id || tx.created_at" class="border-b hover:bg-gray-50 transition">
+              <td class="p-3 whitespace-nowrap text-sm">{{ formatDate(txDate(tx)) }}</td>
               <td class="p-3">
                 <span class="px-2.5 py-1 rounded-full text-xs font-semibold" :class="badgeClass(tx.transaction_type)">
                   {{ typeLabel(tx.transaction_type) }}
                 </span>
               </td>
-              <td class="p-3 text-gray-700">
-                <span v-if="tx.description">{{ tx.description }}</span>
-                <span v-else class="text-gray-400 italic">—</span>
-              </td>
-              <td class="p-3 text-gray-500">
-                <span v-if="tx.reference_id" class="font-mono text-xs">{{ tx.reference_id }}</span>
-                <span v-else class="text-gray-400 italic">—</span>
-              </td>
+              <td class="p-3 text-gray-700">{{ tx.description || '—' }}</td>
+              <!-- <td class="p-3 text-gray-500">{{ tx.reference_id || '—' }}</td> -->
               <td class="p-3 text-right font-semibold" :class="tx.amount >= 0 ? 'text-green-600' : 'text-red-600'">
                 {{ signedARS(tx.amount) }}
               </td>
@@ -127,12 +105,6 @@
                 </span>
               </td>
             </tr>
-
-            <tr v-if="filteredTx.length === 0">
-              <td colspan="6" class="p-6 text-center text-gray-500">
-                Sin movimientos para los filtros seleccionados
-              </td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -140,7 +112,7 @@
       <!-- Mobile cards -->
       <div class="md:hidden space-y-3">
         <div v-for="tx in filteredTx" :key="tx.id || tx.reference_id || tx.created_at"
-          class="border border-gray-200 rounded-xl p-4 bg-white shadow-sm">
+          class="border border-gray-200 rounded-2xl p-4 bg-gradient-to-b from-gray-50 to-white shadow-sm hover:shadow-md transition">
           <div class="flex items-start justify-between">
             <div class="space-y-1">
               <div class="text-sm text-gray-500">{{ formatDate(txDate(tx)) }}</div>
@@ -149,12 +121,8 @@
                   {{ typeLabel(tx.transaction_type) }}
                 </span>
               </div>
-              <div class="text-sm text-gray-700" v-if="tx.description">
-                {{ tx.description }}
-              </div>
-              <div class="text-xs text-gray-400 font-mono" v-if="tx.reference_id">
-                Ref: {{ tx.reference_id }}
-              </div>
+              <div class="text-sm text-gray-700">{{ tx.description || '—' }}</div>
+              <!-- <div class="text-xs text-gray-400 font-mono">{{ tx.reference_id || '' }}</div> -->
             </div>
             <div class="text-right">
               <div class="text-lg font-semibold" :class="tx.amount >= 0 ? 'text-green-600' : 'text-red-600'">
@@ -168,31 +136,32 @@
             </div>
           </div>
         </div>
-
-        <div v-if="filteredTx.length === 0" class="p-6 text-center text-gray-500">
-          Sin movimientos para los filtros seleccionados
-        </div>
-
-        <button @click="withdrawFunds"
-          class="w-full mt-2 flex md:hidden items-center justify-center bg-accent text-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg transition">
-          <font-awesome-icon icon="arrow-down" class="mr-2" />
-          Retirar fondos
-        </button>
       </div>
+
+      <!-- Retiro de fondos -->
+      <button @click="withdrawFunds"
+        class="w-full md:w-auto mt-4 flex items-center justify-center bg-accent text-white px-4 py-2 rounded-2xl shadow hover:shadow-lg transition">
+        <font-awesome-icon icon="arrow-down" class="mr-2" /> Retirar fondos
+      </button>
 
       <!-- Leyenda -->
-      <div class="mt-6 text-xs text-gray-500">
-        <p>
-          * “Pago de reserva” acredita el neto recibido (descontadas tarifas del procesador).
-          “Comisión plataforma” refleja el cargo de servicio cuando aplica.
-          Los importes positivos suman a tu saldo; los negativos lo descuentan.
-        </p>
-      </div>
+      <p class="mt-4 text-xs text-gray-500">
+        * “Pago de reserva” acredita el neto recibido (descontadas tarifas del procesador).<br>
+        “Comisión plataforma” refleja el cargo de servicio cuando aplica.<br>
+        Los importes positivos suman a tu saldo; los negativos lo descuentan.
+      </p>
     </div>
 
     <!-- Modal de retiro -->
-    <WithdrawModal ref="modalRef" v-model="showWithdraw" :summary="summary" :accounts="payoutAccounts"
-      :min-withdraw="1000" @submitted="onModalSubmitted" @open-accounts="$router.push({ name: 'payout-accounts' })" />
+    <WithdrawModal
+      ref="modalRef"
+      v-model="showWithdraw"
+      :summary="summary"
+      :accounts="payoutAccounts"
+      :min-withdraw="1000"
+      @submitted="onModalSubmitted"
+      @open-accounts="$router.push({ name: 'payout-accounts' })"
+    />
   </section>
 </template>
 
@@ -202,6 +171,7 @@ import { useUserStore } from '../store/userStore'
 import api from '../services/apiService'
 import loadIcon from '../assets/load-icon_primary.svg'
 import WithdrawModal from '../components/WithdrawModal.vue'
+import { showToast } from '../utils/toast'
 
 const userStore = useUserStore()
 
@@ -440,12 +410,10 @@ async function onModalSubmitted() {
     showWithdraw.value = false
     // refrescar todo
     await Promise.all([loadSummaryAndAccounts(), loadWallet()])
-    // opcional: toast de éxito
-    // toast.success('Solicitud de retiro enviada')
+    showToast('Solicitud de retiro enviada', 'success');
   } catch (e: any) {
     console.error('Error solicitando retiro', e)
-    // opcional: toast de error
-    // toast.error(e?.response?.data?.message || 'Error solicitando retiro')
+    showToast(e?.response?.data?.message || 'Error solicitando retiro', 'error');
   }
 }
 </script>
