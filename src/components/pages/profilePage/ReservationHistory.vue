@@ -16,16 +16,12 @@
 
     <!-- Lista de reservas -->
     <div v-else-if="reservations.length" class="space-y-4">
-      <div
-        v-for="(reservation, index) in reservations"
-        :key="index"
-        :class="[
-          'border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden',
-          ['cancelled', 'completed', 'failed'].includes(reservation.status) && reservation.hasRating
-            ? 'opacity-70 pointer-events-none'
-            : ''
-        ]"
-      >
+      <div v-for="(reservation, index) in reservations" :key="index" :class="[
+        'border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden',
+        ['cancelled', 'completed', 'failed'].includes(reservation.status) && reservation.hasRating
+          ? 'opacity-70 pointer-events-none'
+          : ''
+      ]">
         <!-- Encabezado -->
         <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
           <div>
@@ -35,12 +31,10 @@
             </h3>
             <p class="text-xs text-gray-500">{{ formatDate(reservation.created_at) }}</p>
           </div>
-          <span
-            :class="[
-              'px-3 py-1 rounded-full text-xs font-semibold',
-              statusColors[reservation.status] || 'bg-gray-100 text-gray-600'
-            ]"
-          >
+          <span :class="[
+            'px-3 py-1 rounded-full text-xs font-semibold',
+            statusColors[reservation.status] || 'bg-gray-100 text-gray-600'
+          ]">
             {{ getStatusInfo(reservation.status).label }}
           </span>
         </div>
@@ -78,39 +72,28 @@
         <!-- Acciones -->
         <div class="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 bg-gray-50">
           <!-- Check-in -->
-          <button
-            v-if="reservation.status === 'approved'"
-            @click="checkInInit(reservation)"
+          <button v-if="reservation.status === 'approved'" @click="checkInInit(reservation)"
             :disabled="!checkInEnabled[reservation.id]"
-            class="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl shadow hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+            class="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl shadow hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
             <font-awesome-icon icon="right-to-bracket" /> Iniciar Check-In
           </button>
 
           <!-- Check-out -->
-          <button
-            v-if="reservation.status === 'in_progress'"
-            @click="checkOutInit(reservation)"
-            class="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-600 transition-all"
-          >
+          <button v-if="reservation.status === 'in_progress'" @click="checkOutInit(reservation)"
+            class="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-600 transition-all">
             <font-awesome-icon icon="right-from-bracket" /> Iniciar Check-Out
           </button>
 
           <!-- Cancelar -->
-          <button
-            v-if="reservation.status === 'pending'"
-            @click="confirmCancelation(reservation)"
-            class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition-all"
-          >
+          <button v-if="reservation.status === 'pending'" @click="confirmCancelation(reservation)"
+            class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition-all">
             <font-awesome-icon icon="ban" /> Cancelar
           </button>
 
           <!-- Calificar -->
-          <button
-            v-if="reservation.status === 'completed' && !reservation.hasRating"
+          <button v-if="reservation.status === 'completed' && !reservation.hasRating"
             @click="showRatingModal = true; selectedReservation = reservation"
-            class="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-xl shadow hover:bg-yellow-600 transition-all"
-          >
+            class="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-xl shadow hover:bg-yellow-600 transition-all">
             <font-awesome-icon icon="star" /> Calificar experiencia
           </button>
         </div>
@@ -122,30 +105,39 @@
       No tenés reservas aún.<br />
     </p>
 
+    <!-- Modal CheckIn -->
+    <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+        <h2 class="text-lg font-bold mb-4">Verificar Check-In</h2>
+
+        <p class="text-sm text-gray-600 mb-2">
+          Ingresa el código de verificación proporcionado por el anfitrión (Solo mayúsculas):
+        </p>
+
+        <input v-model="checkInCode" type="text" placeholder="Código de verificación"
+          class="w-full border rounded-lg p-2 mb-3 focus:ring focus:ring-blue-300" />
+
+        <div class="flex justify-end gap-2">
+          <button @click="showCheckInModal = false" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300">
+            Cancelar
+          </button>
+          <button @click="confirmCheckIn" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+            Confirmar
+          </button>
+        </div>
+        <p v-if="errorMessage" class="text-red-500 text-sm mt-3">{{ errorMessage }}</p>
+      </div>
+    </div>
+
     <!-- Modales -->
-    <ConfirmModal
-      :visible="showConfirmModal"
-      :message="modalConfig.message"
-      :button-text="modalConfig.buttonText"
-      @close="showConfirmModal = false"
-      @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }"
-    />
+    <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
+      @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
 
-    <RatingModal
-      :visible="showRatingModal"
-      :reservationId="selectedReservation?.id"
-      @close="showRatingModal = false"
-      @submit="handleRatingSubmit"
-    />
+    <RatingModal :visible="showRatingModal" :reservationId="selectedReservation?.id" @close="showRatingModal = false"
+      @submit="handleRatingSubmit" />
 
-    <StatusModal
-      :visible="showErrorModal"
-      type="error"
-      title="¡Atención!"
-      message="Ocurrió un error al procesar la acción"
-      icon="/src/assets/logo.png"
-      @confirm="showErrorModal = false"
-    />
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
+      message="Ocurrió un error al procesar la acción" icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
   </section>
 </template>
 

@@ -93,7 +93,6 @@
     <!-- Sin publicaciones -->
     <p v-else class="text-gray-500 text-center py-10 text-sm">
       No tienes publicaciones aún. <br />
-      <span class="text-primary font-medium">¡Publicá tu primer espacio hoy!</span>
     </p>
 
     <!-- Modales -->
