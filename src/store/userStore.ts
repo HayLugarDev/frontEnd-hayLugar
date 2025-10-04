@@ -21,6 +21,7 @@ export const useUserStore = defineStore('user', {
     loading: false,
     error: null as string | null,
     sessionExpired: true,
+    token: null as string | null,
     notifications: [] as any[],
     notificationsLoaded: false, // <- para saber si ya cargamos la primera vez
     reservations: [] as any[],
@@ -50,6 +51,7 @@ export const useUserStore = defineStore('user', {
         }
 
         this.user = user;
+        this.token = response.data?.token ?? null; // por si acaso
         this.terms = response.data?.terms ?? null; // 👈 guardamos términos
         this.sessionExpired = false;
 

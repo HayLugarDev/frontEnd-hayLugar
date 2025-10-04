@@ -206,7 +206,7 @@ const baseMenuSections = [
   { value: 'publicaciones', label: 'Publicaciones' },
   { value: 'favoritos', label: 'Favoritos' },
   { value: 'calificaciones', label: 'Calificaciones' },
-  { value: 'walletP', label: 'Wallet' },
+  { value: 'walletP', label: 'Ganancias' },
   { value: 'cuentas', label: 'Cuentas' },
 ];
 

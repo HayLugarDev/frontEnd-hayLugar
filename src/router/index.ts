@@ -72,15 +72,6 @@ router.beforeEach((to, from, next) => {
     return
   }
 
-  // 2) Autenticación básica (token o store)
-  const userStore = useUserStore()
-  const isLoggedIn = !!(localStorage.getItem('token') || userStore.user?.id)
-
-  if (to.meta.requiresAuth && !isLoggedIn) {
-    next({ name: 'login', query: { redirect: to.fullPath } })
-    return
-  }
-
   next()
 })
 
