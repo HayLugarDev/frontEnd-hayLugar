@@ -39,7 +39,7 @@
               </p>
 
               <p class="text-gray-600">
-                Cargo por servicio ({{ Math.round(SERVICE_FEE_PCT * 100) }}%)
+                Cargo por servicio
               </p>
               <p class="text-end text-gray-800 font-medium">
                 {{ formatARS(serviceFeeAmount) }}

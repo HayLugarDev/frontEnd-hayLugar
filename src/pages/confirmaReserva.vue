@@ -34,7 +34,7 @@
         </div>
         <div class="flex justify-between mb-1" v-if="reservation.service_fee_cents">
           <span>Cargo por servicio</span>
-          <span>{{ formatARS(reservation.service_fee_cents / 100) }}</span>
+          <span>{{ formatARS(reservation.guest_total_cents / 100) }}</span>
         </div>
         <div class="flex justify-between font-bold text-amber-600 border-t pt-2 mt-2">
           <span>Total retenido</span>
