@@ -12,7 +12,7 @@
 
     <!-- Dropdown de notificaciones -->
     <ul v-if="openMenu"
-        class="absolute right-0 mt-2 text-md md:text-xs text-gray-800 bg-gray-50 border-2 rounded-xl z-50 w-60 max-h-64 overflow-y-auto animate-fade-in">
+        class="absolute right-0 mt-2 text-md text-gray-800 bg-gray-50 border-2 rounded-xl z-50 w-60 max-h-64 overflow-y-auto animate-fade-in">
       <li v-if="pendingNotifications.length === 0" class="p-4 text-center">
         No hay notificaciones nuevas.
       </li>

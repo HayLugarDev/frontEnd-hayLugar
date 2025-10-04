@@ -16,11 +16,8 @@
 
     <!-- Lista de reservas -->
     <div v-else-if="reservations.length">
-      <div
-        v-for="(reservation, index) in reservations"
-        :key="index"
-        class="border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden mb-4"
-      >
+      <div v-for="(reservation, index) in reservations" :key="index"
+        class="border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden mb-4">
         <!-- Encabezado -->
         <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
           <div>
@@ -31,13 +28,11 @@
             <p class="text-xs text-gray-500">{{ formatDate(reservation.created_at) }}</p>
           </div>
 
-          <span
-            :class="[
-              'px-3 py-1 rounded-full text-xs font-semibold',
-              statusColors[reservation.status] ||
-                'bg-gray-100 text-gray-600'
-            ]"
-          >
+          <span :class="[
+            'px-3 py-1 rounded-full text-xs font-semibold',
+            statusColors[reservation.status] ||
+            'bg-gray-100 text-gray-600'
+          ]">
             {{ getStatusInfo(reservation.status).label }}
           </span>
         </div>
@@ -46,7 +41,8 @@
         <div class="p-5 space-y-3 text-sm text-gray-700">
           <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
             <p><span class="font-semibold">📍 Espacio:</span> {{ reservation.space?.name ?? '—' }}</p>
-            <p><span class="font-semibold">🗺️ Dirección:</span> {{ (reservation.space?.location || '—').split(',')[0] }}</p>
+            <p><span class="font-semibold">🗺️ Dirección:</span> {{ (reservation.space?.location || '—').split(',')[0]
+              }}</p>
             <p><span class="font-semibold">👤 Usuario:</span> {{ reservation.client?.name ?? '—' }}</p>
             <p>
               <span class="font-semibold">🚘 Vehículo:</span>
@@ -64,93 +60,81 @@
 
           <!-- Badges auxiliares -->
           <div class="flex flex-wrap items-center gap-2 pt-2">
-            <span
-              v-if="hasHold(reservation)"
-              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm"
-            >
+            <span v-if="hasHold(reservation)"
+              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
               <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
               Retención OK
             </span>
 
-            <span
-              v-else-if="reservation.payment_id && !hasHold(reservation)"
-              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm"
-            >
+            <span v-else-if="reservation.payment_id && !hasHold(reservation)"
+              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm">
               <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
               Pago inmediato
             </span>
 
-            <span
-              v-else-if="isApprovedLike(reservation.status)"
-              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 shadow-sm"
-            >
+            <span v-else-if="isApprovedLike(reservation.status)"
+              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
               <span class="w-2 h-2 rounded-full bg-amber-500"></span>
               Esperando retención
             </span>
 
-            <span
-              v-if="reservation.status === 'completed'"
-              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 shadow-sm"
-            >
+            <span v-if="reservation.status === 'completed'"
+              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
               <span class="w-2 h-2 rounded-full bg-blue-500"></span>
               Pago Acreditado
             </span>
           </div>
+          <!-- Countdown -->
+          <div v-if="reservation.status === 'in_progress'" class="mt-2">
+            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold">
+              ⏱ {{ countdowns[reservation.id] || 'Cargando...' }}
+            </span>
+          </div>
+          
         </div>
+
 
         <!-- Acciones -->
         <div class="flex flex-wrap items-center justify-end gap-2 border-t border-gray-200 p-4 bg-gray-50">
           <!-- PENDING -->
           <template v-if="isPending(reservation.status)">
-            <button
-              @click="confirmApprovedReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
-            >
+            <button @click="confirmApprovedReservation(reservation)"
+              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
               <font-awesome-icon :icon="['fas', 'check']" /> Aprobar
             </button>
-            <button
-              @click="confirmRejectReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
-            >
+            <button @click="confirmRejectReservation(reservation)"
+              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
               <font-awesome-icon :icon="['fas', 'xmark']" /> Rechazar
             </button>
           </template>
 
           <!-- VERIFICAR -->
           <template v-else-if="reservation.status === 'verified'">
-            <button
-              @click="confirmCheckinReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
-            >
+            <button @click="confirmCheckinReservation(reservation)"
+              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
               <font-awesome-icon :icon="['fas', 'check']" /> Checkin realizado
             </button>
-            <button
-              @click="confirmRejectReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
-            >
+            <button @click="confirmRejectReservation(reservation)"
+              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
               <font-awesome-icon :icon="['fas', 'xmark']" /> Rechazar
             </button>
           </template>
 
           <!-- FINALIZAR -->
           <template v-else-if="canFinalize(reservation)">
-            <button
-              @click="confirmFinalizeReservation(reservation)"
+            <button @click="confirmFinalizeReservation(reservation)"
               class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-primary to-blue-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
-              :disabled="quoteLoading && selectedReservation?.id === reservation.id"
-            >
+              :disabled="quoteLoading && selectedReservation?.id === reservation.id">
               <font-awesome-icon :icon="['fas', 'money-bill']" />
               {{ (quoteLoading && selectedReservation?.id === reservation.id) ? 'Calculando…' : 'Finalizar y cobrar' }}
             </button>
           </template>
 
           <!-- CANCELAR -->
-          <button
-            v-if="!['pending','cancelled','completed','failed','verified'].includes(reservation.status)"
+          <button v-if="!['pending', 'cancelled', 'completed', 'failed', 'verified'].includes(reservation.status)"
             @click="confirmCancelation(reservation)"
-            class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
-          >
-            <font-awesome-icon :icon="['fas', 'square-xmark']" /> Cancelar
+            class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
+            Cancelar
           </button>
         </div>
       </div>
@@ -158,34 +142,18 @@
 
     <!-- Sin reservas -->
     <p v-else class="text-gray-500 text-center py-10 text-sm">
-      No tienes reservas entrantes aún. <br />
-      <span class="text-primary font-medium">¡Pronto aparecerán aquí!</span>
+      No tienes reservas entrantes aún.
     </p>
 
     <!-- Modales -->
-    <StatusModal
-      :visible="showErrorModal"
-      type="error"
-      title="¡Atención!"
-      :message="errorMessage || 'Ocurrió un error'"
-      icon="/src/assets/logo.png"
-      @confirm="showErrorModal = !showErrorModal"
-    />
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage || 'Ocurrió un error'"
+      icon="/src/assets/logo.png" @confirm="showErrorModal = !showErrorModal" />
 
-    <ConfirmModal
-      :visible="showConfirmModal"
-      :message="modalConfig.message"
-      :button-text="modalConfig.buttonText"
-      @close="showConfirmModal = false"
-      @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }"
-    />
+    <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
+      @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
 
-    <RatingModal
-      :visible="showRatingModal"
-      :reservationId="selectedReservation?.id"
-      @close="showRatingModal = false"
-      @submit="handleRatingSubmit"
-    />
+    <RatingModal :visible="showRatingModal" :reservationId="selectedReservation?.id" @close="showRatingModal = false"
+      @submit="handleRatingSubmit" />
   </section>
 </template>
 

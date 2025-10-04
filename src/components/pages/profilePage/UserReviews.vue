@@ -17,8 +17,6 @@
     <!-- Sin reseñas -->
     <div v-else-if="reviews.length === 0" class="text-gray-500 text-center py-10 text-sm">
       Aún no tienes calificaciones.
-      <br />
-      <span class="text-primary font-medium">¡Ofrecé una gran experiencia y obtené tus primeras reseñas!</span>
     </div>
 
     <!-- Lista de reseñas -->
