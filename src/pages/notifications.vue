@@ -10,56 +10,51 @@
             <div v-if="loading" class="space-y-4">
                 <ItemSkeleton />
             </div>
-            <ul v-else-if="notifications.length" class="divide-y divide-gray-300 space-y-2 font-sans text-xs lg:text-lg">
+            <ul v-else-if="notifications.length" class="grid gap-6">
                 <li v-for="(notification, index) in notifications" :key="index"
-                    class="border border-yellow-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all bg-gray-50 space-y-3">
-
-                    <div class="flex flex-row justify-between items-center">
-                        <!-- Fecha -->
-                        <p>
-                            <font-awesome-icon icon="calendar-alt" class="mr-2 text-primary" />
-                            <strong class="text-gray-800 font-bold">Recibida: {{ formatDate(notification.changed_at)
-                            }}</strong>
-                        </p>
+                    class="flex flex-col gap-2 border border-yellow-200 rounded-2xl bg-gradient-to-b from-yellow-50 to-white shadow-md hover:shadow-lg transition-all cursor-pointer overflow-hidden p-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <font-awesome-icon
+                                :icon="notification.reservation_status === 'approved' ? 'check-circle' : 'bell'"
+                                class="text-2xl"
+                                :class="notification.reservation_status === 'approved' ? 'text-green-500' : 'text-primary'" />
+                            <div>
+                                <span class="font-bold text-gray-800 text-lg">{{
+                                    getSpanishReservationStatus(notification.reservation_status) }}</span>
+                                <span class="block text-xs text-gray-500">Recibida: {{
+                                    formatDate(notification.changed_at) }}</span>
+                            </div>
+                        </div>
                         <font-awesome-icon @click="openConfirm(notification, 'delete')" icon="fa-regular fa-trash-can"
-                            class="text-lg cursor-pointer" />
+                            class="text-lg cursor-pointer text-gray-400 hover:text-red-500 transition"
+                            title="Eliminar notificación" />
                     </div>
 
-                    <!-- Mensaje -->
-                    <p class="whitespace-pre-line text-gray-700">
+                    <p class="whitespace-pre-line text-gray-700 mt-2 text-base">
                         {{ notification.message }}
                     </p>
 
-                    <div class="flex flex-row justify-between items-center">
-                        <p v-if="notification.id" :class="getStatusColor(notification.reservation_status)">
-                            {{ getSpanishReservationStatus(notification.reservation_status) }}
-                        </p>
-
+                    <div class="flex flex-row justify-end items-center gap-2 mt-2">
                         <!-- owner -->
-                        <!-- Si aún no fue aceptada -->
                         <button
                             v-if="notification.reservation_status !== 'approved' && notification.reservation_role === 'owner'"
                             @click="goToIncomingReservations"
-                            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition">
+                            class="px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold">
                             Verificar ahora
                         </button>
-
-                        <!-- Si ya está aceptada -->
-                        <button v-else-if="notification.reservation_status === 'approved' && notification.reservation_role === 'owner'"
-                        @click="goToIncomingReservations" 
-                        class="px-4 py-2 bg-primary text-white rounded-lg">
+                        <button
+                            v-else-if="notification.reservation_status === 'approved' && notification.reservation_role === 'owner'"
+                            @click="goToIncomingReservations"
+                            class="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition font-semibold">
                             Ir a reserva
                         </button>
-
                         <!-- client -->
-                        <button
-                            v-if="notification.reservation_role === 'client'"
-                            @click="goToReservations"
-                            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition">
+                        <button v-if="notification.reservation_role === 'client'" @click="goToReservations"
+                            class="px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold">
                             Ir a reserva
                         </button>
                     </div>
-
                 </li>
             </ul>
 
