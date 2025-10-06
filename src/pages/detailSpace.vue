@@ -33,14 +33,26 @@
           </div>
         </section>
 
-        <!-- Título + Favorito -->
+        <!-- Título + Favorito + Compartir -->
         <div class="flex flex-row items-center justify-between mt-4 px-6 md:px-2">
           <h1 class="text-3xl sm:text-2xl font-bold p-2 text-primary">{{ capitalizeFirst(espacio.name) }}</h1>
-          <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" :class="[
-            activedFavouriteIcon ? 'text-red-500 scale-110' : 'text-gray-700',
-            'text-3xl cursor-pointer transition-transform duration-300 ease-in-out',
-            isAnimating ? 'animate-ping-once' : ''
-          ]" @click="toggleFavourite" />
+
+          <div class="flex flex-row items-center gap-3">
+            <!-- Corazón Favorito Moderno -->
+            <button @click="toggleFavourite" class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-300 ease-in-out
+             hover:scale-110 hover:shadow-xl
+             bg-white" :class="activedFavouriteIcon ? 'bg-red-100 text-red-500' : 'bg-gray-100 text-gray-700'"
+              title="Agregar a favoritos">
+              <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" class="text-2xl" />
+            </button>
+
+            <!-- Botón Compartir Moderno -->
+            <button @click="sharePublication" class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-all duration-300
+             hover:scale-110 hover:shadow-xl
+             bg-white text-gray-700 hover:text-primary" title="Compartir publicación">
+              <font-awesome-icon :icon="['fas', 'share-alt']" class="text-xl" />
+            </button>
+          </div>
         </div>
 
         <!-- Galería de imágenes grande -->
@@ -87,13 +99,14 @@
             </div>
 
             <div class="col-start-3 flex flex-col items-end text-xl">
-              <span :class="formattedRating ? 'text-yellow-600' : 'text-gray-400'">
-                ⭐ <span class="text-black">{{ formattedRating ?? '0.0' }}</span>
+              <span :class="avgRating ? 'text-yellow-600' : 'text-gray-400'">
+                ⭐ <span class="text-black">{{ totalReviews > 0 ? avgRating.toFixed(1) : '5.0' }}</span>
               </span>
 
               <span class="font-sans cursor-pointer hover:underline text-xs sm:text-md" @click="openReviews">
                 {{ totalReviews > 0 ? `${totalReviews} calificaciones` : "Sin calificaciones" }}
               </span>
+
             </div>
           </div>
 
@@ -253,6 +266,8 @@ const obtenerEspacio = async () => {
   try {
     const id = route.params.id;
     const space = await getSpaceById(id);
+    avgRating.value = space.average_rating || 5;
+    fetchReviews(space.id);
     console.log(space);
     return espacio.value = space;
   } catch (error) {
@@ -270,18 +285,44 @@ onMounted(async () => {
   }
 });
 
-const openReviews = async () => {
+const openReviews = () => {
+  showReviewsModal.value = true;
+}
+
+const fetchReviews = async (SpaceId) => {
   try {
-    const { reviews: r, avgRating: avg, totalReviews: total } = await getReviewsBySpace(espacio.value.id);
+    const { reviews: r, totalReviews: total } = await getReviewsBySpace(SpaceId);
     reviews.value = r;
-    avgRating.value = avg;
     totalReviews.value = total;
-    showReviewsModal.value = true;
-    console.log(reviews.value);
   } catch (e) {
     console.error("Error al cargar opiniones", e);
   }
 };
+
+const sharePublication = async () => {
+  if (!espacio.value) return;
+
+  try {
+    const url = `${window.location.origin}/espacio/${espacio.value.id}`;
+
+    if (navigator.share) {
+      // Usa el API nativo de compartir (móvil/compatible)
+      await navigator.share({
+        title: espacio.value.name,
+        text: '¡Mirá este espacio que encontré para estacionar!',
+        url,
+      });
+    } else {
+      // Copiar al portapapeles en escritorio
+      await navigator.clipboard.writeText(url);
+      showToast('Enlace copiado al portapapeles', 'success');
+    }
+  } catch (err) {
+    console.error('Error al compartir:', err);
+    showToast('No se pudo compartir', 'error');
+  }
+};
+
 
 const redirigirATerminos = () => {
   showErrorModal.value = false;
@@ -404,21 +445,6 @@ const vehicleOptions = computed(() => {
   if (!espacio.value?.vehicle_capacities) return [];
 
   return espacio.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
-});
-
-// Formateo de puntuación
-const formattedRating = computed(() => {
-  if (espacio.value?.average_rating == null) {
-    return null;
-  }
-  return Number(espacio.value.average_rating).toFixed(1);
-});
-
-const opinionesTexto = computed(() => {
-  if (!espacio.value?.reviews?.comment) {
-    return 'Sin opiniones';
-  }
-  return `${espacio.value?.reviews?.comment} Opiniones`;
 });
 
 const hostImage = computed(() => {

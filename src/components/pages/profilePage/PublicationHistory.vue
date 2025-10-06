@@ -8,20 +8,14 @@
       </div>
     </div>
 
-    <!-- Loading -->
     <div v-if="loading" class="space-y-4">
       <ItemSkeleton />
       <ItemSkeleton />
     </div>
 
-    <!-- Publicaciones -->
     <div v-else-if="publications.length">
-      <div
-        v-for="(publication, index) in publications"
-        :key="index"
-        class="border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden"
-      >
-        <!-- Encabezado -->
+      <div v-for="(publication, index) in publications" :key="index"
+        class="border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden">
         <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
           <div>
             <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -30,19 +24,16 @@
             </h3>
             <p class="text-xs text-gray-500">{{ publication.location.split(',')[0] }}</p>
           </div>
-          <span
-            :class="[
-              'px-3 py-1 rounded-full text-xs font-semibold',
-              publication.status === 'active'
-                ? 'bg-green-100 text-green-700'
-                : 'bg-gray-100 text-gray-600'
-            ]"
-          >
+          <span :class="[
+            'px-3 py-1 rounded-full text-xs font-semibold',
+            publication.status === 'active'
+              ? 'bg-green-100 text-green-700'
+              : 'bg-gray-100 text-gray-600'
+          ]">
             {{ getSpanishState(publication.status) }}
           </span>
         </div>
 
-        <!-- Cuerpo -->
         <div class="p-5 space-y-3 text-sm text-gray-700">
           <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
             <p><span class="font-semibold">📅 Publicado:</span> {{ formatDate(publication.created_at) }}</p>
@@ -51,17 +42,13 @@
             <p><span class="font-semibold">🚘 Vehículos:</span> {{ publication.vehicle_capacities.length }}</p>
           </div>
 
-          <!-- Vehículos aceptados -->
           <div class="pt-2">
             <p class="font-semibold mb-2 text-gray-800 flex items-center gap-1">
               <font-awesome-icon icon="car" class="text-primary" /> Vehículos aceptados
             </p>
             <div class="flex flex-wrap gap-2">
-              <div
-                v-for="v in publication.vehicle_capacities"
-                :key="v.type"
-                class="flex flex-col items-center p-2 border rounded-xl bg-white shadow-sm hover:shadow-md transition-all w-24"
-              >
+              <div v-for="v in publication.vehicle_capacities" :key="v.type"
+                class="flex flex-col items-center p-2 border rounded-xl bg-white shadow-sm hover:shadow-md transition-all w-24">
                 <font-awesome-icon :icon="['fas', getVehicleIcon(v.type)]" class="text-gray-700 text-lg mb-1" />
                 <span class="text-xs capitalize text-gray-600">{{ getVehicleType(v.type) }}</span>
                 <span v-if="v.price_per_hour" class="text-xs font-semibold text-primary">
@@ -74,41 +61,24 @@
 
         <!-- Acciones -->
         <div class="flex items-center justify-between border-t border-gray-200 p-4 bg-gray-50">
-          <button
-            @click="editPublication(publication)"
-            class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
-          >
+          <button @click="editPublication(publication)"
+            class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
             <font-awesome-icon :icon="['fas', 'pen-to-square']" /> Editar
           </button>
-          <button
-            @click="openConfirm(publication)"
-            class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
-          >
+          <button @click="openConfirm(publication)"
+            class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
             <font-awesome-icon :icon="['fas', 'trash']" /> Eliminar
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Sin publicaciones -->
-    <p v-else class="text-gray-500 text-center py-10 text-sm">
-      No tienes publicaciones aún. <br />
-    </p>
+    <p v-else-if="!loading" class="text-gray-500">No tienes publicaciones anteriores.</p>
 
-    <!-- Modales -->
-    <EditPublications
-      :visible="openModal"
-      :spaceId="space?.id"
-      @close="openModal = false"
-      @updated="fetchPublications"
-    />
-    <ConfirmModal
-      :visible="showConfirmModal"
-      :message="modalConfig.message"
-      :button-text="modalConfig.buttonText"
-      @close="showConfirmModal = false"
-      @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }"
-    />
+    <EditPublications :visible="openModal" :spaceId="space?.id" @close="openModal = false"
+      @updated="fetchPublications" />
+    <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
+      @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
   </section>
 </template>
 
@@ -154,7 +124,7 @@ const loading = ref(true);
 const modalConfig = ref({
   message: '',
   buttonText: 'Aceptar',
-  onConfirm: () => {}
+  onConfirm: () => { }
 });
 
 function openConfirm(publication: Publication) {

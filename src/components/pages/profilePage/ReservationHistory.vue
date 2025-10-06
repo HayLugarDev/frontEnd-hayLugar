@@ -1,6 +1,5 @@
 <template>
   <section class="lg:bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
-    <!-- Título -->
     <div class="flex items-center justify-between mb-4">
       <div>
         <h2 class="text-2xl font-bold text-primary">📅 Tus reservas</h2>
@@ -8,21 +7,17 @@
       </div>
     </div>
 
-    <!-- Loading -->
     <div v-if="loading" class="space-y-4">
       <ItemSkeleton />
       <ItemSkeleton />
     </div>
 
-    <!-- Lista de reservas -->
-    <div v-else-if="reservations.length" class="space-y-4">
+    <div v-if="reservations.length" class="space-y-4">
       <div v-for="(reservation, index) in reservations" :key="index" :class="[
         'border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden',
         ['cancelled', 'completed', 'failed'].includes(reservation.status) && reservation.hasRating
           ? 'opacity-70 pointer-events-none'
-          : ''
-      ]">
-        <!-- Encabezado -->
+          : '']">
         <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
           <div>
             <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -39,7 +34,6 @@
           </span>
         </div>
 
-        <!-- Detalles principales -->
         <div class="p-5 space-y-3 text-sm text-gray-700">
           <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
             <p><span class="font-semibold">📍 Espacio:</span> {{ reservation.space.name }}</p>
@@ -52,12 +46,10 @@
             </p>
           </div>
 
-          <!-- Estado y mensajes -->
           <p class="text-gray-600 text-sm italic mt-2">
             {{ getStatusInfo(reservation.status).message }}
           </p>
 
-          <!-- Fechas -->
           <div class="flex flex-wrap justify-between items-center mt-2">
             <div class="text-sm">
               <p><span class="font-semibold">Check-In:</span> {{ formatDate(reservation.start_time) }}</p>
@@ -69,41 +61,42 @@
           </div>
         </div>
 
-        <!-- Acciones -->
-        <div class="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 bg-gray-50">
-          <!-- Check-in -->
-          <button v-if="reservation.status === 'approved'" @click="checkInInit(reservation)"
-            :disabled="!checkInEnabled[reservation.id]"
-            class="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl shadow hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-            <font-awesome-icon icon="right-to-bracket" /> Iniciar Check-In
-          </button>
+        <div v-if="!['cancelled', 'completed', 'failed'].includes(reservation.status)">
 
-          <!-- Check-out -->
-          <button v-if="reservation.status === 'in_progress'" @click="checkOutInit(reservation)"
-            class="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-600 transition-all">
-            <font-awesome-icon icon="right-from-bracket" /> Iniciar Check-Out
-          </button>
+          <div class="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 bg-gray-50">
 
-          <!-- Cancelar -->
-          <button v-if="reservation.status === 'pending'" @click="confirmCancelation(reservation)"
-            class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition-all">
-            <font-awesome-icon icon="ban" /> Cancelar
-          </button>
+            <!-- Check-in -->
+            <button v-if="reservation.status === 'approved'" @click="checkInInit(reservation)"
+              :disabled="!checkInEnabled[reservation.id]"
+              class="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl shadow hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              <font-awesome-icon icon="right-to-bracket" /> Iniciar Check-In
+            </button>
 
-          <!-- Calificar -->
-          <button v-if="reservation.status === 'completed' && !reservation.hasRating"
-            @click="showRatingModal = true; selectedReservation = reservation"
-            class="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-xl shadow hover:bg-yellow-600 transition-all">
-            <font-awesome-icon icon="star" /> Calificar experiencia
-          </button>
+            <!-- Check-out -->
+            <button v-if="reservation.status === 'in_progress'" @click="checkOutInit(reservation)"
+              class="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-600 transition-all">
+              <font-awesome-icon icon="right-from-bracket" /> Iniciar Check-Out
+            </button>
+
+            <!-- Cancelar -->
+            <button v-if="reservation.status === 'pending'" @click="confirmCancelation(reservation)"
+              class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition-all">
+              <font-awesome-icon icon="ban" /> Cancelar
+            </button>
+
+            <!-- Calificar -->
+            <button v-if="reservation.status === 'completed' && !reservation.hasRating"
+              @click="showRatingModal = true; selectedReservation = reservation"
+              class="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-xl shadow hover:bg-yellow-600 transition-all">
+              <font-awesome-icon icon="star" /> Calificar experiencia
+            </button>
+          </div>
         </div>
+
       </div>
     </div>
 
-    <!-- Sin reservas -->
-    <p v-else class="text-gray-500 text-center py-10 text-sm">
-      No tenés reservas aún.<br />
-    </p>
+    <p v-else-if="!loading" class="text-gray-500">No tienes reservas anteriores.</p>
 
     <!-- Modal CheckIn -->
     <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">

@@ -19,9 +19,9 @@
               <h3 class="text-lg font-semibold text-gray-800">{{ espacio?.name }}</h3>
               <p class="text-gray-600 text-sm">{{ espacio?.location }}</p>
               <div class="flex items-center gap-1 text-gray-700 text-sm mt-1">
-                <span><span class="text-yellow-600">★</span> 4,7</span>
-                <span>(32)</span>
-                <span class="font-medium">Excelente</span>
+                <span><span class="text-yellow-600">★</span> {{ espacio?.average_rating }}</span>
+                <span>({{ espacio?.space_reviews.length }})</span>
+                <span class="font-medium">{{ ratingLabel }}</span>
               </div>
             </div>
           </div>
@@ -176,6 +176,16 @@ onMounted(async () => {
 });
 
 const reserva = computed(() => reservationStore.reservation);
+
+const ratingLabel = computed(() => {
+  const rating = espacio.value?.average_rating || 0;
+
+  if (rating >= 4.5) return "Excelente ⭐";
+  if (rating >= 3.5) return "Muy bueno 👍";
+  if (rating >= 2.5) return "Bueno 🙂";
+  if (rating > 0) return "Regular 😐";
+  return "Sin calificaciones";
+});
 
 // Monto base y fee
 

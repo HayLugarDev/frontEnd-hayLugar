@@ -1,14 +1,13 @@
 <template>
   <section class="shadow-xl p-8 xl:p-10 md:rounded-2xl h-max border border-gray-200 bg-white space-y-2">
-    <!-- Título -->
     <h2 class="text-2xl font-bold text-primary mb-2">📅 Reservá tu espacio</h2>
     <p class="text-sm text-gray-600">Completá los siguientes pasos para confirmar tu reserva</p>
 
     <!-- Disponibilidad -->
     <div class="bg-blue-50 border border-blue-300 text-blue-800 rounded-lg px-4 py-3 text-sm font-medium">
-      <div v-if="availability.dateRange?.length === 2">
+      <div v-if="availability.dateRange && availability.dateRange?.length === 2">
         <span class="font-semibold">📆 Fechas disponibles:</span>
-        {{ formatDate(availability.dateRange[0]) }} - {{ formatDate(availability.dateRange[1]) }}
+        {{ availability.dateRange[0] }} - {{ availability.dateRange[1] }}
       </div>
       <div>
         <span class="font-semibold">⏰ Horarios disponibles:</span>
@@ -31,22 +30,23 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <!-- CheckIn -->
       <div class="flex flex-col border border-gray-200 rounded-xl p-3 bg-gray-50">
-        <label class="font-semibold mb-1">Entrada</label>
+        <label class="font-semibold mb-1">Check-in</label>
         <Datepicker :modelValue="tiempoInicial" @update:modelValue="$emit('update:tiempoInicial', $event)"
           :enable-time-picker="tipoPlazoReserva === 'Por hora'" :is24="true" :model-type="'timestamp'"
           :min-date="getMinDate()" :max-date="availability.dateRange ? availability.dateRange[1] : undefined"
           :min-time="parseTimeString(availability.start)" :max-time="parseTimeString(availability.end)"
-          placeholder="Seleccioná fecha y hora" />
+          placeholder="Entrada" />
       </div>
 
       <!-- CheckOut -->
       <div class="flex flex-col border border-gray-200 rounded-xl p-3 bg-gray-50">
-        <label class="font-semibold mb-1">Salida</label>
+        <label class="font-semibold mb-1">Check-out</label>
         <Datepicker :modelValue="tiempoFinal" @update:modelValue="$emit('update:tiempoFinal', $event)"
           :enable-time-picker="tipoPlazoReserva === 'Por hora'" :is24="true" :model-type="'timestamp'"
-          :min-date="minCheckOut" :max-date="maxCheckOut"
-          :min-time="tipoPlazoReserva === 'Por hora' ? parseTimeString(formatHour(new Date(tiempoInicial))) : parseTimeString(availability.start)"
-          :max-time="parseTimeString(availability.end)" placeholder="Seleccioná fecha y hora" />
+          :min-date="tipoPlazoReserva === 'Por hora' && tiempoInicial ? new Date(tiempoInicial) : (availability.dateRange ? availability.dateRange[0] : undefined)"
+          :max-date="tipoPlazoReserva === 'Por hora' && tiempoInicial ? new Date(tiempoInicial) : (availability.dateRange ? availability.dateRange[1] : undefined)"
+          :min-time="tipoPlazoReserva === 'Por hora' && tiempoInicial ? parseTimeString(formatHour(new Date(tiempoInicial))) : parseTimeString(availability.start)"
+          :max-time="parseTimeString(availability.end)" placeholder="Salida" />
       </div>
     </div>
 
@@ -70,7 +70,7 @@
 import MenuDropdown from "../layout/MenuDropdown.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 
 const props = defineProps({
   tipoVehiculo: String,
@@ -93,6 +93,18 @@ const emit = defineEmits([
   "reservar"
 ]);
 
+watch(
+  () => [props.tipoPlazoReserva, props.tiempoInicial],
+  ([plazo, checkIn]) => {
+    if (plazo === 'Por hora' && checkIn) {
+      // Si el checkout está vacío o es de otro día, lo setea al mismo día
+      const checkInDate = new Date(checkIn);
+      const defaultCheckOut = new Date(checkInDate.getTime() + 60 * 60 * 1000); // +1h
+      emit('update:tiempoFinal', defaultCheckOut.getTime());
+    }
+  }
+);
+
 // Helpers
 function parseTimeString(timeStr) {
   if (!timeStr) return undefined;
@@ -104,15 +116,10 @@ function formatHour(date) {
   return date.toTimeString().slice(0, 5);
 }
 
-function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
-}
-
 function getMinDate() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  if (props.availability.dateRange?.[0]) {
+  if (props.availability.dateRange && props.availability.dateRange?.[0]) {
     const start = new Date(props.availability.dateRange[0]);
     return start > today ? start : today;
   }
