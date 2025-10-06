@@ -74,6 +74,7 @@ import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkelet
 import { useGoogleMap } from '../logic/useGoogleMap';
 import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
 import ZoneNavbarButton from '../components/pages/dashboardPage/ZoneNavbarButton.vue';
+import { getReviewsBySpace } from '../services/reviewService';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -90,10 +91,6 @@ const showMap = ref(false);
 const showSearchMenu = ref(false);
 const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
 
-const gridCols = computed(() => {
-  return espacios.value.length < 4 ? 'grid-cols-1' : 'grid-cols-2';
-});
-
 const {
   center,
   zoom,
@@ -109,6 +106,7 @@ const obtenerEspacios = async () => {
   cargando.value = true;
   try {
     const spaces = await getAllSpaces();
+    console.log(spaces);
     if (!spaces || spaces.length < 1) {
       espacios.value = [];
       error.value = "Aún no hay espacios creados.";

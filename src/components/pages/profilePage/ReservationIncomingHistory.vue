@@ -1,6 +1,5 @@
 <template>
   <section class="lg:bg-white p-2 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3 border border-gray-200">
-    <!-- Título -->
     <div class="flex items-center justify-between mb-4">
       <div>
         <h2 class="text-2xl font-bold text-primary">🧾 Reservas entrantes</h2>
@@ -8,17 +7,14 @@
       </div>
     </div>
 
-    <!-- Skeleton -->
     <div v-if="loading" class="space-y-4">
       <ItemSkeleton />
       <ItemSkeleton />
     </div>
 
-    <!-- Lista de reservas -->
     <div v-else-if="reservations.length">
       <div v-for="(reservation, index) in reservations" :key="index"
         class="border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden mb-4">
-        <!-- Encabezado -->
         <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
           <div>
             <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -37,12 +33,11 @@
           </span>
         </div>
 
-        <!-- Cuerpo -->
         <div class="p-5 space-y-3 text-sm text-gray-700">
           <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
             <p><span class="font-semibold">📍 Espacio:</span> {{ reservation.space?.name ?? '—' }}</p>
             <p><span class="font-semibold">🗺️ Dirección:</span> {{ (reservation.space?.location || '—').split(',')[0]
-              }}</p>
+            }}</p>
             <p><span class="font-semibold">👤 Usuario:</span> {{ reservation.client?.name ?? '—' }}</p>
             <p>
               <span class="font-semibold">🚘 Vehículo:</span>
@@ -53,7 +48,6 @@
             </p>
           </div>
 
-          <!-- Mensaje -->
           <p class="text-sm text-gray-600 italic pt-2">
             {{ getStatusInfo(reservation.status).message }}
           </p>
@@ -84,13 +78,13 @@
               Pago Acreditado
             </span>
           </div>
+
           <!-- Countdown -->
           <div v-if="reservation.status === 'in_progress'" class="mt-2">
             <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold">
               ⏱ {{ countdowns[reservation.id] || 'Cargando...' }}
             </span>
           </div>
-          
         </div>
 
 
@@ -128,7 +122,23 @@
               <font-awesome-icon :icon="['fas', 'money-bill']" />
               {{ (quoteLoading && selectedReservation?.id === reservation.id) ? 'Calculando…' : 'Finalizar y cobrar' }}
             </button>
+
+            <span v-if="quote && selectedReservation?.id === reservation.id" class="text-sm text-gray-600 mt-2 sm:mt-0">
+              Total: {{ formatCents(quote.final_cents) }}
+              <span v-if="quote.penalty_cents > 0">• Penalidad: {{ formatCents(quote.penalty_cents) }}</span>
+              <span v-if="quote.remainder_cents > 0" class="text-amber-600">
+                • Resto vs hold:
+                {{ formatCents(quote.remainder_cents) }}
+              </span>
+            </span>
           </template>
+
+          <!-- Aviso -->
+          <div v-else class="mt-3 text-sm text-gray-500">
+            <span v-if="isApprovedLike(reservation.status)">
+              A la espera de la retención de pago para poder finalizar.
+            </span>
+          </div>
 
           <!-- CANCELAR -->
           <button v-if="!['pending', 'cancelled', 'completed', 'failed', 'verified'].includes(reservation.status)"
@@ -148,6 +158,9 @@
     <!-- Modales -->
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage || 'Ocurrió un error'"
       icon="/src/assets/logo.png" @confirm="showErrorModal = !showErrorModal" />
+
+    <StatusModal :visible="showSuccessModal" title="¡Éxito!" :message="'Verificación exitosa.'"
+      icon="/src/assets/logo.png" @confirm="goToReservation" />
 
     <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
       @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
