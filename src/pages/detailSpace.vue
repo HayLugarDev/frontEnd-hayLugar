@@ -10,23 +10,23 @@
 
         <!-- Info del anfitrión -->
         <section v-if="espacio?.host"
-          class="col-span-3 bg-secondary p-6 px-10 rounded-xl lg:shadow-md mt-6 font-normal">
-          <div class="flex flex-row items-center gap-4">
-            <img :src="hostImage" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
-            <div class="flex flex-col pl-4 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800 text-sm">
-              <div class="flex flex-row gap-1 items-center">
-                <p class="text-lg font-semibold">Anfitrión: </p><span>{{ capitalizeFirst(espacio.host.name) }} {{
-                  capitalizeFirst(espacio.host.last_name)
-                }}</span>
+          class="col-span-3 bg-white p-6 px-10 rounded-xl shadow-md mt-6 font-normal border border-gray-200 transition-all hover:shadow-xl">
+          <div class="flex flex-row items-center gap-6">
+            <img :src="hostImage" alt="Imagen del anfitrión"
+              class="w-20 h-20 rounded-full shadow-lg border-2 border-primary" />
+            <div class="flex flex-col gap-2 w-full text-gray-800 text-base">
+              <div class="flex flex-row gap-2 items-center">
+                <span class="text-lg font-bold text-primary">Anfitrión:</span>
+                <span class="font-semibold">{{ capitalizeFirst(espacio.host.name) }} {{
+                  capitalizeFirst(espacio.host.last_name) }}</span>
               </div>
-              <div class="flex flex-row gap-1 items-center">
-                <p v-if="espacio.host.phone">
-                  <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-800" />
-                  <span>+549{{ espacio.host.phone }}</span>
-                </p>
+              <div v-if="espacio.host.phone" class="flex flex-row gap-2 items-center">
+                <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-600" />
+                <span class="font-medium">+549{{ espacio.host.phone }}</span>
               </div>
-              <div class="flex flex-row gap-1 items-center">
-                <p class="font-semibold">Email: </p><span>{{ espacio.host.email }}</span>
+              <div class="flex flex-row gap-2 items-center">
+                <span class="font-semibold">Email:</span>
+                <span class="font-medium">{{ espacio.host.email }}</span>
               </div>
             </div>
             <BackButton class="md:hidden" />
@@ -34,22 +34,19 @@
         </section>
 
         <!-- Título + Favorito + Compartir -->
-        <div class="flex flex-row items-center justify-between mt-4 px-6 md:px-2">
-          <h1 class="text-3xl sm:text-2xl font-bold p-2 text-primary">{{ capitalizeFirst(espacio.name) }}</h1>
-
-          <div class="flex flex-row items-center gap-3">
-            <!-- Corazón Favorito Moderno -->
-            <button @click="toggleFavourite" class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-300 ease-in-out
-             hover:scale-110 hover:shadow-xl
-             bg-white" :class="activedFavouriteIcon ? 'bg-red-100 text-red-500' : 'bg-gray-100 text-gray-700'"
+        <div
+          class="flex flex-row items-center justify-between mt-4 px-6 md:px-2 sticky top-0 bg-white z-10 rounded-xl shadow-sm py-2">
+          <h1 class="text-3xl sm:text-2xl font-bold text-primary pl-2">{{ capitalizeFirst(espacio.name) }}</h1>
+          <div class="flex flex-row items-center gap-4">
+            <button @click="toggleFavourite"
+              class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-200 hover:scale-110 bg-white border-2 border-gray-200 hover:border-red-400"
+              :class="activedFavouriteIcon ? 'bg-red-100 text-red-500' : 'bg-gray-100 text-gray-700'"
               title="Agregar a favoritos">
               <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" class="text-2xl" />
             </button>
-
-            <!-- Botón Compartir Moderno -->
-            <button @click="sharePublication" class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-all duration-300
-             hover:scale-110 hover:shadow-xl
-             bg-white text-gray-700 hover:text-primary" title="Compartir publicación">
+            <button @click="sharePublication"
+              class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-200 hover:scale-110 bg-white border-2 border-gray-200 hover:border-blue-400 text-gray-700 hover:text-primary"
+              title="Compartir publicación">
               <font-awesome-icon :icon="['fas', 'share-alt']" class="text-xl" />
             </button>
           </div>
@@ -59,13 +56,13 @@
         <div class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-4 h-[400px]">
           <div class="col-span-4 row-span-8">
             <img :src="espacio.images[0]" alt="Principal"
-              class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer"
+              class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer transition-transform duration-200 hover:scale-105"
               @click="openImageModal(0)" />
           </div>
           <template v-for="(img, index) in espacio.images.slice(1, 5)" :key="index">
             <div :class="imageGridPosition(index)">
               <img :src="img" alt="Espacio"
-                class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer"
+                class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer transition-transform duration-200 hover:scale-105"
                 @click="openImageModal(index + 1)" />
             </div>
           </template>
@@ -79,34 +76,33 @@
         <!-- Info general + Formulario -->
         <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
           <!-- Información del espacio -->
-          <div class="col-span-6 grid grid-cols-3 gap-1 sm:gap-4 p-10">
+          <div class="col-span-6 grid grid-cols-3 gap-4 p-10">
             <div class="col-span-2">
-              <p v-if="espacio.location" class="text-md font-bold text-gray-800">
+              <p v-if="espacio.location" class="text-md font-bold text-gray-800 mb-1">
                 {{ espacio.location.split(',')[1] || '' }}
               </p>
-              <p class="text-sm md:text-2xl text-gray-500 font-semibold">{{ espacio.location.split(',')[0] }}</p>
-              <div class="my-4">
-                <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-2 px-6 border-2 shadow-xl">
-                  <p class="font-semibold text-2xl">
+              <p class="text-sm md:text-lg text-gray-500 font-semibold mb-4">{{ espacio.location.split(',')[0] }}</p>
+              <div class="my-4 flex flex-col gap-3">
+                <div v-for="v in espacio.vehicle_capacities" :key="v.type"
+                  class="p-3 px-6 border-2 rounded-xl shadow-md bg-gray-50 flex flex-col gap-1">
+                  <p class="font-semibold text-xl flex items-center gap-2">
+                    <font-awesome-icon :icon="['fas', getVehicleType(v.type)]" class="text-primary" />
                     {{ getVehicleType(v.type) }}
                   </p>
-                  <p v-if="v.price_per_hour" class="font-normal">
-                    Precio por hora: ${{ v.price_per_hour.toLocaleString() }}
-                  </p>
+                  <span v-if="v.price_per_hour"
+                    class="inline-block bg-blue-100 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                    ${{ v.price_per_hour.toLocaleString() }} / hora
+                  </span>
                 </div>
-
               </div>
             </div>
-
-            <div class="col-start-3 flex flex-col items-end text-xl">
+            <div class="col-start-3 flex flex-col items-end text-xl gap-2">
               <span :class="avgRating ? 'text-yellow-600' : 'text-gray-400'">
                 ⭐ <span class="text-black">{{ totalReviews > 0 ? avgRating.toFixed(1) : '5.0' }}</span>
               </span>
-
               <span class="font-sans cursor-pointer hover:underline text-xs sm:text-md" @click="openReviews">
                 {{ totalReviews > 0 ? `${totalReviews} calificaciones` : "Sin calificaciones" }}
               </span>
-
             </div>
           </div>
 
@@ -122,34 +118,38 @@
           <div v-else-if="isOwner"
             class="col-span-10 lg:col-span-4 flex justify-center items-start p-6 order-5 lg:order-3">
             <button @click="editPublication()"
-              class="px-6 py-3 rounded-full bg-gradient-to-r from-indigo-500 to-primary text-white font-semibold shadow-lg hover:from-indigo-600 hover:to-primary transition-all duration-300">
+              class="px-8 py-4 rounded-full bg-gradient-to-r from-indigo-500 to-primary text-white font-bold shadow-lg hover:from-indigo-600 hover:to-primary transition-all duration-300 text-xl">
               ✏️ Editar publicación
             </button>
           </div>
 
           <!-- No logueado -->
           <div v-else-if="!isLogged"
-            class="col-span-10 lg:col-span-4 flex flex-col items-center justify-center p-6 bg-white lg:rounded-xl shadow-lg border border-gray-200 text-center order-5 lg:order-3">
+            class="col-span-10 lg:col-span-4 flex flex-col items-center justify-center p-8 bg-white lg:rounded-xl shadow-lg border border-gray-200 text-center order-5 lg:order-3">
+            <font-awesome-icon icon="user-lock" class="text-4xl text-primary mb-2" />
             <h2 class="text-2xl font-bold text-primary mb-2">¡Inicia sesión para reservar!</h2>
             <p class="text-gray-600 mb-6">Debes estar autenticado para poder seleccionar un vehículo y completar tu
               reserva.</p>
             <router-link to="/login"
-              class="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary-dark transition-all">Iniciar
+              class="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary-dark transition-all font-semibold">Iniciar
               sesión</router-link>
             <router-link to="/register" class="mt-3 text-primary underline">¿No tienes cuenta? Regístrate
               aquí</router-link>
           </div>
 
           <!-- Descripción -->
-          <section class="col-span-10 lg:border border-gray-300 p-4 lg:rounded-lg text-xl order-6">
-            <p class="font-semibold">Descripción:</p>
-            <p class="text-gray-600 font-medium">{{ espacio.description }}</p>
+          <section class="col-span-10 border border-gray-300 p-6 rounded-xl text-xl order-6 bg-white shadow-md">
+            <p class="font-semibold flex items-center gap-2">
+              <font-awesome-icon icon="info-circle" class="text-primary" />
+              Descripción:
+            </p>
+            <p class="text-gray-600 font-medium mt-2">{{ espacio.description }}</p>
           </section>
 
           <!-- Mapa -->
           <div
-            class="col-span-10 flex flex-col justify-center items-start h-[350px] order-7 relative overflow-hidden p-4 rounded-xl">
-            <p class="px-4 font-semibold">Ubicación en el mapa:</p>
+            class="col-span-10 flex flex-col justify-center items-start h-[350px] order-7 relative overflow-hidden p-4 rounded-xl bg-white shadow-md border border-gray-200">
+            <p class="px-4 font-semibold mb-2">Ubicación en el mapa:</p>
             <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
               class="absolute inset-0 w-full h-full rounded-xl overflow-hidden shadow-md">
               <GMapMarker :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="{

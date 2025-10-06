@@ -64,24 +64,9 @@ import { ref, onMounted, computed } from 'vue';
 import { capitalizeFirst } from '../../../utils/capitalizeFirstCharAt';
 import { formatDate } from '../../../utils/FormatDate';
 import Carousel from '../../common/Carousel.vue';
-import { getReviewsBySpace } from '../../../services/reviewService';
 
 const props = defineProps({
     espacio: Object
-});
-
-const avgRating = ref(0);
-const totalReviews = ref(0);
-
-onMounted(async () => {
-    // try {
-    //     const res = await getReviewsBySpace(props.espacio.id);
-    //     console.log(res);
-    //     avgRating.value = res.avgRating;
-    //     totalReviews.value = res.totalReviews;
-    // } catch (error) {
-    //     console.error('Error al cargar reseñas', error);
-    // }
 });
 
 const disponibilidad = computed(() => {
