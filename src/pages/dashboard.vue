@@ -8,7 +8,7 @@
       <button v-if="!showSearchMenu" @click="toggleSearchMenu"
         class="flex flex-row md:hidden mt-20 items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
         <font-awesome-icon icon="search" class="text-xs" />
-        <span>Comenzar búsqueda</span>
+        <span>Encontra tu espacio</span>
       </button>
       <div
         class="hidden md:grid md:grid-cols-11 gap-2 sm:gap-4 items-center justify-center overflow-visible px-8 lg:px-2 py-2 sm:py-4 shadow-md border-b-2 bg-primary rounded-md">
@@ -25,9 +25,11 @@
         <ZoneNavbarButton @click="router.push('/universidades')" :text="'🎓🏛️ Universidades'" />
         <ZoneNavbarButton @click="router.push('/meteredParkingDashboard')" :text="'🅿️ Estacionamiento Medido'" />
       </div> -->
-      
+
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
-        <AdvancedMobileSearch />
+        <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
+          v-model:publishedDate="publishedDate" v-model:maxPrice="maxPrice" v-model:sortBy="sortBy" @search="buscar"
+          @close="showSearchMenu = false" />
       </div>
 
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
@@ -74,15 +76,12 @@ import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkelet
 import { useGoogleMap } from '../logic/useGoogleMap';
 import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
 import ZoneNavbarButton from '../components/pages/dashboardPage/ZoneNavbarButton.vue';
-import { getReviewsBySpace } from '../services/reviewService';
 
 const router = useRouter();
-const userStore = useUserStore();
 
 const searchQuery = ref("");
 const checkIn = ref("");
 const checkOut = ref("");
-const rangoTiempo = ref("hora");
 const refSeccionResultados = ref(null);
 const espacios = ref([]);
 const cargando = ref(true);
@@ -90,6 +89,10 @@ const error = ref(null);
 const showMap = ref(false);
 const showSearchMenu = ref(false);
 const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
+
+const publishedDate = ref(null);
+const maxPrice = ref('');
+const sortBy = ref('nearest');
 
 const {
   center,
@@ -131,12 +134,14 @@ const buscar = async () => {
   cargando.value = true;
   try {
     const response = await getFilteredSpaces({
-      searchQuery: searchQuery?.value,
-      checkIn: checkIn?.value,
-      checkOut: checkOut?.value,
+      searchQuery: searchQuery.value,
+      checkIn: checkIn.value,
+      checkOut: checkOut.value,
+      publishedDate: publishedDate.value,
+      maxPrice: maxPrice.value,
+      sortBy: sortBy.value,
     });
 
-    console.log(response);
     espacios.value = response;
     await nextTick();
     cargando.value = false;
