@@ -2,6 +2,7 @@
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-xl p-4 w-full max-w-lg relative">
       <h2 class="text-lg font-bold mb-2">Seleccioná la ubicación</h2>
+
       <GMapMap
         :center="marker"
         :zoom="15"
@@ -10,6 +11,9 @@
       >
         <GMapMarker :position="marker" />
       </GMapMap>
+
+      <p v-if="address" class="text-gray-600 text-sm mt-2 italic">{{ address }}</p>
+
       <div class="flex justify-end mt-4 space-x-3">
         <button @click="$emit('close')" class="px-4 py-2 border rounded-lg">Cancelar</button>
         <button @click="confirmSelection" class="px-4 py-2 bg-primary text-white rounded-lg">Confirmar</button>
@@ -22,17 +26,26 @@
 import { ref } from 'vue'
 
 const marker = ref({ lat: -26.8083, lng: -65.2176 }) // San Miguel de Tucumán por defecto
-
+const address = ref('')
 const emit = defineEmits(['close', 'selected'])
 
 const updateMarker = (event) => {
-  marker.value = {
-    lat: event.latLng.lat(),
-    lng: event.latLng.lng()
-  }
+  const lat = event.latLng.lat()
+  const lng = event.latLng.lng()
+  marker.value = { lat, lng }
+
+  const geocoder = new google.maps.Geocoder()
+  geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+    if (status === 'OK' && results[0]) {
+      address.value = results[0].formatted_address
+    } else {
+      address.value = 'Ubicación seleccionada manualmente'
+    }
+  })
 }
 
 const confirmSelection = () => {
   emit('selected', marker.value)
+  emit('close')
 }
 </script>
