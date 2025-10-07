@@ -60,8 +60,17 @@
       <div v-if="price_unit === 'week' || price_unit === 'month'" class="mt-4">
         <fieldset class="border p-4 rounded-lg">
           <legend class="text-lg font-semibold text-black">Selecciona un período</legend>
-          <DatePicker v-model:value="availabilityDateRange" type="daterange" format="YYYY-MM-DD"
-            placeholder="Selecciona una fecha de inicio" class="w-full" />
+          <!--<DatePicker v-model:value="availabilityDateRange" type="daterange" format="YYYY-MM-DD"
+            placeholder="Selecciona una fecha de inicio" class="w-full" />-->
+
+            <DatePicker
+            v-model:value="availabilityDateRange"
+            type="date"
+            :range="true"
+            format="YYYY-MM-DD"
+            placeholder="Selecciona una fecha de inicio"
+            class="w-full"
+            />
         </fieldset>
       </div>
 
