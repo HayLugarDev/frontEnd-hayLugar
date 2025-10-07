@@ -531,4 +531,5 @@ const capitalizeDay = (day) => {
 }
 .day-chip:hover {
   @apply bg-primary text-white;
-}</style>
+}
+</style>
