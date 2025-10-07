@@ -13,7 +13,7 @@
         <!-- Botones de navegación -->
         <div class="flex justify-end mt-6 space-x-4">
             <button @click="type ? $emit('next') : (showErrorModal = true)"
-                class="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition duration-300">
+                class="px-8 py-2 bg-gradient-to-r from-indigo-500 to-primary text-white rounded-full font-bold shadow-lg hover:from-indigo-600 hover:to-primary-dark transition-all duration-300">
                 Siguiente
             </button>
         </div>
