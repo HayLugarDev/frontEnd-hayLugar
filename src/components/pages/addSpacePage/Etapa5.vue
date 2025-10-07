@@ -10,6 +10,9 @@
                     <span class="font-semibold">📍 Nombre:</span> {{ modelValue.name }}
                 </li>
                 <li class="flex items-center gap-2">
+                    <span class="font-semibold">📬 Dirección:</span> {{ modelValue.location }}, {{ modelValue.locationDetails }}
+                </li>
+                <li class="flex items-center gap-2">
                     <span class="font-semibold">🏷️ Tipo de espacio:</span> {{ modelValue.parking_type }}
                 </li>
                 <li class="flex items-center gap-2">
@@ -33,7 +36,7 @@
             </ul>
 
             <!-- Acciones -->
-            <div class="flex flex-col md:flex-row gap-4 justify-between mt-8">
+            <div class="flex flex-col gap-4 justify-between mt-8">
                 <button @click="emit('prev')"
                     class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold shadow hover:bg-gray-300 transition">
                     ✏️ Volver a editar

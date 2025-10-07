@@ -90,15 +90,32 @@ const handlePlaceChanged = (place) => {
 }
 
 const handleManualLocation = ({ lat, lng }) => {
-    direccion.value = 'Ubicación seleccionada manualmente';
-    emit('update:modelValue', {
+  const geocoder = new google.maps.Geocoder()
+
+  geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+    if (status === 'OK' && results[0]) {
+      const fullAddress = results[0].formatted_address
+      direccion.value = fullAddress
+      emit('update:modelValue', {
+        ...props.modelValue,
+        location: fullAddress,
+        latitude: lat,
+        longitude: lng
+      })
+    } else {
+      // Si falla el geocoder, dejamos una etiqueta genérica
+      direccion.value = 'Ubicación seleccionada manualmente'
+      emit('update:modelValue', {
         ...props.modelValue,
         location: direccion.value,
         latitude: lat,
         longitude: lng
-    })
+      })
+    }
     showManualMap.value = false
+  })
 }
+
 
 const nextStep = () => {
     if (!props.modelValue.location) {
