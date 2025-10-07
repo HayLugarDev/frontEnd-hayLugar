@@ -10,6 +10,9 @@
                     <span class="font-semibold">📍 Nombre:</span> {{ modelValue.name }}
                 </li>
                 <li class="flex items-center gap-2">
+                    <span class="font-semibold">📬 Dirección:</span> {{ modelValue.location }}, {{ modelValue.locationDetails }}
+                </li>
+                <li class="flex items-center gap-2">
                     <span class="font-semibold">🏷️ Tipo de espacio:</span> {{ modelValue.parking_type }}
                 </li>
                 <li class="flex items-center gap-2">
