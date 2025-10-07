@@ -12,26 +12,22 @@
                 <li class="flex items-center gap-2">
                     <span class="font-semibold">🏷️ Tipo de espacio:</span> {{ modelValue.parking_type }}
                 </li>
-                <li class="flex flex-col items-start gap-2">
-                    <span class="font-semibold">📝 Descripción:</span>
-                    <span class="pl-2 font-semibold">{{ modelValue.description }}</span>
-                </li>
                 <li class="flex items-center gap-2">
-                    <span class="font-semibold">📢 Publicar:</span>
+                    <span class="font-semibold">📢 Publicación activa:</span>
                     <span
                         :class="modelValue.status === 'active' ? 'text-green-600 font-medium' : 'text-red-600 font-medium'">
                         {{ modelValue.status === "active" ? "Sí" : "No" }}
                     </span>
                 </li>
+                <li class="flex flex-col items-start gap-2">
+                    <span class="font-semibold">📝 Descripción:</span>
+                    <span class="pl-2 font-semibold">{{ modelValue.description }}</span>
+                </li>
                 <li>
                     <span class="font-semibold">🖼️ Imágenes cargadas:</span>
                     <div class="flex flex-wrap gap-2 mt-2">
-                        <img
-                            v-for="(img, index) in modelValue.images"
-                            :key="index"
-                            :src="getImageSrc(img)"
-                            class="w-20 h-20 object-cover rounded-lg shadow border"
-                        />
+                        <img v-for="(img, index) in modelValue.images" :key="index" :src="getImageSrc(img)"
+                            class="w-20 h-20 object-cover rounded-lg shadow border" />
                     </div>
                 </li>
             </ul>
@@ -43,8 +39,8 @@
                     ✏️ Volver a editar
                 </button>
                 <button type="button" @click="submitForm"
-                    class="flex-1 bg-green-600 text-white px-6 py-3 rounded-xl font-semibold shadow hover:bg-green-700 transition">
-                    <img v-if="cargando" :src="loadIcon" alt="Cargando" class="w-6 h-6" />
+                    class="w-full flex flex-row justify-center px-8 py-2 bg-gradient-to-r from-indigo-500 to-primary text-white rounded-full font-bold shadow-lg hover:from-indigo-600 hover:to-primary-dark transition-all duration-300">
+                    <img v-if="cargando" :src="loadIcon" alt="Cargando" class="w-6 h-6 text-center" />
                     <span class="text-white" v-else>Confirmar y Publicar</span>
                 </button>
             </div>
@@ -68,15 +64,16 @@ const getImageSrc = (img: string | File | null | undefined) => {
 };
 
 onUnmounted(() => {
-  props.modelValue.images.forEach((img: string | File | null | undefined) => {
-    if (img instanceof File) {
-      URL.revokeObjectURL(img as any);
-    }
-  });
+    props.modelValue.images.forEach((img: string | File | null | undefined) => {
+        if (img instanceof File) {
+            URL.revokeObjectURL(img as any);
+        }
+    });
 });
 
 
 const submitForm = () => {
+    cargando.value = true;
     emit('submit');
 };
 </script>
