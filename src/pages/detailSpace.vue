@@ -95,6 +95,30 @@
                   </span>
                 </div>
               </div>
+              <!-- Días disponibles -->
+              <div v-if="disponibilidad.days" class="mt-4">
+                <p class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-2">
+                  <font-awesome-icon icon="calendar-days" class="text-primary text-xl" />
+                  Días disponibles
+                </p>
+
+                <!-- Si está disponible todos los días -->
+                <div v-if="disponibilidad.allDays" class="flex items-center gap-2">
+                  <span
+                    class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full font-medium shadow-sm">
+                    <font-awesome-icon icon="check-circle" />
+                    Disponible todos los días
+                  </span>
+                </div>
+
+                <!-- Si tiene días específicos -->
+                <div v-else class="flex flex-wrap gap-2 mt-1">
+                  <span v-for="day in disponibilidad.days" :key="day"
+                    class="day-chip border border-primary/30 bg-primary/10 text-primary">
+                    {{ capitalizeDay(day) }}
+                  </span>
+                </div>
+              </div>
             </div>
             <div class="col-start-3 flex flex-col items-end text-xl gap-2">
               <span :class="avgRating ? 'text-yellow-600' : 'text-gray-400'">
@@ -486,7 +510,25 @@ const toggleFavourite = async () => {
   }
 };
 
+const capitalizeDay = (day) => {
+  const map = {
+    monday: "Lunes",
+    tuesday: "Martes",
+    wednesday: "Miércoles",
+    thursday: "Jueves",
+    friday: "Viernes",
+    saturday: "Sábado",
+    sunday: "Domingo",
+  };
+  return map[day.toLowerCase()] || day;
+};
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.day-chip {
+  @apply px-3 py-1 rounded-full text-sm font-semibold transition-all;
+}
+.day-chip:hover {
+  @apply bg-primary text-white;
+}</style>
