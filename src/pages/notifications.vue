@@ -159,7 +159,6 @@ const fetchNotifications = async () => {
     try {
         const response = await api.get(`notifications/${userId}`);
         notifications.value = response.data;
-        console.log(notifications.value);
 
         // 🚀 Marcar como leídas
         const unreadIds = notifications.value

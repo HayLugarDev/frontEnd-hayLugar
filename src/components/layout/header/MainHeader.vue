@@ -106,11 +106,6 @@ const handleNavigate = (path: string) => {
   }
 };
 
-function toggleNotifications() {
-  console.log('Mostrar panel de notificaciones');
-  hasUnread.value = false;
-}
-
 function toggleMap() {
   showMap.value = !showMap.value;
   showMobileMenu.value = false;

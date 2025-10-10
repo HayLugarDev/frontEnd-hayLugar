@@ -44,7 +44,6 @@ export const useUserStore = defineStore('user', {
       try {
         const response = await api.get('/auth/google-session', { withCredentials: true });
         // Manejo defensivo de la forma de la respuesta
-        console.log(response.data);
         const user = response.data?.user ?? response.data;
         if (!user?.id) {
           throw new Error('No se recibió user desde /auth/google-session');

@@ -145,7 +145,6 @@ const fetchVehicles = async () => {
       vehiculos.value = [];
       errorMessage.value = 'Aún no hay vehículos cargados.';
     } else {
-      console.log(vehiculos.value);
       vehiculos.value = vehicles;
     }
   } catch (err) {
@@ -162,7 +161,6 @@ const editVehicles = async () => {
   return modoEdicion.value = true;
 }
 const guardarVehiculos = async () => {
-  console.log(vehiculos.value);
 
   // Validación personalizada
   const vehiculosInvalidos = vehiculos.value.filter((v) => {

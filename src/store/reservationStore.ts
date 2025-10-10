@@ -49,7 +49,6 @@ export const useReservationStore = defineStore('reservation', {
       }
 
       this.reservation = { ...this.reservation, ...data };
-      console.log("Reserva actualizada:", this.reservation);
     },
 
     /**
@@ -61,7 +60,6 @@ export const useReservationStore = defineStore('reservation', {
       try {
         const response = await api.post('/reservations/create', this.reservation);
         this.reservation.id = response.data.reservation.id;
-        console.log("Reserva creada con ID:", response.data.reservation.id);
         return response.data;
       } catch (error) {
         this.error = 'Error al crear la reserva';

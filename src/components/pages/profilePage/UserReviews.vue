@@ -91,7 +91,7 @@ onMounted(async () => {
     const res = await getReviewsByUser(userId);
     reviews.value = res || [];
   } catch (error) {
-    console.log("Error al cargar calificaciones: ", error);
+    console.error("Error al cargar calificaciones: ", error);
   } finally {
     loading.value = false;
   }
