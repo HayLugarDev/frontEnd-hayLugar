@@ -51,6 +51,7 @@
 import MainHeader from '../components/layout/header/MainHeader.vue'
 import GoogleLogin from '../components/layout/GoogleLogin.vue'
 import logo from '../assets/logo.png'
+import BackButton from '../components/common/BackButton.vue';
 </script>
 
 <style scoped>

@@ -6,7 +6,7 @@
     <li v-if="user" @click="$emit('navigate', '/notifications')" class="menu-item">
       <font-awesome-icon icon="bell" /> <span>Notificaciones</span>
     </li>
-    <li v-if="!user" @click="$emit('navigate', '/register')" class="menu-item">
+    <li v-if="!user" @click="$emit('navigate', '/login')" class="menu-item">
       <font-awesome-icon icon="user-plus" /> <span>Registrarse</span>
     </li>
     <li v-if="!user" @click="$emit('navigate', '/login')" class="menu-item">
