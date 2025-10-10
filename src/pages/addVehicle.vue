@@ -159,7 +159,6 @@ const currentComponent = computed(() => components[step.value])
 
 function nextStep() {
     if (step.value < 5) step.value++
-    console.log(vehicleData.value);
 };
 
 function prevStep() {
@@ -168,16 +167,13 @@ function prevStep() {
 
 const addVehicle = async () => {
 
-    console.log(vehicleData.value);
     const payload = { ...vehicleData.value }; // Copia para modificar sin afectar el estado reactivo
-    console.log(payload);
 
     try {
         const response = await api.post('/vehicles/create', payload, {
             withCredentials: true
         });
         showSuccessModal.value = true;
-        console.log(response);
         emit('success');
         resetValues();
     } catch (error) {

@@ -59,6 +59,7 @@
       </div>
     </div>
   </div>
+  <WelcomeSpeech />
 </template>
 
 <script setup>
@@ -76,6 +77,7 @@ import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkelet
 import { useGoogleMap } from '../logic/useGoogleMap';
 import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
 import ZoneNavbarButton from '../components/pages/dashboardPage/ZoneNavbarButton.vue';
+import WelcomeSpeech from '../components/layout/WelcomeSpeech.vue';
 
 const router = useRouter();
 
@@ -109,7 +111,6 @@ const obtenerEspacios = async () => {
   cargando.value = true;
   try {
     const spaces = await getAllSpaces();
-    console.log(spaces);
     if (!spaces || spaces.length < 1) {
       espacios.value = [];
       error.value = "Aún no hay espacios creados.";
