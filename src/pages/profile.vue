@@ -23,41 +23,52 @@
       <transition name="fade-step" mode="out-in">
         <KeepAlive>
           <section v-if="activeSection === 'datos'" key="datos"
-            class="w-full md:w-2/3 bg-white p-12 rounded-lg shadow-lg">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div class="flex items-center justify-around gap-4 flex-wrap">
-                <button @click="cambiarFoto" class="relative flex items-center px-4 py-2 rounded-full">
-                  <font-awesome-icon icon="camera" class="mr-2 absolute bottom-2 right-4 text-primary" />
-                  <img :src="usuario.profile_picture || defaultProfilePicture" alt="Foto de perfil" @click="cambiarFoto"
-                    class="w-24 h-24 object-cover rounded-full shadow-lg" />
-                </button>
-                <div class="flex flex-col">
-                  <h2 class="text-2xl font-bold">
+            class="w-full md:w-2/3 bg-white p-10 md:p-12 rounded-2xl shadow-xl border border-gray-100 transition-all">
+            <!-- Encabezado con foto y datos -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div class="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto">
+                <!-- Foto de perfil -->
+                <div class="relative group">
+                  <img :src="usuario.profile_picture || defaultProfilePicture" alt="Foto de perfil"
+                    class="w-28 h-28 md:w-32 md:h-32 object-cover rounded-full shadow-lg ring-4 ring-blue-100 group-hover:ring-blue-300 transition-all cursor-pointer"
+                    @click="cambiarFoto" />
+                  <button @click="cambiarFoto"
+                    class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-md hover:bg-blue-700 transition"
+                    title="Cambiar foto">
+                    <font-awesome-icon icon="camera" />
+                  </button>
+                </div>
+
+                <!-- Datos del usuario -->
+                <div class="text-center sm:text-left">
+                  <h2 class="text-2xl font-bold text-gray-800">
                     {{ usuario.name }} {{ usuario.last_name }}
                   </h2>
-                  <p class="text-gray-600 flex items-center">
-                    <font-awesome-icon icon="envelope" class="mr-2" />
+                  <p class="text-gray-600 flex items-center justify-center sm:justify-start mt-1">
+                    <font-awesome-icon icon="envelope" class="mr-2 text-primary" />
                     {{ usuario.email }}
                   </p>
-                  <p class="text-gray-600 flex items-center">
-                    <font-awesome-icon icon="id-card" class="mr-2" />
+                  <p v-if="usuario.dni" class="text-gray-600 flex items-center justify-center sm:justify-start mt-1">
+                    <font-awesome-icon icon="id-card" class="mr-2 text-primary" />
                     DNI: {{ usuario.dni }}
                   </p>
-                  <p v-if="isAdmin" class="text-xs mt-1 inline-flex items-center gap-1 text-green-700">
+                  <p v-if="isAdmin"
+                    class="text-xs mt-2 inline-flex items-center gap-1 text-green-700 justify-center sm:justify-start">
                     <span class="inline-block h-2 w-2 rounded-full bg-green-600"></span>
                     Admin
                   </p>
                 </div>
-                <button @click="verifyToken('/quit')"
-                  class="p-2 text-red-600 md:hidden border-2 rounded-xl hover:border-red-600">
-                  Cerrar sesión
-                </button>
               </div>
-              <div></div>
+
+              <!-- Botón de cerrar sesión (solo móvil) -->
+              <button @click="verifyToken('/quit')"
+                class="p-2 text-red-600 md:hidden border-2 border-transparent rounded-xl hover:border-red-600 hover:bg-red-50 transition font-semibold">
+                Cerrar sesión
+              </button>
             </div>
 
-            <!-- Formulario de Datos Personales -->
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-1">
+            <!-- Formulario -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField v-model="usuario.name" label="NOMBRE" type="text" required />
               <FormField v-model="usuario.last_name" label="APELLIDO" type="text" required />
               <FormField v-model="usuario.email" label="EMAIL" type="text" required />
@@ -65,12 +76,14 @@
               <FormFieldAutocomplete v-model="usuario.address" label="DIRECCIÓN" class="md:col-span-2" />
             </div>
 
-            <!-- Botón para Guardar Todos los Cambios -->
-            <button @click="guardarTodo"
-              class="w-full bg-accent mt-6 text-white p-4 rounded-lg text-lg font-bold shadow-md hover:shadow-xl transition-all">
-              <font-awesome-icon icon="save" class="mr-2" />
-              Guardar Cambios
-            </button>
+            <!-- Botón Guardar -->
+            <div class="mt-8">
+              <button @click="guardarTodo"
+                class="w-full bg-primary text-white py-4 rounded-xl text-lg font-semibold shadow-md hover:shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                <font-awesome-icon icon="save" class="text-lg" />
+                Guardar Cambios
+              </button>
+            </div>
           </section>
 
           <VehicleSection v-else-if="activeSection === 'vehicles'" key="vehicles" />
@@ -88,7 +101,7 @@
           <UserReviews v-else-if="activeSection === 'calificaciones'" key="reviews" />
 
           <PayoutAccounts v-else-if="activeSection === 'cuentas'" key="cuentas" :payout="cuentas" />
-          
+
           <walletProfile v-else-if="activeSection === 'walletP'" key="walletP" />
 
           <!-- Solo admin -->

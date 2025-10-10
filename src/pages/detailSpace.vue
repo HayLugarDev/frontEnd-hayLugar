@@ -24,12 +24,10 @@
                 <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-600" />
                 <span class="font-medium">+549{{ espacio.host.phone }}</span>
               </div>
-              <div class="flex flex-row gap-2 items-center">
-                <span class="font-semibold">Email:</span>
+              <div class="text-xs md:text-md flex flex-row gap-2 items-center">
                 <span class="font-medium">{{ espacio.host.email }}</span>
               </div>
             </div>
-            <BackButton class="md:hidden" />
           </div>
         </section>
 
@@ -211,7 +209,7 @@ import CustomGoogleMap from '../components/layout/GoogleMap.vue';
 import MainHeader from "../components/layout/header/MainHeader.vue";
 import carMarker from '../assets/logo.png';
 import user_icon_primary from "../assets/user_icon_primary.png";
-import { getSpaceById } from '../services/spaceService';
+import { getSpaceBySlug } from '../services/spaceService';
 import Carousel from '../components/common/Carousel.vue';
 import { useReservationStore } from '../store/reservationStore';
 import BackButton from "../components/common/BackButton.vue";
@@ -288,8 +286,8 @@ const disponibilidad = computed(() => {
 
 const obtenerEspacio = async () => {
   try {
-    const id = route.params.id;
-    const space = await getSpaceById(id);
+    const slug = route.params.slug;
+    const space = await getSpaceBySlug(slug);
     avgRating.value = space.average_rating || 5;
     fetchReviews(space.id);
     console.log(space);

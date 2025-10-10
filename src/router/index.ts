@@ -32,7 +32,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/aceptar-terminos', name: 'accept-terms', component: AcceptTerms },
 
   { path: '/add-space', component: addSpace, meta: { requiresAuth: true } },
-  { path: '/espacio/:id', component: detailSpace },
+  { path: '/espacio/:slug', component: detailSpace },
   { path: '/pago', component: payment, meta: { requiresAuth: true } },
   { path: '/confirmacion', component: confirmaReserva, meta: { requiresAuth: true } },
   { path: '/profile', component: profile, meta: { requiresAuth: true } },

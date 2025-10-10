@@ -153,7 +153,6 @@ const obtenerEspacio = async () => {
   }
 };
 
-
 onMounted(async () => {
   const dataSpace = await obtenerEspacio();
   console.log(dataSpace);
