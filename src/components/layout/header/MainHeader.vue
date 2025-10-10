@@ -13,7 +13,7 @@
       <div v-if="route.path !== '/add-space' && route.path !== '/add-vehicle'"
         class="relative flex flex-row sm:gap-2 items-center max-h-12 text-gray-800">
         <font-awesome-icon icon="fa-regular fa-circle-question"
-          class="hidden md:block p-3 w-6 h-6 rounded-full cursor-pointer text-gray-400" />
+          class="hidden md:block p-3 w-6 h-6 rounded-full cursor-pointer text-gray-400" @click="openHelp" />
         <div class="">
           <!-- Botón visible solo en mobile -->
           <button @click="showMobileMenu = true"
@@ -47,6 +47,7 @@
       </div>
     </template>
   </header>
+  <HelpModal :visible="activatedModal" @close="activatedModal = false" />
   <SessionExpired :sessionExpired="isSessionInvalid" />
 </template>
 
@@ -64,12 +65,13 @@ import MobileUserMenu from './MobileUserMenu.vue';
 import MapButton from '../../pages/dashboardPage/MapButton.vue';
 import { showToast } from '../../../utils/toast';
 import BackButton from '../../common/BackButton.vue';
+import HelpModal from '../HelpModal.vue';
 
 const userStore = useUserStore();
 const showNotificationBubble = ref(false);
 const showMobileMenu = ref(false)
 const authChecked = ref(false);
-const hasUnread = ref(true);
+const activatedModal = ref(false);
 const showMap = ref(false);
 const router = useRouter();
 const route = useRoute();
@@ -111,6 +113,11 @@ function toggleMap() {
   showMobileMenu.value = false;
   showNotificationBubble.value = false;
   emit('toggle');
+}
+
+function openHelp() {
+  activatedModal.value = true;
+  document.body.style.overflow = 'hidden' // evita scroll de fondo
 }
 </script>
 
