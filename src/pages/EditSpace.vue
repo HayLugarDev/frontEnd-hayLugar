@@ -92,7 +92,6 @@ const currentComponent = computed(() => components[step.value])
 
 function nextStep() {
   if (step.value < 5) step.value++
-  console.log(spaceData.value);
 };
 
 function prevStep() {
@@ -101,20 +100,12 @@ function prevStep() {
 
 const addSpace = async () => {
 
-  console.log(spaceData.value);
-  // const error = validarFormulario();
-  // if (error) {
-  //   alert(error);
-  //   return;
-  // }
-
   if (spaceData.value.images.length === 0) {
     alert('Debe subir al menos una imagen del espacio');
     return;
   }
   const formData = new FormData();
   const payload = { ...spaceData.value }; // Copia para modificar sin afectar el estado reactivo
-  console.log(payload);
 
   // Agregar vehicle_capacities y precio
   payload.status = 'active';
@@ -127,13 +118,11 @@ const addSpace = async () => {
     formData.append('images', file);
   });
 
-  console.log(formData);
   try {
     const response = await api.post('/spaces/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     showSuccessModal.value = true;
-    console.log(response);
     emit('success');
     resetValues();
   } catch (error) {

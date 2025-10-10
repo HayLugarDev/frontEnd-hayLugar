@@ -22,7 +22,6 @@ export const getFilteredSpaces = async (filters: {
     const response = await api.get("/spaces/getAll", {
       params: filters,
     });
-    console.log(response.data);
     const raw = response.data;
     if (!Array.isArray(raw)) return [];
     return raw;

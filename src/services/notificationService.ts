@@ -4,7 +4,6 @@ import api from "./apiService";
 export const getNotificationsByUserId = async (id: number) => {
   try {
     const response = await api.get(`/notifications/${id}`, { withCredentials: true });
-    console.log("getNotificationsByUserId:", response.data);
 
     // Normalizamos: siempre devolver un array
     if (Array.isArray(response.data)) {

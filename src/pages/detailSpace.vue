@@ -290,7 +290,6 @@ const obtenerEspacio = async () => {
     const space = await getSpaceBySlug(slug);
     avgRating.value = space.average_rating || 5;
     fetchReviews(space.id);
-    console.log(space);
     return espacio.value = space;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
@@ -299,7 +298,6 @@ const obtenerEspacio = async () => {
 
 onMounted(async () => {
   await obtenerEspacio();
-  console.log(espacio.value);
 
   if (isLogged.value) {
     const favs = await getUserFavorites();
@@ -397,8 +395,6 @@ const reservar = async () => {
 
 const onSelectedVehicle = (vehicle) => {
   vehiculoSeleccionado.value = vehicle;
-  console.log('Ingreso y entrada: ', formatLocalDateTime(new Date(tiempoInicial.value)), formatLocalDateTime(new Date(tiempoFinal.value)));
-  console.log(vehicle);
   const payload = {
     owner_id: espacio.value.owner_id,
     space_id: espacio.value.id,
@@ -470,7 +466,6 @@ const vehicleOptions = computed(() => {
 });
 
 const hostImage = computed(() => {
-  console.log("Host:", espacio.value.host);
   return espacio.value.host?.profile_picture || user_icon_primary;
 });
 
