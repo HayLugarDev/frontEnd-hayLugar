@@ -156,7 +156,7 @@
             <router-link to="/login"
               class="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary-dark transition-all font-semibold">Iniciar
               sesión</router-link>
-            <router-link to="/register" class="mt-3 text-primary underline">¿No tienes cuenta? Regístrate
+            <router-link to="/login" class="mt-3 text-primary underline">¿No tienes cuenta? Regístrate
               aquí</router-link>
           </div>
 
