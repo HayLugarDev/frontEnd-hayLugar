@@ -59,6 +59,8 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal bienvenida -->
   <WelcomeSpeech />
 </template>
 
