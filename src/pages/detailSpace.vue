@@ -24,8 +24,7 @@
                 <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-600" />
                 <span class="font-medium">+549{{ espacio.host.phone }}</span>
               </div>
-              <div class="flex flex-row gap-2 items-center">
-                <span class="font-semibold">Email:</span>
+              <div class="text-xs md:text-md flex flex-row gap-2 items-center">
                 <span class="font-medium">{{ espacio.host.email }}</span>
               </div>
             </div>
