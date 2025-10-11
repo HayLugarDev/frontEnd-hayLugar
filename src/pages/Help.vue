@@ -121,7 +121,7 @@
                         <h3 class="text-xl font-semibold text-gray-700 mb-2">🧭 Soporte y contacto</h3>
                         <ul class="list-disc ml-5 text-gray-600 space-y-1">
                             <li>Si necesitás ayuda adicional, podés enviar un correo a <span
-                                    class="text-primary font-medium">soporte@haylugar.com</span>.</li>
+                                    class="text-primary font-medium">soportehaylugar@gmail.com</span>.</li>
                         </ul>
                     </section>
                 </div>
