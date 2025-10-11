@@ -147,8 +147,8 @@
         Anterior
       </button>
       <button @click="handleNext"
-        class="px-6 py-2 bg-primary text-white rounded-full font-semibold hover:bg-primary/90 transition duration-300">
-        Siguiente
+        class="px-8 py-2 bg-primary text-white rounded-full font-bold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
+        Siguiente ➜
       </button>
     </div>
 
