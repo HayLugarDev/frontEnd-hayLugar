@@ -2,8 +2,8 @@
   <div v-if="userStore.user" class="relative">
     <!-- Botón de campana -->
     <button @click="toggleMenu"
-            class="relative w-12 h-12 flex items-center justify-center hover:shadow-xl bg-gray-50 md:bg-secondary rounded-full border-2 md:border-none transition duration-200">
-      <font-awesome-icon icon="bell" class="text-xl text-gray-700 " />
+            class="relative w-12 h-12 flex items-center justify-center rounded-full transition duration-200">
+      <font-awesome-icon icon="bell" class="text-lg text-gray-700 " />
       <!-- Punto rojo si hay notificaciones sin leer -->
       <span v-if="hasUnreadNotifications && !viewNotification"
             class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping">

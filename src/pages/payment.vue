@@ -153,10 +153,8 @@ const obtenerEspacio = async () => {
   }
 };
 
-
 onMounted(async () => {
   const dataSpace = await obtenerEspacio();
-  console.log(dataSpace);
   if (!reservationStore.reservation.space_id || !reservationStore.reservation.start_time) {
     console.error('Error en envío de datos.');
     router.push('/dashboard');
@@ -170,7 +168,6 @@ onMounted(async () => {
   const vehicle_id = reservationStore.reservation.vehicle_id;
   if (vehicle_id) {
     const vehicleSelect = await getVehicleById(vehicle_id);
-    console.log(vehicleSelect);
     vehiculoSeleccionado.value = vehicleSelect;
   }
 });
@@ -240,7 +237,6 @@ const initCardBrick = async () => {
         console.log("Brick is ready");
       },
       onSubmit: async (cardFormData: any) => {
-        console.log("Datos del Brick:", cardFormData);
         const tokenGenerado = cardFormData?.token;
         const monto = Number(cardFormData?.transaction_amount ?? Number(totalGuestPays.value)); // fallback
         const paymentMethodId = cardFormData?.payment_method_id;

@@ -175,7 +175,6 @@ const addSpace = async () => {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     showSuccessModal.value = true;
-    console.log(response);
     emit('success');
     resetValues();
   } catch (error) {

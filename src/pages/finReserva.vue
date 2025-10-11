@@ -85,7 +85,6 @@ const obtenerReserva = async () => {
   try {
     const id = route.query.id; 
     const response = await api.get(`/reservations/${id}`, { withCredentials : true });
-    console.log(response.data);
     reserva.value = response.data;
     
     // Simulación (reemplaza esta parte con la llamada real)

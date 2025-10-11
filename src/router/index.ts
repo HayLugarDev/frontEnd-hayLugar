@@ -41,7 +41,7 @@ const routes: RouteRecordRaw[] = [
 
 
   { path: '/add-space', component: addSpace, meta: { requiresAuth: true } },
-  { path: '/espacio/:id', component: detailSpace },
+  { path: '/espacio/:slug', component: detailSpace },
   { path: '/pago', component: payment, meta: { requiresAuth: true } },
   { path: '/confirmacion', component: confirmaReserva, meta: { requiresAuth: true } },
   { path: '/profile', component: profile, meta: { requiresAuth: true } },

@@ -222,7 +222,6 @@ async function confirmCheckIn() {
     selectedReservation.value.status = "verified";
     showCheckInModal.value = false;
 
-    console.log("CheckIn exitoso", response.data);
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || "Error al verificar código";
   }
@@ -294,8 +293,6 @@ async function handleRatingSubmit(formData: { rating: number; comment?: string }
     comment: formData.comment,
     role: 'client' // usuario que califica como cliente
   };
-
-  console.log(payload);
 
   try {
     await api.post(`/users/rate/${payload.targetId}`, payload, { withCredentials: true });
