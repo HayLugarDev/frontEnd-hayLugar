@@ -147,7 +147,6 @@ watch(() => props.visible, async (val) => {
         try {
             const res = await api.get(`/spaces/getbyid/${props.spaceId}`)
             formData.value = res.data
-            console.log(res.data.images);
         } catch (e) {
             console.error("Error cargando espacio:", e)
         }

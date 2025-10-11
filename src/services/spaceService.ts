@@ -22,7 +22,6 @@ export const getFilteredSpaces = async (filters: {
     const response = await api.get("/spaces/getAll", {
       params: filters,
     });
-    console.log(response.data);
     const raw = response.data;
     if (!Array.isArray(raw)) return [];
     return raw;
@@ -50,6 +49,41 @@ export const getSpaceById = async (id: number) => {
   try {
     const response = await api.get(`/spaces/getbyid/${id}`);
     const item = response.data as any;
+    let paymentMethods: string[] = [];
+    if (typeof item.paymentMethods === "string") {
+      try {
+        paymentMethods = JSON.parse(item.paymentMethods);
+      } catch {
+        paymentMethods = [];
+      }
+    } else {
+      paymentMethods = item.paymentMethods;
+    }
+    // let images: string[] = [];
+    // if (typeof item.images === "string") {
+    //   try {
+    //     images = JSON.parse(item.images);
+    //   } catch {
+    //     images = [];
+    //   }
+    // } else {
+    //   images=item.images;
+    // }
+    return {
+      ...item,
+      //      images,
+      paymentMethods,
+    };
+  }
+  catch (error) {
+    console.error("Error al obtener el espacio por ID:", error);
+  }
+};
+
+export const getSpaceBySlug = async (slug: string) => {
+  try {
+    const response = await api.get(`/spaces/getbyslug/${slug}`);
+    const item = response.data as any;
 
     let paymentMethods: string[] = [];
     if (typeof item.paymentMethods === "string") {
@@ -59,7 +93,7 @@ export const getSpaceById = async (id: number) => {
         paymentMethods = [];
       }
     } else {
-      paymentMethods=item.paymentMethods;
+      paymentMethods = item.paymentMethods;
     }
 
     // let images: string[] = [];
@@ -75,7 +109,7 @@ export const getSpaceById = async (id: number) => {
 
     return {
       ...item,
-//      images,
+      //      images,
       paymentMethods,
     };
   } catch (error) {

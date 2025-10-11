@@ -6,7 +6,7 @@
       <MapButton :text="buttonText" color="white" background="primary" @toggle="toggleMap"
         class="hidden md:block md:fixed" />
       <button v-if="!showSearchMenu" @click="toggleSearchMenu"
-        class="flex flex-row md:hidden mt-20 items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
+        class="text-gray-700 flex flex-row md:hidden mt-20 items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
         <font-awesome-icon icon="search" class="text-xs" />
         <span>Encontra tu espacio</span>
       </button>
@@ -59,6 +59,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal bienvenida -->
+  <WelcomeSpeech />
 </template>
 
 <script setup>
@@ -76,6 +79,7 @@ import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkelet
 import { useGoogleMap } from '../logic/useGoogleMap';
 import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
 import ZoneNavbarButton from '../components/pages/dashboardPage/ZoneNavbarButton.vue';
+import WelcomeSpeech from '../components/layout/WelcomeSpeech.vue';
 
 const router = useRouter();
 
@@ -109,7 +113,6 @@ const obtenerEspacios = async () => {
   cargando.value = true;
   try {
     const spaces = await getAllSpaces();
-    console.log(spaces);
     if (!spaces || spaces.length < 1) {
       espacios.value = [];
       error.value = "Aún no hay espacios creados.";
@@ -175,7 +178,7 @@ const toggleSearchMenu = () => {
 }
 
 const handleMarkerClick = (espacio) => {
-  router.push(`/espacio/${espacio.id}`);
+  router.push(`/espacio/${espacio.slug}`);
 };
 </script>
 

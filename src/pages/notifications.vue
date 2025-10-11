@@ -1,70 +1,95 @@
 <template>
     <MainHeader />
-    <div class="min-h-screen bg-secondary md:px-6 py-20 md:py-6">
-        <BackButton class="md:hidden" />
-        <section class="bg-white p-4 md:p-8 rounded-lg shadow-lg mb-8">
-            <h2 class="text-2xl font-bold text-primary mb-4 flex space-x-2 items-center">
-                <font-awesome-icon icon="history" class="mr-2" />
-                Notificaciones
-            </h2>
+    <div class="min-h-screen bg-secondary md:px-6 py-20 md:py-8">
+
+        <section class="bg-white rounded-2xl shadow-lg p-4 md:p-8 max-w-3xl mx-auto border border-gray-100">
+            <!-- Título -->
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                    <font-awesome-icon icon="history" />
+                    Notificaciones
+                </h2>
+            </div>
+
+            <!-- Loading -->
             <div v-if="loading" class="space-y-4">
                 <ItemSkeleton />
             </div>
-            <ul v-else-if="notifications.length" class="grid gap-6">
+
+            <!-- Lista -->
+            <ul v-else-if="notifications.length" class="flex flex-col gap-4">
                 <li v-for="(notification, index) in notifications" :key="index"
-                    class="flex flex-col gap-2 border border-yellow-200 rounded-2xl bg-gradient-to-b from-yellow-50 to-white shadow-md hover:shadow-lg transition-all cursor-pointer overflow-hidden p-6">
-                    <div class="flex items-center justify-between">
+                    class="bg-gradient-to-br from-white to-blue-50 border border-blue-100 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden p-5 flex flex-col gap-3">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between">
                         <div class="flex items-center gap-3">
-                            <font-awesome-icon
-                                :icon="notification.reservation_status === 'approved' ? 'check-circle' : 'bell'"
-                                class="text-2xl"
-                                :class="notification.reservation_status === 'approved' ? 'text-green-500' : 'text-primary'" />
-                            <div>
-                                <span class="font-bold text-gray-800 text-lg">{{
-                                    getSpanishReservationStatus(notification.reservation_status) }}</span>
-                                <span class="block text-xs text-gray-500">Recibida: {{
-                                    formatDate(notification.changed_at) }}</span>
+                            <div class="p-2 rounded-full flex items-center justify-center" :class="notification.reservation_status === 'approved'
+                                ? 'bg-green-100 text-green-500'
+                                : 'bg-blue-100 text-blue-600'">
+                                <font-awesome-icon :icon="notification.reservation_status === 'approved'
+                                    ? 'check-circle'
+                                    : 'bell'" class="text-xl" />
+                            </div>
+
+                            <div class="flex flex-col">
+                                <span class="font-semibold text-gray-800 text-base leading-tight">
+                                    {{ getSpanishReservationStatus(notification.reservation_status) }}
+                                </span>
+                                <span class="text-xs text-gray-500">
+                                    Recibida: {{ formatDate(notification.changed_at) }}
+                                </span>
                             </div>
                         </div>
-                        <font-awesome-icon @click="openConfirm(notification, 'delete')" icon="fa-regular fa-trash-can"
-                            class="text-lg cursor-pointer text-gray-400 hover:text-red-500 transition"
-                            title="Eliminar notificación" />
+
+                        <button @click="openConfirm(notification, 'delete')"
+                            class="text-gray-400 hover:text-red-500 transition" title="Eliminar notificación">
+                            <font-awesome-icon icon="fa-regular fa-trash-can" class="text-lg" />
+                        </button>
                     </div>
 
-                    <p class="whitespace-pre-line text-gray-700 mt-2 text-base">
+                    <!-- Mensaje -->
+                    <p class="text-gray-700 text-xs leading-relaxed">
                         {{ notification.message }}
                     </p>
 
-                    <div class="flex flex-row justify-end items-center gap-2 mt-2">
+                    <!-- Botones -->
+                    <div class="flex justify-end flex-wrap gap-2 mt-2">
                         <!-- owner -->
                         <button
                             v-if="notification.reservation_status !== 'approved' && notification.reservation_role === 'owner'"
                             @click="goToIncomingReservations"
-                            class="px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold">
+                            class="px-4 py-2 bg-primary text-white text-sm rounded-lg font-semibold shadow hover:bg-blue-700 transition active:scale-95">
                             Verificar ahora
                         </button>
+
                         <button
                             v-else-if="notification.reservation_status === 'approved' && notification.reservation_role === 'owner'"
                             @click="goToIncomingReservations"
-                            class="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition font-semibold">
+                            class="px-4 py-2 bg-green-500 text-white text-sm rounded-lg font-semibold shadow hover:bg-green-600 transition active:scale-95">
                             Ir a reserva
                         </button>
+
                         <!-- client -->
                         <button v-if="notification.reservation_role === 'client'" @click="goToReservations"
-                            class="px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold">
+                            class="px-4 py-2 bg-primary text-white text-sm rounded-lg font-semibold shadow hover:bg-blue-700 transition active:scale-95">
                             Ir a reserva
                         </button>
                     </div>
                 </li>
             </ul>
 
-            <p v-else-if="!loading" class="text-gray-500">No hay notificaciones.</p>
+            <!-- Sin notificaciones -->
+            <div v-else class="text-center py-10 text-gray-500 space-y-2">
+                <font-awesome-icon icon="bell-slash" class="text-3xl text-gray-400" />
+                <p>No hay notificaciones.</p>
+            </div>
         </section>
 
         <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
             @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
     </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
@@ -134,7 +159,6 @@ const fetchNotifications = async () => {
     try {
         const response = await api.get(`notifications/${userId}`);
         notifications.value = response.data;
-        console.log(notifications.value);
 
         // 🚀 Marcar como leídas
         const unreadIds = notifications.value
