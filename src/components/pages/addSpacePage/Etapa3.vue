@@ -18,7 +18,7 @@
     <div class="space-y-4">
       <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value" :title="type.title"
         :text="type.description" :configured="!!vehicleMap[type.value]" :configuration="vehicleMap[type.value]"
-        @configure="openConfig(type.value)" />
+        @save="saveConfiguration" @remove="removeConfiguration" />
     </div>
 
     <!-- Navegación -->
@@ -34,8 +34,8 @@
     </div>
 
     <!-- Modal de configuración -->
-    <VehicleModal v-if="selectedType" :type="selectedType" :existing="vehicleMap[selectedType]"
-      @save="saveConfiguration" @close="selectedType = null" />
+    <!-- <VehicleModal v-if="selectedType" :type="selectedType" :existing="vehicleMap[selectedType]"
+      @save="saveConfiguration" @close="selectedType = null" /> -->
 
     <!-- Modal de error -->
     <StatusModal :visible="showErrorModal" title="¡Atención!"
@@ -94,9 +94,12 @@ const vehicleMap = computed(() => {
   return map;
 });
 
-// Abrir modal para configurar
-function openConfig(type) {
-  selectedType.value = type;
+function removeConfiguration(type) {
+  const updated = props.modelValue.vehicle_capacities.filter((v) => v.type !== type);
+  emit('update:modelValue', {
+    ...props.modelValue,
+    vehicle_capacities: updated,
+  });
 }
 
 // Guardar datos de configuración
