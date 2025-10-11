@@ -117,8 +117,6 @@
     </transition>
 </template>
 
-
-
 <script setup>
 import { ref, computed } from 'vue';
 import '@vuepic/vue-datepicker/dist/main.css';
@@ -128,7 +126,6 @@ import api from '../services/apiService';
 import Etapa1 from '../components/pages/addVehiclePage/Etapa1.vue';
 import Etapa2 from '../components/pages/addVehiclePage/Etapa2.vue';
 import Etapa3 from '../components/pages/addVehiclePage/Etapa3.vue';
-import Etapa4 from '../components/pages/addVehiclePage/Etapa4.vue';
 import BackButton from '../components/common/BackButton.vue';
 
 const router = useRouter();
@@ -151,8 +148,7 @@ const vehicleData = ref({
 const components = {
     1: Etapa1,
     2: Etapa2,
-    3: Etapa3,
-    4: Etapa4
+    3: Etapa3
 };
 
 const currentComponent = computed(() => components[step.value])

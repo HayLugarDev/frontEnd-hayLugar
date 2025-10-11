@@ -119,7 +119,7 @@
           <p>Disponible desde {{ formatDate(availabilityStart) }}</p>
           <p>Hasta {{ formatDate(availabilityEnd) }}</p>
           <p v-if="selectedDaysLabels">Días: {{ selectedDaysLabels }}</p>
-          <p v-else >Todos los días</p>
+          <p v-else>Todos los días</p>
           <p v-if="price_unit === 'week' || price_unit === 'month'">
             Período: {{ availabilityDateRange }}
           </p>
