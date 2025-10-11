@@ -1,19 +1,29 @@
 <template>
-  <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2">
-    <h1 class="text-primary text-4xl font-semibold mb-8">Completá los detalles de tu espacio</h1>
+  <div
+    class="flex flex-col max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
+    <!-- Título -->
+    <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-4">
+      Completá los detalles de tu espacio
+    </h1>
+
+    <p class="text-gray-500 text-center mb-6">
+      Ingresá toda la información para que tus clientes tengan claro tu espacio.
+    </p>
 
     <div class="space-y-6 font-normal">
+
       <!-- Nombre del espacio -->
       <div>
-        <label class="block text-sm font-semibold text-gray-900">Nombre del espacio</label>
-        <input type="text" v-model="name" class="text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4"
-          placeholder="Ej: Estacionamiento privado en Palermo" />
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre del espacio</label>
+        <input type="text" v-model="name" placeholder="Ej: Estacionamiento privado en Palermo"
+          class="w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary focus:outline-none transition" />
       </div>
 
       <!-- Tipo de parking -->
       <div>
-        <label class="block text-sm font-semibold text-gray-900">Tipo de estacionamiento</label>
-        <select v-model="parking_type" class="text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de estacionamiento</label>
+        <select v-model="parking_type"
+          class="w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary focus:outline-none transition">
           <option value="">Selecciona una opción</option>
           <option value="cubierto">Cubierto</option>
           <option value="descubierto">Descubierto</option>
@@ -22,68 +32,61 @@
 
       <!-- Descripción -->
       <div>
-        <label class="block text-sm font-semibold text-gray-900">Descripción</label>
-        <textarea v-model="description" class="text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4"
-          rows="4" placeholder="Escribe una descripción detallada del espacio..."></textarea>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+        <textarea v-model="description" rows="4" placeholder="Escribe una descripción detallada del espacio..."
+          class="w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary focus:outline-none transition"></textarea>
       </div>
 
       <!-- Tipo de plazo -->
       <div>
-        <label class="block text-sm font-semibold text-gray-900 mb-2">Tipo de Plazo ofrecido</label>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Plazo ofrecido</label>
         <div class="flex gap-2">
           <button v-for="unit in priceUnits" :key="unit.value"
-            @click="price_unit = unit.value; updateAvailabilityFields()" class="px-4 py-2 rounded-lg border"
-            :class="price_unit === unit.value ? 'bg-primary text-white' : 'bg-gray-100'">
+            @click="price_unit = unit.value; updateAvailabilityFields()" :class="[
+              'px-4 py-2 rounded-xl font-semibold transition',
+              price_unit === unit.value
+                ? 'bg-primary text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            ]">
             {{ unit.label }}
           </button>
         </div>
       </div>
 
       <!-- Horario de disponibilidad -->
-      <fieldset v-if="price_unit === 'hour'" class="border p-4 rounded-lg">
-        <legend class="text-lg font-semibold text-black">Horario de Disponibilidad</legend>
-        <div class="grid grid-cols-2 gap-4">
+      <fieldset v-if="price_unit === 'hour'" class="border border-gray-200 p-4 rounded-2xl">
+        <legend class="text-lg font-semibold text-gray-800">Horario de Disponibilidad</legend>
+        <div class="grid grid-cols-2 gap-4 mt-2">
           <div>
-            <label class="block mb-1">Desde:</label>
+            <label class="block text-sm mb-1">Desde:</label>
             <DatePicker v-model:value="availabilityStart" type="time" format="HH:mm" placeholder="Hora inicio"
-              class="input-field" />
+              class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
           </div>
           <div>
-            <label class="block mb-1">Hasta:</label>
+            <label class="block text-sm mb-1">Hasta:</label>
             <DatePicker v-model:value="availabilityEnd" type="time" format="HH:mm" placeholder="Hora fin"
-              class="input-field" />
+              class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
           </div>
         </div>
       </fieldset>
 
-      <!-- Período (semana o mes) -->
+      <!-- Período semanal o mensual -->
       <div v-if="price_unit === 'week' || price_unit === 'month'" class="mt-4">
-        <fieldset class="border p-4 rounded-lg">
-          <legend class="text-lg font-semibold text-black">Selecciona un período</legend>
-          <!--<DatePicker v-model:value="availabilityDateRange" type="daterange" format="YYYY-MM-DD"
-            placeholder="Selecciona una fecha de inicio" class="w-full" />-->
-
-            <DatePicker
-            v-model:value="availabilityDateRange"
-            type="date"
-            :range="true"
-            format="YYYY-MM-DD"
+        <fieldset class="border border-gray-200 p-4 rounded-2xl">
+          <legend class="text-lg font-semibold text-gray-800">Selecciona un período</legend>
+          <DatePicker v-model:value="availabilityDateRange" type="date" :range="true" format="YYYY-MM-DD"
             placeholder="Selecciona una fecha de inicio"
-            class="w-full"
-            />
+            class="w-full mt-2 rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
         </fieldset>
       </div>
 
       <!-- Días disponibles -->
       <div class="mt-4">
-        <fieldset class="border p-4 rounded-lg">
-          <legend class="text-lg font-semibold text-black">Días disponibles</legend>
+        <fieldset class="border border-gray-200 p-4 rounded-2xl">
+          <legend class="text-lg font-semibold text-gray-800">Días disponibles</legend>
           <p class="text-xs text-gray-500 mb-2">
-            Seleccioná los días en los que tu espacio está disponible, o marcá <b>Todos los días</b>.
-            Debes elegir al menos una opción para continuar.
+            Seleccioná los días disponibles o marcá <b>Todos los días</b>.
           </p>
-
-          <!-- Opción "Todos los días" -->
           <div class="mb-2">
             <label class="flex items-center gap-2">
               <input type="checkbox" v-model="allDaysSelected" @change="handleAllDaysChange"
@@ -91,8 +94,6 @@
               <span><b>Todos los días</b></span>
             </label>
           </div>
-
-          <!-- Días individuales -->
           <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
             <label v-for="day in daysOfWeek" :key="day.value" class="flex items-center gap-2">
               <input type="checkbox" :value="day.value" v-model="availabilityDays" :disabled="allDaysSelected"
@@ -104,44 +105,50 @@
       </div>
 
       <!-- Mensaje dinámico -->
-      <div v-if="price_unit" :class="['alert', price_unit === 'hour' ? 'alert-info' : 'alert-warning']">
+      <div v-if="price_unit" :class="[
+        'p-4 rounded-xl text-sm',
+        price_unit === 'hour' ? 'bg-blue-50 text-blue-700' : 'bg-yellow-50 text-yellow-700'
+      ]">
         <p v-html="currentMessage"></p>
       </div>
 
       <!-- Resumen -->
-      <div v-if="price_unit" class="mt-6 p-4 border rounded-lg bg-gray-50 text-sm">
+      <div v-if="price_unit" class="mt-6 p-4 border rounded-2xl bg-gray-50 text-sm">
         <p><strong>Resumen:</strong></p>
-        <p>Disponible desde {{ formatDate(availabilityStart) }}</p>
-        <p>Hasta {{ formatDate(availabilityEnd) }}</p>
-        <p v-if="price_unit === 'day'">Días: {{ selectedDaysLabels }}</p>
-        <p v-if="price_unit === 'week' || price_unit === 'month'">
-          Periodo: {{ availabilityDateRange }}
-        </p>
+        <div v-if="availabilityStart && availabilityEnd">
+          <p>Disponible desde {{ formatDate(availabilityStart) }}</p>
+          <p>Hasta {{ formatDate(availabilityEnd) }}</p>
+          <p v-if="selectedDaysLabels">Días: {{ selectedDaysLabels }}</p>
+          <p v-else >Todos los días</p>
+          <p v-if="price_unit === 'week' || price_unit === 'month'">
+            Período: {{ availabilityDateRange }}
+          </p>
+        </div>
       </div>
 
       <!-- Imágenes -->
       <div>
-        <p class="text-gray-700 mb-6 text-sm">
-          <strong>Atención:</strong> Debes subir al menos 5 imágenes...
+        <p class="text-gray-500 mb-4 text-sm">
+          <strong>Atención:</strong> Debes subir al menos 5 imágenes de tu espacio.
         </p>
         <input type="file" multiple accept="image/*" @change="handleFileUpload"
-          class="text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4" />
+          class="w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary transition" />
         <div class="mt-3 flex flex-wrap gap-3">
           <img v-for="(img, index) in previewImages" :key="index" :src="img"
-            class="w-24 h-24 object-cover rounded-lg shadow-md ring-1 ring-gray-200" />
+            class="w-24 h-24 object-cover rounded-xl shadow-md ring-1 ring-gray-200" />
         </div>
       </div>
     </div>
 
     <!-- Botones -->
     <div class="flex justify-between mt-6 space-x-4">
-      <button @click="emit('prev')" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
+      <button @click="emit('prev')"
+        class="px-6 py-2 border-2 border-primary text-primary rounded-full font-semibold hover:bg-primary hover:text-white transition">
         Anterior
       </button>
-
       <button @click="handleNext"
-        class="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition duration-300">
-        Siguiente
+        class="px-8 py-2 bg-primary text-white rounded-full font-bold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
+        Siguiente ➜
       </button>
     </div>
 
@@ -149,6 +156,7 @@
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
       icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
   </div>
+
 </template>
 
 <script setup lang="ts">
@@ -260,10 +268,10 @@ const handleNext = () => {
   }
 
   if (!allDaysSelected.value && availabilityDays.value.length === 0) {
-  errorMessage.value = "Debes seleccionar al menos un día o marcar 'Todos los días'.";
-  showErrorModal.value = true;
-  return;
-}
+    errorMessage.value = "Debes seleccionar al menos un día o marcar 'Todos los días'.";
+    showErrorModal.value = true;
+    return;
+  }
 
   if ((price_unit.value === "week" || price_unit.value === "month") && !availabilityDateRange.value) {
     errorMessage.value = "Debes seleccionar un rango de fechas de disponibilidad.";

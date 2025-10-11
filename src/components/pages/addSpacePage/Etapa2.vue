@@ -1,13 +1,22 @@
 <template>
-    <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2">
-        <h1 class="text-4xl font-semibold mb-8 text-primary">¿Dónde está ubicado tu espacio?</h1>
+    <div
+        class="flex flex-col max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
+
+        <!-- Título -->
+        <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-4">
+            ¿Dónde está ubicado tu espacio?
+        </h1>
+
+        <p class="text-gray-500 text-center mb-6">
+            Seleccioná la dirección exacta para que los usuarios puedan encontrar tu espacio fácilmente.
+        </p>
 
         <!-- Autocomplete -->
         <div>
             <label class="block text-sm font-semibold text-gray-900 mb-1">Calle</label>
             <input type="text" v-model="direccion"
-                class="input-field text-gray-900 mt-1 block w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-primary focus:outline-none transition"
-                placeholder="Ingresá tu dirección" readonly />
+                class="block w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary focus:outline-none transition"
+                placeholder="Ingresá tu dirección" />
             <GMapAutocomplete class="hidden" @place_changed="handlePlaceChanged" placeholder="Ingresá tu dirección" />
         </div>
 
@@ -21,26 +30,27 @@
             </button>
         </div>
 
-        <!-- Detalles -->
+        <!-- Detalles adicionales -->
         <div v-if="location">
             <label class="block text-sm font-semibold text-gray-900 mb-1">Referencias adicionales</label>
             <input type="text" v-model="locationDetails"
-                class="text-gray-500 mt-1 block w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-primary focus:outline-none transition"
+                class="block w-full border border-gray-300 rounded-xl p-4 text-gray-500 focus:ring-2 focus:ring-primary focus:outline-none transition"
                 placeholder="Ej: Edificio A, Planta Baja, etc." />
         </div>
 
         <!-- Navegación -->
-        <div class="flex justify-between space-x-4 mt-8">
+        <div class="flex justify-between mt-auto space-x-4">
             <button @click="emit('prev')"
                 class="px-6 py-2 border-2 border-primary text-primary rounded-full font-semibold hover:bg-primary hover:text-white transition">
                 Anterior
             </button>
             <button @click="nextStep"
-                class="px-8 py-2 bg-gradient-to-r from-indigo-500 to-primary text-white rounded-full font-bold shadow-lg hover:from-indigo-600 hover:to-primary-dark transition-all duration-300">
-                Siguiente
+                class="px-8 py-2 bg-primary text-white rounded-full font-bold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
+                Siguiente ➜
             </button>
         </div>
 
+        <!-- Modal de error -->
         <StatusModal :visible="showErrorModal" type="error" title="Dirección faltante"
             message="Por favor, seleccioná una dirección antes de continuar." icon="/src/assets/logo.png"
             @confirm="showErrorModal = false" />
@@ -48,6 +58,7 @@
         <!-- Modal con mapa manual -->
         <SelectLocationMap v-if="showManualMap" @close="showManualMap = false" @selected="handleManualLocation" />
     </div>
+
 </template>
 
 <script setup>
@@ -63,7 +74,7 @@ const showManualMap = ref(false);
 const direccion = ref(props.modelValue.location || '');
 
 watch(() => props.modelValue.location, (val) => {
-  direccion.value = val || '';
+    direccion.value = val || '';
 });
 
 const handlePlaceChanged = (place) => {
@@ -90,30 +101,30 @@ const handlePlaceChanged = (place) => {
 }
 
 const handleManualLocation = ({ lat, lng }) => {
-  const geocoder = new google.maps.Geocoder()
+    const geocoder = new google.maps.Geocoder()
 
-  geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-    if (status === 'OK' && results[0]) {
-      const fullAddress = results[0].formatted_address
-      direccion.value = fullAddress
-      emit('update:modelValue', {
-        ...props.modelValue,
-        location: fullAddress,
-        latitude: lat,
-        longitude: lng
-      })
-    } else {
-      // Si falla el geocoder, dejamos una etiqueta genérica
-      direccion.value = 'Ubicación seleccionada manualmente'
-      emit('update:modelValue', {
-        ...props.modelValue,
-        location: direccion.value,
-        latitude: lat,
-        longitude: lng
-      })
-    }
-    showManualMap.value = false
-  })
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+            const fullAddress = results[0].formatted_address
+            direccion.value = fullAddress
+            emit('update:modelValue', {
+                ...props.modelValue,
+                location: fullAddress,
+                latitude: lat,
+                longitude: lng
+            })
+        } else {
+            // Si falla el geocoder, dejamos una etiqueta genérica
+            direccion.value = 'Ubicación seleccionada manualmente'
+            emit('update:modelValue', {
+                ...props.modelValue,
+                location: direccion.value,
+                latitude: lat,
+                longitude: lng
+            })
+        }
+        showManualMap.value = false
+    })
 }
 
 

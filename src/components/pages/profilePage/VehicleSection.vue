@@ -39,51 +39,56 @@
     </div>
 
     <!-- Lista de Vehículos -->
-    <div v-if="vehiculos.length" class="space-y-6">
+    <div v-if="vehiculos.length" class="space-y-2">
       <div v-for="(vehiculo, index) in vehiculos" :key="index"
-        class="border border-gray-200 rounded-2xl p-5 shadow-md hover:shadow-lg transition-all bg-gradient-to-b from-gray-50 to-white">
-        <div v-if="!modoEdicion" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-800">
-          <div class="flex items-center gap-2">
-            <font-awesome-icon icon="car-side" class="text-primary" />
-            <span><strong>Tipo:</strong> {{ vehicleLabel(vehiculo.type) }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <font-awesome-icon icon="palette" class="text-primary" />
-            <span><strong>Color:</strong> {{ vehiculo.color || 'No especificado' }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <font-awesome-icon icon="rectangle-list" class="text-primary" />
-            <span><strong>Modelo:</strong> {{ vehiculo.model || 'No especificado' }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <font-awesome-icon icon="id-card" class="text-primary" />
-            <span><strong>Patente:</strong> {{ vehiculo.license_plate || 'No aplica' }}</span>
+        class="border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 bg-gradient-to-b from-white to-gray-50">
+        <!-- Vista normal -->
+        <div v-if="!modoEdicion" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
+          <div v-for="(item, i) in [
+            { icon: 'car-side', label: 'Tipo', value: vehicleLabel(vehiculo.type) },
+            { icon: 'rectangle-list', label: 'Modelo', value: vehiculo.model || 'No especificado' },
+            { icon: 'palette', label: 'Color', value: vehiculo.color || 'No especificado' },
+            { icon: 'id-card', label: 'Patente', value: vehiculo.license_plate || 'No aplica' }
+          ]" :key="i"
+            class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-all">
+            <div class="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-full">
+              <font-awesome-icon :icon="item.icon" class="text-primary text-md" />
+            </div>
+            <div class="flex flex-col">
+              <span class="text-sm text-gray-500 font-medium">{{ item.label }}</span>
+              <span class="text-base font-semibold text-gray-800">{{ item.value }}</span>
+            </div>
           </div>
         </div>
 
         <!-- Modo edición -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div class="flex flex-col">
-            <label class="text-md font-semibold text-gray-800 mb-1">Tipo</label>
-            <select v-model="vehiculo.type" class="border border-gray-300 rounded-lg px-3 py-2">
+            <label class="text-md font-semibold text-gray-700 mb-1">Tipo</label>
+            <select v-model="vehiculo.type"
+              class="border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary/50 focus:outline-none">
               <option disabled value="">Seleccione un tipo</option>
               <option v-for="option in vehicleTypes" :key="option.value" :value="option.value">
                 {{ option.label }}
               </option>
             </select>
           </div>
-          <FormFieldVehicle v-model="vehiculo.model" label="Modelo" class="mt-0" allowNull="false" />
-          <FormFieldVehicle v-model="vehiculo.color" label="Color" class="mt-0" allowNull="false" />
-          <FormFieldVehicle v-model="vehiculo.license_plate" label="Patente" class="mt-0" allowNull="false" />
+          <FormFieldVehicle v-model="vehiculo.model" label="Modelo" class="mt-0" />
+          <FormFieldVehicle v-model="vehiculo.color" label="Color" class="mt-0" />
+          <FormFieldVehicle v-model="vehiculo.license_plate" label="Patente" class="mt-0" />
         </div>
       </div>
     </div>
 
     <!-- Sin vehículos -->
-    <div v-else class="text-center text-gray-500 mt-10">
-      <p>No tienes ningún vehículo registrado aún.</p>
-      <span class="text-primary font-medium">¡Agregá tu primer vehículo!</span>
+    <div v-else class="text-center text-gray-500 mt-10 flex flex-col items-center justify-center">
+      <div class="bg-primary/10 p-4 rounded-full mb-3">
+        <font-awesome-icon icon="car" class="text-primary text-3xl" />
+      </div>
+      <p class="text-lg font-medium">No tienes ningún vehículo registrado aún.</p>
+      <span class="text-primary font-semibold mt-1">¡Agregá tu primer vehículo!</span>
     </div>
+
 
     <!-- Modales (éxito y error) -->
     <transition name="fade">

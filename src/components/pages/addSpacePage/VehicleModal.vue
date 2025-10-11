@@ -1,24 +1,41 @@
 <template>
-    <div class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg w-96">
-            <h2 class="text-xl font-semibold mb-4">Configurar {{ typeLabel[type] }}</h2>
+    <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 animate-fade-in">
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 w-full max-w-md p-8 relative">
 
-            <label class="block mb-2">Capacidad</label>
-            <input v-model.number="form.capacity" type="number" min="1" class="input-field mb-4" />
+            <!-- Título -->
+            <h2 class="text-primary text-2xl sm:text-3xl font-bold text-center mb-6">
+                Configurar {{ typeLabel[type] }}
+            </h2>
 
-            <label class="block mb-2">Precio por hora ($)</label>
-            <input v-model.number="form.price_per_hour" type="number" min="0" class="input-field mb-6" />
+            <!-- Capacidad -->
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Capacidad</label>
+                <input v-model.number="form.capacity" type="number" min="1" placeholder="Cantidad de vehículos"
+                    class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-primary focus:outline-none transition" />
+            </div>
 
-            <div class="flex justify-end space-x-2">
-                <button @click="$emit('close')" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">
+            <!-- Precio por hora -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Precio por hora ($)</label>
+                <input v-model.number="form.price_per_hour" type="number" min="0" placeholder="Ej: 250"
+                    class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-primary focus:outline-none transition" />
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-end gap-3">
+                <button @click="$emit('close')"
+                    class="px-6 py-2 rounded-full bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition">
                     Cancelar
                 </button>
-                <button @click="handleSave" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
+                <button @click="handleSave"
+                    class="px-6 py-2 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 active:scale-95 transition-all">
                     Guardar
                 </button>
             </div>
+
         </div>
     </div>
+
 </template>
 
 <script setup>
