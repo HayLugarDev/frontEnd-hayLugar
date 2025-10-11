@@ -313,7 +313,7 @@
             <button class="btn bg-white/10 hover:bg-white/15 text-white border border-white/30 w-full sm:w-auto" @click="goTo('/dashboard')">
               Quiero estacionar
             </button>
-            <button class="btn bg-accent hover:bg-accent/90 text-white w-full sm:w-auto" @click="goTo('/faq')">
+            <button class="btn bg-accent hover:bg-accent/90 text-white w-full sm:w-auto" @click="goTo('/FAQView')">
               Preguntas frecuentes
             </button>
           </div>
@@ -321,12 +321,25 @@
       </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer original -->
     <footer class="border-t border-white/10 bg-dark text-white/70">
       <div class="container mx-auto px-6 py-6 text-center text-sm">
         © {{ currentYear }} HayLugar · La nueva microeconomía urbana — Tecnología tucumana con impacto global
       </div>
     </footer>
+
+    <!-- 🔹 Bloque legal adicional -->
+    <div class="bg-dark text-white/70 border-t border-white/10">
+      <div class="container mx-auto px-6 py-4 text-center text-sm flex flex-col md:flex-row items-center justify-center gap-3">
+        <RouterLink to="/cookies" class="hover:text-white transition-colors">Política de Cookies</RouterLink>
+        <RouterLink to="/PrivacyPolicy" class="hover:text-white transition-colors">Política de Privacidad</RouterLink>
+        <RouterLink to="/termsConditions" class="hover:text-white transition-colors">Términos y Condiciones</RouterLink>
+        <RouterLink to="/FAQView" class="hover:text-white transition-colors">Preguntas Frecuentes</RouterLink>
+      </div>
+    </div>
+
+    <!-- 🔹 Banner de cookies -->
+    <CookieBanner />
   </div>
 </template>
 
@@ -334,6 +347,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
+import CookieBanner from '../components/common/CookieBanner.vue'
 
 import logo from '../assets/logo.png'
 import logoMarker from '../assets/logo.png'
