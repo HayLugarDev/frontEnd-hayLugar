@@ -80,10 +80,12 @@
                             <h3 class="text-xl font-semibold text-gray-700 mb-2">🔔 Notificaciones</h3>
                             <ul class="list-disc ml-5 text-gray-600 space-y-1">
                                 <li>Recibí alertas en tiempo real dentro de la app a través del ícono de la
-                                    <strong>campanita</strong> 🔔 ubicado en la parte superior del menú.</li>
+                                    <strong>campanita</strong> 🔔 ubicado en la parte superior del menú.
+                                </li>
                                 <li>Las notificaciones te informan sobre <strong>nuevas reservas</strong>,
                                     <strong>confirmaciones</strong>, <strong>mensajes importantes</strong> y
-                                    <strong>actualizaciones de estado</strong>.</li>
+                                    <strong>actualizaciones de estado</strong>.
+                                </li>
                                 <li>Podés acceder al historial completo desde la sección <strong>Notificaciones</strong>
                                     en tu perfil.</li>
                             </ul>
@@ -124,13 +126,7 @@
                             <h3 class="text-xl font-semibold text-gray-700 mb-2">🧭 Soporte y contacto</h3>
                             <ul class="list-disc ml-5 text-gray-600 space-y-1">
                                 <li>Si necesitás ayuda adicional, podés enviar un correo a <span
-                                        class="text-primary font-medium"><section>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-2">🧭 Soporte y contacto</h3>
-                        <ul class="list-disc ml-5 text-gray-600 space-y-1">
-                            <li>Si necesitás ayuda adicional, podés enviar un correo a <span
-                                    class="text-primary font-medium">soportehaylugar@gmail.com</span>.</li>
-                        </ul>
-                    </section></span>.</li>
+                                        class="text-primary font-medium">soportehaylugar@gmail.com</span>.</li>
                             </ul>
                         </section>
                     </div>
