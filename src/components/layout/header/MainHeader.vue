@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import Logo from '../Logo.vue';
 import { useUserStore } from '../../../store/userStore';
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import SessionExpired from '../../common/SessionExpired.vue';
 import { useHeaderVisibility } from "../../../logic/useHeaderVisibility";
@@ -63,7 +63,6 @@ import NotificationDropdown from './NotificationDropdown.vue';
 import UserMenu from '../UserMenu.vue';
 import MobileUserMenu from './MobileUserMenu.vue';
 import MapButton from '../../pages/dashboardPage/MapButton.vue';
-import { showToast } from '../../../utils/toast';
 import BackButton from '../../common/BackButton.vue';
 import HelpModal from '../HelpModal.vue';
 
@@ -87,15 +86,6 @@ const emit = defineEmits(['toggle']);
 onMounted(async () => {
   authChecked.value = true;
 });
-
-// watch(
-//   () => userStore.notifications,
-//   (newList, oldList) => {
-//     if (newList.length > oldList.length) {
-//       showToast('¡Tienes nuevas notificaciones!', "notification");
-//     }
-//   }
-// );
 
 const handleNavigate = (path: string) => {
   if (path === '/quit') {

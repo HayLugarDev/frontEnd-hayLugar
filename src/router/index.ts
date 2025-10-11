@@ -9,12 +9,12 @@ import detailSpace from '../pages/detailSpace.vue'
 import payment from '../pages/payment.vue'
 import confirmaReserva from '../pages/confirmaReserva.vue'
 import profile from '../pages/profile.vue'
-import { useUserStore } from '../store/userStore'
 import AddVehicle from '../pages/addVehicle.vue'
 import universityDashboard from '../pages/universityDashboard.vue'
 import meteredParkingDashboard from '../pages/meteredParkingDashboard.vue'
 import Notifications from '../pages/notifications.vue'
 import landingHayLugar from '../pages/landingHayLugar.vue'
+import Help from '../pages/Help.vue'
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -38,6 +38,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/profile', component: profile, meta: { requiresAuth: true } },
   { path: '/notifications', component: Notifications, meta: { requiresAuth: true } },
   { path: '/add-vehicle', component: AddVehicle, meta: { requiresAuth: true } },
+  { path: '/help', component: Help, meta: { requiresAuth: false } },
 
   {
     path: '/universidades',

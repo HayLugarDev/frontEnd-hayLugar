@@ -1,16 +1,20 @@
 <template>
-    <div class="flex flex-col md:w-2/3 lg:w-1/2 mx-auto p-6 gap-6">
-        <div class="bg-white shadow-lg rounded-2xl p-6 space-y-6 border">
-            <h2 class="text-2xl font-bold text-primary text-center">
+    <div class="flex flex-col max-w-3xl mx-auto p-6 gap-6 min-h-[80vh] animate-fade-in">
+        <div class="bg-white shadow-lg rounded-2xl p-8 space-y-6 border border-gray-100">
+
+            <!-- Título -->
+            <h2 class="text-3xl font-bold text-primary text-center mb-4">
                 🚗 Resumen antes de publicar
             </h2>
 
+            <!-- Lista de detalles -->
             <ul class="space-y-4 text-gray-700">
                 <li class="flex items-center gap-2">
                     <span class="font-semibold">📍 Nombre:</span> {{ modelValue.name }}
                 </li>
                 <li class="flex items-center gap-2">
-                    <span class="font-semibold">📬 Dirección:</span> {{ modelValue.location }}, {{ modelValue.locationDetails }}
+                    <span class="font-semibold">📬 Dirección:</span> {{ modelValue.location }}, {{
+                        modelValue.locationDetails }}
                 </li>
                 <li class="flex items-center gap-2">
                     <span class="font-semibold">🏷️ Tipo de espacio:</span> {{ modelValue.parking_type }}
@@ -24,31 +28,33 @@
                 </li>
                 <li class="flex flex-col items-start gap-2">
                     <span class="font-semibold">📝 Descripción:</span>
-                    <span class="pl-2 font-semibold">{{ modelValue.description }}</span>
+                    <span class="pl-2 text-gray-600">{{ modelValue.description }}</span>
                 </li>
                 <li>
                     <span class="font-semibold">🖼️ Imágenes cargadas:</span>
-                    <div class="flex flex-wrap gap-2 mt-2">
+                    <div class="flex flex-wrap gap-3 mt-2">
                         <img v-for="(img, index) in modelValue.images" :key="index" :src="getImageSrc(img)"
-                            class="w-20 h-20 object-cover rounded-lg shadow border" />
+                            class="w-24 h-24 object-cover rounded-xl shadow-sm border border-gray-200" />
                     </div>
                 </li>
             </ul>
 
             <!-- Acciones -->
-            <div class="flex flex-col gap-4 justify-between mt-8">
+            <div class="flex flex-col md:flex-row gap-4 justify-between mt-6">
                 <button @click="emit('prev')"
-                    class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold shadow hover:bg-gray-300 transition">
-                    ✏️ Volver a editar
+                    class="px-6 py-2 border-2 border-primary text-primary rounded-full font-semibold hover:bg-primary hover:text-white transition">
+                    Volver a editar        
                 </button>
+
                 <button type="button" @click="submitForm"
-                    class="w-full flex flex-row justify-center px-8 py-2 bg-gradient-to-r from-indigo-500 to-primary text-white rounded-full font-bold shadow-lg hover:from-indigo-600 hover:to-primary-dark transition-all duration-300">
-                    <img v-if="cargando" :src="loadIcon" alt="Cargando" class="w-6 h-6 text-center" />
-                    <span class="text-white" v-else>Confirmar y Publicar</span>
+                    class="px-8 py-2 bg-primary text-white rounded-full font-bold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
+                    <img v-if="cargando" :src="loadIcon" alt="Cargando" class="w-6 h-6 animate-spin" />
+                    <span v-else>Confirmar y Publicar</span>
                 </button>
             </div>
         </div>
     </div>
+
 </template>
 
 <script setup lang="ts">
