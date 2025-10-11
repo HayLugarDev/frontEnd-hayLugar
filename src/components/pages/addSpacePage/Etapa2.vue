@@ -14,11 +14,11 @@
         <!-- Autocomplete -->
         <div>
             <label class="block text-sm font-semibold text-gray-900 mb-1">Calle</label>
-            <input type="text" v-model="direccion"
+            <input ref="addressInput" type="text" v-model="direccion"
                 class="block w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary focus:outline-none transition"
                 placeholder="Ingresá tu dirección" />
-            <GMapAutocomplete class="hidden" @place_changed="handlePlaceChanged" placeholder="Ingresá tu dirección" />
         </div>
+
 
         <!-- Botón para seleccionar manualmente -->
         <div class="flex justify-center my-4">
@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import StatusModal from '../addSpacePage/StatusModal.vue'
 import SelectLocationMap from '../addSpacePage/SelectLocationMap.vue'
 
@@ -72,14 +72,28 @@ const emit = defineEmits(['update:modelValue', 'next', 'prev'])
 const showErrorModal = ref(false);
 const showManualMap = ref(false);
 const direccion = ref(props.modelValue.location || '');
+const addressInput = ref(null) // referencia al input
 
 watch(() => props.modelValue.location, (val) => {
     direccion.value = val || '';
 });
 
-const handlePlaceChanged = (place) => {
-    const components = place.address_components || []
+const initAutocomplete = () => {
+  if (!window.google) {
+    setTimeout(initAutocomplete, 100) // vuelve a intentar hasta que cargue
+    return
+  }
 
+  const autocomplete = new google.maps.places.Autocomplete(addressInput.value, {
+    types: ['geocode'],
+    componentRestrictions: { country: 'AR' },
+  })
+
+  autocomplete.addListener('place_changed', () => {
+    const place = autocomplete.getPlace()
+    if (!place.geometry) return
+
+    const components = place.address_components || []
     const streetNumber = components.find(c => c.types.includes('street_number'))?.long_name || ''
     const route = components.find(c => c.types.includes('route'))?.long_name || ''
     const locality = components.find(c => c.types.includes('locality') || c.types.includes('sublocality'))?.long_name || ''
@@ -87,18 +101,19 @@ const handlePlaceChanged = (place) => {
     const country = components.find(c => c.types.includes('country'))?.long_name || ''
 
     const street = [route, streetNumber].filter(Boolean).join(' ')
-    const parts = [street, locality, province, country].filter(Boolean)
-    const fullAddress = parts.join(', ');
+    const fullAddress = [street, locality, province, country].filter(Boolean).join(', ')
 
-    direccion.value = fullAddress;
-
+    direccion.value = fullAddress
     emit('update:modelValue', {
-        ...props.modelValue,
-        location: fullAddress,
-        latitude: place.geometry.location.lat(),
-        longitude: place.geometry.location.lng()
+      ...props.modelValue,
+      location: fullAddress,
+      latitude: place.geometry.location.lat(),
+      longitude: place.geometry.location.lng()
     })
+  })
 }
+
+onMounted(() => initAutocomplete())
 
 const handleManualLocation = ({ lat, lng }) => {
     const geocoder = new google.maps.Geocoder()
