@@ -15,6 +15,10 @@ import universityDashboard from '../pages/universityDashboard.vue'
 import meteredParkingDashboard from '../pages/meteredParkingDashboard.vue'
 import Notifications from '../pages/notifications.vue'
 import landingHayLugar from '../pages/landingHayLugar.vue'
+import FAQView from '../pages/FAQView.vue'
+import CookiesPolicy from '../pages/CookiesPolicy.vue'
+import PrivacyPolicyView from '../pages/PrivacyPolicyView.vue'
+import termsConditions from '../pages/termsConditions.vue'
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -30,6 +34,11 @@ const routes: RouteRecordRaw[] = [
   // ✅ Rutas de Términos y Condiciones
   { path: '/terminos-y-condiciones', name: 'terms', component: TermsPage },
   { path: '/aceptar-terminos', name: 'accept-terms', component: AcceptTerms },
+  { path: '/FAQView', name: 'FAQView', component: FAQView },
+  { path: '/cookies', name: 'cookies', component: CookiesPolicy }, 
+  { path: '/PrivacyPolicy', name: 'PrivacyPolicyView', component: PrivacyPolicyView },
+  { path: '/termsConditions', name: 'termsConditions', component: termsConditions },
+
 
   { path: '/add-space', component: addSpace, meta: { requiresAuth: true } },
   { path: '/espacio/:id', component: detailSpace },
