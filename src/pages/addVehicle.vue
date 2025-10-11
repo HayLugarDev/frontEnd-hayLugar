@@ -117,8 +117,6 @@
     </transition>
 </template>
 
-
-
 <script setup>
 import { ref, computed } from 'vue';
 import '@vuepic/vue-datepicker/dist/main.css';
