@@ -76,12 +76,12 @@
 
     <!-- Modal de éxito -->
     <StatusModal :visible="showSuccessModal" type="success" title="Excelente!"
-      message="Publicaste correctamente tu espacio en HayLugar." icon="/src/assets/logo.png"
+      message="Publicaste correctamente tu espacio en HayLugar." :icon="logo"
       @confirm="closeSuccesModal" />
 
     <!-- Modal de error -->
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-      :message="errorMessage" icon="/src/assets/logo.png"
+      :message="errorMessage" :icon="logo"
       @confirm="showErrorModal = false" />
   </div>
 </template>
@@ -99,6 +99,7 @@ import Etapa4 from '../components/pages/addSpacePage/Etapa4.vue';
 import Etapa5 from '../components/pages/addSpacePage/Etapa5.vue';
 import BackButton from '../components/common/BackButton.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
+import logo from "../assets/logo.png";
 
 const router = useRouter();
 const showSuccessModal = ref(false);
