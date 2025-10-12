@@ -51,7 +51,7 @@
                         <div>
                             <span>Horario: </span>
                             <span v-if="disponibilidad.start && disponibilidad.end">
-                                {{ formatDate(disponibilidad.start) }} a {{ formatDate(disponibilidad.end) }} hs
+                                {{ disponibilidad.start }} a {{ disponibilidad.end }} hs
                             </span>
                             <span v-else>
                                 No especificados
