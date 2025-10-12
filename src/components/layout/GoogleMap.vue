@@ -2,13 +2,18 @@
   <GMapMap
     ref="mapRef"
     class="w-full h-[500px] rounded-lg shadow-md"
-    :center="center"
+    :center="mapCenter"
     :zoom="zoomComputed"
     :options="optionsComputed"
     map-type-id="roadmap"
     @load="onLoadEvent"
     @tilesloaded="onTilesLoaded"
   >
+    <!-- Marcador del usuario -->
+    <GMapMarker
+      v-if="userMarker"
+      :position="userMarker"
+    />
     <slot />
   </GMapMap>
 
@@ -37,9 +42,6 @@ type AnyMap = {
   getZoom?: () => number
 }
 
-/**
- * Props
- */
 const props = defineProps<{
   center: google.maps.LatLngLiteral
   zoom?: number
@@ -49,113 +51,128 @@ const props = defineProps<{
 
 const debug = props.debug ?? false
 const zoomComputed = computed(() => props.zoom ?? 15)
-const optionsComputed = computed(() => props.options ?? {})
 
-/**
- * Refs / estado
- */
+const optionsComputed = computed<google.maps.MapOptions>(() => ({
+  gestureHandling: 'greedy',
+  zoomControl: true,
+  streetViewControl: false,
+  mapTypeControl: false,
+  fullscreenControl: false,
+  ...props.options, 
+}))
+
+
 const mapRef = ref<any>(null)
 const mapInstance = ref<AnyMap | null>(null)
 const debugStatus = ref<string>('')
 
+const mapCenter = ref<google.maps.LatLngLiteral>(props.center)
+const userMarker = ref<google.maps.LatLngLiteral | null>(null)
+
+/** Debug helper */
 function setDebug(msg: string) {
   if (debug) {
-    // eslint-disable-next-line no-console
     console.log('[CustomGoogleMap]', msg)
     debugStatus.value = msg
   }
 }
 
-/**
- * Helpers
- */
+/** Detecta si Google Maps está cargado */
 function hasGoogleMaps(): boolean {
   return typeof window !== 'undefined' && !!(window as any).google && !!(window as any).google.maps
 }
 
+/** Tipado "duck" para detectar mapa */
 function looksLikeMap(m: any): m is AnyMap {
-  // Duck typing: no dependemos de window.google para hacer instanceof
   return m && typeof m.setCenter === 'function' && typeof m.addListener === 'function'
 }
 
-/**
- * Intenta extraer la instancia real del mapa desde el wrapper,
- * sin romper si window.google aún no está presente.
- */
+/** Obtiene instancia del mapa según el wrapper */
 function tryResolveMapInstance(): AnyMap | null {
   const refVal = mapRef.value
-
-  // 1) vue3-google-map variantes
   if (refVal?.map && looksLikeMap(refVal.map)) return refVal.map
   if (typeof refVal?.getMap === 'function') {
     const m = refVal.getMap()
     if (looksLikeMap(m)) return m
   }
-
-  // 2) @fawmi/vue-google-maps → $mapObject
   if (refVal?.$mapObject && looksLikeMap(refVal.$mapObject)) return refVal.$mapObject
-
-  // 3) Otras variantes
   if (refVal?.$map && looksLikeMap(refVal.$map)) return refVal.$map
   if (refVal?._map && looksLikeMap(refVal._map)) return refVal._map
-
-  // 4) Algunos wrappers tienen .mapRef?.$mapObject
   if (refVal?.mapRef?.$mapObject && looksLikeMap(refVal.mapRef.$mapObject)) return refVal.mapRef.$mapObject
-
   return null
 }
 
+/** Asigna la instancia */
 function setMap(map: AnyMap | null) {
   if (map && map !== mapInstance.value) {
     mapInstance.value = map
-    // Provide para overlays (CurbBandsLayer/CurbBandOverlay)
     provide('googleMap', mapInstance.value as any)
     setDebug('✅ Map instance set & provided.')
   }
 }
 
-/**
- * Handlers de eventos
- */
+/** Handlers */
 function onLoadEvent(mapArg: any) {
-  // Algunos wrappers pasan el map en este evento. Aceptamos si “parece” un mapa.
   if (looksLikeMap(mapArg)) {
-    setDebug('onLoad → got map from event (duck-typed).')
     setMap(mapArg)
   } else {
-    setDebug('onLoad fired, trying fallback resolution…')
     setMap(tryResolveMapInstance())
   }
 }
 
 function onTilesLoaded() {
-  // @fawmi/vue-google-maps: llamado cuando el mapa dibuja tiles por primera vez
-  setDebug('tilesloaded → resolving map instance…')
   const m = tryResolveMapInstance()
   if (m) setMap(m)
 }
 
-/**
- * Montaje: intenta resolver el mapa por si el evento no dispara.
- * Si aún no existe window.google, no forzamos nada: esperamos a los eventos.
- */
+/** ✅ Obtiene ubicación actual del usuario */
+function locateUser() {
+  if (!navigator.geolocation) {
+    setDebug('⚠️ Geolocation no soportada.')
+    return
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords
+      const coords = { lat: latitude, lng: longitude }
+
+      userMarker.value = coords
+      mapCenter.value = coords
+
+      if (mapInstance.value?.setCenter) {
+        mapInstance.value.setCenter(coords)
+      }
+
+      setDebug(`📍 Usuario localizado en (${latitude}, ${longitude})`)
+    },
+    (err) => {
+      setDebug(`⚠️ Error obteniendo ubicación: ${err.message}`)
+    },
+    { enableHighAccuracy: true }
+  )
+}
+
+/** Montaje */
 onMounted(async () => {
-  setDebug('mounted → attempting to resolve map…')
+  setDebug('mounted → intentando resolver mapa...')
   await nextTick()
   const m = tryResolveMapInstance()
-  if (m) {
-    setMap(m)
-  } else {
-    setDebug('⚠️ No map instance yet. Waiting for @load / @tilesloaded…')
-  }
+  if (m) setMap(m)
+  else setDebug('⚠️ No map instance yet. Waiting for @load / @tilesloaded…')
+
+  locateUser()
 })
 
-/**
- * Recenter cuando cambie center
- */
-watch(() => props.center, (c) => {
-  if (mapInstance.value && c && typeof mapInstance.value.setCenter === 'function') {
-    mapInstance.value.setCenter(c)
-  }
-}, { deep: true })
+/** Recenter dinámico si cambia center */
+watch(
+  () => props.center,
+  (c) => {
+    if (c && mapInstance.value?.setCenter) {
+      mapInstance.value.setCenter(c)
+      mapCenter.value = c
+    }
+  },
+  { deep: true }
+)
 </script>
