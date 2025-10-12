@@ -18,6 +18,10 @@
                         {{ espacio.location.split(',')[0] }}
                     </p>
 
+                    <p v-if="espacio.distancia" class="text-md md:text-[10px] text-gray-400 font-medium">
+                        📍 A {{ espacio.distancia.toFixed(1) }} km de distancia
+                    </p>
+
                     <div class="w-full flex flex-row justify-between items-start md:text-xs text-center py-2">
                         <div class="flex flex-row justify-start">
                             <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-1 border rounded-xl">

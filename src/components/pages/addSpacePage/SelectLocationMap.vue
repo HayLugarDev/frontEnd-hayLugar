@@ -1,9 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+
+import logo from "../../../assets/logo.png";
 
 const marker = ref({ lat: -26.8083, lng: -65.2176 }) // default
 const address = ref('')
 const emit = defineEmits(['close', 'selected'])
+
+const optionsComputed = computed<google.maps.MapOptions>(() => ({
+  gestureHandling: 'greedy',
+  zoomControl: true,
+  streetViewControl: true,
+  mapTypeControl: false,
+  fullscreenControl: true,
+  ...props.options, 
+}))
 
 // cuando el usuario hace click en el mapa
 const updateMarker = (event) => {
@@ -43,13 +54,8 @@ const confirmSelection = () => {
     <div class="bg-white rounded-xl p-4 w-full max-w-lg relative">
       <h2 class="text-lg font-bold mb-2">Seleccioná la ubicación</h2>
 
-      <GMapMap
-        :center="marker"
-        :zoom="15"
-        style="width: 100%; height: 400px"
-        @click="updateMarker"
-      >
-        <GMapMarker :position="marker" />
+      <GMapMap :center="marker" :zoom="15" style="width: 100%; height: 400px" @click="updateMarker" :options="optionsComputed">
+        <GMapMarker :position="marker" :icon="{ url: logo, scaledSize: { width: 40, height: 40 } }" />
       </GMapMap>
 
       <p v-if="address" class="text-gray-600 text-sm mt-2 italic">{{ address }}</p>
