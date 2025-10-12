@@ -40,7 +40,7 @@
         </div>
         <div v-else class="w-full h-full">
           <CustomGoogleMap class="rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
-            :options="mapOptions">
+            :options="mapOptions" :showUserMarker="true" :userPosition="center">
             <GMapMarker v-for="(espacio) in espacios" :key="espacio.id" :options="getMarkerOptions(espacio)"
               @mouseover="handleMouseOver(espacio)" @mouseout="handleMouseOut"
               @click="() => handleMarkerClick(espacio)" />
@@ -80,6 +80,7 @@ import { useGoogleMap } from '../logic/useGoogleMap';
 import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
 import ZoneNavbarButton from '../components/pages/dashboardPage/ZoneNavbarButton.vue';
 import WelcomeSpeech from '../components/layout/WelcomeSpeech.vue';
+import { calculateDistance } from '../utils/distance';
 
 const router = useRouter();
 
@@ -98,6 +99,8 @@ const publishedDate = ref(null);
 const maxPrice = ref('');
 const sortBy = ref('nearest');
 
+const userLocation = ref(null);
+
 const {
   center,
   zoom,
@@ -109,6 +112,26 @@ const {
   setCenterToUserLocation
 } = useGoogleMap();
 
+// Ordenar segun la distancia
+const setUserLocation = () => {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          userLocation.value = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          resolve(userLocation.value);
+        },
+        error => reject(error)
+      );
+    } else {
+      reject("Geolocalización no soportada");
+    }
+  });
+};
+
 const obtenerEspacios = async () => {
   cargando.value = true;
   try {
@@ -117,7 +140,21 @@ const obtenerEspacios = async () => {
       espacios.value = [];
       error.value = "Aún no hay espacios creados.";
     } else {
-      espacios.value = spaces;
+      if (userLocation.value) {
+        espacios.value = spaces
+          .map(espacio => ({
+            ...espacio,
+            distancia: calculateDistance(
+              userLocation.value.lat,
+              userLocation.value.lng,
+              Number(espacio.latitude),
+              Number(espacio.longitude)
+            ),
+          }))
+          .sort((a, b) => a.distancia - b.distancia);
+      } else {
+        espacios.value = spaces;
+      }
     }
   } catch (err) {
     error.value = "No se pudieron cargar los espacios.";
@@ -125,11 +162,15 @@ const obtenerEspacios = async () => {
   } finally {
     cargando.value = false;
   }
-  cargando.value = false;
 };
 
 onMounted(async () => {
-  setCenterToUserLocation();
+  try {
+    await setUserLocation();
+    setCenterToUserLocation();
+  } catch (e) {
+    console.warn("No se pudo obtener ubicación del usuario:", e);
+  }
   await obtenerEspacios();
 });
 

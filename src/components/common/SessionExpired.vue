@@ -1,6 +1,7 @@
 <script setup>
 import { useUserStore } from '../../store/userStore';
 import { useRouter } from 'vue-router';
+import logo from '../../assets/logo.png';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -28,10 +29,10 @@ const closeModal = () => {
     <div v-if="sessionExpired" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
         <div class="flex flex-col items-center">
-          <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
+          <img :src="logo" alt="HayLugar" class="mx-auto w-20 h-20 mb-4 drop-shadow-lg select-none" loading="eager" />
           <!-- <h2 class="text-3xl font-bold text-primary mb-2">Hay Lugar</h2> -->
           <p class="text-lg text-gray-700 text-center mb-6">
-            Debes iniciar sesión para utilizar esta función.
+            Tenés que iniciar sesión para utilizar esta función.
           </p>
           <button @click="closeModal" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
             Iniciar Sesión
@@ -43,10 +44,13 @@ const closeModal = () => {
 </template>
 
 <style>
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s;
 }
-.fade-enter, .fade-leave-to {
+
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 </style>
