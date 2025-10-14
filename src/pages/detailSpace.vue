@@ -94,28 +94,36 @@
                 </div>
               </div>
               <!-- Días disponibles -->
-              <div v-if="disponibilidad.days" class="mt-4">
+              <div class="mt-4">
                 <p class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-2">
                   <font-awesome-icon icon="calendar-days" class="text-primary text-xl" />
-                  Días disponibles
+                  Disponibilidad:
                 </p>
 
                 <!-- Si está disponible todos los días -->
-                <div v-if="disponibilidad.allDays" class="flex items-center gap-2">
-                  <span
-                    class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full font-medium shadow-sm">
-                    <font-awesome-icon icon="check-circle" />
-                    Disponible todos los días
-                  </span>
-                </div>
 
-                <!-- Si tiene días específicos -->
-                <div v-else class="flex flex-wrap gap-2 mt-1">
-                  <span v-for="day in disponibilidad.days" :key="day"
-                    class="day-chip border border-primary/30 bg-primary/10 text-primary">
-                    {{ capitalizeDay(day) }}
-                  </span>
+
+                <div class="flex flex-wrap gap-2 my-2">
+                  <template v-if="disponibilidad?.days?.length">
+                    <div class="flex flex-wrap gap-2">
+                      <span v-for="(day, i) in disponibilidad.days" :key="i"
+                        class="px-3 py-1 text-sm rounded-full border border-primary/30 bg-primary/10 text-primary font-medium">
+                        {{ capitalizeDay(day) }}
+                      </span>
+                    </div>
+                  </template>
+
+                  <template v-else>
+                    <span
+                      class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full font-medium shadow-sm">
+                      <font-awesome-icon icon="check-circle" />
+                      Todos los días
+                    </span>
+                  </template>
                 </div>
+                <span v-if="disponibilidad.start && disponibilidad.end"
+                  class="day-chip border border-primary/30 bg-primary/10 text-primary flex-wrap">
+                  Horario: {{ disponibilidad.start }} - {{ disponibilidad.end }}</span>
               </div>
             </div>
             <div class="col-start-3 flex flex-col items-end text-xl gap-2">
@@ -290,6 +298,7 @@ const obtenerEspacio = async () => {
     const space = await getSpaceBySlug(slug);
     avgRating.value = space.average_rating || 5;
     fetchReviews(space.id);
+    console.log(space);
     return espacio.value = space;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
@@ -522,6 +531,7 @@ const capitalizeDay = (day) => {
 .day-chip {
   @apply px-3 py-1 rounded-full text-sm font-semibold transition-all;
 }
+
 .day-chip:hover {
   @apply bg-primary text-white;
 }
