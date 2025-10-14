@@ -89,8 +89,6 @@ const props = defineProps({
     espacio: Object
 });
 
-console.log(props.espacio);
-
 const disponibilidad = computed(() => {
     if (!props.espacio?.availability) return {};
     return typeof props.espacio.availability === 'string'
