@@ -110,6 +110,7 @@ const step = ref(1);
 const selectedFiles = ref([]);
 const emit = defineEmits(["success"]);
 
+
 const spaceData = ref({
   name: '',
   location: '',
@@ -124,6 +125,7 @@ const spaceData = ref({
   description: '',
   status: 'active',
   images: [],
+  reservation_period: '', // 'hour' | 'day' | 'week' | 'month'
   availability: { start: '', end: '', dateRange: [] }
 });
 
@@ -217,6 +219,7 @@ const resetValues = () => {
     description: '',
     status: 'active',
     images: [],
+    reservation_period: '', // 'hour' | 'day' | 'week' | 'month'
     availability: { start: '', end: '', dateRange: [] }
   };
 }

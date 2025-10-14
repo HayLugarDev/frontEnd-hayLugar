@@ -39,19 +39,25 @@
 
       <!-- Tipo de plazo -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Plazo ofrecido</label>
-        <div class="flex gap-2">
-          <button v-for="unit in priceUnits" :key="unit.value"
-            @click="price_unit = unit.value; updateAvailabilityFields()" :class="[
-              'px-4 py-2 rounded-xl font-semibold transition',
-              price_unit === unit.value
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            ]">
-            {{ unit.label }}
-          </button>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          Tipo de plazo ofrecido
+        </label>
+
+        <div
+          class="flex items-center justify-between gap-2 bg-gray-50 rounded-2xl p-1 border border-gray-200 shadow-sm">
+          <label v-for="unit in priceUnits" :key="unit.value" class="flex-1 cursor-pointer">
+            <input type="radio" name="reservation_period" class="hidden peer" :value="unit.value"
+              v-model="reservation_period" @change="updateAvailabilityFields" />
+
+            <div class="text-center px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 
+               peer-checked:bg-primary peer-checked:text-white 
+               peer-checked:shadow-md text-gray-700 hover:bg-gray-100">
+              {{ unit.label }}
+            </div>
+          </label>
         </div>
       </div>
+
 
       <!-- Horario de disponibilidad -->
       <fieldset v-if="price_unit === 'hour'" class="border border-gray-200 p-4 rounded-2xl">
@@ -59,26 +65,16 @@
         <div class="grid grid-cols-2 gap-4 mt-2">
           <div>
             <label class="block text-sm mb-1">Desde:</label>
-            <DatePicker v-model:value="availabilityStart" type="time" format="HH:mm" placeholder="Hora inicio"
+            <DatePicker v-model:value="availabilityStartRaw" type="time" format="HH:mm" placeholder="Hora inicio"
               class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
           </div>
           <div>
             <label class="block text-sm mb-1">Hasta:</label>
-            <DatePicker v-model:value="availabilityEnd" type="time" format="HH:mm" placeholder="Hora fin"
+            <DatePicker v-model:value="availabilityEndRaw" type="time" format="HH:mm" placeholder="Hora fin"
               class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
           </div>
         </div>
       </fieldset>
-
-      <!-- Período semanal o mensual -->
-      <div v-if="price_unit === 'week' || price_unit === 'month'" class="mt-4">
-        <fieldset class="border border-gray-200 p-4 rounded-2xl">
-          <legend class="text-lg font-semibold text-gray-800">Selecciona un período</legend>
-          <DatePicker v-model:value="availabilityDateRange" type="date" :range="true" format="YYYY-MM-DD"
-            placeholder="Selecciona una fecha de inicio"
-            class="w-full mt-2 rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
-        </fieldset>
-      </div>
 
       <!-- Días disponibles -->
       <div class="mt-4">
@@ -90,21 +86,20 @@
           <div class="mb-2">
             <label class="flex items-center gap-2">
               <input type="checkbox" v-model="allDaysSelected" @change="handleAllDaysChange"
-                class="h-4 w-4 text-primary" />
+                :disabled="price_unit !== 'hour'" class="h-4 w-4 text-primary" />
               <span><b>Todos los días</b></span>
             </label>
           </div>
-          <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
+          <div v-if="price_unit === 'hour'" class="grid grid-cols-2 gap-2 md:grid-cols-3">
             <label v-for="day in daysOfWeek" :key="day.value" class="flex items-center gap-2">
-              <input type="checkbox" :value="day.value" v-model="availabilityDays" :disabled="allDaysSelected"
-                @change="handleSpecificDaysChange" class="h-4 w-4 text-primary" />
+              <input type="checkbox" :value="day.value" v-model="availabilityDays" @change="handleSpecificDaysChange"
+                class="h-4 w-4 text-primary" />
               <span>{{ day.label }}</span>
             </label>
           </div>
         </fieldset>
       </div>
 
-      <!-- Mensaje dinámico -->
       <div v-if="price_unit" :class="[
         'p-4 rounded-xl text-sm',
         price_unit === 'hour' ? 'bg-blue-50 text-blue-700' : 'bg-yellow-50 text-yellow-700'
@@ -113,16 +108,29 @@
       </div>
 
       <!-- Resumen -->
-      <div v-if="price_unit" class="mt-6 p-4 border rounded-2xl bg-gray-50 text-sm">
-        <p><strong>Resumen:</strong></p>
-        <div v-if="availabilityStart && availabilityEnd">
-          <p>Disponible desde {{ formatDate(availabilityStart) }}</p>
-          <p>Hasta {{ formatDate(availabilityEnd) }}</p>
-          <p v-if="selectedDaysLabels">Días: {{ selectedDaysLabels }}</p>
-          <p v-else>Todos los días</p>
-          <p v-if="price_unit === 'week' || price_unit === 'month'">
-            Período: {{ availabilityDateRange }}
-          </p>
+      <div v-if="price_unit" class="mt-6 p-5 bg-white rounded-2xl shadow-sm border border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <span class="inline-block w-2 h-2 bg-primary rounded-full"></span>
+          Resumen de disponibilidad
+        </h3>
+
+        <div class="space-y-1 text-gray-700 text-sm leading-relaxed">
+          <div v-if="reservation_period === 'hour' && availabilityStartRaw && availabilityEndRaw">
+            <p><span class="font-medium">Días disponible para reservar:</span> {{ selectedDaysLabels ?
+              selectedDaysLabels : 'Todos los días' }}</p>
+            <p>
+              <span class="font-medium">Franja horaria disponible:</span>
+              {{ formatDate(availabilityStartRaw, 'time') }} – {{ formatDate(availabilityEndRaw, 'time') }}
+            </p>
+          </div>
+
+          <div v-else-if="reservation_period === 'day' || reservation_period === 'week' || reservation_period === 'month'">
+            <p><span class="font-medium">Días disponible para reservar:</span> Todos los días</p>
+          </div>
+
+          <div v-else class="text-red-600 font-medium">
+            Aún no has seleccionado días u horarios de disponibilidad.
+          </div>
         </div>
       </div>
 
@@ -161,7 +169,7 @@
 
 <script setup lang="ts">
 import StatusModal from "../addSpacePage/StatusModal.vue";
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import { getAllDays, WeekDay } from "../../../utils/daysTraslation";
@@ -175,9 +183,22 @@ const emit = defineEmits(['update:modelValue', 'next', 'prev']);
 
 const selectedFiles = ref([]);
 const previewImages = ref([]);
-const price_unit = ref<'hour' | 'day' | 'week' | 'month'>('hour');
+
+const price_unit = computed({
+  get: () => props.modelValue.reservation_period || 'hour',
+  set: (val) => {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      reservation_period: val
+    });
+  }
+});
+
 const daysOfWeek = getAllDays();
 const allDaysSelected = ref(false);
+
+const availabilityStartRaw = ref<Date | null>(null);
+const availabilityEndRaw = ref<Date | null>(null);
 
 // 👉 Opciones de plazo
 const priceUnits = [
@@ -189,26 +210,42 @@ const priceUnits = [
 
 // 👉 Mensajes informativos según el plazo seleccionado
 const availabilityMessages: Record<string, string> = {
-  hour: `⏱️ <strong>Por Hora:</strong> La reserva se calcula por <strong>cantidad de horas</strong> 
-         dentro del rango horario que definas como disponible. 
-         El usuario podrá elegir inicio y fin solo en el mismo día. 
-         <br/><br/>🔑 Recordá aclarar los <strong>horarios en los que podrás recibir a los clientes</strong> 
-         para realizar <em>check-in</em> y <em>check-out</em>.`,
+  hour: `
+    ⏱️ <strong>Reservas por hora</strong><br/>
+    El usuario podrá alquilar tu espacio por <strong>cantidad de horas</strong> dentro del horario que definas como disponible.
+    <br/><br/>
+    📍 Podrá elegir hora de inicio y fin, siempre <strong>dentro del mismo día</strong>.
+    <br/><br/>
+    💡 <strong>Consejo:</strong> Indicá claramente en qué horarios estarás disponible para recibir al cliente y facilitar el <em>check-in</em> y <em>check-out</em>.
+  `,
 
-  day: `📅 <strong>Por Día:</strong> Cada reserva abarca <strong>24 horas exactas</strong> 
-        desde el momento en que comienza, aplicando únicamente en los días y horarios que configures. 
-        <br/><br/>🔑 Es importante que indiques los <strong>horarios disponibles para recibir a los clientes</strong> 
-        y coordinar el <em>check-in</em> y <em>check-out</em>.`,
+  day: `
+    📅 <strong>Reservas por día</strong><br/>
+    El usuario podrá seleccionar un <strong>rango de fechas</strong>, eligiendo un día de inicio y uno de finalización.
+    <br/><br/>
+    📍 Cada día reservado equivale a <strong>24 horas</strong>. 
+    <br/>El rango puede ser desde <strong>1 hasta 30 días consecutivos</strong>, siempre que tu espacio esté disponible.
+    <br/><br/>
+    🔑 <strong>Importante:</strong> El usuario debe poder ingresar y salir libremente durante el período reservado.
+  `,
 
-  week: `🗓️ <strong>Por Semana:</strong> El período contempla <strong>7 días consecutivos</strong> 
-         desde la fecha de inicio. El sistema validará que la disponibilidad abarque la semana completa. 
-         <br/><br/>🔑 No olvides detallar los <strong>horarios en los que atenderás a los clientes</strong> 
-         para facilitar el <em>check-in</em> y <em>check-out</em>.`,
+  week: `
+    🗓️ <strong>Reservas por semana</strong><br/>
+    El usuario podrá alquilar tu espacio por <strong>períodos de 7 días consecutivos</strong>, a partir de la fecha de inicio seleccionada.
+    <br/><br/>
+    📍 El sistema verificará que la disponibilidad cubra la semana completa.
+    <br/><br/>
+    🔑 <strong>Importante:</strong> Asegurate de que el usuario pueda ingresar y salir libremente durante toda la semana reservada.
+  `,
 
-  month: `📆 <strong>Por Mes:</strong> Cada reserva corresponde a un período de <strong>30 días corridos</strong> 
-          desde la fecha de inicio, siempre que el espacio esté disponible durante todo el mes seleccionado. 
-          <br/><br/>🔑 Asegurate de indicar claramente los <strong>horarios en los que recibirás a los clientes</strong> 
-          para realizar el <em>check-in</em> y <em>check-out</em>.`
+  month: `
+    📆 <strong>Reservas por mes</strong><br/>
+    Cada reserva corresponde a un período de <strong>30 días corridos</strong> desde la fecha de inicio seleccionada.
+    <br/><br/>
+    📍 El sistema verificará que el espacio esté disponible durante todo el mes.
+    <br/><br/>
+    🔑 <strong>Importante:</strong> El usuario debe poder ingresar y salir libremente durante el mes de la reserva.
+  `
 };
 
 // 👉 Computed para el mensaje dinámico según el plazo seleccionado
@@ -261,7 +298,7 @@ const handleNext = () => {
     return;
   }
 
-  if (!availabilityStart.value || !availabilityEnd.value) {
+  if ((!availabilityStartRaw.value || !availabilityEndRaw.value) && reservation_period.value === "hour") {
     errorMessage.value = "Debes definir un horario de disponibilidad (inicio y fin).";
     showErrorModal.value = true;
     return;
@@ -272,13 +309,6 @@ const handleNext = () => {
     showErrorModal.value = true;
     return;
   }
-
-  if ((price_unit.value === "week" || price_unit.value === "month") && !availabilityDateRange.value) {
-    errorMessage.value = "Debes seleccionar un rango de fechas de disponibilidad.";
-    showErrorModal.value = true;
-    return;
-  }
-
 
   emit("next"); // pasa a la siguiente etapa
 };
@@ -304,9 +334,18 @@ const handleFileUpload = (event: Event) => {
     previewImages.value = results;
   });
 };
+
 const updateAvailabilityFields = () => {
-  props.modelValue.availability = { start: '', end: '', dateRange: [] };
+  emit('update:modelValue', {
+    ...props.modelValue,
+    availability: { start: '', end: '', dateRange: [] }
+  });
 };
+
+const reservation_period = computed({
+  get: () => props.modelValue.reservation_period,
+  set: (val) => emit('update:modelValue', { ...props.modelValue, reservation_period: val })
+});
 
 const name = computed({
   get: () => props.modelValue.name,
@@ -320,6 +359,7 @@ const description = computed({
   get: () => props.modelValue.description,
   set: (val) => emit('update:modelValue', { ...props.modelValue, description: val })
 });
+
 const availabilityStart = computed({
   get: () => props.modelValue.availability?.start || '',
   set: (val) => {
@@ -346,7 +386,22 @@ const availabilityEnd = computed({
   },
 });
 
-// 👉 Aquí conectamos los días seleccionados
+// Lógica para sincronizar DatePicker -> HH:mm
+watch(availabilityStartRaw, (val) => {
+  if (!val) return;
+  const h = val.getHours().toString().padStart(2, '0');
+  const m = val.getMinutes().toString().padStart(2, '0');
+  availabilityStart.value = `${h}:${m}`;
+});
+
+watch(availabilityEndRaw, (val) => {
+  if (!val) return;
+  const h = val.getHours().toString().padStart(2, '0');
+  const m = val.getMinutes().toString().padStart(2, '0');
+  availabilityEnd.value = `${h}:${m}`;
+});
+
+
 const availabilityDays = computed<WeekDay[]>({
   get: () => props.modelValue.availability?.days || [],
   set: (val) => {
@@ -360,8 +415,37 @@ const availabilityDays = computed<WeekDay[]>({
   },
 });
 
+watch(price_unit, (newUnit) => {
+
+  // Ajustes para disponibilidad de días
+  if (newUnit !== 'hour') {
+    allDaysSelected.value = true;
+    availabilityDays.value = [];
+  } else {
+    allDaysSelected.value = false;
+  }
+}, { immediate: true });
+
+watch(
+  () => [availabilityDays.value, price_unit.value],
+  ([newDays, unit]) => {
+    // Si es por hora, todos los días bloqueados
+    if (unit === "hour") {
+      if (newDays.length > 0) {
+        allDaysSelected.value = false;
+      }
+      if (newDays.length === 0) {
+        allDaysSelected.value = true;
+      }
+      return;
+    }
+  },
+  { immediate: true }
+);
+
+
 const availabilityDateRange = computed({
-  get: () => props.modelValue.availability?.dateRange || null,
+  get: () => props.modelValue.availability?.dateRange || [],
   set: (val) => {
     emit('update:modelValue', {
       ...props.modelValue,
