@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const props = defineProps({
   controls: Boolean,
