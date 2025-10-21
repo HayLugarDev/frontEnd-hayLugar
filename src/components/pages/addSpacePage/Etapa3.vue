@@ -33,10 +33,6 @@
       </button>
     </div>
 
-    <!-- Modal de configuración -->
-    <!-- <VehicleModal v-if="selectedType" :type="selectedType" :existing="vehicleMap[selectedType]"
-      @save="saveConfiguration" @close="selectedType = null" /> -->
-
     <!-- Modal de error -->
     <StatusModal :visible="showErrorModal" title="¡Atención!"
       message="Por favor, selecciona al menos un tipo de vehículo y configura su capacidad y precio."

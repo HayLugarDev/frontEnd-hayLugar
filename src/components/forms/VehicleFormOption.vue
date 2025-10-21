@@ -65,13 +65,21 @@
       </div>
     </transition>
   </div>
+
+  <StatusModal :visible="showErrorModal" title="¡Atención!"
+      :message="errorMessage"
+      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
+import StatusModal from '../pages/addSpacePage/StatusModal.vue';
 
 const props = defineProps(['value', 'title', 'text', 'configured', 'configuration'])
 const emit = defineEmits(['save', 'remove'])
+
+const showErrorModal = ref(false);
+const errorMessage = ref('');
 
 const expanded = ref(false)
 const localConfig = ref({
@@ -98,6 +106,18 @@ function cancel() {
 }
 
 function save() {
+
+  if (localConfig.value.capacity < 1) {
+    errorMessage.value = 'La cantidad de vehículos debe ser al menos 1';
+    showErrorModal.value = true;
+    return;
+  }
+  if (localConfig.value.price_per_hour < 100) {
+    errorMessage.value = 'El precio por hora debe ser al menos $100';
+    showErrorModal.value = true;
+    return;
+  }
+
   emit('save', { ...localConfig.value })
   expanded.value = false
 }
