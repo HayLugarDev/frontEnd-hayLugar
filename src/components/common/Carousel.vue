@@ -10,7 +10,7 @@
 
     <div v-if="props.controls">
       <!-- Botones de navegación -->
-      <div v-if="props.images.length > 1" class="absolute inset-0 flex justify-between items-center px-4">
+      <!-- <div v-if="props.images.length > 1" class="absolute inset-0 flex justify-between items-center px-4">
         <button @click="prevSlide" type="button"
           class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none">
           <span
@@ -35,7 +35,7 @@
             <span class="sr-only">Siguiente</span>
           </span>
         </button>
-      </div>
+      </div> -->
 
       <!-- Indicadores -->
       <div v-if="props.images.length > 1" class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
