@@ -42,7 +42,7 @@
         <div v-else class="w-full h-full">
           <CustomGoogleMap class="rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
             :options="mapOptions" :showUserMarker="true" :userPosition="center">
-            <GMapMarker v-for="(space) in spaces" :key="espacio.id" :options="getMarkerOptions(space)"
+            <GMapMarker v-for="(space) in spaces" :key="space.id" :options="getMarkerOptions(space)"
               @mouseover="handleMouseOver(space)" @mouseout="handleMouseOut"
               @click="() => handleMarkerClick(space)" />
             <InfoWindow v-if="hoveredSpace && hoveredSpace.latitude && hoveredSpace.longitude" :position="{
