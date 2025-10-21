@@ -33,7 +33,7 @@
       </div>
 
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
-        <div v-if="!showMap" class="relative flex-1 gap-1 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
+        <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
           <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">
             {{ error }}
           </div>
