@@ -13,6 +13,41 @@ export const getAllSpaces = async () => {
   }
 };
 
+export const getSpaceImages = async (spaceId: number) => {
+  try {
+    const response = await api.get(`/spaces/${spaceId}/images`);
+    const data = response.data;
+
+    // Si las imágenes vienen como string JSON → convertir
+    let images: string[] = [];
+    if (typeof data === "string") {
+      try {
+        images = JSON.parse(data);
+      } catch {
+        images = [];
+      }
+    } else if (Array.isArray(data)) {
+      images = data;
+    } else if (data?.images) {
+      // si la respuesta es un objeto con la propiedad images
+      if (typeof data.images === "string") {
+        try {
+          images = JSON.parse(data.images);
+        } catch {
+          images = [];
+        }
+      } else {
+        images = data.images;
+      }
+    }
+
+    return images;
+  } catch (error) {
+    console.error(`Error al obtener imágenes del espacio ${spaceId}:`, error);
+    return [];
+  }
+};
+
 export const getFilteredSpaces = async (filters: {
   searchQuery?: string;
   checkIn?: string;

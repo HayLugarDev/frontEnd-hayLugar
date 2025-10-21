@@ -76,12 +76,10 @@
 
     <!-- Modal de éxito -->
     <StatusModal :visible="showSuccessModal" type="success" title="Excelente!"
-      message="Publicaste correctamente tu espacio en HayLugar." :icon="logo"
-      @confirm="closeSuccesModal" />
+      message="Publicaste correctamente tu espacio en HayLugar." :icon="logo" @confirm="closeSuccesModal" />
 
     <!-- Modal de error -->
-    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-      :message="errorMessage" :icon="logo"
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage" :icon="logo"
       @confirm="showErrorModal = false" />
   </div>
 </template>
@@ -100,6 +98,7 @@ import Etapa5 from '../components/pages/addSpacePage/Etapa5.vue';
 import BackButton from '../components/common/BackButton.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import logo from "../assets/logo.png";
+import { useSpaceStore } from "../store/spaceStore";
 
 const router = useRouter();
 const showSuccessModal = ref(false);
@@ -107,8 +106,9 @@ const showErrorModal = ref(false);
 const errorMessage = ref('');
 const currentStep = ref(0); // 0 = instrucciones, 1 = formulario
 const step = ref(1);
-const selectedFiles = ref([]);
 const emit = defineEmits(["success"]);
+
+const spaceStore = useSpaceStore()
 
 
 const spaceData = ref({
@@ -149,12 +149,6 @@ function prevStep() {
 
 const addSpace = async () => {
 
-  // const error = validarFormulario();
-  // if (error) {
-  //   alert(error);
-  //   return;
-  // }
-
   if (spaceData.value.images.length === 0) {
     alert('Debe subir al menos una imagen del espacio');
     return;
@@ -177,6 +171,10 @@ const addSpace = async () => {
     const response = await api.post('/spaces/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+
+    const newSpace = response.data;
+    spaceStore.addSpaceToStore(newSpace);
+
     showSuccessModal.value = true;
     emit('success');
     resetValues();
