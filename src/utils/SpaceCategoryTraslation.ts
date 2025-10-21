@@ -1,8 +1,8 @@
-export type SpaceCategory = 'private_parking' | 'university' | 'public';
+export type SpaceCategory = 'private' | 'university' | 'public';
 
 // Creamos un mapa fuertemente tipado
 export const categoryTraslatation: Record<SpaceCategory, string> = {
-  private_parking: 'Privado',
+  private: 'Privado',
   university: 'Universidad',
   public: 'Público',
 };

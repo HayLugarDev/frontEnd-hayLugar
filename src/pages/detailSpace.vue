@@ -3,13 +3,13 @@
   <div class="flex flex-col bg-secondary xl:w-11/12 mx-auto md:gap-4 mt-16 md:mt-0">
 
     <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
-      <div v-if="espacio?.images">
+      <div v-if="space?.images">
 
         <!-- Carrusel en móviles -->
-        <Carousel :images="espacio.images" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
+        <Carousel :images="space.images" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
 
         <!-- Info del anfitrión -->
-        <section v-if="espacio?.host"
+        <section v-if="space?.host"
           class="col-span-3 bg-white p-6 px-10 rounded-xl shadow-md mt-6 font-normal border border-gray-200 transition-all hover:shadow-xl">
           <div class="flex flex-row items-center gap-6">
             <img :src="hostImage" alt="Imagen del anfitrión"
@@ -17,15 +17,15 @@
             <div class="flex flex-col gap-2 w-full text-gray-800 text-base">
               <div class="flex flex-row gap-2 items-center">
                 <span class="text-lg font-bold text-primary">Anfitrión:</span>
-                <span class="font-semibold">{{ capitalizeFirst(espacio.host.name) }} {{
-                  capitalizeFirst(espacio.host.last_name) }}</span>
+                <span class="font-semibold">{{ capitalizeFirst(space.host.name) }} {{
+                  capitalizeFirst(space.host.last_name) }}</span>
               </div>
-              <div v-if="espacio.host.phone" class="flex flex-row gap-2 items-center">
+              <div v-if="space.host.phone" class="flex flex-row gap-2 items-center">
                 <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-600" />
-                <span class="font-medium">+549{{ espacio.host.phone }}</span>
+                <span class="font-medium">+549{{ space.host.phone }}</span>
               </div>
               <div class="text-xs md:text-md flex flex-row gap-2 items-center">
-                <span class="font-medium">{{ espacio.host.email }}</span>
+                <span class="font-medium">{{ space.host.email }}</span>
               </div>
             </div>
           </div>
@@ -34,7 +34,7 @@
         <!-- Título + Favorito + Compartir -->
         <div
           class="flex flex-row items-center justify-between mt-4 px-6 md:px-2 sticky top-0 bg-white z-10 rounded-xl shadow-sm py-2">
-          <h1 class="text-3xl sm:text-2xl font-bold text-primary pl-2">{{ capitalizeFirst(espacio.name) }}</h1>
+          <h1 class="text-3xl sm:text-2xl font-bold text-primary pl-2">{{ capitalizeFirst(space.name) }}</h1>
           <div class="flex flex-row items-center gap-4">
             <button @click="toggleFavourite"
               class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-200 hover:scale-110 bg-white border-2 border-gray-200 hover:border-red-400"
@@ -53,11 +53,11 @@
         <!-- Galería de imágenes grande -->
         <div class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-4 h-[400px]">
           <div class="col-span-4 row-span-8">
-            <img :src="espacio.images[0]" alt="Principal"
+            <img :src="space.images[0]" alt="Principal"
               class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer transition-transform duration-200 hover:scale-105"
               @click="openImageModal(0)" />
           </div>
-          <template v-for="(img, index) in espacio.images.slice(1, 5)" :key="index">
+          <template v-for="(img, index) in space.images.slice(1, 5)" :key="index">
             <div :class="imageGridPosition(index)">
               <img :src="img" alt="Espacio"
                 class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer transition-transform duration-200 hover:scale-105"
@@ -67,7 +67,7 @@
         </div>
 
         <!-- Modal -->
-        <ImageModal :visible="isImageModalOpen" :images="espacio.images" :startIndex="currentImageIndex"
+        <ImageModal :visible="isImageModalOpen" :images="space.images" :startIndex="currentImageIndex"
           @close="isImageModalOpen = false" />
 
 
@@ -76,12 +76,12 @@
           <!-- Información del espacio -->
           <div class="col-span-6 grid grid-cols-3 gap-4 p-10">
             <div class="col-span-2">
-              <p v-if="espacio.location" class="text-md font-bold text-gray-800 mb-1">
-                {{ espacio.location.split(',')[1] || '' }}
+              <p v-if="space.location" class="text-md font-bold text-gray-800 mb-1">
+                {{ space.location.split(',')[1] || '' }}
               </p>
-              <p class="text-sm md:text-lg text-gray-500 font-semibold mb-4">{{ espacio.location.split(',')[0] }}</p>
+              <p class="text-sm md:text-lg text-gray-500 font-semibold mb-4">{{ space.location.split(',')[0] }}</p>
               <div class="my-4 flex flex-col gap-3">
-                <div v-for="v in espacio.vehicle_capacities" :key="v.type"
+                <div v-for="v in space.vehicle_capacities" :key="v.type"
                   class="p-3 px-6 border-2 rounded-xl shadow-md bg-gray-50 flex flex-col gap-1">
                   <p class="font-semibold text-xl flex items-center gap-2">
                     <font-awesome-icon :icon="['fas', getVehicleType(v.type)]" class="text-primary" />
@@ -173,16 +173,16 @@
               <font-awesome-icon icon="info-circle" class="text-primary" />
               Descripción:
             </p>
-            <p class="text-gray-600 font-medium mt-2">{{ espacio.description }}</p>
+            <p class="text-gray-600 font-medium mt-2">{{ space.description }}</p>
           </section>
 
           <!-- Mapa -->
           <div
             class="col-span-10 flex flex-col justify-center items-start h-[350px] order-7 relative overflow-hidden p-4 rounded-xl bg-white shadow-md border border-gray-200">
             <p class="px-4 font-semibold mb-2">Ubicación en el mapa:</p>
-            <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
+            <CustomGoogleMap :center="{ lat: Number(space.latitude), lng: Number(space.longitude) }"
               class="absolute inset-0 w-full h-full rounded-xl overflow-hidden shadow-md">
-              <GMapMarker :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="{
+              <GMapMarker :position="{ lat: Number(space.latitude), lng: Number(space.longitude) }" :icon="{
                 url: carMarker,
                 scaledSize: { width: 40, height: 40 }
               }" />
@@ -239,6 +239,11 @@ import { formatLocalDateTime } from '../utils/FormatDate';
 import { imageGridPosition } from '../utils/imageGrid';
 import { getReviewsBySpace } from "../services/reviewService";
 import ReviewsModal from '../components/common/ReviewsModal.vue';
+import { storeToRefs } from 'pinia'
+import { useSpaceStore } from '../store/spaceStore'
+
+const spaceStore = useSpaceStore()
+const { selectedSpace: space, favorites } = storeToRefs(spaceStore)
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -248,10 +253,8 @@ const tiempoInicial = ref(null);
 const tiempoFinal = ref(null);
 const tipoVehiculo = ref('');
 const tipoPlazoReserva = ref('Por hora');
-const espacio = ref(null);
 const deadLine = ref(null);
 const activedFavouriteIcon = ref(false);
-const isAnimating = ref(false);
 
 const showVehicleModal = ref(false);
 const vehiculosUsuario = ref([]);
@@ -273,8 +276,8 @@ const avgRating = ref(0);
 const totalReviews = ref(0);
 
 const ownerIdFromSpace = computed(() => {
-  if (!espacio.value) return null;
-  return espacio.value.owner_id ?? espacio.value.host?.id ?? espacio.value.host?.user_id ?? null;
+  if (!space.value) return null;
+  return space.value.owner_id ?? space.value.host?.id ?? space.value.host?.user_id ?? null;
 });
 
 const isOwner = computed(() => {
@@ -286,32 +289,28 @@ const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 // Espacio disponible del espacio
 const disponibilidad = computed(() => {
-  if (!espacio.value?.availability) return {};
-  return typeof espacio.value.availability === 'string'
-    ? JSON.parse(espacio.value.availability)
-    : espacio.value.availability;
+  if (!space.value?.availability) return {};
+  return typeof space.value.availability === 'string'
+    ? JSON.parse(space.value.availability)
+    : space.value.availability;
 });
 
 const obtenerEspacio = async () => {
-  try {
-    const slug = route.params.slug;
-    const space = await getSpaceBySlug(slug);
-    avgRating.value = space.average_rating || 5;
-    fetchReviews(space.id);
-    console.log(space);
-    return espacio.value = space;
-  } catch (error) {
-    console.error("Error al obtener el espacio:", error);
+  const slug = route.params.slug
+  const space = await spaceStore.fetchSpaceBySlug(slug)
+  if (!space) return
+
+  avgRating.value = space.average_rating || 5
+  fetchReviews(space.id)
+
+  if (isLogged.value) {
+    await spaceStore.fetchFavoriteSpaces()
+    activedFavouriteIcon.value = await spaceStore.isFavorite(space.id)
   }
 };
 
 onMounted(async () => {
   await obtenerEspacio();
-
-  if (isLogged.value) {
-    const favs = await getUserFavorites();
-    activedFavouriteIcon.value = favs.some(f => f.space_id === espacio.value.id);
-  }
 });
 
 const openReviews = () => {
@@ -329,15 +328,15 @@ const fetchReviews = async (SpaceId) => {
 };
 
 const sharePublication = async () => {
-  if (!espacio.value) return;
+  if (!space.value) return;
 
   try {
-    const url = `${window.location.origin}/espacio/${espacio.value.id}`;
+    const url = `${window.location.origin}/espacio/${space.value.slug}`;
 
     if (navigator.share) {
       // Usa el API nativo de compartir (móvil/compatible)
       await navigator.share({
-        title: espacio.value.name,
+        title: space.value.name,
         text: '¡Mirá este espacio que encontré para estacionar!',
         url,
       });
@@ -366,7 +365,7 @@ const reservar = async () => {
     return;
   }
 
-  if (!espacio.value || !tiempoInicial.value || !tiempoFinal.value || !tipoVehiculo.value) {
+  if (!space.value || !tiempoInicial.value || !tiempoFinal.value || !tipoVehiculo.value) {
     errorMessage.value = 'Faltan completar campos para la reserva';
     modalIsHtml.value = false;
     showErrorModal.value = true;
@@ -405,8 +404,8 @@ const reservar = async () => {
 const onSelectedVehicle = (vehicle) => {
   vehiculoSeleccionado.value = vehicle;
   const payload = {
-    owner_id: espacio.value.owner_id,
-    space_id: espacio.value.id,
+    owner_id: space.value.owner_id,
+    space_id: space.value.id,
     vehicle_id: vehiculoSeleccionado.value.id,
     vehicle_type: getVehicleKey(tipoVehiculo.value),
     start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
@@ -421,7 +420,7 @@ const onSelectedVehicle = (vehicle) => {
 };
 
 const totalCalculado = computed(() => {
-  if (!tiempoInicial.value || !tiempoFinal.value || !espacio.value || !tipoVehiculo.value) return 0;
+  if (!tiempoInicial.value || !tiempoFinal.value || !space.value || !tipoVehiculo.value) return 0;
 
   const inicio = new Date(tiempoInicial.value);
   const fin = new Date(tiempoFinal.value);
@@ -435,9 +434,9 @@ const totalCalculado = computed(() => {
 
   // Buscar la tarifa del vehículo seleccionado
   let precioHora = 0;
-  if (Array.isArray(espacio.value.vehicle_capacities)) {
+  if (Array.isArray(space.value.vehicle_capacities)) {
     const tipoOriginal = getVehicleKey(tipoVehiculo.value);
-    const vehicle = espacio.value.vehicle_capacities.find(v => v.type === tipoOriginal);
+    const vehicle = space.value.vehicle_capacities.find(v => v.type === tipoOriginal);
     if (vehicle) {
       precioHora = Number(vehicle.price_per_hour);
     }
@@ -469,13 +468,13 @@ const totalCalculado = computed(() => {
 });
 
 const vehicleOptions = computed(() => {
-  if (!espacio.value?.vehicle_capacities) return [];
+  if (!space.value?.vehicle_capacities) return [];
 
-  return espacio.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
+  return space.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
 });
 
 const hostImage = computed(() => {
-  return espacio.value.host?.profile_picture || user_icon_primary;
+  return space.value.host?.profile_picture || user_icon_primary;
 });
 
 const openImageModal = (index) => {
@@ -488,29 +487,31 @@ const editPublication = () => {
 };
 
 const toggleFavourite = async () => {
-  await verifyToken();
-  if (isSessionInvalid.value) return;
+  await verifyToken()
+  if (isSessionInvalid.value) return
 
   try {
-    if (!activedFavouriteIcon.value) {
-      await addFavorite(espacio.value.id);
+    const spaceId = space.value.id
+    const isFav = await spaceStore.isFavorite(spaceId);
+
+    if (!isFav) {
+      await addFavorite(spaceId)
+      await spaceStore.fetchFavoriteSpaces()
       activedFavouriteIcon.value = true;
-      showToast("Agregado a mis favoritos", "success");
+      showToast("Agregado a mis favoritos", "success")
     } else {
-      await removeFavorite(espacio.value.id);
+      await removeFavorite(spaceId)
+      await spaceStore.fetchFavoriteSpaces()
       activedFavouriteIcon.value = false;
-      showToast("Eliminado de mis favoritos", "error");
+      showToast("Eliminado de mis favoritos", "error")
     }
-    // animación del corazón
-    isAnimating.value = true;
-    setTimeout(() => {
-      isAnimating.value = false;
-    }, 400);
   } catch (err) {
-    console.error("Error en toggleFavourite", err);
-    showToast("Ocurrió un error, intenta de nuevo", "error");
+    console.error("Error en toggleFavourite", err)
+    showToast("Ocurrió un error, intenta de nuevo", "error")
   }
-};
+}
+
+
 
 const capitalizeDay = (day) => {
   const map = {

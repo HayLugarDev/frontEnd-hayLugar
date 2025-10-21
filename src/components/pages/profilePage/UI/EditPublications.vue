@@ -1,222 +1,289 @@
 <template>
-    <transition name="fade">
-        <div v-if="visible" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div class="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-8 relative overflow-y-auto max-h-[90vh]">
+  <transition name="fade">
+    <div v-if="visible" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-8 relative overflow-y-auto max-h-[90vh]">
 
-                <!-- Botón cerrar -->
-                <button @click="close" class="absolute top-4 right-4 text-gray-600 hover:text-black">
-                    ✖
-                </button>
+        <!-- Botón cerrar -->
+        <button @click="close" class="absolute top-4 right-4 text-gray-600 hover:text-black">✖</button>
 
-                <!-- Encabezado -->
-                <h2 class="text-3xl font-bold text-primary mb-6">
-                    Editá tu espacio
-                </h2>
+        <!-- Encabezado -->
+        <h2 class="text-3xl font-bold text-primary mb-6">Editá tu espacio</h2>
 
-                <!-- Formulario -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField v-model="formData.name" label="Nombre del espacio" type="text" required />
-                    <FormFieldAutocomplete v-model="formData.location" label="Ubicación" class="md:col-span-2" />
-                    <FormField v-model="formData.type" label="Tipo de espacio" type="text" required />
-                    <FormField v-model="formData.parking_type" label="Tipo de estacionamiento" type="text" required />
-                    <FormField v-model="formData.description" label="Descripción" type="textarea"
-                        class="md:col-span-2" />
-                </div>
+        <!-- Formulario básico -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField v-model="formData.name" label="Nombre del espacio" type="text" required />
+          <FormFieldAutocomplete v-model="formData.location" label="Ubicación" class="md:col-span-2" />
+          <FormField v-model="formData.type" label="Tipo de espacio" type="text" required />
+          <FormField v-model="formData.parking_type" label="Tipo de estacionamiento" type="text" required />
+          <FormField v-model="formData.description" label="Descripción" type="textarea" class="md:col-span-2" />
+        </div>
 
-                <!-- Capacidades -->
-                <div class="mt-6">
-                    <h3 class="text-xl font-semibold text-primary mb-4">Vehículos aceptados</h3>
+        <!-- Tipo de plazo -->
+        <div class="mt-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de plazo ofrecido</label>
+          <div class="flex items-center justify-between gap-2 bg-gray-50 rounded-2xl p-1 border border-gray-200 shadow-sm">
+            <label v-for="unit in priceUnits" :key="unit.value" class="flex-1 cursor-pointer">
+              <input type="radio" name="reservation_period" class="hidden peer" :value="unit.value"
+                     v-model="formData.reservation_period" @change="updateAvailabilityFields" />
+              <div class="text-center px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200
+                          peer-checked:bg-primary peer-checked:text-white
+                          peer-checked:shadow-md text-gray-700 hover:bg-gray-100">
+                {{ unit.label }}
+              </div>
+            </label>
+          </div>
+        </div>
 
-                    <!-- Lista de opciones -->
-                    <div class="flex flex-col gap-3">
-                        <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value"
-                            :title="type.title" :text="type.description" :configured="!!vehicleMap[type.value]"
-                            :configuration="vehicleMap[type.value]" @configure="openConfig(type.value)" />
-                    </div>
+        <!-- Horario de disponibilidad -->
+        <fieldset v-if="formData.reservation_period === 'hour'" class="border border-gray-200 p-4 rounded-2xl mt-4">
+          <legend class="text-lg font-semibold text-gray-800">Horario de Disponibilidad</legend>
+          <div class="grid grid-cols-2 gap-4 mt-2">
+            <div>
+              <label class="block text-sm mb-1">Desde:</label>
+              <DatePicker v-model:value="availabilityStartRaw" type="time" format="HH:mm"
+                          placeholder="Hora inicio"
+                          class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
+            </div>
+            <div>
+              <label class="block text-sm mb-1">Hasta:</label>
+              <DatePicker v-model:value="availabilityEndRaw" type="time" format="HH:mm"
+                          placeholder="Hora fin"
+                          class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
+            </div>
+          </div>
+        </fieldset>
 
-                    <!-- Modal de configuración -->
-                    <VehicleModal v-if="selectedType" :type="selectedType" :existing="vehicleMap[selectedType]"
+        <!-- Días disponibles -->
+        <div v-if="formData.reservation_period === 'hour'" class="mt-4">
+          <fieldset class="border border-gray-200 p-4 rounded-2xl">
+            <legend class="text-lg font-semibold text-gray-800">Días disponibles</legend>
+            <div class="mb-2">
+              <label class="flex items-center gap-2">
+                <input type="checkbox" v-model="allDaysSelected" @change="handleAllDaysChange"
+                       class="h-4 w-4 text-primary" />
+                <span><b>Todos los días</b></span>
+              </label>
+            </div>
+            <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
+              <label v-for="day in daysOfWeek" :key="day.value" class="flex items-center gap-2">
+                <input type="checkbox" :value="day.value" v-model="availabilityDays" @change="handleSpecificDaysChange"
+                       class="h-4 w-4 text-primary" />
+                <span>{{ day.label }}</span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- Mensaje informativo -->
+        <div v-if="formData.reservation_period" class="mt-4 p-4 rounded-xl text-sm bg-blue-50 text-blue-700"
+             v-html="currentMessage">
+        </div>
+
+        <!-- Vehículos aceptados -->
+        <div class="mt-6">
+          <h3 class="text-xl font-semibold text-primary mb-4">Vehículos aceptados</h3>
+          <div class="flex flex-col gap-3">
+            <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value"
+                               :title="type.title" :text="type.description"
+                               :configured="!!vehicleMap[type.value]"
+                               :configuration="vehicleMap[type.value]"
+                               @configure="openConfig(type.value)" />
+          </div>
+          <VehicleModal v-if="selectedType" :type="selectedType" :existing="vehicleMap[selectedType]"
                         @save="saveConfiguration" @close="selectedType = null" />
-
-                    <!-- Error si no selecciona ninguno -->
-                    <StatusModal :visible="showErrorModal" title="¡Atención!"
-                        message="Selecciona al menos un vehículo y configura capacidad y precio."
-                        icon="/src/assets/logo.png" @close="showErrorModal = false" />
-
-                    <!-- Imágenes -->
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold text-primary mb-2">Modificar imágenes actuales</h3>
-                        <input type="file" multiple @change="onFileChange"
-                            class="border-2 shadow-xl rounded-full p-2" />
-                        <div class="flex gap-2 mt-2 flex-wrap">
-                            <img v-for="(img, i) in previewImages" :key="i" :src="img"
-                                class="w-24 h-24 object-cover rounded-lg shadow" />
-                        </div>
-                    </div>
-
-                    <!-- Botones -->
-                    <div class="mt-8 flex justify-end gap-4">
-                        <button @click="close" class="px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300">
-                            Cancelar
-                        </button>
-                        <button @click="guardarCambios"
-                            class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700">
-                            Guardar Cambios
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
-    </transition>
 
-    <!-- Modal Éxito -->
-    <transition name="fade">
-        <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-                <h2 class="text-2xl font-bold text-primary mb-2">¡Éxito!</h2>
-                <p class="text-gray-700 text-center mb-6">El espacio se actualizó correctamente.</p>
-                <button @click="closeSuccess" class="bg-primary text-white px-6 py-3 rounded-lg">
-                    Continuar
-                </button>
-            </div>
+        <!-- Imágenes -->
+        <div class="mt-6">
+          <h3 class="text-xl font-semibold text-primary mb-2">Modificar imágenes actuales</h3>
+          <input type="file" multiple @change="onFileChange" class="border-2 shadow-xl rounded-full p-2" />
+          <div class="flex gap-2 mt-2 flex-wrap">
+            <img v-for="(img, i) in previewImages" :key="i" :src="img"
+                 class="w-24 h-24 object-cover rounded-lg shadow" />
+          </div>
         </div>
-    </transition>
+
+        <!-- Botones -->
+        <div class="mt-8 flex justify-end gap-4">
+          <button @click="close" class="px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+          <button @click="guardarCambios"
+                  class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700">Guardar Cambios</button>
+        </div>
+
+      </div>
+    </div>
+  </transition>
+
+  <!-- Modales -->
+  <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
+               icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+  <StatusModal :visible="showSuccessModal" title="¡Éxito!"
+               message="Tus cambios han sido guardados correctamente."
+               icon="/src/assets/logo.png" @confirm="closeSuccess" />
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue';
 import api from '../../../../services/apiService';
 import FormField from '../../../forms/FormField.vue';
 import FormFieldAutocomplete from '../../../forms/FormFieldAutocomplete.vue';
 import VehicleFormOption from '../../../forms/VehicleFormOption.vue';
 import VehicleModal from '../../addSpacePage/VehicleModal.vue';
 import StatusModal from '../../addSpacePage/StatusModal.vue';
+import DatePicker from 'vue-datepicker-next';
+import 'vue-datepicker-next/index.css';
+import { getAllDays } from '../../../../utils/daysTraslation';
 
-const selectedType = ref<string | null>(null)
-const showErrorModal = ref(false)
+// Props y eventos
+const props = defineProps<{ visible: boolean, spaceId: number | null }>();
+const emit = defineEmits(['close', 'updated']);
 
-const vehicleTypes = [
-    { value: 'van', title: 'Camioneta', description: 'Espacio mín. 2.5 x 4 m.' },
-    { value: 'car', title: 'Automóvil', description: 'Espacio mín. 2.2 x 3.2 m.' },
-    { value: 'motorcycle', title: 'Motocicleta', description: 'Espacio mín. 1 x 1.8 m.' },
-    { value: 'bicycle', title: 'Bicicleta / Monopatín', description: 'Espacio seguro para almacenarlas.' }
-]
-
-// mapa de configuraciones actuales
-const vehicleMap = computed<Record<string, any>>(() => {
-    const map: Record<string, any> = {}
-        ; (formData.value.vehicle_capacities || []).forEach((v: any) => {
-            map[v.type] = v
-        })
-    return map;
-})
-
-function openConfig(type: string) {
-    selectedType.value = type
-}
-
-function saveConfiguration(data: any) {
-    const updated = formData.value.vehicle_capacities.filter((v: any) => v.type !== data.type)
-    updated.push(data)
-    formData.value.vehicle_capacities = updated
-    selectedType.value = null
-}
-
-const props = defineProps<{
-    visible: boolean,
-    spaceId: number | null
-}>()
-
-const emit = defineEmits(['close', 'updated'])
-
+// Formulario
 const formData = ref<any>({
-    name: '',
-    location: '',
-    type: '',
-    parking_type: '',
-    description: '',
-    vehicle_capacities: [],
-    images: []
-})
+  name: '',
+  location: '',
+  type: '',
+  parking_type: '',
+  description: '',
+  reservation_period: 'hour',
+  availability: { start: '', end: '', days: [] },
+  vehicle_capacities: [],
+  images: []
+});
 
-const previewImages = ref<string[]>([])
-const showSuccessModal = ref(false)
+const previewImages = ref<string[]>([]);
+const selectedType = ref<string | null>(null);
+const showSuccessModal = ref(false);
+const showErrorModal = ref(false);
+const errorMessage = ref('');
 
-watch(() => props.visible, async (val) => {
-    if (val && props.spaceId) {
-        try {
-            const res = await api.get(`/spaces/getbyid/${props.spaceId}`)
-            formData.value = res.data
-        } catch (e) {
-            console.error("Error cargando espacio:", e)
-        }
-    }
-})
+// Tipos de vehículos
+const vehicleTypes = [
+  { value: 'van', title: 'Camioneta', description: 'Espacio mín. 2.5 x 4 m.' },
+  { value: 'car', title: 'Automóvil', description: 'Espacio mín. 2.2 x 3.2 m.' },
+  { value: 'motorcycle', title: 'Motocicleta', description: 'Espacio mín. 1 x 1.8 m.' },
+  { value: 'bicycle', title: 'Bicicleta / Monopatín', description: 'Espacio seguro para almacenarlas.' }
+];
 
-const onFileChange = (e: Event) => {
-  const files = (e.target as HTMLInputElement).files
-  if (!files) return
+// Map de configuraciones
+const vehicleMap = computed(() => {
+  const map: Record<string, any> = {};
+  (formData.value.vehicle_capacities || []).forEach((v: any) => map[v.type] = v);
+  return map;
+});
 
-  // Convertimos a array y agregamos al array existente
-  const newFiles = Array.from(files)
-  formData.value.images = [
-    // mantenemos las imágenes antiguas (strings)
-    ...formData.value.images.filter((img: any) => typeof img === 'string'),
-    // agregamos los nuevos archivos
-    ...newFiles
-  ]
+// Disponibilidad
+const daysOfWeek = getAllDays();
+const allDaysSelected = ref(false);
+const availabilityStartRaw = ref<Date | null>(null);
+const availabilityEndRaw = ref<Date | null>(null);
 
-  // Actualizamos la previsualización
-  previewImages.value = formData.value.images.map((img: any) =>
-    typeof img === 'string' ? img : URL.createObjectURL(img)
-  )
+const availabilityDays = computed({
+  get: () => formData.value.availability?.days || [],
+  set: (val) => formData.value.availability.days = val
+});
+
+allDaysSelected.value = !formData.value.availability.days.length || formData.value.availability.days.length === daysOfWeek.length;
+
+// Plazos
+const priceUnits = [
+  { value: "hour", label: "Por Hora" },
+  { value: "day", label: "Por Día" },
+  { value: "week", label: "Por Semana" },
+  { value: "month", label: "Por Mes" }
+];
+
+// Mensaje según plazo
+const availabilityMessages: Record<string, string> = {
+  hour: `⏱️ <strong>Reservas por hora</strong><br/>El usuario podrá alquilar tu espacio por <strong>horas</strong>.`,
+  day: `📅 <strong>Reservas por día</strong><br/>El usuario seleccionará días completos.`,
+  week: `🗓️ <strong>Reservas por semana</strong><br/>Se reservarán períodos de 7 días consecutivos.`,
+  month: `📆 <strong>Reservas por mes</strong><br/>Cada reserva corresponde a 30 días.`
+};
+const currentMessage = computed(() => availabilityMessages[formData.value.reservation_period] || "");
+
+// Funciones vehículos
+function openConfig(type: string) { selectedType.value = type; }
+function saveConfiguration(data: any) {
+  const updated = formData.value.vehicle_capacities.filter((v: any) => v.type !== data.type);
+  updated.push(data);
+  formData.value.vehicle_capacities = updated;
+  selectedType.value = null;
 }
 
-
-const guardarCambios = async () => {
-  const fd = new FormData()
-
-  // Separamos archivos nuevos de imágenes existentes
-  const imagesArray = Array.isArray(formData.value.images) ? formData.value.images : []
-  const existingImages = imagesArray.filter((img: any) => typeof img === 'string')
-  const newFiles = imagesArray.filter((img: any) => img instanceof File)
-
-  // Enviamos las imágenes existentes dentro del JSON
-  const payload = { ...formData.value, images: existingImages }
-  fd.append('data', JSON.stringify(payload))
-
-  // Adjuntamos solo los archivos nuevos
-  newFiles.forEach((file: File) => fd.append('images', file))
-
-  try {
-    await api.put(`/spaces/${props.spaceId}`, fd, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-    showSuccessModal.value = true
-    emit('updated')
-  } catch (e) {
-    console.error("Error guardando cambios:", e)
+// Funciones disponibilidad
+const handleAllDaysChange = () => {
+  if (allDaysSelected.value) {
+    availabilityDays.value = []; // Todos los días -> vacíos individualmente
+  } else {
+    // Si se desmarca "Todos los días", forzamos al menos un día por defecto
+    if (availabilityDays.value.length === 0) availabilityDays.value = [daysOfWeek[0].value];
   }
-}
+};
+
+const handleSpecificDaysChange = () => { if (availabilityDays.value.length > 0) allDaysSelected.value = false; };
+const updateAvailabilityFields = () => { formData.value.availability.start = ''; formData.value.availability.end = ''; };
+
+// Watchers
+watch(() => props.visible, async (val) => {
+  if (val && props.spaceId) {
+    try {
+      const res = await api.get(`/spaces/getbyid/${props.spaceId}`);
+      formData.value = res.data;
+      previewImages.value = formData.value.images.map((img: any) => typeof img === 'string' ? img : URL.createObjectURL(img));
+      availabilityStartRaw.value = formData.value.availability?.start ? new Date(`1970-01-01T${formData.value.availability.start}:00`) : null;
+      availabilityEndRaw.value = formData.value.availability?.end ? new Date(`1970-01-01T${formData.value.availability.end}:00`) : null;
+      allDaysSelected.value = formData.value.availability.days.length === 0;
+    } catch (e) { console.error(e); }
+  }
+});
+
+const availabilityStart = computed({
+  get: () => formData.value.availability?.start || '',
+  set: (val) => formData.value.availability.start = val
+});
+
+const availabilityEnd = computed({
+  get: () => formData.value.availability?.end || '',
+  set: (val) => formData.value.availability.end = val
+});
+
+watch(availabilityStartRaw, (val) => { if (val) formData.value.availability.start = `${val.getHours().toString().padStart(2,'0')}:${val.getMinutes().toString().padStart(2,'0')}`; });
+watch(availabilityEndRaw, (val) => { if (val) formData.value.availability.end = `${val.getHours().toString().padStart(2,'0')}:${val.getMinutes().toString().padStart(2,'0')}`; });
+watch(availabilityDays, (val) => {
+  allDaysSelected.value = val.length === 0 || val.length === daysOfWeek.length;
+}, { immediate: true });
 
 
+// Imágenes
+const onFileChange = (e: Event) => {
+  const files = (e.target as HTMLInputElement).files;
+  if (!files) return;
+  formData.value.images = [...formData.value.images.filter((img: any) => typeof img === 'string'), ...Array.from(files)];
+  previewImages.value = formData.value.images.map((img: any) => typeof img === 'string' ? img : URL.createObjectURL(img));
+};
 
+// Guardar cambios con validaciones
+const guardarCambios = async () => {
+  if (!formData.value.name || !formData.value.parking_type || !formData.value.description) {
+    errorMessage.value = "Por favor, completá todos los campos requeridos.";
+    showErrorModal.value = true; return;
+  }
+  if (formData.value.images.length < 5) { errorMessage.value = "Debes tener al menos 5 imágenes."; showErrorModal.value = true; return; }
+  if (formData.value.reservation_period === 'hour') {
+    if (!formData.value.availability.start || !formData.value.availability.end) {
+      errorMessage.value = "Debes definir horario de disponibilidad (inicio y fin)."; showErrorModal.value = true; return;
+    }
+    if (!allDaysSelected.value && availabilityDays.value.length === 0) {
+      errorMessage.value = "Debes seleccionar al menos un día de disponibilidad."; showErrorModal.value = true; return;
+    }
+  }
+  try {
+    await api.put(`/spaces/update/${props.spaceId}`, formData.value);
+    showSuccessModal.value = true;
+  } catch (err) { errorMessage.value = "Ocurrió un error al guardar."; showErrorModal.value = true; console.error(err); }
+};
 
-const close = () => emit('close')
-const closeSuccess = () => {
-    showSuccessModal.value = false
-    emit('close')
-}
+const close = () => emit('close');
+const closeSuccess = () => { showSuccessModal.value = false; emit('updated'); close(); };
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-</style>

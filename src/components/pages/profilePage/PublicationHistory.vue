@@ -93,6 +93,7 @@ import EditPublications from './UI/EditPublications.vue';
 import { formatDate } from '../../../utils/FormatDate';
 import ConfirmModal from '../../common/ConfirmModal.vue';
 import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
+import { useSpaceStore } from '../../../store/spaceStore';
 
 export interface VehicleCapacity {
   type: 'car' | 'motorcycle' | 'van' | 'bicycle';
@@ -116,6 +117,7 @@ const publications = ref<Publication[]>([]);
 const space = ref<Publication | null>(null);
 const selectedPublication = ref<Publication | null>(null);
 
+const spaceStore = useSpaceStore();
 const userStore = useUserStore();
 const showConfirmModal = ref(false);
 const openModal = ref(false);
@@ -148,6 +150,7 @@ const fetchPublications = async () => {
   try {
     const { data } = await api.get(`spaces/myspaces`, { withCredentials: true });
     publications.value = data || [];
+    console.log('Publicaciones obtenidas:', publications.value);
   } catch (error) {
     console.error('Error al obtener publicaciones', error);
     publications.value = [];
@@ -169,6 +172,7 @@ const deletePublication = async (id: number) => {
   try {
     await api.delete(`spaces/${id}`, { withCredentials: true });
     publications.value = publications.value.filter(p => p.id !== id);
+    spaceStore.removeSpaceFromStore(id);
   } catch (error) {
     console.error('Error al eliminar publicación', error);
   }

@@ -55,9 +55,9 @@ const zoomComputed = computed(() => props.zoom ?? 15)
 const optionsComputed = computed<google.maps.MapOptions>(() => ({
   gestureHandling: 'greedy',
   zoomControl: true,
-  streetViewControl: false,
+  streetViewControl: true,
   mapTypeControl: false,
-  fullscreenControl: false,
+  fullscreenControl: true,
   ...props.options, 
 }))
 
