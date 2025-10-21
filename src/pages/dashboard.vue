@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DashboardSkeleton v-if="cargando" />
+    <DashboardSkeleton v-if="loading" />
     <div v-else class="flex flex-col h-full bg-secondary">
       <MainHeader @toggle="toggleMap" />
       <MapButton :text="buttonText" color="white" background="primary" @toggle="toggleMap"
@@ -33,18 +33,18 @@
       </div>
 
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-2 sm:p-6">
-        <div v-if="!showMap" class="relative flex-1 gap-1 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
+        <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
           <div v-if="error" class="absolute top-1/4 flex justify-center items-center text-center text-red-500 w-full">
             {{ error }}
           </div>
-          <SpaceCard v-for="espacio in espacios" :key="espacio.id" :espacio="espacio" />
+          <SpaceCard v-for="space in spaces" :key="space.id" :espacio="space" />
         </div>
         <div v-else class="w-full h-full">
           <CustomGoogleMap class="rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
             :options="mapOptions" :showUserMarker="true" :userPosition="center">
-            <GMapMarker v-for="(espacio) in espacios" :key="espacio.id" :options="getMarkerOptions(espacio)"
-              @mouseover="handleMouseOver(espacio)" @mouseout="handleMouseOut"
-              @click="() => handleMarkerClick(espacio)" />
+            <GMapMarker v-for="(space) in spaces" :key="espacio.id" :options="getMarkerOptions(space)"
+              @mouseover="handleMouseOver(space)" @mouseout="handleMouseOut"
+              @click="() => handleMarkerClick(space)" />
             <InfoWindow v-if="hoveredSpace && hoveredSpace.latitude && hoveredSpace.longitude" :position="{
               lat: Number(hoveredSpace.latitude),
               lng: Number(hoveredSpace.longitude)
@@ -67,12 +67,10 @@
 
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
-import { useUserStore } from '../store/userStore';
 import { InfoWindow } from 'vue3-google-map';
 import { useRouter } from 'vue-router';
 import CustomGoogleMap from '../components/layout/GoogleMap.vue';
 import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue';
-import { getAllSpaces, getFilteredSpaces } from '../services/spaceService';
 import MainHeader from '../components/layout/header/MainHeader.vue';
 import MapButton from '../components/pages/dashboardPage/MapButton.vue';
 import CustomInputGroup from "../components/pages/dashboardPage/CustomInputGroup.vue";
@@ -81,17 +79,18 @@ import { useGoogleMap } from '../logic/useGoogleMap';
 import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
 import ZoneNavbarButton from '../components/pages/dashboardPage/ZoneNavbarButton.vue';
 import WelcomeSpeech from '../components/layout/WelcomeSpeech.vue';
-import { calculateDistance } from '../utils/distance';
+import { useSpaceStore } from '../store/spaceStore';
+import { storeToRefs } from 'pinia'
 
 const router = useRouter();
+
+const spaceStore = useSpaceStore();
+const { spaces, loading, error } = storeToRefs(spaceStore);
 
 const searchQuery = ref("");
 const checkIn = ref("");
 const checkOut = ref("");
 const refSeccionResultados = ref(null);
-const espacios = ref([]);
-const cargando = ref(true);
-const error = ref(null);
 const showMap = ref(false);
 const showSearchMenu = ref(false);
 const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
@@ -99,8 +98,6 @@ const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
 const publishedDate = ref(null);
 const maxPrice = ref('');
 const sortBy = ref('nearest');
-
-const userLocation = ref(null);
 
 const {
   center,
@@ -113,106 +110,43 @@ const {
   setCenterToUserLocation
 } = useGoogleMap();
 
-// Ordenar segun la distancia
-const setUserLocation = () => {
-  return new Promise((resolve, reject) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          userLocation.value = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          resolve(userLocation.value);
-        },
-        error => reject(error)
-      );
-    } else {
-      reject("Geolocalización no soportada");
-    }
-  });
-};
-
-const obtenerEspacios = async () => {
-  cargando.value = true;
-  try {
-    const spaces = await getAllSpaces();
-    if (!spaces || spaces.length < 1) {
-      espacios.value = [];
-      error.value = "Aún no hay espacios creados.";
-    } else {
-      if (userLocation.value) {
-        espacios.value = spaces
-          .map(espacio => ({
-            ...espacio,
-            distancia: calculateDistance(
-              userLocation.value.lat,
-              userLocation.value.lng,
-              Number(espacio.latitude),
-              Number(espacio.longitude)
-            ),
-          }))
-          .sort((a, b) => a.distancia - b.distancia);
-      } else {
-        espacios.value = spaces;
-      }
-    }
-  } catch (err) {
-    error.value = "No se pudieron cargar los espacios.";
-    console.error(err);
-  } finally {
-    cargando.value = false;
-  }
-};
-
 onMounted(async () => {
-  try {
-    await setUserLocation();
+  if (spaces.value.length === 0) {
+    loading.value = true;
+    await spaceStore.setUserLocation();
+    try {
+      await spaceStore.fetchSpaces(true);
+      setCenterToUserLocation();
+    } catch (e) {
+      console.warn("No se pudo obtener ubicación del usuario:", e);
+    } finally {
+      loading.value = false;
+    }
+    console.log(spaces.value);
+  } else {
+    // Ya tenés los datos cacheados
     setCenterToUserLocation();
-  } catch (e) {
-    console.warn("No se pudo obtener ubicación del usuario:", e);
   }
-  await obtenerEspacios();
 });
 
+
 const buscar = async () => {
-  cargando.value = true;
-  try {
-    const response = await getFilteredSpaces({
-      searchQuery: searchQuery.value,
-      checkIn: checkIn.value,
-      checkOut: checkOut.value,
-      publishedDate: publishedDate.value,
-      maxPrice: maxPrice.value,
-      sortBy: sortBy.value,
-    });
-
-    espacios.value = response;
-    await nextTick();
-    cargando.value = false;
-
-    if (refSeccionResultados.value && searchQuery.value) {
-      refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
-    }
-  } catch (error) {
-    if (error.response) {
-      error.value = "No se encontraron espacios con esos filtros.";
-      console.error('Error response:', error.response.status, error.response.data);
-    } else {
-      console.error('Error:', error.message);
-    }
+  await spaceStore.fetchFilteredSpaces({
+    searchQuery: searchQuery.value,
+    checkIn: checkIn.value,
+    checkOut: checkOut.value,
+    publishedDate: publishedDate.value,
+    maxPrice: maxPrice.value,
+    sortBy: sortBy.value,
+  });
+  await nextTick();
+  if (refSeccionResultados.value && searchQuery.value) {
+    refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
   }
-  cargando.value = false;
 };
 
 const toggleMap = () => {
-
   showMap.value = !showMap.value;
-  // nextTick(() => {
-  //   if (!showMap.value && refSeccionResultados.value) {
-  //     refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
-  //   }
-  // });
 };
 
 const toggleSearchMenu = () => {
