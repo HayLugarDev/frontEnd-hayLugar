@@ -47,6 +47,7 @@ const props = defineProps<{
   zoom?: number
   options?: google.maps.MapOptions
   debug?: boolean
+  locateUser?: boolean   // 👈 nueva prop
 }>()
 
 const debug = props.debug ?? false
@@ -161,8 +162,12 @@ onMounted(async () => {
   if (m) setMap(m)
   else setDebug('⚠️ No map instance yet. Waiting for @load / @tilesloaded…')
 
-  locateUser()
+  // ✅ Solo localizar usuario si está permitido
+  if (props.locateUser) {
+    locateUser()
+  }
 })
+
 
 /** Recenter dinámico si cambia center */
 watch(

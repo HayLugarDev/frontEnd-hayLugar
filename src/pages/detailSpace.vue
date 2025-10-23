@@ -180,12 +180,10 @@
           <div
             class="col-span-10 flex flex-col justify-center items-start h-[350px] order-7 relative overflow-hidden p-4 rounded-xl bg-white shadow-md border border-gray-200">
             <p class="px-4 font-semibold mb-2">Ubicación en el mapa:</p>
-            <CustomGoogleMap :center="{ lat: Number(space.latitude), lng: Number(space.longitude) }"
+            <CustomGoogleMap :center="{ lat: Number(space.latitude), lng: Number(space.longitude) }" :locateUser="false"
               class="absolute inset-0 w-full h-full rounded-xl overflow-hidden shadow-md">
-              <GMapMarker :position="{ lat: Number(space.latitude), lng: Number(space.longitude) }" :icon="{
-                url: carMarker,
-                scaledSize: { width: 40, height: 40 }
-              }" />
+              <GMapMarker :position="{ lat: Number(space.latitude), lng: Number(space.longitude) }"
+                :icon="{ url: carMarker, scaledSize: { width: 40, height: 40 } }" />
             </CustomGoogleMap>
           </div>
 

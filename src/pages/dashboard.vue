@@ -41,7 +41,7 @@
         </div>
         <div v-else class="w-full h-full">
           <CustomGoogleMap class="rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
-            :options="mapOptions" :showUserMarker="true" :userPosition="center">
+            :options="mapOptions" :showUserMarker="true" :userPosition="center" :locateUser="true">
             <GMapMarker v-for="(space) in spaces" :key="space.id" :options="getMarkerOptions(space)"
               @mouseover="handleMouseOver(space)" @mouseout="handleMouseOut"
               @click="() => handleMarkerClick(space)" />

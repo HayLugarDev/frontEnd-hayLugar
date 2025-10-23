@@ -78,6 +78,7 @@
   :zoom="zoom"
   :options="{ ...mapOptions, styles: streetTechStyle }"
   :debug="true"
+  :locateUser="true"
 />
 
 
