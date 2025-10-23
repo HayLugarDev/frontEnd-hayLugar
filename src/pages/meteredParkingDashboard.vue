@@ -189,18 +189,18 @@
     </div>
 
     <!-- Modal: Estacionamiento Medido (iniciar) -->
-    <MeteredAccessDialog
+    <!-- <MeteredAccessDialog
       :open="modalOpen"
       :zone="selectedZone"
       @close="modalOpen = false"
       @success="handleStarted"
-    />
+    /> -->
 
     <!-- Modal: mis tickets activos -->
-    <MeteredActiveSessions :open="showTickets" @close="showTickets = false" />
+    <!-- <MeteredActiveSessions :open="showTickets" @close="showTickets = false" /> -->
 
     <!-- Modal: finalizar ticket -->
-    <MeteredCompleteDialog
+    <!-- <MeteredCompleteDialog
       :open="finishOpen"
       :session-id="finishSessionId"
       :zone-label="finishZoneLabel"
@@ -209,7 +209,7 @@
       :expected-end-i-s-o="finishExpectedEnd"
       @close="finishOpen=false"
       @completed="onFinishCompleted"
-    />
+    /> -->
   </div>
 </template>
 
