@@ -40,11 +40,15 @@ export const useSpaceStore = defineStore('space', {
 
     // 🔹 Nueva acción: obtener la ubicación del usuario
     async setUserLocation() {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         if (!navigator.geolocation) {
-          reject('Geolocalización no soportada');
+          console.warn("Geolocalización no soportada");
+          this.userLocation = null;
+          resolve(null);
           return;
         }
+
+        const options = { timeout: 5000, maximumAge: 10000 };
 
         navigator.geolocation.getCurrentPosition(
           (pos) => {
@@ -54,7 +58,12 @@ export const useSpaceStore = defineStore('space', {
             };
             resolve(this.userLocation);
           },
-          (err) => reject(err)
+          (err) => {
+            console.warn("Error en geolocalización:", err);
+            this.userLocation = null;
+            resolve(null); // ⚠️ nunca reject, para no bloquear
+          },
+          options
         );
       });
     },
