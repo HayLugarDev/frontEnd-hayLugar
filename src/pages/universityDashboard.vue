@@ -59,7 +59,7 @@
 
       <!-- MAPA -->
       <div v-if="showMap" class="w-full h-[68vh] relative rounded-xl overflow-hidden shadow">
-        <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions">
+        <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions" :locateUser="true">
           <!-- Zonas exactas (polígonos) -->
           <GMapPolygon
             v-for="(zona, i) in zonasFiltradas"

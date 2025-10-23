@@ -58,6 +58,7 @@
                   :center="center"
                   :zoom="zoom"
                   :options="mapOptions"
+                  :locateUser="true"
                 >
                   <GMapMarker
                     v-for="espacio in espacios"
