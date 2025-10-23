@@ -113,21 +113,35 @@ const {
 onMounted(async () => {
   if (spaces.value.length === 0) {
     loading.value = true;
-    await spaceStore.setUserLocation();
+
     try {
+      // Intentamos obtener ubicación del usuario, pero con fallback
+      try {
+        await Promise.race([
+          spaceStore.setUserLocation(),
+          new Promise((_, reject) => setTimeout(() => reject('timeout'), 6000)), // 6s máximo
+        ]);
+      } catch (geoError) {
+        console.warn("⚠️ No se pudo obtener ubicación del usuario:", geoError);
+        // sigue sin detener el flujo
+      }
+
+      // Luego de intentar ubicación, cargamos los espacios
       await spaceStore.fetchSpaces(true);
       setCenterToUserLocation();
     } catch (e) {
-      console.warn("No se pudo obtener ubicación del usuario:", e);
+      console.error("Error al cargar espacios:", e);
     } finally {
       loading.value = false;
     }
+
     console.log(spaces.value);
   } else {
-    // Ya tenés los datos cacheados
+    // Datos cacheados
     setCenterToUserLocation();
   }
 });
+
 
 
 const buscar = async () => {

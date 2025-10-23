@@ -230,6 +230,7 @@ watch(() => props.visible, async (val) => {
     try {
       const res = await api.get(`/spaces/getbyid/${props.spaceId}`);
       formData.value = res.data;
+      console.log(res.data);
       previewImages.value = formData.value.images.map((img: any) => typeof img === 'string' ? img : URL.createObjectURL(img));
       availabilityStartRaw.value = formData.value.availability?.start ? new Date(`1970-01-01T${formData.value.availability.start}:00`) : null;
       availabilityEndRaw.value = formData.value.availability?.end ? new Date(`1970-01-01T${formData.value.availability.end}:00`) : null;
