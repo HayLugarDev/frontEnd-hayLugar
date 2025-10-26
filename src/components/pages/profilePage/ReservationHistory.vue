@@ -96,7 +96,9 @@
       </div>
     </div>
 
-    <p v-else-if="!loading" class="text-gray-500">No tienes reservas anteriores.</p>
+    <p v-else class="text-gray-500 text-center py-10 text-sm">
+      No tienes reservas realizadas aún.
+    </p>
 
     <!-- Modal CheckIn -->
     <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -380,3 +382,19 @@ function updateCountdowns() {
 }
 
 </script>
+
+<style scoped>
+section {
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
