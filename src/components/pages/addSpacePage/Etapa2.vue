@@ -92,39 +92,35 @@ watch(
     }
 )
 
-const updateDireccionManualmente = (e) => {
-    const value = e.target.value
-    direccion.value = value
-    emit('update:modelValue', {
-        ...props.modelValue,
-        location: value,
-        latitude: null,
-        longitude: null
-    })
-}
-
 const handlePlaceChanged = (place) => {
-    const components = place.address_components || []
+    if (!place || !place.address_components) return;
 
-    const streetNumber = components.find(c => c.types.includes('street_number'))?.long_name || ''
-    const route = components.find(c => c.types.includes('route'))?.long_name || ''
-    const locality = components.find(c => c.types.includes('locality') || c.types.includes('sublocality'))?.long_name || ''
-    const province = components.find(c => c.types.includes('administrative_area_level_1'))?.long_name || ''
-    const country = components.find(c => c.types.includes('country'))?.long_name || ''
+    const components = place.address_components;
 
-    const street = [route, streetNumber].filter(Boolean).join(' ')
-    const parts = [street, locality, province, country].filter(Boolean)
-    const fullAddress = parts.join(', ');
+    // ✅ Filtramos el código postal completamente
+    const getComponent = (type) =>
+        components.find((c) => c.types.includes(type))?.long_name || '';
 
-    direccion.value = fullAddress;
+    const streetNumber = getComponent('street_number');
+    const route = getComponent('route');
+    const locality = getComponent('locality') || getComponent('sublocality') || '';
+    const province = getComponent('administrative_area_level_1');
+    const country = getComponent('country');
 
+    const street = [route, streetNumber].filter(Boolean).join(' ');
+    const parts = [street, locality, province, country].filter(Boolean);
+    const cleanAddress = parts.join(', ');
+
+    const finalAddress = cleanAddress.replace(/\s{2,}/g, ' ').trim();
+
+    direccion.value = finalAddress;
     emit('update:modelValue', {
         ...props.modelValue,
-        location: fullAddress,
-        latitude: place.geometry.location.lat(),
-        longitude: place.geometry.location.lng()
-    })
-}
+        location: finalAddress,
+        latitude: place.geometry?.location?.lat() || null,
+        longitude: place.geometry?.location?.lng() || null,
+    });
+};
 
 const handleManualLocation = (payload) => {
     // Debug: ver qué llega

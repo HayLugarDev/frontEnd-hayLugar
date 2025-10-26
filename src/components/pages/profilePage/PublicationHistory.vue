@@ -73,7 +73,9 @@
       </div>
     </div>
 
-    <p v-else-if="!loading" class="text-gray-500">No tienes publicaciones anteriores.</p>
+    <p v-else-if="!loading" class="text-gray-500 text-center py-10 text-sm">
+      No tienes publicaciones anteriores.
+    </p>
 
     <EditPublications :visible="openModal" :spaceId="space?.id" @close="openModal = false"
       @updated="fetchPublications" />
@@ -178,3 +180,19 @@ const deletePublication = async (id: number) => {
   }
 };
 </script>
+
+<style scoped>
+section {
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
