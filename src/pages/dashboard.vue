@@ -21,10 +21,40 @@
       </div>
 
       <!-- Habilitar Navbar Buttons -->
-      <!-- <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
-        <ZoneNavbarButton @click="router.push('/universidades')" :text="'🎓🏛️ Universidades'" />
-        <ZoneNavbarButton @click="router.push('/meteredParkingDashboard')" :text="'🅿️ Estacionamiento Medido'" />
-      </div> -->
+      <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
+          <nav
+    class="flex overflow-x-auto gap-3 p-3 md:p-4 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] shadow-lg rounded-2xl md:mt-4 backdrop-blur-lg border border-white/5"
+  >
+    <ZoneNavbarButton
+      icon="🎓"
+      title="Universidades"
+      subtitle="Campus Inteligentes"
+      @click="router.push('/universidades')"
+      active-color="#06D6A0"
+    />
+    <ZoneNavbarButton
+      icon="🅿️"
+      title="Estacionamiento Medido"
+      subtitle="Calles en tiempo real"
+      @click="router.push('/meteredParkingDashboard')"
+      active-color="#00B4D8"
+    />
+    <ZoneNavbarButton
+      icon="🎟️"
+      title="Eventos"
+      subtitle="Festivales y shows"
+      @click="router.push('/events')"
+      active-color="#FFD166"
+    />
+     <ZoneNavbarButton
+      icon="🏬"
+      title="Parque Industrial / Logístico"
+      subtitle="Festivales y shows"
+      @click="router.push('/events')"
+      active-color="#FFD166"
+    />
+  </nav>
+      </div> 
 
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
         <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
@@ -41,7 +71,7 @@
         </div>
         <div v-else class="w-full h-full">
           <CustomGoogleMap class="rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
-            :options="mapOptions" :showUserMarker="true" :userPosition="center" :locateUser="true">
+            :options="mapOptions" :showUserMarker="true" :userPosition="center">
             <GMapMarker v-for="(space) in spaces" :key="space.id" :options="getMarkerOptions(space)"
               @mouseover="handleMouseOver(space)" @mouseout="handleMouseOut"
               @click="() => handleMarkerClick(space)" />
@@ -113,35 +143,21 @@ const {
 onMounted(async () => {
   if (spaces.value.length === 0) {
     loading.value = true;
-
+    await spaceStore.setUserLocation();
     try {
-      // Intentamos obtener ubicación del usuario, pero con fallback
-      try {
-        await Promise.race([
-          spaceStore.setUserLocation(),
-          new Promise((_, reject) => setTimeout(() => reject('timeout'), 6000)), // 6s máximo
-        ]);
-      } catch (geoError) {
-        console.warn("⚠️ No se pudo obtener ubicación del usuario:", geoError);
-        // sigue sin detener el flujo
-      }
-
-      // Luego de intentar ubicación, cargamos los espacios
       await spaceStore.fetchSpaces(true);
       setCenterToUserLocation();
     } catch (e) {
-      console.error("Error al cargar espacios:", e);
+      console.warn("No se pudo obtener ubicación del usuario:", e);
     } finally {
       loading.value = false;
     }
-
     console.log(spaces.value);
   } else {
-    // Datos cacheados
+    // Ya tenés los datos cacheados
     setCenterToUserLocation();
   }
 });
-
 
 
 const buscar = async () => {
