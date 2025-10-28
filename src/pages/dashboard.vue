@@ -49,8 +49,8 @@
      <ZoneNavbarButton
       icon="🏬"
       title="Parque Industrial / Logístico"
-      subtitle="Festivales y shows"
-      @click="router.push('/events')"
+      subtitle="Industria"
+      @click="router.push('/industrial-dashboard')"
       active-color="#FFD166"
     />
   </nav>

@@ -23,6 +23,7 @@ import EventDashboard from '../pages/EventDashboard.vue'
 import EventDetail from '../pages/EventDetail.vue'
 import ReservationQR from '../pages/ReservationQR.vue'
 import ImpactDashboard from '../pages/ImpactDashboard.vue'
+import IndustrialDashboard from '../pages/IndustrialDashboard.vue'
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -78,6 +79,8 @@ const routes: RouteRecordRaw[] = [
 { path: '/event-qr/:token', name: 'ReservationQR', component: ReservationQR },
 
 { path: '/impact-dashboard', name: 'ImpactDashboard', component:ImpactDashboard },
+
+{ path: '/industrial-dashboard', name: 'IndustrialDashboard', component:IndustrialDashboard },
 
 ]
 
