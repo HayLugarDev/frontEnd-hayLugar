@@ -21,7 +21,7 @@
       </div>
 
       <!-- Habilitar Navbar Buttons -->
-      <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
+      <!-- <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
           <nav
     class="flex overflow-x-auto gap-3 p-3 md:p-4 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] shadow-lg rounded-2xl md:mt-4 backdrop-blur-lg border border-white/5"
   >
@@ -54,7 +54,7 @@
       active-color="#FFD166"
     />
   </nav>
-      </div> 
+      </div>  -->
 
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
         <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
