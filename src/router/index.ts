@@ -24,6 +24,8 @@ import EventDetail from '../pages/EventDetail.vue'
 import ReservationQR from '../pages/ReservationQR.vue'
 import ImpactDashboard from '../pages/ImpactDashboard.vue'
 import IndustrialDashboard from '../pages/IndustrialDashboard.vue'
+import IndustrialDetail from '../pages/IndustrialDetail.vue'
+import IndustrialReservation from '../pages/IndustrialReservation.vue'
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -82,6 +84,9 @@ const routes: RouteRecordRaw[] = [
 
 { path: '/industrial-dashboard', name: 'IndustrialDashboard', component:IndustrialDashboard },
 
+{ path: '/industrial/:slug', name: 'IndustrialDetail', component: IndustrialDetail },
+
+{ path: '/industrial/:slug/industrial-reservation', name: 'IndustrialReservation', component: IndustrialReservation }
 ]
 
 
