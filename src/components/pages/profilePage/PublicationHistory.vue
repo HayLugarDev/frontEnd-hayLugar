@@ -77,6 +77,9 @@
       No tienes publicaciones anteriores.
     </p>
 
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
+      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+
     <EditPublications :visible="openModal" :spaceId="space?.id" @close="openModal = false"
       @updated="fetchPublications" />
     <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
@@ -96,6 +99,8 @@ import { formatDate } from '../../../utils/FormatDate';
 import ConfirmModal from '../../common/ConfirmModal.vue';
 import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 import { useSpaceStore } from '../../../store/spaceStore';
+import { deleteSpaceById } from '../../../services/spaceService';
+import StatusModal from '../addSpacePage/StatusModal.vue';
 
 export interface VehicleCapacity {
   type: 'car' | 'motorcycle' | 'van' | 'bicycle';
@@ -124,6 +129,10 @@ const userStore = useUserStore();
 const showConfirmModal = ref(false);
 const openModal = ref(false);
 const loading = ref(true);
+
+const showSuccessModal = ref(false);
+const showErrorModal = ref(false);
+const errorMessage = ref('');
 
 const modalConfig = ref({
   message: '',
@@ -171,13 +180,17 @@ const editPublication = (pub: Publication) => {
 };
 
 const deletePublication = async (id: number) => {
+  if (!id) {
+    errorMessage.value = 'No se pudo eliminar la publicación';
+    showErrorModal.value = true;
+  }
   try {
-    await api.delete(`spaces/${id}`, { withCredentials: true });
+    await deleteSpaceById(id);
     publications.value = publications.value.filter(p => p.id !== id);
     spaceStore.removeSpaceFromStore(id);
   } catch (error) {
     console.error('Error al eliminar publicación', error);
-  }
+  } 
 };
 </script>
 
@@ -185,11 +198,13 @@ const deletePublication = async (id: number) => {
 section {
   animation: fadeIn 0.4s ease-in-out;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

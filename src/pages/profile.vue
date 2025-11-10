@@ -2,7 +2,6 @@
   <MainHeader />
   <div class="min-h-screen bg-secondary md:p-10" v-if="!userStore.loading">
     <div class="flex flex-col pt-20 md:pt-0 md:flex-row w-full items-start">
-      <BackButton class="md:hidden" />
 
       <!-- Encabezado del Perfil -->
       <header class="hidden w-full md:w-1/3 md:flex flex-col justify-between items-center">

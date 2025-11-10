@@ -46,7 +46,7 @@
 
                 <div class="col-span-2 mb-2">
                     <div
-                        class="flex flex-row justify-between md:flex-col items-start bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 text-primary rounded-xl px-4 py-1 shadow-sm">
+                        class="flex flex-row justify-between md:flex-col items-start bg-gradient-to-br from-blue-100 to-blue-200 text-primary rounded-xl px-4 py-1 shadow-sm">
                         <div class="flex items-center gap-1">
                             <span
                                 class="bg-primary/10 text-primary rounded-md text-md md:text-[10px] font-bold uppercase tracking-wide">
@@ -88,24 +88,29 @@ import { capitalizeFirst } from '../../../utils/capitalizeFirstCharAt'
 import Carousel from '../../common/Carousel.vue'
 import { getVehicleIcon } from '../../../utils/vehicleTypeIconTraslation'
 import { getSpaceImages } from '../../../services/spaceService'
+import fallbackImage from '../../../assets/img-haylugar.jpeg'
 
 const props = defineProps({
     espacio: Object
 })
 
 const hovered = ref(false)
-const images = ref([props.espacio.images?.[0]])
+
+const images = ref(
+  props.espacio.images?.length
+    ? [props.espacio.images[0]]
+    : [fallbackImage]
+)
 
 const handleMouseEnter = async () => {
-    hovered.value = true
-    if (images.value.length === 1) {
-        const fetched = await getSpaceImages(props.espacio.id)
-        if (fetched.length > 0) {
-            images.value = fetched
-        }
-    }
-}
+  hovered.value = true
+  if (!props.espacio.images?.length) return
 
+  if (images.value.length === 1 && images.value[0] === fallbackImage) {
+    const fetched = await getSpaceImages(props.espacio.id)
+    images.value = fetched.length ? fetched : [fallbackImage]
+  }
+}
 const handleMouseLeave = () => {
     hovered.value = false
 }

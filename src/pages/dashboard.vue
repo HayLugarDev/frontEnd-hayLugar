@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DashboardSkeleton v-if="loading" />
+    <DashboardSkeleton v-if="loading || !spaces" />
     <div v-else class="flex flex-col h-full bg-secondary">
       <MainHeader @toggle="toggleMap" />
       <MapButton :text="buttonText" color="white" background="primary" @toggle="toggleMap"
@@ -11,7 +11,7 @@
         <span>Encontra tu espacio</span>
       </button>
       <div
-        class="hidden md:grid md:grid-cols-11 gap-2 sm:gap-4 items-center justify-center overflow-visible px-8 lg:px-2 py-2 sm:py-4 shadow-md border-b-2 bg-primary rounded-md">
+        class="hidden md:grid md:grid-cols-11 gap-2 sm:gap-4 items-center justify-center overflow-visible px-8 lg:px-2 py-2 sm:py-4 shadow-md border-b-2 bg-gradient-to-br from-primary via-primary/60 to-dark text-white">
         <span class="anton-regular col-span-6 sm:col-span-8 sm:col-start-2 text-3xl lg:text-4xl text-white">
           <font-awesome-icon icon="map-marker-alt" class="text-4xl text-white" />
           Encontrá tu próximo estacionamiento...
@@ -21,40 +21,23 @@
       </div>
 
       <!-- Habilitar Navbar Buttons -->
-      <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
-          <nav
-    class="flex overflow-x-auto gap-3 p-3 md:p-4 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] shadow-lg rounded-2xl md:mt-4 backdrop-blur-lg border border-white/5"
-  >
-    <ZoneNavbarButton
-      icon="🎓"
-      title="Universidades"
-      subtitle="Campus Inteligentes"
-      @click="router.push('/universidades')"
-      active-color="#06D6A0"
-    />
-    <ZoneNavbarButton
-      icon="🅿️"
-      title="Estacionamiento Medido"
-      subtitle="Calles en tiempo real"
-      @click="router.push('/meteredParkingDashboard')"
-      active-color="#00B4D8"
-    />
-    <ZoneNavbarButton
-      icon="🎟️"
-      title="Eventos"
-      subtitle="Festivales y shows"
-      @click="router.push('/events')"
-      active-color="#FFD166"
-    />
-     <ZoneNavbarButton
-      icon="🏬"
-      title="Parque Industrial / Logístico"
-      subtitle="Festivales y shows"
-      @click="router.push('/events')"
-      active-color="#FFD166"
-    />
-  </nav>
-      </div> 
+      <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg">
+        <nav
+          class="flex overflow-x-auto gap-3 p-3 md:p-4 bg-gray-300 shadow-lg rounded-2xl backdrop-blur-lg border border-white/5">
+
+          <ZoneNavbarButton :icon="School" title="Universidades" subtitle="Campus Inteligentes"
+            :disabled="!ENABLE_UNIVERSITIES" @click="router.push('/universidades')" active-color="#06D6A0" />
+
+          <ZoneNavbarButton :icon="ParkingSquare" title="Estacionamiento Medido" subtitle="Calles en tiempo real"
+            :disabled="!ENABLE_PARKING" @click="router.push('/meteredParkingDashboard')" active-color="#00B4D8" />
+
+          <ZoneNavbarButton :icon="Ticket" title="Eventos" subtitle="Festivales y shows" :disabled="!ENABLE_EVENTS"
+            @click="router.push('/events')" active-color="#FFD166" />
+
+          <ZoneNavbarButton :icon="Factory" title="Parque Industrial / Logístico" subtitle="Zonas logísticas"
+            :disabled="!ENABLE_INDUSTRIAL" @click="router.push('/industrial')" active-color="#FF8C00" />
+        </nav>
+      </div>
 
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
         <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
@@ -73,8 +56,7 @@
           <CustomGoogleMap class="rounded-lg overflow-hidden shadow-md" :center="center" :zoom="zoom"
             :options="mapOptions" :showUserMarker="true" :userPosition="center">
             <GMapMarker v-for="(space) in spaces" :key="space.id" :options="getMarkerOptions(space)"
-              @mouseover="handleMouseOver(space)" @mouseout="handleMouseOut"
-              @click="() => handleMarkerClick(space)" />
+              @mouseover="handleMouseOver(space)" @mouseout="handleMouseOut" @click="() => handleMarkerClick(space)" />
             <InfoWindow v-if="hoveredSpace && hoveredSpace.latitude && hoveredSpace.longitude" :position="{
               lat: Number(hoveredSpace.latitude),
               lng: Number(hoveredSpace.longitude)
@@ -111,6 +93,14 @@ import ZoneNavbarButton from '../components/pages/dashboardPage/ZoneNavbarButton
 import WelcomeSpeech from '../components/layout/WelcomeSpeech.vue';
 import { useSpaceStore } from '../store/spaceStore';
 import { storeToRefs } from 'pinia'
+import { School, ParkingSquare, Ticket, Factory } from 'lucide-vue-next'
+
+// Secciones habilitadas
+const ENABLE_UNIVERSITIES = import.meta.env.VITE_ENABLE_UNIVERSITIES === 'true'
+const ENABLE_PARKING = import.meta.env.VITE_ENABLE_PARKING === 'true'
+const ENABLE_EVENTS = import.meta.env.VITE_ENABLE_EVENTS === 'true'
+const ENABLE_INDUSTRIAL = import.meta.env.VITE_ENABLE_INDUSTRIAL === 'true'
+
 
 const router = useRouter();
 
@@ -141,21 +131,15 @@ const {
 } = useGoogleMap();
 
 onMounted(async () => {
-  if (spaces.value.length === 0) {
-    loading.value = true;
-    await spaceStore.setUserLocation();
-    try {
-      await spaceStore.fetchSpaces(true);
-      setCenterToUserLocation();
-    } catch (e) {
-      console.warn("No se pudo obtener ubicación del usuario:", e);
-    } finally {
-      loading.value = false;
-    }
-    console.log(spaces.value);
-  } else {
-    // Ya tenés los datos cacheados
+  loading.value = true;
+  await spaceStore.setUserLocation();
+  try {
+    await spaceStore.fetchSpaces(true);
     setCenterToUserLocation();
+  } catch (e) {
+    console.warn("No se pudo obtener ubicación del usuario:", e);
+  } finally {
+    loading.value = false;
   }
 });
 
