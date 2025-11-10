@@ -3,7 +3,7 @@
     <!-- Botón de campana -->
     <button @click="toggleMenu"
             class="relative w-12 h-12 flex items-center justify-center rounded-full transition duration-200">
-      <font-awesome-icon icon="bell" class="text-lg text-gray-700 " />
+      <font-awesome-icon icon="fa-regular fa-bell" class="text-2xl text-gray-400 " />
       <!-- Punto rojo si hay notificaciones sin leer -->
       <span v-if="hasUnreadNotifications && !viewNotification"
             class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping">
