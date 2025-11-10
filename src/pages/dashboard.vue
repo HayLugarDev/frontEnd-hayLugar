@@ -6,7 +6,7 @@
       <MapButton :text="buttonText" color="white" background="primary" @toggle="toggleMap"
         class="hidden md:block md:fixed" />
       <button v-if="!showSearchMenu" @click="toggleSearchMenu"
-        class="text-gray-700 flex flex-row md:hidden mt-20 items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
+        class="text-gray-700 flex flex-row md:hidden mt-24 items-center justify-center border-spacing-2 shadow-md bg-white p-4 mx-6 rounded-full my-4 gap-2">
         <font-awesome-icon icon="search" class="text-xs" />
         <span>Encontra tu espacio</span>
       </button>
