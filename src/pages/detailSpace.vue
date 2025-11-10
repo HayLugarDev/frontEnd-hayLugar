@@ -18,16 +18,16 @@
           <img :src="hostImage" alt="Imagen del anfitrión"
             class="w-20 h-20 rounded-full shadow-lg border-2 border-primary object-cover" @error="onHostImageError" />
           <div class="flex flex-col gap-2 w-full text-gray-800 text-base">
-            <div class="flex flex-row gap-2 items-center">
-              <span class="text-lg font-bold text-primary">Anfitrión:</span>
+            <div class="flex flex-row gap-2 items-center text-xl">
+              <span class="font-bold text-primary">Anfitrión:</span>
               <span class="font-semibold">{{ space.host.name }} {{ space.host.last_name }}</span>
             </div>
             <div v-if="space.host.phone" class="flex flex-row gap-2 items-center">
               <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-600" />
               <span class="font-medium">+549{{ space.host.phone }}</span>
             </div>
-            <div class="text-xs md:text-md flex flex-row gap-2 items-center">
-              <span class="font-medium">{{ space.host.email }}</span>
+            <div class="text-lg md:text-md flex flex-row gap-2 items-center">
+              <span class="font-medium">email: {{ space.host.email }}</span>
             </div>
           </div>
         </div>
@@ -83,12 +83,25 @@
       <!-- Info general + Formulario -->
       <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
         <!-- Información del espacio -->
-        <div class="col-span-6 grid grid-cols-3 gap-4 p-10">
+        <div class="md:col-span-6 md:grid md:grid-cols-3 gap-4 p-10">
+          <div class="flex flex-row md:col-span-3 justify-between items-center text-2xl mb-4 gap-2">
+            <span :class="avgRating ? 'text-yellow-600' : 'text-gray-400'">
+              <div v-for="v in avgRating ? Math.round(avgRating) : 5" :key="v" class="inline-block">
+                <font-awesome-icon icon="star" />
+              </div>
+            </span>
+            <div class="flex flex-row gap-2">
+              <span class="text-black">{{ totalReviews > 0 ? avgRating.toFixed(1) : '5.0' }}</span>
+              <span class="font-sans cursor-pointer hover:underline text-lg md:text-md" @click="openReviews">
+                ({{ totalReviews > 0 ? `${totalReviews} calificaciones` : "Sin calificaciones" }})
+              </span>
+            </div>
+          </div>
           <div class="col-span-2">
-            <p v-if="space.location" class="text-md font-bold text-gray-800 mb-1">
+            <p v-if="space.location" class="text-3xl md:text-md font-bold text-gray-800 mb-1">
               {{ space.location.split(',')[1] || '' }}
             </p>
-            <p class="text-sm md:text-lg text-gray-500 font-semibold mb-4">{{ space.location.split(',')[0] }}</p>
+            <p class="text-xl md:text-lg text-gray-500 font-semibold mb-4">{{ space.location.split(',')[0] }}</p>
             <div class="my-4 flex flex-col gap-3">
               <div v-for="v in space.vehicle_capacities" :key="v.type"
                 class="p-3 px-6 border-2 rounded-xl shadow-md bg-gray-50 flex flex-col gap-1">
@@ -104,7 +117,7 @@
             </div>
             <!-- Días disponibles -->
             <div class="mt-4">
-              <p class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-2">
+              <p class="text-xl md:text-lg font-semibold text-gray-800 flex items-center gap-2 mb-2">
                 <font-awesome-icon icon="calendar-days" class="text-primary text-xl" />
                 Disponibilidad:
               </p>
@@ -134,14 +147,6 @@
                 class="day-chip border border-primary/30 bg-primary/10 text-primary flex-wrap">
                 Horario: {{ disponibilidad.start }} - {{ disponibilidad.end }}</span>
             </div>
-          </div>
-          <div class="col-start-3 flex flex-col items-end text-xl gap-2">
-            <span :class="avgRating ? 'text-yellow-600' : 'text-gray-400'">
-              ⭐ <span class="text-black">{{ totalReviews > 0 ? avgRating.toFixed(1) : '5.0' }}</span>
-            </span>
-            <span class="font-sans cursor-pointer hover:underline text-xs sm:text-md" @click="openReviews">
-              {{ totalReviews > 0 ? `${totalReviews} calificaciones` : "Sin calificaciones" }}
-            </span>
           </div>
         </div>
 
