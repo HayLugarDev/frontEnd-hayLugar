@@ -133,10 +133,14 @@ import StatusModal from '../../addSpacePage/StatusModal.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import { getAllDays } from '../../../../utils/daysTraslation';
+import { useSpaceStore } from '../../../../store/spaceStore';
 
 // Props y eventos
 const props = defineProps<{ visible: boolean, spaceId: number | null }>();
 const emit = defineEmits(['close', 'updated']);
+
+const spaceStore = useSpaceStore();
+
 
 // Formulario
 const formData = ref<any>({

@@ -271,9 +271,10 @@ export const useSpaceStore = defineStore('space', {
     /**
      * 🔹 Agrega un nuevo espacio al store (se asume que fue creado en backend).
      */
-    addSpaceToStore(space: any) {
+    async addSpaceToStore(space: any) {
       this.spaces.unshift(space);
       showToast?.('Espacio agregado correctamente', 'success');
+      console.log(this.spaces);
     },
 
     /**
@@ -300,6 +301,24 @@ export const useSpaceStore = defineStore('space', {
       showToast?.('Espacio eliminado', 'success');
     },
 
+    /**
+     * 🔹 Obtiene un espacio directamente desde el store sin llamar al backend.
+     *    Si no existe, devuelve null.
+     */
+    getSpaceFromStore(identifier: number | string) {
+      // Si el identificador es un número => busca por ID
+      if (typeof identifier === 'number') {
+        const found = this.spaces.find((s: any) => s.id === identifier) || null;
+        this.selectedSpace = found;
+        return found;
+      }
+
+      // Si es un string => busca por slug
+      const found = this.spaces.find((s: any) => s.slug === identifier) || null;
+      this.selectedSpace = found;
+      return found;
+    },
+    
     /**
      * 🔹 Limpia todos los datos del store (por ejemplo, al cerrar sesión).
      */

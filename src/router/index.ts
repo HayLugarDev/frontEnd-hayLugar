@@ -19,6 +19,12 @@ import FAQView from '../pages/FAQView.vue'
 import CookiesPolicy from '../pages/CookiesPolicy.vue'
 import PrivacyPolicyView from '../pages/PrivacyPolicyView.vue'
 import termsConditions from '../pages/termsConditions.vue'
+import EventDashboard from '../pages/EventDashboard.vue'
+import EventDetail from '../pages/EventDetail.vue'
+import ReservationQR from '../pages/ReservationQR.vue'
+import ImpactDashboard from '../pages/ImpactDashboard.vue'
+import IndustrialDashboard from '../pages/IndustrialDashboard.vue'
+import AdminPage from '../pages/AdminPage.vue'
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -61,7 +67,28 @@ const routes: RouteRecordRaw[] = [
     component: meteredParkingDashboard,
     meta: { requiresAuth: false },
   },
+
+  { path: '/events', component: EventDashboard, meta: { requiresAuth: false } },
+{
+  path: '/events/:id',
+  name: 'EventDetail',
+  component: EventDetail,
+  meta: { requiresAuth: true },
+  props: true, // 👈 habilita recibir "id" como prop
+},
+
+{ path: '/event-qr/:token', name: 'ReservationQR', component: ReservationQR },
+
+{ path: '/impact-dashboard', name: 'ImpactDashboard', component: ImpactDashboard },
+
+{ path: '/industrial-dashboard', name: 'IndustrialDashboard', component:IndustrialDashboard },
+
+// Admin Page
+{ path: '/admin-page', name: 'adminPage', component: AdminPage, meta: { requiresAuth: true } },
+
+
 ]
+
 
 const router = createRouter({
   history: createWebHistory(),

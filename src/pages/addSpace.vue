@@ -172,7 +172,8 @@ const addSpace = async () => {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 
-    const newSpace = response.data;
+    const newSpace = response.data.space;
+    console.log(newSpace);
     spaceStore.addSpaceToStore(newSpace);
 
     showSuccessModal.value = true;
@@ -223,8 +224,9 @@ const resetValues = () => {
 }
 
 
-const closeSuccesModal = () => {
+const closeSuccesModal = async () => {
   showSuccessModal.value = false;
+  await spaceStore.fetchSpaces(true);
   router.push('/dashboard');
 };
 
