@@ -21,23 +21,40 @@
       </div>
 
       <!-- Habilitar Navbar Buttons -->
-      <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg">
-        <nav
-          class="flex overflow-x-auto gap-3 p-3 md:p-4 bg-gray-300 shadow-lg rounded-2xl backdrop-blur-lg border border-white/5">
-
-          <ZoneNavbarButton :icon="School" title="Universidades" subtitle="Campus Inteligentes"
-            :disabled="!ENABLE_UNIVERSITIES" @click="router.push('/universidades')" active-color="#06D6A0" />
-
-          <ZoneNavbarButton :icon="ParkingSquare" title="Estacionamiento Medido" subtitle="Calles en tiempo real"
-            :disabled="!ENABLE_PARKING" @click="router.push('/meteredParkingDashboard')" active-color="#00B4D8" />
-
-          <ZoneNavbarButton :icon="Ticket" title="Eventos" subtitle="Festivales y shows" :disabled="!ENABLE_EVENTS"
-            @click="router.push('/events')" active-color="#FFD166" />
-
-          <ZoneNavbarButton :icon="Factory" title="Parque Industrial / Logístico" subtitle="Zonas logísticas"
-            :disabled="!ENABLE_INDUSTRIAL" @click="router.push('/industrial')" active-color="#FF8C00" />
-        </nav>
-      </div>
+      <!-- <div class="flex overflow-x-auto p-4 md:bg-white shadow-md rounded-lg md:mt-4">
+          <nav
+    class="flex overflow-x-auto gap-3 p-3 md:p-4 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] shadow-lg rounded-2xl md:mt-4 backdrop-blur-lg border border-white/5"
+  >
+    <ZoneNavbarButton
+      icon="🎓"
+      title="Universidades"
+      subtitle="Campus Inteligentes"
+      @click="router.push('/universidades')"
+      active-color="#06D6A0"
+    />
+    <ZoneNavbarButton
+      icon="🅿️"
+      title="Estacionamiento Medido"
+      subtitle="Calles en tiempo real"
+      @click="router.push('/meteredParkingDashboard')"
+      active-color="#00B4D8"
+    />
+    <ZoneNavbarButton
+      icon="🎟️"
+      title="Eventos"
+      subtitle="Festivales y shows"
+      @click="router.push('/events')"
+      active-color="#FFD166"
+    />
+     <ZoneNavbarButton
+      icon="🏬"
+      title="Parque Industrial / Logístico"
+      subtitle="Festivales y shows"
+      @click="router.push('/events')"
+      active-color="#FFD166"
+    />
+  </nav>
+      </div>  -->
 
       <div v-if="showSearchMenu" class="p-4 w-11/12 mx-auto rounded-full h-full bg-white">
         <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
