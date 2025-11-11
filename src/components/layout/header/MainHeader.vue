@@ -1,6 +1,6 @@
 <template>
   <header
-    class="bg-gray-50 gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 py-2 xl:px-16 fixed md:static shadow-md md:shadow-none rounded-b-xl">
+    class="bg-gray-50 gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 pt-6 pb-2 xl:px-16 fixed md:static shadow-md md:shadow-none rounded-b-xl">
     <Logo width="12" @click="router.push('/dashboard')"
       class="hidden md:block" />
       <div v-if="routeConfig.showSalirButton" @click="router.push('/dashboard')" class="w-full flex flex-row justify-end">
@@ -12,12 +12,10 @@
     <div v-if="authChecked" class="flex flex-row justify-between gap-2">
       <div v-if="route.path !== '/add-space' && route.path !== '/add-vehicle'"
         class="relative flex flex-row sm:gap-2 items-center max-h-12 text-gray-800">
-        <font-awesome-icon icon="fa-regular fa-circle-question"
-          class="hidden md:block p-3 w-6 h-6 rounded-full cursor-pointer text-gray-400" @click="openHelp" />
         <div class="">
           <!-- Botón visible solo en mobile -->
           <button @click="showMobileMenu = true"
-            class="block md:hidden w-11 h-11 rounded-full">
+            class="block md:hidden w-12 h-12 rounded-full text-2xl">
             <font-awesome-icon icon="fa-align-justify" />
           </button>
 
@@ -26,6 +24,8 @@
         </div>
       </div>
       <div class="flex flex-row gap-1">
+        <font-awesome-icon icon="fa-regular fa-circle-question"
+          class="p-3 w-6 h-6 rounded-full cursor-pointer text-gray-400" @click="openHelp" />
         <NotificationDropdown v-if="routeConfig.showNotificationButton" />
         <MapButton :text="buttonText" color="gray-800" @click="toggleMap" class="md:hidden" />
         <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
@@ -35,7 +35,7 @@
     <template v-else>
       <!-- Skeleton Loader -->
       <div
-        class="hidden md:flex justify-between items-center border-b-2 px-4 pt-2 xl:px-10 xl:mx-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
+        class="hidden md:flex justify-between items-center border-b-2 px-4 pt-6 md:pt-2 xl:px-10 xl:mx-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
         <!-- Logo placeholder -->
         <div class="w-16 h-10 bg-gray-400 rounded"></div>
 
