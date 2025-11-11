@@ -121,7 +121,7 @@
 
     <!-- Modales auxiliares -->
     <EditPublications :visible="showEditModal" :spaceId="selectedSpace?.id" @close="showEditModal = false"
-      @updated="refreshSpaces" />
+      @updated="handleSpaceUpdated" />
 
     <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
       @close="showConfirmModal = false" @acept="modalConfig.onConfirm" />
@@ -162,13 +162,23 @@ interface SpaceAttributes {
 }
 
 const props = defineProps<{ spaces: SpaceAttributes[] }>();
-const emit = defineEmits(["edit", "delete", "refresh"]);
+const emit = defineEmits(["refresh"]);
 
 const selectedSpace = ref<SpaceAttributes | null>(null);
 const showEditModal = ref(false);
 const showConfirmModal = ref(false);
 const showErrorModal = ref(false);
 const errorMessage = ref("");
+
+const handleSpaceUpdated = async (data?: any) => {
+  await refreshSpaces('edit', data);
+  showEditModal.value = false;
+
+  if (data) {
+    selectedSpace.value = data;
+    showEditModal.value = true;
+  }
+};
 
 const modalConfig = ref({
   message: "",
@@ -213,21 +223,21 @@ const editSelected = (space: SpaceAttributes) => {
 
 const deleteSpace = async (id: number) => {
   try {
-    console.log(id);
     await deleteSpaceById(id);
-    emit("refresh", id);
     closeModal();
     showToast("Espacio eliminado correctamente.", "success");
+    await refreshSpaces('delete', { id });
   } catch (error) {
     errorMessage.value = "Error al eliminar el espacio.";
     showErrorModal.value = true;
   }
 };
 
-const refreshSpaces = () => {
-  emit("refresh");
+const refreshSpaces = async (action?: string, payload?: any) => {
+  emit("refresh", action, payload);
   showEditModal.value = false;
 };
+
 </script>
 
 <style scoped>
