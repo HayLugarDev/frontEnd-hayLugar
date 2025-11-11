@@ -1,7 +1,6 @@
 <template>
   <div
     class="border border-gray-200 bg-white rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md relative overflow-hidden">
-    <!-- Encabezado -->
     <div class="flex justify-between items-center cursor-pointer px-5 py-4" @click="toggleExpanded">
       <div>
         <h2 class="text-lg sm:text-xl font-semibold text-gray-800">
@@ -14,6 +13,7 @@
             ✅ Configurado: capacidad {{ configuration.capacity }},
             ${{ configuration.price_per_hour }}/hora
           </p>
+
         </transition>
       </div>
 
@@ -24,7 +24,6 @@
       </button>
     </div>
 
-    <!-- Contenido expandido -->
     <transition name="expand">
       <div v-if="expanded" class="px-5 pb-5 space-y-3 bg-gray-50 rounded-b-2xl">
         <div class="pt-3">
@@ -66,9 +65,8 @@
     </transition>
   </div>
 
-  <StatusModal :visible="showErrorModal" title="¡Atención!"
-      :message="errorMessage"
-      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+  <StatusModal :visible="showErrorModal" title="¡Atención!" :message="errorMessage" icon="/src/assets/logo.png"
+    @confirm="showErrorModal = false" />
 </template>
 
 <script setup>
