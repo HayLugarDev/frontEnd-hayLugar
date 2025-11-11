@@ -62,7 +62,7 @@
             @click="openImageModal(0)" @error="onImageError" />
         </div>
 
-        <template
+        <div
           v-for="(img, index) in space.images?.slice(1, space.images.length) || [someImg, someImg, someImg, someImg]"
           :key="index">
           <div :class="imageGridPosition(index)">
@@ -70,7 +70,7 @@
               class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer transition-transform duration-200 hover:scale-105"
               @click="openImageModal(index + 1)" @error="onImageError" />
           </div>
-        </template>
+        </div>
       </div>
 
 
@@ -87,7 +87,7 @@
           <div class="flex flex-row md:col-span-3 justify-between items-center text-2xl mb-4 gap-2">
             <span :class="avgRating ? 'text-yellow-600' : 'text-gray-400'">
               <div v-for="v in avgRating ? Math.round(avgRating) : 5" :key="v" class="inline-block">
-                <font-awesome-icon icon="star" />
+                ⭐
               </div>
             </span>
             <div class="flex flex-row gap-2">
@@ -327,7 +327,6 @@ const obtenerEspacio = async () => {
   const slug = route.params.slug
   const space = await spaceStore.fetchSpaceBySlug(slug)
   if (!space) return
-  console.log(space);
 
   avgRating.value = space.average_rating || 5
   fetchReviews(space.id)
