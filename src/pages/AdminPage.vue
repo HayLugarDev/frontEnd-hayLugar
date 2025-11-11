@@ -20,7 +20,7 @@
 
     <div v-else>
       <AdminUsers v-if="activeTab === 'users'" :users="users" />
-      <AdminSpaces v-if="activeTab === 'spaces'" :spaces="spaces" @refresh="onSpaceDeleted" />
+      <AdminSpaces v-if="activeTab === 'spaces'" :spaces="spaces" @refresh="handleUpdateSpaces" />
       <AdminReservations v-if="activeTab === 'reservations'" :reservations="reservations" />
       <AdminPayments v-if="activeTab === 'payments'" :payments="payments" />
     </div>
@@ -87,7 +87,30 @@ onMounted(async () => {
   }
 });
 
-const onSpaceDeleted = (id: number) => {
-  spaces.value = spaces.value.filter(space => space.id !== id);
+function deepMerge(target: any, source: any) {
+  for (const key of Object.keys(source)) {
+    if (
+      source[key] instanceof Object &&
+      !(source[key] instanceof Array) &&
+      key in target
+    ) {
+      Object.assign(source[key], deepMerge(target[key], source[key]));
+    }
+  }
+  return { ...target, ...source };
+}
+
+const handleUpdateSpaces = (action: string, payload?: any) => {
+  if (action === 'edit' && payload) {
+    const index = spaces.value.findIndex(space => space.id === payload.id);
+    if (index !== -1) {
+      spaces.value[index] = deepMerge(spaces.value[index], payload);
+    } else {
+      spaces.value.push(payload);
+    }
+  } else if (action === 'delete' && payload) {
+    spaces.value = spaces.value.filter(space => space.id !== payload.id);
+  }
 };
+
 </script>
