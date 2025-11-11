@@ -18,7 +18,7 @@
           <img :src="hostImage" alt="Imagen del anfitrión"
             class="w-20 h-20 rounded-full shadow-lg border-2 border-primary object-cover" @error="onHostImageError" />
           <div class="flex flex-col gap-2 w-full text-gray-800 text-base">
-            <div class="flex flex-row gap-2 items-center text-xl">
+            <div class="flex flex-row gap-2 items-center text-lg">
               <span class="font-bold text-primary">Anfitrión:</span>
               <span class="font-semibold">{{ space.host.name }} {{ space.host.last_name }}</span>
             </div>
@@ -26,7 +26,7 @@
               <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-600" />
               <span class="font-medium">+549{{ space.host.phone }}</span>
             </div>
-            <div class="text-lg md:text-md flex flex-row gap-2 items-center">
+            <div class="text-md md:text-md flex flex-row gap-2 items-center">
               <span class="font-medium">email: {{ space.host.email }}</span>
             </div>
           </div>
@@ -36,7 +36,7 @@
       <!-- Título + Favorito + Compartir -->
       <div
         class="flex flex-row items-center justify-between mt-4 px-6 md:px-2 sticky top-0 bg-white z-10 rounded-xl shadow-sm py-2">
-        <h1 class="text-3xl sm:text-2xl font-bold text-primary pl-2">{{ capitalizeFirst(space.name) }}</h1>
+        <h1 class="text-2xl sm:text-xl font-bold text-primary pl-2">{{ capitalizeFirst(space.name) }}</h1>
         <div class="flex flex-row items-center gap-4">
           <button @click="toggleFavourite"
             class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-200 hover:scale-110 bg-white border-2 border-gray-200 hover:border-red-400"
@@ -84,7 +84,7 @@
       <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
         <!-- Información del espacio -->
         <div class="md:col-span-6 md:grid md:grid-cols-3 gap-4 p-10">
-          <div class="flex flex-row md:col-span-3 justify-between items-center text-2xl mb-4 gap-2">
+          <div class="flex flex-row md:col-span-3 justify-between items-center text-xl mb-4 gap-2">
             <span :class="avgRating ? 'text-yellow-600' : 'text-gray-400'">
               <div v-for="v in avgRating ? Math.round(avgRating) : 5" :key="v" class="inline-block">
                 ⭐
@@ -98,7 +98,7 @@
             </div>
           </div>
           <div class="col-span-2">
-            <p v-if="space.location" class="text-3xl md:text-md font-bold text-gray-800 mb-1">
+            <p v-if="space.location" class="text-2xl md:text-md font-bold text-gray-800 mb-1">
               {{ space.location.split(',')[1] || '' }}
             </p>
             <p class="text-xl md:text-lg text-gray-500 font-semibold mb-4">{{ space.location.split(',')[0] }}</p>
