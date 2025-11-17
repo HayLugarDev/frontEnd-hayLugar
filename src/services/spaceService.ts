@@ -1,5 +1,5 @@
-// services/spaceService.ts
 import api from "./apiService";
+
 
 export const getAllSpaces = async () => {
   try {
@@ -175,3 +175,12 @@ export const getSpaceBySlug = async (slug: string) => {
     console.error("Error al obtener el espacio:", error);
   }
 };
+
+export const deleteSpaceById = async (id: number) => {
+  try {
+    await api.delete(`spaces/${id}`, { withCredentials: true });
+    return;
+  } catch (error) {
+    console.error('Error al eliminar publicación', error);
+  }
+}

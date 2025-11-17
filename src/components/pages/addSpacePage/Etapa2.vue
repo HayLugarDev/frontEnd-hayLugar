@@ -28,7 +28,7 @@
                 class="flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-indigo-500 to-primary text-white font-semibold shadow-md hover:from-indigo-600 hover:to-primary-dark transition-all duration-300 text-base"
                 @click="showManualMap = true">
                 <font-awesome-icon icon="map-marker-alt" class="text-lg" />
-                Seleccionar manualmente en el mapa
+                No encuentro mi dirección
             </button>
         </div>
 
@@ -43,7 +43,7 @@
         <transition name="fade">
             <div v-if="location" class="mt-4">
                 <label class="block text-sm font-semibold text-gray-900 mb-1">
-                    Referencias adicionales
+                    Referencias adicionales (opcional)
                 </label>
                 <input type="text" v-model="locationDetails"
                     class="block w-full border border-gray-300 rounded-xl p-4 text-gray-600 focus:ring-2 focus:ring-primary focus:outline-none transition"

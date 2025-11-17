@@ -137,3 +137,12 @@
 /* .fixed button:hover {
   transform: scale(1.2);
 } */
+ 
+ /* Scoped o global */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #0079c1;
+  border-radius: 4px;
+}

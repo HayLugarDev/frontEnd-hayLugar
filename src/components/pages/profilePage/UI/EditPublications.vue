@@ -21,10 +21,11 @@
         <!-- Tipo de plazo -->
         <div class="mt-6">
           <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de plazo ofrecido</label>
-          <div class="flex items-center justify-between gap-2 bg-gray-50 rounded-2xl p-1 border border-gray-200 shadow-sm">
+          <div
+            class="flex items-center justify-between gap-2 bg-gray-50 rounded-2xl p-1 border border-gray-200 shadow-sm">
             <label v-for="unit in priceUnits" :key="unit.value" class="flex-1 cursor-pointer">
               <input type="radio" name="reservation_period" class="hidden peer" :value="unit.value"
-                     v-model="formData.reservation_period" @change="updateAvailabilityFields" />
+                v-model="formData.reservation_period" @change="updateAvailabilityFields" />
               <div class="text-center px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200
                           peer-checked:bg-primary peer-checked:text-white
                           peer-checked:shadow-md text-gray-700 hover:bg-gray-100">
@@ -40,15 +41,13 @@
           <div class="grid grid-cols-2 gap-4 mt-2">
             <div>
               <label class="block text-sm mb-1">Desde:</label>
-              <DatePicker v-model:value="availabilityStartRaw" type="time" format="HH:mm"
-                          placeholder="Hora inicio"
-                          class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
+              <DatePicker v-model:value="availabilityStartRaw" type="time" format="HH:mm" placeholder="Hora inicio"
+                class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
             </div>
             <div>
               <label class="block text-sm mb-1">Hasta:</label>
-              <DatePicker v-model:value="availabilityEndRaw" type="time" format="HH:mm"
-                          placeholder="Hora fin"
-                          class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
+              <DatePicker v-model:value="availabilityEndRaw" type="time" format="HH:mm" placeholder="Hora fin"
+                class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
             </div>
           </div>
         </fieldset>
@@ -60,14 +59,14 @@
             <div class="mb-2">
               <label class="flex items-center gap-2">
                 <input type="checkbox" v-model="allDaysSelected" @change="handleAllDaysChange"
-                       class="h-4 w-4 text-primary" />
+                  class="h-4 w-4 text-primary" />
                 <span><b>Todos los días</b></span>
               </label>
             </div>
             <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
               <label v-for="day in daysOfWeek" :key="day.value" class="flex items-center gap-2">
                 <input type="checkbox" :value="day.value" v-model="availabilityDays" @change="handleSpecificDaysChange"
-                       class="h-4 w-4 text-primary" />
+                  class="h-4 w-4 text-primary" />
                 <span>{{ day.label }}</span>
               </label>
             </div>
@@ -76,21 +75,19 @@
 
         <!-- Mensaje informativo -->
         <div v-if="formData.reservation_period" class="mt-4 p-4 rounded-xl text-sm bg-blue-50 text-blue-700"
-             v-html="currentMessage">
+          v-html="currentMessage">
         </div>
 
         <!-- Vehículos aceptados -->
         <div class="mt-6">
           <h3 class="text-xl font-semibold text-primary mb-4">Vehículos aceptados</h3>
           <div class="flex flex-col gap-3">
-            <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value"
-                               :title="type.title" :text="type.description"
-                               :configured="!!vehicleMap[type.value]"
-                               :configuration="vehicleMap[type.value]"
-                               @configure="openConfig(type.value)" />
+            <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value" :title="type.title"
+              :text="type.description" :configured="!!vehicleMap[type.value]" :configuration="vehicleMap[type.value]"
+              @configure="openConfig(type.value)" @save="saveConfiguration" />
           </div>
           <VehicleModal v-if="selectedType" :type="selectedType" :existing="vehicleMap[selectedType]"
-                        @save="saveConfiguration" @close="selectedType = null" />
+            @save="saveConfiguration" @close="selectedType = null" />
         </div>
 
         <!-- Imágenes -->
@@ -99,15 +96,15 @@
           <input type="file" multiple @change="onFileChange" class="border-2 shadow-xl rounded-full p-2" />
           <div class="flex gap-2 mt-2 flex-wrap">
             <img v-for="(img, i) in previewImages" :key="i" :src="img"
-                 class="w-24 h-24 object-cover rounded-lg shadow" />
+              class="w-24 h-24 object-cover rounded-lg shadow" />
           </div>
         </div>
 
         <!-- Botones -->
         <div class="mt-8 flex justify-end gap-4">
           <button @click="close" class="px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
-          <button @click="guardarCambios"
-                  class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700">Guardar Cambios</button>
+          <button @click="guardarCambios" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700">Guardar
+            Cambios</button>
         </div>
 
       </div>
@@ -116,10 +113,9 @@
 
   <!-- Modales -->
   <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-               icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
-  <StatusModal :visible="showSuccessModal" title="¡Éxito!"
-               message="Tus cambios han sido guardados correctamente."
-               icon="/src/assets/logo.png" @confirm="closeSuccess" />
+    icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+  <StatusModal :visible="showSuccessModal" title="¡Éxito!" :message="successMessage"
+    icon="/src/assets/logo.png" @confirm="closeSuccess" />
 </template>
 
 <script setup lang="ts">
@@ -133,10 +129,14 @@ import StatusModal from '../../addSpacePage/StatusModal.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import { getAllDays } from '../../../../utils/daysTraslation';
+import { useSpaceStore } from '../../../../store/spaceStore';
 
 // Props y eventos
 const props = defineProps<{ visible: boolean, spaceId: number | null }>();
 const emit = defineEmits(['close', 'updated']);
+
+const spaceStore = useSpaceStore();
+
 
 // Formulario
 const formData = ref<any>({
@@ -165,12 +165,8 @@ const vehicleTypes = [
   { value: 'bicycle', title: 'Bicicleta / Monopatín', description: 'Espacio seguro para almacenarlas.' }
 ];
 
-// Map de configuraciones
-const vehicleMap = computed(() => {
-  const map: Record<string, any> = {};
-  (formData.value.vehicle_capacities || []).forEach((v: any) => map[v.type] = v);
-  return map;
-});
+const vehicleMap = ref<Record<string, any>>({});
+const successMessage = ref('');
 
 // Disponibilidad
 const daysOfWeek = getAllDays();
@@ -204,10 +200,10 @@ const currentMessage = computed(() => availabilityMessages[formData.value.reserv
 
 // Funciones vehículos
 function openConfig(type: string) { selectedType.value = type; }
+
 function saveConfiguration(data: any) {
-  const updated = formData.value.vehicle_capacities.filter((v: any) => v.type !== data.type);
-  updated.push(data);
-  formData.value.vehicle_capacities = updated;
+  vehicleMap.value[data.type] = data;
+  formData.value.vehicle_capacities = Object.values(vehicleMap.value);
   selectedType.value = null;
 }
 
@@ -230,27 +226,55 @@ watch(() => props.visible, async (val) => {
     try {
       const res = await api.get(`/spaces/getbyid/${props.spaceId}`);
       formData.value = res.data;
-      console.log(res.data);
-      previewImages.value = formData.value.images.map((img: any) => typeof img === 'string' ? img : URL.createObjectURL(img));
-      availabilityStartRaw.value = formData.value.availability?.start ? new Date(`1970-01-01T${formData.value.availability.start}:00`) : null;
-      availabilityEndRaw.value = formData.value.availability?.end ? new Date(`1970-01-01T${formData.value.availability.end}:00`) : null;
-      allDaysSelected.value = formData.value.availability.days.length === 0;
-    } catch (e) { console.error(e); }
+
+      if (typeof formData.value.availability === 'string') {
+        formData.value.availability = JSON.parse(formData.value.availability);
+      } else if (!formData.value.availability) {
+        formData.value.availability = { start: '', end: '', days: [] };
+      }
+
+      vehicleMap.value = {};
+      (res.data.vehicle_capacities || []).forEach((v: any) => {
+        vehicleMap.value[v.type] = v;
+      });
+
+      previewImages.value = formData.value.images.map((img: any) =>
+        typeof img === 'string' ? img : URL.createObjectURL(img)
+      );
+
+      availabilityStartRaw.value = formData.value.availability?.start
+        ? new Date(`1970-01-01T${formData.value.availability.start}:00`)
+        : null;
+
+      availabilityEndRaw.value = formData.value.availability?.end
+        ? new Date(`1970-01-01T${formData.value.availability.end}:00`)
+        : null;
+
+      allDaysSelected.value =
+        formData.value.availability?.days?.length === 0;
+    } catch (e) {
+      console.error(e);
+    }
   }
 });
 
-const availabilityStart = computed({
-  get: () => formData.value.availability?.start || '',
-  set: (val) => formData.value.availability.start = val
+
+watch(availabilityStartRaw, (val) => {
+  if (val instanceof Date && !isNaN(val.getTime())) {
+    formData.value.availability.start = `${val.getHours().toString().padStart(2, '0')}:${val.getMinutes().toString().padStart(2, '0')}`;
+  } else {
+    formData.value.availability.start = '';
+  }
 });
 
-const availabilityEnd = computed({
-  get: () => formData.value.availability?.end || '',
-  set: (val) => formData.value.availability.end = val
+watch(availabilityEndRaw, (val) => {
+  if (val instanceof Date && !isNaN(val.getTime())) {
+    formData.value.availability.end = `${val.getHours().toString().padStart(2, '0')}:${val.getMinutes().toString().padStart(2, '0')}`;
+  } else {
+    formData.value.availability.end = '';
+  }
 });
 
-watch(availabilityStartRaw, (val) => { if (val) formData.value.availability.start = `${val.getHours().toString().padStart(2,'0')}:${val.getMinutes().toString().padStart(2,'0')}`; });
-watch(availabilityEndRaw, (val) => { if (val) formData.value.availability.end = `${val.getHours().toString().padStart(2,'0')}:${val.getMinutes().toString().padStart(2,'0')}`; });
 watch(availabilityDays, (val) => {
   allDaysSelected.value = val.length === 0 || val.length === daysOfWeek.length;
 }, { immediate: true });
@@ -279,12 +303,18 @@ const guardarCambios = async () => {
       errorMessage.value = "Debes seleccionar al menos un día de disponibilidad."; showErrorModal.value = true; return;
     }
   }
+  console.log(formData.value);
   try {
-    await api.put(`/spaces/update/${props.spaceId}`, formData.value);
+    const response = await api.put(`/spaces/update/${props.spaceId}`, formData.value)
+    successMessage.value = response.data.message || "Cambios guardados con éxito.";
     showSuccessModal.value = true;
   } catch (err) { errorMessage.value = "Ocurrió un error al guardar."; showErrorModal.value = true; console.error(err); }
 };
 
 const close = () => emit('close');
-const closeSuccess = () => { showSuccessModal.value = false; emit('updated'); close(); };
+const closeSuccess = async () => {
+  showSuccessModal.value = false;
+  emit('updated', formData.value);
+  close();
+};
 </script>

@@ -24,8 +24,12 @@ import EventDetail from '../pages/EventDetail.vue'
 import ReservationQR from '../pages/ReservationQR.vue'
 import ImpactDashboard from '../pages/ImpactDashboard.vue'
 import IndustrialDashboard from '../pages/IndustrialDashboard.vue'
+<<<<<<< HEAD
 import IndustrialDetail from '../pages/IndustrialDetail.vue'
 import IndustrialReservation from '../pages/IndustrialReservation.vue'
+=======
+import AdminPage from '../pages/AdminPage.vue'
+>>>>>>> e8ef1679a3f60402aff142a166288c959e7371f5
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -80,13 +84,20 @@ const routes: RouteRecordRaw[] = [
 
 { path: '/event-qr/:token', name: 'ReservationQR', component: ReservationQR },
 
-{ path: '/impact-dashboard', name: 'ImpactDashboard', component:ImpactDashboard },
+{ path: '/impact-dashboard', name: 'ImpactDashboard', component: ImpactDashboard },
 
 { path: '/industrial-dashboard', name: 'IndustrialDashboard', component:IndustrialDashboard },
 
+<<<<<<< HEAD
 { path: '/industrial/:slug', name: 'IndustrialDetail', component: IndustrialDetail },
 
 { path: '/industrial/:slug/industrial-reservation', name: 'IndustrialReservation', component: IndustrialReservation }
+=======
+// Admin Page
+{ path: '/admin-page', name: 'adminPage', component: AdminPage, meta: { requiresAuth: true } },
+
+
+>>>>>>> e8ef1679a3f60402aff142a166288c959e7371f5
 ]
 
 
