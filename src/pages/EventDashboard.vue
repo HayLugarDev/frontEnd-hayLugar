@@ -23,16 +23,16 @@
         muted
         loop
         playsinline
-        poster="/assets/fallback.png"
+        poster="/assets/events.png"
         class="absolute inset-0 w-full h-full object-cover brightness-75"
       >
         
       </video>
       <div class="relative z-10 text-center">
         <h2 class="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">HayLugar Eventos</h2>
-        <p class="text-[#B0BEC5] font-light max-w-xl mx-auto">
+        <p class="text-3xl md:text-3xl font-bold mb-2 drop-shadow-lg">
           Tecnología + Sustentabilidad + Experiencia.  
-          La red inteligente que transforma los festivales del país.
+          La red inteligente que transforma los eventos del país.
         </p>
       </div>
     </section>

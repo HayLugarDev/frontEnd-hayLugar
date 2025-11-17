@@ -296,15 +296,10 @@ export const useSpaceStore = defineStore('space', {
       return this.favorites.some((fav: any) => fav.id === spaceId);
     },
 
-<<<<<<< HEAD
-    // 🔹 Actualizaciones locales
-    addSpaceToStore(space: any) {
-=======
     /**
      * 🔹 Agrega un nuevo espacio al store (se asume que fue creado en backend).
      */
     async addSpaceToStore(space: any) {
->>>>>>> e8ef1679a3f60402aff142a166288c959e7371f5
       this.spaces.unshift(space);
       showToast?.('Espacio agregado correctamente', 'success');
       console.log(this.spaces);
@@ -327,8 +322,6 @@ export const useSpaceStore = defineStore('space', {
       showToast?.('Espacio eliminado', 'success');
     },
 
-<<<<<<< HEAD
-=======
     /**
      * 🔹 Obtiene un espacio directamente desde el store sin llamar al backend.
      *    Si no existe, devuelve null.
@@ -350,7 +343,6 @@ export const useSpaceStore = defineStore('space', {
     /**
      * 🔹 Limpia todos los datos del store (por ejemplo, al cerrar sesión).
      */
->>>>>>> e8ef1679a3f60402aff142a166288c959e7371f5
     clearSpaces() {
       this.spaces = [];
       this.selectedSpace = null;

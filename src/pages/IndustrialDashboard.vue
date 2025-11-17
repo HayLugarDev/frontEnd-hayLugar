@@ -23,13 +23,13 @@
         muted
         loop
         playsinline
-        poster="/assets/industrial_cover.jpg"
+        poster="/assets/industry.png"
         class="absolute inset-0 w-full h-full object-cover brightness-75"
       ></video>
       <div class="absolute inset-0 bg-gradient-to-t from-[#0D1B2A]/90 via-transparent"></div>
       <div class="relative z-10 text-center">
         <h2 class="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">Espacios Logísticos en Red</h2>
-        <p class="text-[#B0BEC5] font-light max-w-2xl mx-auto">
+        <p class="text-3xl md:text-3xl font-bold mb-2 drop-shadow-lg">
           Almacená, transportá y optimizá tus operaciones con inteligencia urbana HayLugar.
         </p>
       </div>
