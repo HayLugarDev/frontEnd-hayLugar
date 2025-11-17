@@ -1,119 +1,99 @@
 <template>
-  <div v-if="props.images.length" class="relative w-full overflow-hidden mb-2 lg:rounded-xl">
-    <!-- Carrusel de imágenes -->
-    <div class="flex transition-transform duration-500" :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
-      @touchstart="onTouchStart" @touchend="onTouchEnd">
-      <div v-for="(img, index) in props.images" :key="index" class="w-full flex-shrink-0 aspect-square">
-        <img :src="img" class="w-full h-full object-cover" alt="Imagen del carrusel" />
-      </div>
-    </div>
-
-    <div v-if="props.controls">
-      <!-- Botones de navegación -->
-      <div v-if="props.images.length > 1" class="absolute inset-0 flex justify-between items-center px-4">
-        <button @click="prevSlide" type="button"
-          class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none">
-          <span
-            class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-            <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" xmlns="http://www.w3.org/2000/svg"
-              fill="none" viewBox="0 0 6 10">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M5 1 1 5l4 4" />
-            </svg>
-            <span class="sr-only">Anterior</span>
-          </span>
-        </button>
-        <button @click="nextSlide" type="button"
-          class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none">
-          <span
-            class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-            <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" xmlns="http://www.w3.org/2000/svg"
-              fill="none" viewBox="0 0 6 10">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="m1 9 4-4-4-4" />
-            </svg>
-            <span class="sr-only">Siguiente</span>
-          </span>
-        </button>
-      </div>
-
-      <!-- Indicadores -->
-      <div v-if="props.images.length > 1" class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        <button v-for="(img, index) in props.images" :key="`indicator-${index}`" @click="goToSlide(index)" :class="[
-          'w-3 h-3 rounded-full',
-          currentSlide === index ? 'bg-white' : 'bg-white/50'
-        ]"></button>
+  <!-- Si hay imágenes -->
+  <div v-if="displayedImages.length" class="relative w-full overflow-hidden mb-2 lg:rounded-xl">
+    <div class="flex transition-transform duration-500" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
+      <div v-for="(img, index) in displayedImages" :key="index" class="w-full flex-shrink-0 aspect-square">
+        <img :src="img" class="w-full h-full object-cover" alt="Imagen del espacio" @error="onImageError(index)" />
       </div>
     </div>
   </div>
+
+  <!-- Fallback absoluto: si no hay imágenes válidas -->
+  <div v-else class="w-full flex-shrink-0 aspect-square">
+    <img :src="someImg" class="w-full h-full object-cover" alt="Imagen por defecto" />
+  </div>
 </template>
 
+
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted } from 'vue'
+import someImg from '../../assets/img-haylugar.jpeg'
+
 
 const props = defineProps({
   controls: Boolean,
   images: {
     type: Array,
-    required: true
+    required: true,
+    default: () => []
   }
-});
+})
 
-const currentSlide = ref(0);
+const currentSlide = ref(0)
+const displayedImages = ref(
+  props.images?.length ? [...props.images] : [someImg] // ← fallback inicial
+)
 
-const startX = ref(0);
-const startY = ref(0);
-const endX = ref(0);
-const isSwiping = ref(false);
+watch(
+  () => props.images,
+  (newImgs) => {
+    displayedImages.value = newImgs?.length ? [...newImgs] : [someImg]
+  },
+  { immediate: true }
+)
+
+const onImageError = (index) => {
+  displayedImages.value[index] = someImg
+}
+
+// Swipe / touch controls
+const startX = ref(0)
+const startY = ref(0)
+const endX = ref(0)
+const isSwiping = ref(false)
 
 const nextSlide = () => {
-  currentSlide.value = (currentSlide.value + 1) % props.images.length;
-};
+  currentSlide.value = (currentSlide.value + 1) % displayedImages.value.length
+}
 
 const prevSlide = () => {
-  currentSlide.value = (currentSlide.value - 1 + props.images.length) % props.images.length;
-};
+  currentSlide.value = (currentSlide.value - 1 + displayedImages.value.length) % displayedImages.value.length
+}
 
 const handleSwipe = () => {
-
-  const distance = endX.value - startX.value;
-  if (distance > 50) {
-    prevSlide();
-  } else if (distance < -50) {
-    nextSlide();
-  }
-};
+  const distance = endX.value - startX.value
+  if (distance > 50) prevSlide()
+  else if (distance < -50) nextSlide()
+}
 
 onMounted(() => {
-  const container = document.querySelector('.flex');
+  const container = document.querySelector('.flex')
+  if (!container) return
 
   const handleTouchStart = (e) => {
-    startX.value = e.touches[0].clientX;
-    startY.value = e.touches[0].clientY;
-    isSwiping.value = false;
-  };
+    startX.value = e.touches[0].clientX
+    startY.value = e.touches[0].clientY
+    isSwiping.value = false
+  }
 
   const handleTouchMove = (e) => {
-    const deltaX = e.touches[0].clientX - startX.value;
-    const deltaY = e.touches[0].clientY - startY.value;
-
-    // Solo prevenimos scroll si el gesto es claramente horizontal
+    const deltaX = e.touches[0].clientX - startX.value
+    const deltaY = e.touches[0].clientY - startY.value
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      isSwiping.value = true;
-      e.preventDefault(); // Bloquea scroll horizontal
+      isSwiping.value = true
+      e.preventDefault()
     }
-  };
+  }
 
   const handleTouchEnd = (e) => {
     if (isSwiping.value) {
-      endX.value = e.changedTouches[0].clientX;
-      handleSwipe();
+      endX.value = e.changedTouches[0].clientX
+      handleSwipe()
     }
-  };
+  }
 
-  container.addEventListener('touchstart', handleTouchStart, { passive: false });
-  container.addEventListener('touchmove', handleTouchMove, { passive: false });
-  container.addEventListener('touchend', handleTouchEnd);
-
-});
+  container.addEventListener('touchstart', handleTouchStart, { passive: false })
+  container.addEventListener('touchmove', handleTouchMove, { passive: false })
+  container.addEventListener('touchend', handleTouchEnd)
+})
 </script>

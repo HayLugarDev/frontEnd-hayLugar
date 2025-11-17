@@ -9,14 +9,22 @@ import detailSpace from '../pages/detailSpace.vue'
 import payment from '../pages/payment.vue'
 import confirmaReserva from '../pages/confirmaReserva.vue'
 import profile from '../pages/profile.vue'
-import { useUserStore } from '../store/userStore'
 import AddVehicle from '../pages/addVehicle.vue'
 import universityDashboard from '../pages/universityDashboard.vue'
 import meteredParkingDashboard from '../pages/meteredParkingDashboard.vue'
 import Notifications from '../pages/notifications.vue'
 import landingHayLugar from '../pages/landingHayLugar.vue'
-import PlayaDashboard from '../pages/PlayaDashboard.vue'
-import DetailPlaya from '../pages/DetailPlaya.vue'
+import Help from '../pages/Help.vue'
+import FAQView from '../pages/FAQView.vue'
+import CookiesPolicy from '../pages/CookiesPolicy.vue'
+import PrivacyPolicyView from '../pages/PrivacyPolicyView.vue'
+import termsConditions from '../pages/termsConditions.vue'
+import EventDashboard from '../pages/EventDashboard.vue'
+import EventDetail from '../pages/EventDetail.vue'
+import ReservationQR from '../pages/ReservationQR.vue'
+import ImpactDashboard from '../pages/ImpactDashboard.vue'
+import IndustrialDashboard from '../pages/IndustrialDashboard.vue'
+import AdminPage from '../pages/AdminPage.vue'
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -32,14 +40,20 @@ const routes: RouteRecordRaw[] = [
   // ✅ Rutas de Términos y Condiciones
   { path: '/terminos-y-condiciones', name: 'terms', component: TermsPage },
   { path: '/aceptar-terminos', name: 'accept-terms', component: AcceptTerms },
+  { path: '/FAQView', name: 'FAQView', component: FAQView },
+  { path: '/cookies', name: 'cookies', component: CookiesPolicy }, 
+  { path: '/PrivacyPolicy', name: 'PrivacyPolicyView', component: PrivacyPolicyView },
+  { path: '/termsConditions', name: 'termsConditions', component: termsConditions },
+
 
   { path: '/add-space', component: addSpace, meta: { requiresAuth: true } },
-  { path: '/espacio/:id', component: detailSpace },
+  { path: '/espacio/:slug', component: detailSpace },
   { path: '/pago', component: payment, meta: { requiresAuth: true } },
   { path: '/confirmacion', component: confirmaReserva, meta: { requiresAuth: true } },
   { path: '/profile', component: profile, meta: { requiresAuth: true } },
   { path: '/notifications', component: Notifications, meta: { requiresAuth: true } },
   { path: '/add-vehicle', component: AddVehicle, meta: { requiresAuth: true } },
+  { path: '/help', component: Help, meta: { requiresAuth: false } },
 
   {
     path: '/universidades',
@@ -53,19 +67,28 @@ const routes: RouteRecordRaw[] = [
     component: meteredParkingDashboard,
     meta: { requiresAuth: false },
   },
-    {
-    path: '/playas',
-    name: 'playas',
-    component: PlayaDashboard,
-    meta: { requiresAuth: false },
-  },
-  {
-    path: '/playa/:id',
-    name: 'DetailPlaya',
-    component: DetailPlaya,
-    meta: { requiresAuth: false },
-  },
+
+  { path: '/events', component: EventDashboard, meta: { requiresAuth: false } },
+{
+  path: '/events/:id',
+  name: 'EventDetail',
+  component: EventDetail,
+  meta: { requiresAuth: true },
+  props: true, // 👈 habilita recibir "id" como prop
+},
+
+{ path: '/event-qr/:token', name: 'ReservationQR', component: ReservationQR },
+
+{ path: '/impact-dashboard', name: 'ImpactDashboard', component: ImpactDashboard },
+
+{ path: '/industrial-dashboard', name: 'IndustrialDashboard', component:IndustrialDashboard },
+
+// Admin Page
+{ path: '/admin-page', name: 'adminPage', component: AdminPage, meta: { requiresAuth: true } },
+
+
 ]
+
 
 const router = createRouter({
   history: createWebHistory(),
@@ -83,15 +106,6 @@ router.beforeEach((to, from, next) => {
   // 1) Forzar flujo de aceptación de T&C si llegó desde OAuth con el flag
   if (to.query.mustReaccept === '1') {
     next({ name: 'accept-terms' })
-    return
-  }
-
-  // 2) Autenticación básica (token o store)
-  const userStore = useUserStore()
-  const isLoggedIn = !!(localStorage.getItem('token') || userStore.user?.id)
-
-  if (to.meta.requiresAuth && !isLoggedIn) {
-    next({ name: 'login', query: { redirect: to.fullPath } })
     return
   }
 

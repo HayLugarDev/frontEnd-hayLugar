@@ -15,9 +15,11 @@ export const useReservationStore = defineStore('reservation', {
       start_time: null as string | null,
       end_time: null as string | null,
       dead_line: null as number | null,
-      total: 0,
-      payment_method: null as string | null, // "tarjeta", "mercadopago", "transferencia"
-      payment_data: null as Record<string, any> | null, // Datos de facturación (invoice_name, invoice_dni, invoice_address, invoice_email)
+      total: 0, // ⚠️ monto base en ARS (decimal, como venía del FE)
+      service_fee_cents: null as number | null, // calculado al setear
+      guest_total_cents: null as number | null, // calculado al setear
+      payment_method: null as string | null,
+      payment_data: null as Record<string, any> | null,
     },
     loading: false,
     error: null as string | null,
@@ -33,19 +35,31 @@ export const useReservationStore = defineStore('reservation', {
       if (!data.user_id && userStore.user) {
         data.user_id = userStore.user.id;
       }
+
+      // Si tenemos un total (ARS decimal), calculamos fee y total huésped en centavos
+      if (typeof data.total === "number" && data.total > 0) {
+        const SERVICE_FEE_PCT = Number((import.meta as any).env?.VITE_SERVICE_FEE_PCT ?? 0.15);
+
+        const baseCents = Math.round(data.total * 100); // ARS → centavos
+        const serviceFeeCents = Math.round(baseCents * SERVICE_FEE_PCT);
+        const guestTotalCents = baseCents + serviceFeeCents;
+
+        data.service_fee_cents = serviceFeeCents;
+        data.guest_total_cents = guestTotalCents;
+      }
+
       this.reservation = { ...this.reservation, ...data };
-      console.log("Reserva actualizada:", this.reservation);
     },
 
-
-    //Envía la reserva al backend para guardarla en la base de datos.
+    /**
+     * Envía la reserva al backend para guardarla en la base de datos.
+     */
     async submitReservation() {
       this.loading = true;
       this.error = null;
       try {
         const response = await api.post('/reservations/create', this.reservation);
-        this.reservation.id = response.data.reservation.id; // Actualiza el id según la respuesta del backend
-        console.log(response.data.reservation.id)
+        this.reservation.id = response.data.reservation.id;
         return response.data;
       } catch (error) {
         this.error = 'Error al crear la reserva';
@@ -56,17 +70,23 @@ export const useReservationStore = defineStore('reservation', {
       }
     },
 
+    /**
+     * Limpia el estado de la reserva (reset).
+     */
     clearReservation() {
       this.reservation = {
         id: null,
         user_id: null,
         owner_id: null,
         space_id: null,
+        vehicle_id: null,
         vehicle_type: null,
         start_time: null,
         end_time: null,
         dead_line: null,
         total: 0,
+        service_fee_cents: null,
+        guest_total_cents: null,
         payment_method: null,
         payment_data: null,
       };

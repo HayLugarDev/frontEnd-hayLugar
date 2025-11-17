@@ -1,99 +1,112 @@
 <template>
   <section class="lg:bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h2 class="text-2xl font-bold text-primary">📅 Tus reservas</h2>
+        <p class="text-sm text-gray-600 px-4">Revisá el estado y detalles de tus reservas activas o pasadas</p>
+      </div>
+    </div>
+
     <div v-if="loading" class="space-y-4">
       <ItemSkeleton />
+      <ItemSkeleton />
     </div>
-    <ul v-if="reservations.length" class="divide-y divide-gray-300 relative space-y-4">
-      <li v-for="(reservation, index) in reservations" :key="index" :class="[
-        'relative border border-yellow-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all space-y-3',
-        ['cancelled', 'completed', 'failed'].includes(reservation.status)
-          ? 'bg-gray-200 opacity-70 pointer-events-none'
-          : 'bg-gray-50'
-      ]">
-        <div class="flex flex-col xl:grid xl:grid-cols-4 text-gray-700 font-semibold text-[1rem]">
-          <div class="col-span-4 flex flex-row gap-1">
-            <span class="font-bold">Numero de reserva: </span>
-            <p class="text-gray-500 font-normal">#{{ reservation.id }}</p>
-          </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Fecha de solicitud: </span>
-            <p class="text-gray-500 font-normal">{{ formatDate(reservation.created_at) }}</p>
-          </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Nombre del espacio: </span>
-            <p class="text-gray-500 font-normal">{{ reservation.space.name }}</p>
-          </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Dirección: </span>
-            <p class="text-gray-500 font-normal">{{ reservation.space.location.split(',')[0] }}</p>
-          </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Anfitrión: </span>
-            <p class="text-gray-500 font-normal">{{ reservation.owner.name }}</p>
-          </div>
-          <div class="col-span-2 flex flex-col gap-1">
-            <div class="flex flex-row justify-start gap-2">
-              <h3 class="font-bold text-lg">Estado de la reserva:</h3>
-              <div
-                :class="`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[reservation.status] || 'bg-gray-200 text-gray-600'}`">
-                {{ getStatusInfo(reservation.status).label }}
-              </div>
-            </div>
-          </div>
-          <div class="col-span-2 flex flex-row gap-1">
-            <span class="font-bold">Vehículo: </span>
-            <p class="text-gray-500 font-normal">{{ getVehicleType(reservation.vehicle.type) }}</p>
-            <p class="text-gray-600">({{ reservation.vehicle.brand }} {{ reservation.vehicle.model }})</p>
-          </div>
-        </div>
-        <p class="col-span-4 mt-2 text-gray-600 text-sm">
-          {{ getStatusInfo(reservation.status).message }}
-        </p>
 
-        <!-- Solo muestra botones si la reserva NO está finalizada/cancelada/failed -->
-        <div v-if="!['cancelled', 'completed', 'failed'].includes(reservation.status)"
-          class="flex flex-col lg:flex-row items-center justify-between">
-          <div class="flex flex-col w-full">
-            <div v-if="reservation.status === 'in_progress'" class="mt-2 text-red-600 font-bold">
-              Tiempo restante: {{ countdowns[reservation.id] || 'Cargando...' }}
-            </div>
-            <div v-else class="flex flex-row gap-1">
-              <span class="font-bold">CheckIn: </span>
-              <p class="text-gray-500 font-normal">{{ formatDate(reservation.start_time) }}</p>
-            </div>
-            <div class="flex flex-row gap-1">
-              <span class="font-bold">CheckOut: </span>
-              <p class="text-gray-500 font-normal">{{ formatDate(reservation.end_time) }}</p>
+    <div v-if="reservations.length" class="space-y-4">
+      <div v-for="(reservation, index) in reservations" :key="index" :class="[
+        'border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden',
+        ['cancelled', 'completed', 'failed'].includes(reservation.status) && reservation.hasRating
+          ? 'opacity-70 pointer-events-none'
+          : '']">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <font-awesome-icon icon="calendar-check" class="text-primary" />
+              Reserva #{{ reservation.id }}
+            </h3>
+            <p class="text-xs text-gray-500">{{ formatDate(reservation.created_at) }}</p>
+          </div>
+          <span :class="[
+            'px-3 py-1 rounded-full text-xs font-semibold',
+            statusColors[reservation.status] || 'bg-gray-100 text-gray-600'
+          ]">
+            {{ getStatusInfo(reservation.status).label }}
+          </span>
+        </div>
+
+        <div class="p-5 space-y-3 text-sm text-gray-700">
+          <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
+            <p><span class="font-semibold">📍 Espacio:</span> {{ reservation.space.name }}</p>
+            <p><span class="font-semibold">📫 Dirección:</span> {{ reservation.space.location.split(',')[0] }}</p>
+            <p><span class="font-semibold">👤 Anfitrión:</span> {{ reservation.owner.name }}</p>
+            <p>
+              <span class="font-semibold">🚘 Vehículo:</span>
+              {{ getVehicleType(reservation.vehicle.type) }}
+              ({{ reservation.vehicle.brand }} {{ reservation.vehicle.model }})
+            </p>
+          </div>
+
+          <p class="text-gray-600 text-sm italic mt-2">
+            {{ getStatusInfo(reservation.status).message }}
+          </p>
+
+          <div class="flex flex-wrap justify-between items-center mt-2">
+            <div class="text-sm">
+              <p><span class="font-semibold">Check-In:</span> {{ formatDate(reservation.start_time) }}</p>
+              <p><span class="font-semibold">Check-Out:</span> {{ formatDate(reservation.end_time) }}</p>
+              <p v-if="reservation.status === 'in_progress'" class="text-red-600 font-bold mt-1">
+                ⏳ Tiempo restante: {{ countdowns[reservation.id] || 'Cargando...' }}
+              </p>
             </div>
           </div>
-          <button v-if="reservation.status === 'in_progress'" @click="checkOutInit(reservation)"
-            class="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
-            <font-awesome-icon :icon="['fas', 'square-xmark']" />
-            Iniciar CheckOut
-          </button>
-          <div v-else class="w-full flex flex-row items-center lg:justify-end gap-1">
+        </div>
+
+        <div v-if="!['cancelled', 'completed', 'failed'].includes(reservation.status)">
+
+          <div class="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 bg-gray-50">
+
+            <!-- Check-in -->
             <button v-if="reservation.status === 'approved'" @click="checkInInit(reservation)"
-              class="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
-              <font-awesome-icon :icon="['fas', 'square-xmark']" />
-              Iniciar CheckIn
+              :disabled="!checkInEnabled[reservation.id]"
+              class="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl shadow hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              <font-awesome-icon icon="right-to-bracket" /> Iniciar Check-In
             </button>
+
+            <!-- Check-out -->
+            <button v-if="reservation.status === 'in_progress'" @click="checkOutInit(reservation)"
+              class="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-600 transition-all">
+              <font-awesome-icon icon="right-from-bracket" /> Iniciar Check-Out
+            </button>
+
+            <!-- Cancelar -->
             <button v-if="reservation.status === 'pending'" @click="confirmCancelation(reservation)"
-              class="bg-red-400 text-white px-4 py-2 rounded-lg shadow hover:bg-red-500 transition-all flex items-center justify-center gap-2 w-full md:w-auto mt-4">
-              <font-awesome-icon :icon="['fas', 'square-xmark']" />
-              Cancelar Reserva
+              class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition-all">
+              <font-awesome-icon icon="ban" /> Cancelar
+            </button>
+
+            <!-- Calificar -->
+            <button v-if="reservation.status === 'completed' && !reservation.hasRating"
+              @click="showRatingModal = true; selectedReservation = reservation"
+              class="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-xl shadow hover:bg-yellow-600 transition-all">
+              <font-awesome-icon icon="star" /> Calificar experiencia
             </button>
           </div>
         </div>
-      </li>
-    </ul>
-    <p v-else-if="!loading" class="text-gray-500">No tienes reservas anteriores.</p>
+
+      </div>
+    </div>
+
+    <p v-else class="text-gray-500 text-center py-10 text-sm">
+      No tienes reservas realizadas aún.
+    </p>
+
     <!-- Modal CheckIn -->
     <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div class="bg-white rounded-lg shadow-lg p-6 w-96">
         <h2 class="text-lg font-bold mb-4">Verificar Check-In</h2>
 
         <p class="text-sm text-gray-600 mb-2">
-          Ingresa el código de verificación proporcionado por el anfitrión:
+          Ingresa el código de verificación proporcionado por el anfitrión (Solo mayúsculas):
         </p>
 
         <input v-model="checkInCode" type="text" placeholder="Código de verificación"
@@ -103,37 +116,26 @@
           <button @click="showCheckInModal = false" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300">
             Cancelar
           </button>
-          <button @click="confirmCheckIn" class="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600">
+          <button @click="confirmCheckIn" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
             Confirmar
           </button>
         </div>
+        <p v-if="errorMessage" class="text-red-500 text-sm mt-3">{{ errorMessage }}</p>
       </div>
     </div>
 
-    <!-- Modal de éxito -->
-    <transition name="fade">
-      <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-          <div class="flex flex-col items-center">
-            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-            <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
-            <p class="text-lg text-gray-700 text-center mb-6">Verificación exitosa.</p>
-            <button @click="goToReservation" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-              Continuar
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
-
-    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-      message="El código ingresado es incorrecto. Intentá nuevamente" icon="/src/assets/logo.png"
-      @close="openCheckInModal" />
-
+    <!-- Modales -->
     <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
       @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
+
+    <RatingModal :visible="showRatingModal" :reservationId="selectedReservation?.id" @close="showRatingModal = false"
+      @submit="handleRatingSubmit" />
+
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
+      message="Ocurrió un error al procesar la acción" icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
   </section>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
@@ -145,6 +147,8 @@ import StatusModal from '../addSpacePage/StatusModal.vue';
 import { useRouter } from 'vue-router';
 import ConfirmModal from '../../common/ConfirmModal.vue';
 import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
+import RatingModal from '../../common/RatingModal.vue';
+import { showToast } from '../../../utils/toast';
 
 const reservations = ref([]);
 const userStore = useUserStore();
@@ -152,13 +156,18 @@ const router = useRouter();
 
 const showCheckInModal = ref(false);
 const showErrorModal = ref(false);
+const showErrorCheckinModal = ref(false);
 const showSuccessModal = ref(false);
 const showConfirmModal = ref(false);
 const loading = ref(true);
 
+const checkInEnabled = ref<Record<number, boolean>>({});
+
 const checkInCode = ref("");
 const selectedReservation = ref<any>(null);
 const errorMessage = ref("");
+
+const showRatingModal = ref(false);
 
 const countdowns = ref<Record<number, string>>({});
 
@@ -187,6 +196,11 @@ const fetchReservations = async () => {
   loading.value = false;
 };
 
+onMounted(() => {
+  updateCheckInEnabled(); // inicial
+  setInterval(updateCheckInEnabled, 1000); // actualización en tiempo real
+});
+
 onMounted(async () => {
   await fetchReservations();
   setInterval(updateCountdowns, 1000);
@@ -210,7 +224,6 @@ async function confirmCheckIn() {
     selectedReservation.value.status = "verified";
     showCheckInModal.value = false;
 
-    console.log("CheckIn exitoso", response.data);
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || "Error al verificar código";
   }
@@ -236,6 +249,20 @@ function checkOutInit(reservation: any) {
   };
 }
 
+function updateCheckInEnabled() {
+  const now = new Date().getTime();
+
+  reservations.value.forEach((reservation: any) => {
+    const start = new Date(reservation.start_time).getTime();
+    const end = new Date(reservation.end_time).getTime();
+
+    // Habilitado 10 minutos antes del inicio hasta el final de la reserva
+    checkInEnabled.value[reservation.id] = now >= start - 10 * 60 * 1000 && now <= end;
+  });
+}
+
+
+
 const completeReservation = async () => {
   if (!selectedReservation.value) return;
 
@@ -248,6 +275,7 @@ const completeReservation = async () => {
     );
 
     showErrorModal.value = false;
+    showErrorCheckinModal.value = false;
     showSuccessModal.value = false;
     showCheckInModal.value = false;
   } catch (error: any) {
@@ -255,6 +283,35 @@ const completeReservation = async () => {
     errorMessage.value = error.response?.data?.message || "Error al finalizar la reserva";
   }
 };
+
+async function handleRatingSubmit(formData: { rating: number; comment?: string }) {
+  if (!selectedReservation.value) return;
+
+  const payload = {
+    authorId: userStore.user?.id,               // quién califica (logueado)
+    targetId: selectedReservation.value.owner.id, // quién recibe la review
+    reservationId: selectedReservation.value.id,
+    rating: formData.rating,
+    comment: formData.comment,
+    role: 'client' // usuario que califica como cliente
+  };
+
+  try {
+    await api.post(`/users/rate/${payload.targetId}`, payload, { withCredentials: true });
+
+    // Marcar localmente que ya fue calificada
+    selectedReservation.value.hasRating = true;
+
+    showRatingModal.value = false;
+    selectedReservation.value = null;
+
+    await fetchReservations();
+    showToast('Calificación enviada con éxito', 'success');
+  } catch (err) {
+    showToast('No se pudo enviar la calificación', 'error');
+  }
+}
+
 
 function confirmCancelation(reservation: any) {
   showConfirmModal.value = true;
@@ -276,7 +333,7 @@ const cancelReservation = async () => {
     );
 
     selectedReservation.value = null;
-    showErrorModal.value = false;
+    showErrorCheckinModal.value = false;
     showSuccessModal.value = false;
     showCheckInModal.value = false;
     showConfirmModal.value = false;
@@ -325,3 +382,19 @@ function updateCountdowns() {
 }
 
 </script>
+
+<style scoped>
+section {
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

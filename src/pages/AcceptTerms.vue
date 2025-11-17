@@ -21,15 +21,18 @@
           <div class="prose max-w-none" v-html="html"></div>
         </div>
 
-        <div class="mt-6 flex gap-3">
-          <button
-            class="px-4 py-2 bg-black text-white rounded disabled:opacity-60"
-            @click="accept"
-            :disabled="loading || !terms || loadingAccept"
-          >
-            {{ loadingAccept ? 'Guardando…' : 'Acepto' }}
+        <div class="mt-8 flex items-center gap-3">
+          <input type="checkbox" id="accept" v-model="accepted" class="w-4 h-4" />
+          <label for="accept" class="text-sm">
+            He leído y acepto los Términos y Condiciones
+          </label>
+        </div>
+
+        <div class="mt-6">
+          <button @click="handleAccept" :disabled="!accepted || loadingAccept"
+            class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50">
+            {{ loadingAccept ? "Guardando…" : "Aceptar" }}
           </button>
-          <RouterLink to="/" class="px-4 py-2 border rounded">Cancelar</RouterLink>
         </div>
       </div>
     </div>
@@ -39,8 +42,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '../services/apiService'
-import axios from 'axios'                     
+import api from '../services/apiService'          // 👉 cliente Axios con baseURL = VITE_API_BASE_URL
+import axios from 'axios'                         // 👉 instancia default para traer el HTML estático
+import { useUserStore } from '../store/userStore'
 
 type Terms = {
   version: string
@@ -49,6 +53,8 @@ type Terms = {
 }
 
 const router = useRouter()
+const accepted = ref(false)
+const userStore = useUserStore();
 
 const terms = ref<Terms | null>(null)
 const html = ref<string>('')
@@ -78,15 +84,29 @@ async function load() {
   }
 }
 
-async function accept() {
-  if (!terms.value) return
-  loadingAccept.value = true
-  error.value = ''
+async function handleAccept() {
+  if (!terms.value?.version) return
   try {
-    await api.post('/terms/accept', { version: terms.value.version })
+    loadingAccept.value = true
+    const { data } = await api.post(
+      '/terms/accept',
+      { version: terms.value.version },
+      { withCredentials: true }
+    )
+
+    // ✅ Actualizar el userStore en memoria
+    if (userStore.user) {
+      userStore.user = {
+        ...userStore.user,
+        termsAccepted: true,
+        acceptedTermsVersion: data.acceptedVersion,
+      }
+    }
+
+    // Redirigir (ejemplo: a home o reservas)
     router.push('/dashboard')
   } catch (e: any) {
-    error.value = e?.message || 'Error guardando aceptación.'
+    error.value = e?.response?.data?.error || 'Error aceptando términos.'
   } finally {
     loadingAccept.value = false
   }
@@ -96,5 +116,7 @@ onMounted(load)
 </script>
 
 <style scoped>
-.prose :deep(img){max-width:100%}
+.prose :deep(img) {
+  max-width: 100%
+}
 </style>

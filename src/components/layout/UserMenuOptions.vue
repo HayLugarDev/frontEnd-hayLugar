@@ -1,18 +1,21 @@
 <template>
   <ul class="flex flex-col divide-y divide-gray-200 text-gray-700 text-2xl md:text-base z-50">
-    <li>
-      <MobileNotificationButton @click="$emit('navigate', '/notifications')" class="menu-item" />
-    </li>
     <li v-if="route.path !== '/dashboard'" @click="$emit('navigate', '/dashboard')" class="menu-item">
       <font-awesome-icon icon="house" /> <span>Inicio</span>
     </li>
-    <li v-if="!user" @click="$emit('navigate', '/register')" class="menu-item">
+    <li v-if="user" @click="$emit('navigate', '/notifications')" class="menu-item">
+      <font-awesome-icon icon="bell" /> <span>Notificaciones</span>
+    </li>
+    <li v-if="!user" @click="$emit('navigate', '/login')" class="menu-item">
       <font-awesome-icon icon="user-plus" /> <span>Registrarse</span>
     </li>
     <li v-if="!user" @click="$emit('navigate', '/login')" class="menu-item">
       <font-awesome-icon icon="right-to-bracket" /> <span>Iniciar sesión</span>
     </li>
-    <li v-if="user" @click="$emit('navigate', '/profile')" class="menu-item">
+    <li v-if="user && user.role === 'admin'" @click="$emit('navigate', '/admin-page')" class="menu-item">
+      <font-awesome-icon icon="wrench" /> <span>Administración</span>
+    </li>
+    <li v-else-if="user" @click="$emit('navigate', '/profile')" class="menu-item">
       <font-awesome-icon icon="user" /> <span>Mi Perfil</span>
     </li>
     <li @click="$emit('navigate', '/add-space')" class="menu-item">
@@ -31,7 +34,6 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { useUserStore } from '../../store/userStore';
-import MobileNotificationButton from './header/MobileNotificationButton.vue';
 const userStore = useUserStore();
 const user = userStore.user;
 

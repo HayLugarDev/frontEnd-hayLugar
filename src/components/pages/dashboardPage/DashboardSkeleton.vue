@@ -2,7 +2,7 @@
   <div class="flex flex-col h-full bg-secondary animate-pulse text-transparent">
     <!-- Simulación del MainHeader en modo skeleton -->
     <div
-      class="hidden md:flex justify-between items-center border-b-2 px-4 pt-2 xl:px-10 xl:mx-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
+      class="hidden md:flex justify-between items-center border-b-2 px-4 pt-16 md:pt-2 xl:px-10 xl:mx-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
       <!-- Logo placeholder -->
       <div class="w-16 h-10 bg-gray-400 rounded"></div>
 
@@ -25,7 +25,7 @@
 
     <!-- Cards o mapa -->
     <div class="flex flex-1 p-6">
-      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4 w-full">
+      <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4 w-full">
         <SkeletonSpaceCard v-for="n in 14" :key="'skeleton-' + n" />
       </div>
     </div>

@@ -1,105 +1,171 @@
 <template>
-    <router-link :to="`/espacio/${espacio.id}`">
-        <div class="bg-secondary rounded-xl transition-all h-full lg:h-80 min-h-[22rem] lg:p-2 md:p-0">
-            <div class="relative w-full h-48 overflow-hidden rounded-lg">
-                <Carousel :images="espacio.images" class="w-full h-full object-cover" :controls="false" />
-            </div>
-            <div class="p-1">
-                <div class="flex flex-col items-start px-1 md:px-0">
-                    <div class="text-md lg:text-xs font-bold text-primary line-clamp-1">
-                        {{ capitalizeFirst(espacio.name) }}
-                    </div>
+  <router-link
+    :to="`/espacio/${espacio.slug}`"
+    class="block transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
+  >
+    <div
+      class="bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden 
+             shadow-md flex flex-col h-full transition-all duration-300"
+    >
 
-                    <p class="text-xs text-gray-800 line-clamp-1">
-                        {{ espacio.location.split(',')[1] }}
-                    </p>
+      <!-- IMAGEN + CONTROLES -->
+      <div class="relative w-full h-44 overflow-hidden">
+        <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover" />
 
-                    <p class="text-[10px] sm:text-xs text-gray-500 line-clamp-1">
-                        {{ espacio.location.split(',')[0] }}
-                    </p>
-
-                    <div class="w-full flex flex-row justify-between items-start md:text-xs text-center py-2">
-                        <div class="flex flex-row justify-start">
-                            <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-1 border rounded-xl">
-                                <font-awesome-icon :icon="['fas', `${vehicleTypeTranslations[v.type]}`]"
-                                    class="text-gray-700 text-sm md:text-sm" />
-                                <p v-if="v.price_per_hour" class="text-[.6rem] font-normal md:hidden">Hora: ${{
-                                    v.price_per_hour.toLocaleString() }}</p>
-                            </div>
-                        </div>
-                        <div class="text-gray-800 font-semibold text-md md:text-sm">
-                            <span class="text-yellow-600">★</span> {{ Number(espacio.average_rating).toFixed(1) }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-2 mb-2">
-                    <div
-                        class="bg-blue-100 text-primary rounded-lg px-4 py-2 text-start text-[10px] font-semibold">
-                        <div v-if="disponibilidad.dateRange && disponibilidad.dateRange.length === 2">
-                            <span>
-                                {{ formatDate(disponibilidad.dateRange[0]) }} al {{ disponibilidad.dateRange[1] }}
-                            </span>
-                        </div>
-                        <div class="text-[10px]">
-                            <span>Horario: </span>
-                            <span v-if="disponibilidad.start && disponibilidad.end">
-                                {{ disponibilidad.start }} a {{ disponibilidad.end }} hs
-                            </span>
-                            <span v-else>
-                                No especificados
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- PRICE BADGE -->
+        <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl">
+          <span class="text-[#06D6A0] font-bold text-sm">${{ getMinPrice() }}</span>
+          <span class="text-gray-300 text-[10px]">/h</span>
         </div>
-    </router-link>
+      </div>
+
+      <!-- CONTENIDO -->
+      <div class="flex flex-col flex-1 p-4">
+
+        <!-- TITULO -->
+        <h3 class="text-white font-semibold text-base leading-tight line-clamp-1">
+          {{ capitalizeFirst(espacio.name) }}
+        </h3>
+
+        <!-- UBICACIÓN -->
+        <p class="text-gray-300 text-xs mt-1 line-clamp-1">
+          {{ ciudad }}
+        </p>
+        <p class="text-gray-400 text-[11px] -mt-1 line-clamp-1">
+          {{ calle }}
+        </p>
+
+        <!-- DISTANCIA -->
+        <p v-if="espacio.distancia"
+           class="text-[11px] text-gray-400 mt-2 flex items-center gap-1">
+          📍 A {{ espacio.distancia.toFixed(1) }} km
+        </p>
+
+        <!-- ICONOS VEHÍCULOS -->
+        <div class="flex flex-row justify-start gap-2 mt-3">
+          <div
+            v-for="v in espacio.vehicle_capacities"
+            :key="v.type"
+            class="flex items-center gap-1 bg-white/5 border border-white/10 
+                   px-2 py-1 rounded-lg text-white"
+          >
+            <font-awesome-icon :icon="['fas', `${getVehicleIcon(v.type)}`]" class="text-xs" />
+            <span v-if="v.price_per_hour" class="text-[10px]">
+              ${{ v.price_per_hour }}/h
+            </span>
+          </div>
+        </div>
+
+        <!-- RATING -->
+        <div class="flex items-center justify-end mt-2 text-xs gap-1">
+          <span :class="espacio.average_rating ? 'text-yellow-400' : 'text-gray-500'">⭐</span>
+          <span class="text-gray-200 font-medium">
+            {{ espacio.space_reviews.length > 0 ? espacio.average_rating.toFixed(1) : '5.0' }}
+          </span>
+        </div>
+
+        <!-- AVAILABILITY BADGE -->
+        <div
+          class="mt-3 bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-gray-200 
+                 flex items-center justify-between"
+        >
+          <div class="flex items-center gap-1">
+            <span class="text-xs text-[#00B4D8] font-semibold uppercase">
+              {{ labelHorario }}
+            </span>
+          </div>
+
+          <div>
+            <template v-if="espacio.reservation_period !== 'hour'">
+              Todos los días 🗓️
+            </template>
+
+            <template v-else>
+              {{ disponibilidad.start }} - {{ disponibilidad.end }} hs
+            </template>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </router-link>
 </template>
+
 <script setup>
-import { capitalizeFirst } from '../../../utils/capitalizeFirstCharAt';
-import { formatDate } from '../../../utils/FormatDate';
-import Carousel from '../../common/Carousel.vue';
-import { computed } from 'vue';
+import { ref, computed } from 'vue'
+import Carousel from '../../common/Carousel.vue'
+import fallbackImage from '../../../assets/img-haylugar.jpeg'
+import { getVehicleIcon } from '../../../utils/vehicleTypeIconTraslation'
+import { getSpaceImages } from '../../../services/spaceService'
+import { capitalizeFirst } from '../../../utils/capitalizeFirstCharAt'
 
 const props = defineProps({
-    espacio: Object
-});
+  espacio: Object
+})
 
-const disponibilidad = computed(() => {
-    if (!props.espacio?.availability) return {};
-    return typeof props.espacio.availability === 'string'
-        ? JSON.parse(props.espacio.availability)
-        : props.espacio.availability;
-});
+const hovered = ref(false)
 
-const vehicleOptions = computed(() => {
-    if (!espacio.value?.vehicle_capacities) return [];
+const images = ref(
+  props.espacio?.images?.length ? [props.espacio.images[0]] : [fallbackImage]
+)
 
-    return espacio.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
-});
+const getMinPrice = () => {
+  if (!props.espacio?.vehicle_capacities) return '—'
+  const prices = props.espacio.vehicle_capacities
+    .filter(v => v.price_per_hour)
+    .map(v => v.price_per_hour)
 
-function vehicleLabel(type) {
-    switch (type) {
-        case 'car': return 'car-side';
-        case 'van': return 'truck-pickup';
-        case 'motorcycle': return 'motorcycle';
-        case 'bicycle': return 'bicycle';
-        default: return type;
-    }
+  return prices.length ? Math.min(...prices) : '—'
 }
 
-const vehicleTypeTranslations = {
-    car: 'car-side',
-    motorcycle: 'motorcycle',
-    van: 'truck-pickup',
-    bicycle: 'bicycle',
-    // truck: 'Camión',
-    // suv: 'SUV',
-};
+const handleMouseEnter = async () => {
+  hovered.value = true
+  if (!props.espacio.images?.length) return
 
-const reverseVehicleTypeTranslations = Object.fromEntries(
-    Object.entries(vehicleTypeTranslations).map(([en, es]) => [es, en])
-);
+  if (images.value.length === 1 && images.value[0] === fallbackImage) {
+    const fetched = await getSpaceImages(props.espacio.id)
+    images.value = fetched.length ? fetched : [fallbackImage]
+  }
+}
 
+const handleMouseLeave = () => (hovered.value = false)
+
+const disponibilidad = computed(() => {
+  if (!props.espacio?.availability) return {}
+
+  return typeof props.espacio.availability === 'string'
+    ? JSON.parse(props.espacio.availability)
+    : props.espacio.availability
+})
+
+const labelHorario = computed(() => {
+  switch (props.espacio.reservation_period) {
+    case 'hour': return 'Por Hora'
+    case 'day': return 'Por Día'
+    case 'week': return 'Por Semana'
+    default: return 'Por Mes'
+  }
+})
+
+const ciudad = computed(() => props.espacio.location.split(',')[1] ?? '')
+const calle = computed(() => props.espacio.location.split(',')[0] ?? '')
 </script>
+
+<style scoped>
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+</style>

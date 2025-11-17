@@ -2,6 +2,8 @@
 import { onMounted } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import { useUserStore } from './store/userStore';
+import Toast from './components/common/Toast.vue';
+import CookieBanner from './components/common/CookieBanner.vue';
 
 const userStore = useUserStore();
 
@@ -11,6 +13,8 @@ onMounted(async ()=> userStore.fetchUser());
 <template>
   <div class="flex flex-col min-h-screen raleway">
     <router-view />
+    <CookieBanner />
+    <Toast />
   </div>
 </template>
 

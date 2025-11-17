@@ -1,29 +1,44 @@
 <template>
-  <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-4">
-    <h1 class="text-4xl font-semibold mb-8">¿Qué tipos de vehículos aceptarás en tu espacio?</h1>
+  <div
+    class="flex flex-col max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
 
-    <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value" :title="type.title"
-      :text="type.description" :configured="!!vehicleMap[type.value]" :configuration="vehicleMap[type.value]"
-      @configure="openConfig(type.value)" />
+    <!-- Título -->
+    <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-2">
+      ¿Qué tipos de vehículos aceptarás en tu espacio?
+    </h1>
 
-    <!-- Navegación -->
-    <div class="flex justify-between space-x-4">
-      <button @click="emit('prev')" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">Anterior</button>
-      <button @click="Object.keys(vehicleMap).length ? emitSubmit() : (showErrorModal = true)"
-        class="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition duration-300">
-        Siguiente
-      </button>
+    <!-- Subtítulo / Advertencia -->
+    <p class="text-gray-500 text-center mb-6 text-sm">
+      <strong>Atención:</strong> No publiques más espacios de los que realmente tenés disponibles.
+      Así nos aseguramos de que cada vehículo cuente con su lugar sin problemas y que ninguna reserva se superponga con
+      otra.
+    </p>
+
+    <!-- Opciones de vehículo -->
+    <div class="space-y-4">
+      <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value" :title="type.title"
+        :text="type.description" :configured="!!vehicleMap[type.value]" :configuration="vehicleMap[type.value]"
+        @save="saveConfiguration" @remove="removeConfiguration" />
     </div>
 
-    <!-- Modal de configuración -->
-    <VehicleModal v-if="selectedType" :type="selectedType" :existing="vehicleMap[selectedType]"
-      @save="saveConfiguration" @close="selectedType = null" />
+    <!-- Navegación -->
+    <div class="mt-auto flex justify-between space-x-4">
+      <button @click="emit('prev')"
+        class="px-6 py-2 border-2 border-primary text-primary rounded-full font-semibold hover:bg-primary hover:text-white transition">
+        Anterior
+      </button>
+      <button @click="Object.keys(vehicleMap).length ? emitSubmit() : (showErrorModal = true)"
+        class="px-8 py-2 bg-primary text-white rounded-full font-bold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
+        Siguiente ➜
+      </button>
+    </div>
 
     <!-- Modal de error -->
     <StatusModal :visible="showErrorModal" title="¡Atención!"
       message="Por favor, selecciona al menos un tipo de vehículo y configura su capacidad y precio."
-      icon="/src/assets/logo.png" @close="showErrorModal = false" />
+      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
   </div>
+
 </template>
 
 <script setup>
@@ -75,9 +90,12 @@ const vehicleMap = computed(() => {
   return map;
 });
 
-// Abrir modal para configurar
-function openConfig(type) {
-  selectedType.value = type;
+function removeConfiguration(type) {
+  const updated = props.modelValue.vehicle_capacities.filter((v) => v.type !== type);
+  emit('update:modelValue', {
+    ...props.modelValue,
+    vehicle_capacities: updated,
+  });
 }
 
 // Guardar datos de configuración

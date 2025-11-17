@@ -4,6 +4,7 @@
     "jsx": "preserve",
     "target": "ESNext",
     "module": "ESNext",
+    "skipLibCheck": true,
     "moduleResolution": "bundler"
   },
   "include": [

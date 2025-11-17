@@ -1,6 +1,6 @@
 <template>
   <section class="lg:bg-white p-2 md:p-8 rounded-lg w-full md:w-2/3">
-    <div class="mx-auto max-w-6xl" v-if="!loadingUser">
+    <div class="p-4 flex flex-col gap-4" v-if="!loadingUser">
       <!-- Header -->
       <section class="bg-gray-50 p-6 md:p-8 rounded-2xl shadow-lg">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -363,5 +363,17 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Estética consistente: todo con Tailwind */
+section {
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>

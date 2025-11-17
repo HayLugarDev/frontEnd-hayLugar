@@ -1,38 +1,41 @@
 <template>
   <header
-    class="bg-secondary/80 backdrop-blur-md gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 py-2 xl:px-16 fixed md:static transition-all duration-300 shadow-md md:shadow-none animate-fade-in-down">
+    class="bg-gray-50 gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 pt-6 pb-2 xl:px-16 fixed md:static shadow-md md:shadow-none rounded-b-xl">
     <Logo width="12" @click="router.push('/dashboard')"
-      class="transition-transform duration-300 hover:scale-105 hidden md:block" />
-    <div v-if="authChecked" class="flex flex-row justify-between gap-2">
-      <div v-if="routeConfig.showSalirButton" @click="router.push('/dashboard')">
+      class="hidden md:block" />
+      <div v-if="routeConfig.showSalirButton" @click="router.push('/dashboard')" class="w-full flex flex-row justify-end">
         <button
-          class="text-gray-800 border sm:text-md hover:shadow-lg bg-gray-50 py-2 px-4 rounded-full cursor-pointer h-full">
+          class="text-gray-600 sm:text-md hover:shadow-lg py-2 px-4 rounded-full cursor-pointer">
           Salir
         </button>
       </div>
+    <div v-if="authChecked" class="flex flex-row justify-between gap-2">
       <div v-if="route.path !== '/add-space' && route.path !== '/add-vehicle'"
-        class="relative flex flex-row sm:gap-2 items-center max-h-12">
-        <font-awesome-icon icon="fa-regular fa-circle-question"
-          class="hidden md:block p-3 text-gray-500 w-6 h-6 hover:shadow-xl hover:bg-gray-50 rounded-full cursor-pointer" />
-        <NotificationDropdown class="hidden md:block" v-if="routeConfig.showNotificationButton" />
+        class="relative flex flex-row sm:gap-2 items-center max-h-12 text-gray-800">
         <div class="">
           <!-- Botón visible solo en mobile -->
           <button @click="showMobileMenu = true"
-            class="block md:hidden w-11 h-11 rounded-full border-2 border-gray-300 bg-gray-50 shadow-lg">
+            class="block md:hidden w-12 h-12 rounded-full text-2xl">
             <font-awesome-icon icon="fa-align-justify" />
           </button>
 
           <!-- Menú lateral en mobile -->
           <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
         </div>
-        <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
       </div>
-      <MapButton :text="buttonText" color="black" background="gray-50" @click="toggleMap" class="md:hidden" />
+      <div class="flex flex-row gap-1">
+        <font-awesome-icon icon="fa-regular fa-circle-question"
+          class="p-3 w-6 h-6 rounded-full cursor-pointer text-gray-400" @click="openHelp" />
+        <NotificationDropdown v-if="routeConfig.showNotificationButton" />
+        <MapButton :text="buttonText" color="gray-800" @click="toggleMap" class="md:hidden" />
+        <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
+        <BackButton v-if="routeConfig.showBackButton" />
+      </div>
     </div>
     <template v-else>
       <!-- Skeleton Loader -->
       <div
-        class="hidden md:flex justify-between items-center border-b-2 px-4 pt-2 xl:px-10 xl:mx-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
+        class="hidden md:flex justify-between items-center border-b-2 px-4 pt-6 md:pt-2 xl:px-10 xl:mx-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
         <!-- Logo placeholder -->
         <div class="w-16 h-10 bg-gray-400 rounded"></div>
 
@@ -44,28 +47,30 @@
       </div>
     </template>
   </header>
+  <HelpModal :visible="activatedModal" @close="activatedModal = false" />
   <SessionExpired :sessionExpired="isSessionInvalid" />
 </template>
 
 <script setup lang="ts">
 import Logo from '../Logo.vue';
 import { useUserStore } from '../../../store/userStore';
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import SessionExpired from '../../common/SessionExpired.vue';
 import { useHeaderVisibility } from "../../../logic/useHeaderVisibility";
 import { useVerifyToken } from '../../../logic/useVerifyToken';
-import BackButton from "../../common/BackButton.vue";
 import NotificationDropdown from './NotificationDropdown.vue';
 import UserMenu from '../UserMenu.vue';
 import MobileUserMenu from './MobileUserMenu.vue';
 import MapButton from '../../pages/dashboardPage/MapButton.vue';
+import BackButton from '../../common/BackButton.vue';
+import HelpModal from '../HelpModal.vue';
 
 const userStore = useUserStore();
 const showNotificationBubble = ref(false);
 const showMobileMenu = ref(false)
 const authChecked = ref(false);
-const hasUnread = ref(true);
+const activatedModal = ref(false);
 const showMap = ref(false);
 const router = useRouter();
 const route = useRoute();
@@ -82,19 +87,6 @@ onMounted(async () => {
   authChecked.value = true;
 });
 
-watch(
-  () => userStore.notifications.length,
-  (newVal) => {
-    if (newVal > 0) {
-      showNotificationBubble.value = true;
-
-      setTimeout(() => {
-        showNotificationBubble.value = false;
-      }, 4000); // Oculta el globo tras 4 segundos
-    }
-  }
-);
-
 const handleNavigate = (path: string) => {
   if (path === '/quit') {
     return verifyToken(path);
@@ -106,14 +98,16 @@ const handleNavigate = (path: string) => {
   }
 };
 
-function toggleNotifications() {
-  console.log('Mostrar panel de notificaciones');
-  hasUnread.value = false;
-}
-
 function toggleMap() {
   showMap.value = !showMap.value;
+  showMobileMenu.value = false;
+  showNotificationBubble.value = false;
   emit('toggle');
+}
+
+function openHelp() {
+  activatedModal.value = true;
+  document.body.style.overflow = 'hidden' // evita scroll de fondo
 }
 </script>
 

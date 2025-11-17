@@ -24,8 +24,8 @@ export const reservationMessages: Record<
   },
   approved: {
     label: "Confirmado",
-    client: "Todo está listo para que guardes tu vehículo en el horario seleccionado. Recuerda ser puntual para evitar penalidades.",
-    owner: "Has aprobado la reserva. El cliente podrá utilizar el espacio en el horario seleccionado.",
+    client: "Todo está listo para que guardes tu vehículo en el horario seleccionado. Recuerda ser puntual para evitar penalidades. Podrás realizar el Checkin hasta 10 minutos antes del inicio de la resera",
+    owner: "Has aprobado la reserva. El cliente podrá utilizar el espacio en el horario seleccionado una vez que realice el Checkin.",
   },
   cancelled: {
     label: "Rechazado",
@@ -39,7 +39,7 @@ export const reservationMessages: Record<
   },
   verified: {
     label: "Verificada",
-    client: "Tu código de acceso ya fue verificado y puedes ingresar al espacio.",
+    client: "Tu código de acceso ya fue verificado y puedes ingresar al espacio en cuanto el Anfitrión te de acceso.",
     owner: "El cliente ha realizado el check-in correctamente.",
   },
   in_progress: {

@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div v-if="userStore.user" class="relative" @click="router.push('/profile')">
         <font-awesome-icon icon="bell" /> Notificaciones
         <span v-if="hasNotifications && !viewNotification"
@@ -31,4 +31,4 @@ watch(
         }
     }
 );
-</script>
+</script> -->

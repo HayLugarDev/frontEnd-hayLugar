@@ -1,7 +1,7 @@
 <template>
   <MainHeader />
   <BackButton class="md:hidden" />
-  <div class="relative w-full h-full mx-auto py-12">
+  <div class="relative w-full h-full mx-auto py-12 md:py-6">
     <!-- Instrucciones iniciales -->
     <transition name="fade-step" mode="out-in">
       <div :key="currentStep">
@@ -75,24 +75,12 @@
     </transition>
 
     <!-- Modal de éxito -->
-    <transition name="fade">
-      <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-          <div class="flex flex-col items-center">
-            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-            <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
-            <p class="text-lg text-gray-700 text-center mb-6">El espacio se ha guardado correctamente.</p>
-            <button @click="closeSuccesModal" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-              Continuar
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
+    <StatusModal :visible="showSuccessModal" type="success" title="Excelente!"
+      message="Publicaste correctamente tu espacio en HayLugar." :icon="logo" @confirm="closeSuccesModal" />
 
-    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-      :message="errorMessage" icon="/src/assets/logo.png"
-      @close="openCheckInModal" />
+    <!-- Modal de error -->
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage" :icon="logo"
+      @confirm="showErrorModal = false" />
   </div>
 </template>
 
@@ -109,6 +97,8 @@ import Etapa4 from '../components/pages/addSpacePage/Etapa4.vue';
 import Etapa5 from '../components/pages/addSpacePage/Etapa5.vue';
 import BackButton from '../components/common/BackButton.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
+import logo from "../assets/logo.png";
+import { useSpaceStore } from "../store/spaceStore";
 
 const router = useRouter();
 const showSuccessModal = ref(false);
@@ -116,8 +106,10 @@ const showErrorModal = ref(false);
 const errorMessage = ref('');
 const currentStep = ref(0); // 0 = instrucciones, 1 = formulario
 const step = ref(1);
-const selectedFiles = ref([]);
 const emit = defineEmits(["success"]);
+
+const spaceStore = useSpaceStore()
+
 
 const spaceData = ref({
   name: '',
@@ -133,6 +125,7 @@ const spaceData = ref({
   description: '',
   status: 'active',
   images: [],
+  reservation_period: '', // 'hour' | 'day' | 'week' | 'month'
   availability: { start: '', end: '', dateRange: [] }
 });
 
@@ -156,12 +149,6 @@ function prevStep() {
 
 const addSpace = async () => {
 
-  // const error = validarFormulario();
-  // if (error) {
-  //   alert(error);
-  //   return;
-  // }
-
   if (spaceData.value.images.length === 0) {
     alert('Debe subir al menos una imagen del espacio');
     return;
@@ -184,8 +171,12 @@ const addSpace = async () => {
     const response = await api.post('/spaces/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+
+    const newSpace = response.data.space;
+    console.log(newSpace);
+    spaceStore.addSpaceToStore(newSpace);
+
     showSuccessModal.value = true;
-    console.log(response);
     emit('success');
     resetValues();
   } catch (error) {
@@ -227,13 +218,15 @@ const resetValues = () => {
     description: '',
     status: 'active',
     images: [],
+    reservation_period: '', // 'hour' | 'day' | 'week' | 'month'
     availability: { start: '', end: '', dateRange: [] }
   };
 }
 
 
-const closeSuccesModal = () => {
+const closeSuccesModal = async () => {
   showSuccessModal.value = false;
+  await spaceStore.fetchSpaces(true);
   router.push('/dashboard');
 };
 

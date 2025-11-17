@@ -1,67 +1,89 @@
 <template>
-    <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2">
-        <div v-if="showSummary" class="mt-2 xl:mt-6 space-y-6">
-            <h2 class="text-2xl font-bold">Resumen antes de guardar</h2>
+    <div class="flex flex-col md:w-3/4 mx-auto gap-2">
+        <div v-if="showSummary"
+            class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 max-w-xl mx-auto animate-fade-in">
+            <h2 class="text-2xl font-bold text-primary text-center mb-6">
+                Resumen antes de guardar
+            </h2>
 
-            <ul class="space-y-2 text-2xl">
-                <li><strong>Tipo de vehículo:</strong> {{ vehicleLabel(modelValue.type) }}</li>
-                <li><strong>Marca:</strong> {{ modelValue.brand }}</li>
-                <li><strong>Modelo:</strong> {{ modelValue.model }}</li>
-                <li><strong>Color:</strong> {{ modelValue.color }}</li>
-                <li><strong>Patente:</strong>
-                    {{ modelValue.type !== 'bicycle' ? modelValue.license_plate : 'No aplica' }}
-                </li>
-            </ul>
+            <div class="space-y-4">
+                <div v-for="(item, index) in [
+                    { label: 'Tipo de vehículo', value: modelValue.type },
+                    { label: 'Marca', value: modelValue.brand },
+                    { label: 'Modelo', value: modelValue.model },
+                    { label: 'Color', value: modelValue.color },
+                    { label: 'Patente', value: modelValue.type !== 'bicycle' ? modelValue.license_plate : 'No aplica' }
+                ]" :key="index"
+                    class="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-xl px-5 py-3 hover:bg-gray-100 transition-all">
+                    <span class="text-gray-500 font-medium">{{ item.label }}</span>
+                    <span class="text-gray-800 font-semibold">{{ item.value || '—' }}</span>
+                </div>
+            </div>
 
-            <div class="flex gap-4 mt-6">
-                <button type="button" @click="submitForm" class="bg-green-600 text-white px-4 py-2 rounded-lg">Confirmar
-                    y
-                    Guardar</button>
-                <button @click="showSummary = false" class="bg-gray-300 px-4 py-2 rounded-lg">Volver a editar</button>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+                <button type="button" @click="submitForm"
+                    class="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors">
+                    Guardar vehículo
+                </button>
+                <button @click="showSummary = false"
+                    class="border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-xl hover:bg-gray-100 transition-colors">
+                    Volver a editar
+                </button>
             </div>
         </div>
         <!-- SOLO si el tipo de vehículo no es bicicleta -->
-        <div v-else-if="modelValue.type !== 'bicycle'">
-            <h1 class="text-4xl font-semibold mb-8">¿Cuál es la patente de tu vehículo?</h1>
+        <div v-else-if="modelValue.type !== 'bicycle'"
+            class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 max-w-xl mx-auto animate-fade-in">
+
+            <h1 class="text-3xl sm:text-4xl font-bold text-primary mb-6 text-center">
+                ¿Cuál es la patente de tu vehículo?
+            </h1>
 
             <!-- Patente del vehículo -->
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-900">Ingresá un dominio válido</label>
-                <input type="text" v-model="license_plate"
-                    class="text-gray-500 mt-1 block w-full border border-gray-900 rounded-md p-4"
-                    placeholder="Ej: AB-123-CD" />
+            <div class="mb-8">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Ingresá un dominio válido sin símbolos
+                </label>
+                <input type="text" v-model="license_plate" placeholder="Ej: AB123CD"
+                    class="w-full border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 rounded-xl p-4 text-gray-800 placeholder-gray-400 transition-all outline-none" />
             </div>
 
             <!-- Botones de navegación -->
-            <div class="flex justify-between space-x-4">
-                <button @click="emit('prev')" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
-                    Anterior
+            <div class="flex justify-between gap-4">
+                <button @click="emit('prev')"
+                    class="w-1/2 border border-gray-300 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-100 transition-all">
+                    ⬅ Anterior
                 </button>
-                <button @click="validateAndContinue" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
-                    Siguiente
-                </button>
-            </div>
-        </div>
-
-        <!-- Si es bicicleta y no se muestra aún el resumen, mostrar directamente el botón -->
-        <div v-else>
-            <h1 class="text-4xl font-semibold mb-8">¿Listo para guardar tu bicicleta?</h1>
-
-            <div class="flex justify-between space-x-4">
-                <button @click="emit('prev')" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
-                    Anterior
-                </button>
-                <button @click="validateAndContinue" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
-                    Siguiente
+                <button @click="validateAndContinue"
+                    class="w-1/2 bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition-all">
+                    Siguiente ➜
                 </button>
             </div>
         </div>
 
+        <!-- Si es bicicleta -->
+        <div v-else class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 max-w-xl mx-auto animate-fade-in">
+
+            <h1 class="text-3xl sm:text-4xl font-bold text-primary mb-8 text-center">
+                ¿Listo para guardar tu bicicleta?
+            </h1>
+
+            <div class="flex justify-between gap-4">
+                <button @click="emit('prev')"
+                    class="w-1/2 border border-gray-300 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-100 transition-all">
+                    ⬅ Anterior
+                </button>
+                <button @click="validateAndContinue"
+                    class="w-1/2 bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition-all">
+                    Guardar 🚲
+                </button>
+            </div>
+        </div>
 
         <!-- Modal de error -->
         <StatusModal :visible="showErrorModal" type="error" title="Patente faltante"
             message="Por favor, ingresá una patente válida antes de continuar." icon="/src/assets/logo.png"
-            @close="showErrorModal = false" />
+            @confirm="showErrorModal = false" />
     </div>
 </template>
 
@@ -101,13 +123,13 @@ const validateAndContinue = () => {
 };
 
 watch(
-  () => props.modelValue.type,
-  (newType) => {
-    if (newType === 'bicycle') {
-      showSummary.value = true;
-    }
-  },
-  { immediate: true }
+    () => props.modelValue.type,
+    (newType) => {
+        if (newType === 'bicycle') {
+            showSummary.value = true;
+        }
+    },
+    { immediate: true }
 );
 
 </script>

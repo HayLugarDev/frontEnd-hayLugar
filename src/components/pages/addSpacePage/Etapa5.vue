@@ -1,126 +1,188 @@
 <template>
-    <div class="flex flex-col md:w-1/2 mx-auto p-6 gap-2">
-        <div v-if="showSummary" class="mt-8 space-y-6">
-            <h2 class="text-xl font-bold">Resumen antes de publicar</h2>
-
-            <ul class="space-y-2">
-                <li><strong>Nombre:</strong> {{ modelValue.name }}</li>
-                <li><strong>Tipo de espacio:</strong> {{ modelValue.parking_type }}</li>
-                <li><strong>Descripción:</strong> {{ modelValue.description }}</li>
-                <li><strong>Métodos de pago:</strong> {{ modelValue.paymentMethods.join(', ') }}</li>
-                <li v-if="paymentMethods.includes('Mercado Pago')">
-                    <strong>Email de wallet:</strong> {{ modelValue.walletDetails.mpEmail }}
-                </li>
-                <li><strong>Publicar:</strong> {{ modelValue.status === 'active' ? 'Sí' : 'No' }}</li>
-                <li><strong>Imágenes:</strong> {{ modelValue.images.length }} archivo(s) cargado(s)</li>
-            </ul>
-
-            <div class="flex gap-4 mt-6">
-                <button type="button" @click="submitForm" class="bg-green-600 text-white px-4 py-2 rounded-lg">Confirmar y
-                    Publicar</button>
-                <button @click="showSummary = false" class="bg-gray-300 px-4 py-2 rounded-lg">Volver a editar</button>
-            </div>
-        </div>
-
-        <div v-else>
-
-            <h1 class="text-4xl font-semibold mb-8">Confirmá los datos para recibir los pagos</h1>
-    
-            <div class="space-y-6 font-normal">
-                <!-- Métodos de Pago Aceptados -->
-                <fieldset class="border p-4 rounded-lg shadow-sm">
-                    <legend class="text-lg font-semibold text-gray-800 mb-2">Métodos de Pago Aceptados</legend>
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" v-model="paymentMethods" value="Efectivo" class="accent-green-600" />
-                            <font-awesome-icon :icon="['fas', 'money-bill-wave']" class="text-green-600" />
-                            <span class="text-gray-700">Efectivo</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" v-model="paymentMethods" value="Mercado Pago"
-                                class="accent-indigo-600" />
-                            <font-awesome-icon :icon="['fas', 'credit-card']" class="text-indigo-600" />
-                            <span class="text-gray-700">Mercado Pago</span>
-                        </label>
-                    </div>
-                </fieldset>
-    
-                <!-- Datos de Wallet para Mercado Pago -->
-                <fieldset v-if="paymentMethods.includes('Mercado Pago')" class="border p-4 rounded-lg">
-                    <legend class="text-lg font-semibold text-black">Datos de Wallet (Mercado Pago)</legend>
-                    <label class="block">
-                        <span class="text-sm font-semibold text-gray-900">Correo de Mercado Pago:</span>
-                        <input v-model="walletEmail" type="email" class="input-field" placeholder="correo@ejemplo.com" />
-                    </label>
-                </fieldset>
-            </div>
-    
-            <!-- Botones de navegación -->
-            <div class="flex justify-between mt-6 space-x-4">
-                <button @click="emit('prev')" class="px-4 py-2 border-2 rounded-xl hover:border-gray-900">
-                    Anterior
-                </button>
-                <button @click="validateAndContinue"
-                    class="text-white px-4 py-2 border-2 rounded-xl hover:border-gray-900 bg-primary">
-                    Publicar
-                </button>
-            </div>
-        </div>
-
-
-        <!-- Modal de error -->
-        <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-            message="Por favor, selecciona al menos un método de pago y completá los datos requeridos."
-            icon="/src/assets/logo.png" @close="showErrorModal = false" />
+  <div
+    class="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-br from-primary via-primary/90 to-dark text-white animate-fade-in"
+  >
+    <!-- Capa decorativa -->
+    <div class="pointer-events-none absolute inset-0 overflow-hidden -z-10">
+      <div class="absolute -right-40 -top-40 h-[28rem] w-[28rem] rounded-full bg-white/10 blur-3xl"></div>
+      <div class="absolute -left-32 -bottom-40 h-[26rem] w-[26rem] rounded-full bg-accent/20 blur-3xl"></div>
     </div>
+
+    <!-- Contenedor principal -->
+    <div
+      class="bg-white/90 text-gray-800 rounded-2xl shadow-2xl border border-white/30 backdrop-blur-lg w-full max-w-3xl p-10 space-y-8"
+    >
+      <!-- Título -->
+      <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-primary mb-2">
+            Resumen antes de publicar
+        </h2>
+        <p class="text-gray-500 text-sm">
+          Verificá los datos antes de confirmar tu publicación
+        </p>
+      </div>
+
+      <!-- Datos principales -->
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <p class="text-gray-500 text-sm">📍 Nombre</p>
+          <p class="font-semibold text-lg">{{ modelValue.name }}</p>
+        </div>
+
+        <div>
+          <p class="text-gray-500 text-sm">🏷️ Tipo de espacio</p>
+          <p class="font-semibold capitalize">{{ modelValue.parking_type }}</p>
+        </div>
+
+        <div class="sm:col-span-2">
+          <p class="text-gray-500 text-sm">📬 Dirección</p>
+          <p class="font-semibold">{{ modelValue.location }}, {{ modelValue.locationDetails }}</p>
+        </div>
+
+        <div>
+          <p class="text-gray-500 text-sm">💡 Tipo de plazo ofrecido</p>
+          <p class="font-semibold capitalize">
+            {{
+              modelValue.reservation_period === 'hour'
+                ? 'Por hora'
+                : modelValue.reservation_period === 'day'
+                ? 'Por día'
+                : modelValue.reservation_period === 'week'
+                ? 'Por semana'
+                : 'Por mes'
+            }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-gray-500 text-sm">🕒 Horarios disponibles</p>
+          <p class="font-semibold">
+            {{
+              modelValue.reservation_period === 'month'
+                ? 'Todos los días'
+                : `${modelValue.availability.start} - ${modelValue.availability.end} hs`
+            }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-gray-500 text-sm">💳 Métodos de pago</p>
+          <p class="font-semibold">
+            MercadoPago
+          </p>
+        </div>
+
+        <div>
+          <p class="text-gray-500 text-sm">📢 Publicación activa</p>
+          <p
+            :class="modelValue.status === 'active' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'"
+          >
+            {{ modelValue.status === 'active' ? 'Sí' : 'No' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Capacidades y precios -->
+      <div>
+        <h3 class="text-lg font-bold text-primary">🚘 Tipos de vehículos y precios</h3>
+        <div
+          class="grid sm:grid-cols-2 gap-1"
+          v-if="modelValue.vehicle_capacities && modelValue.vehicle_capacities.length"
+        >
+          <div
+            v-for="(v, i) in modelValue.vehicle_capacities"
+            :key="i"
+            class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 shadow-sm"
+          >
+            <div class="flex items-center gap-2">
+              <font-awesome-icon :icon="['fas', `${getVehicleIcon(v.type)}`]"
+                class="text-primary text-lg"
+              />
+              <span class="font-semibold capitalize">{{ getVehicleType(v.type) }}</span>
+            </div>
+            <span class="font-bold text-gray-700">${{ v.price_per_hour.toLocaleString() }}/h</span>
+          </div>
+        </div>
+        <p v-else class="text-gray-400 italic">No hay vehículos configurados.</p>
+      </div>
+
+      <!-- Descripción -->
+      <div>
+        <h3 class="text-lg font-bold text-primary mb-3">📝 Descripción</h3>
+        <p class="bg-gray-50 text-gray-700 rounded-xl p-4 border border-gray-200 whitespace-pre-wrap">
+          {{ modelValue.description || 'Sin descripción disponible.' }}
+        </p>
+      </div>
+
+      <!-- Imágenes -->
+      <div>
+        <h3 class="text-lg font-bold text-primary mb-3">🖼️ Imágenes cargadas</h3>
+        <div v-if="modelValue.images.length" class="flex flex-wrap gap-3">
+          <img
+            v-for="(img, index) in modelValue.images"
+            :key="index"
+            :src="getImageSrc(img)"
+            class="w-28 h-28 object-cover rounded-xl shadow-md border border-gray-200"
+          />
+        </div>
+        <p v-else class="text-gray-400 italic">No se subieron imágenes aún.</p>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex flex-col md:flex-row gap-4 justify-between pt-6 border-t border-gray-200">
+        <button
+          @click="emit('prev')"
+          class="px-6 py-2 border-2 border-primary text-primary rounded-full font-semibold hover:bg-primary hover:text-white transition-all"
+        >
+          ← Volver a editar
+        </button>
+
+        <button
+          type="button"
+          @click="submitForm"
+          class="px-8 py-2 bg-primary text-white rounded-full font-bold shadow-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+        >
+          <img v-if="cargando" :src="loadIcon" alt="Cargando" class="w-5 h-5 animate-spin" />
+          <span v-else>Confirmar y Publicar</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue';
-import StatusModal from '../addSpacePage/StatusModal.vue';
+<script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue';
+import loadIcon from '../../../assets/load-icon_secondary.svg';
+import { getVehicleIcon, getVehicleType } from '../../../utils/vehicleTypeIconTraslation';
 
-const showSummary = ref(false);
-const props = defineProps(['modelValue']);
-const emit = defineEmits(['update:modelValue', 'next', 'prev']);
+const props = defineProps<{ modelValue: any }>();
+const emit = defineEmits(['update:modelValue', 'next', 'prev', 'submit']);
 
-const showErrorModal = ref(false);
+const cargando = ref(false);
 
-// Computed bindings con actualización del modelValue principal
-const paymentMethods = computed({
-    get: () => props.modelValue.paymentMethods || [],
-    set: (val) =>
-        emit('update:modelValue', { ...props.modelValue, paymentMethods: val }),
+onMounted(() => {
+    console.log(props.modelValue);
 });
 
-const walletEmail = computed({
-    get: () => props.modelValue.walletDetails?.mpEmail || '',
-    set: (val) =>
-        emit('update:modelValue', {
-            ...props.modelValue,
-            walletDetails: {
-                ...props.modelValue.walletDetails,
-                mpEmail: val,
-            },
-        }),
-});
-
-// Validación y navegación
-const validateAndContinue = () => {
-    if (
-        paymentMethods.value.length === 0 ||
-        (paymentMethods.value.includes('Mercado Pago') && !walletEmail.value)
-    ) {
-        showErrorModal.value = true;
-        return;
-    }
-
-    showSummary.value = true;
+// Función segura para mostrar imágenes
+const getImageSrc = (img: string | File | null | undefined) => {
+    if (!img) return '';
+    return typeof img === 'string' ? img : URL.createObjectURL(img);
 };
+
+onUnmounted(() => {
+    props.modelValue.images.forEach((img: string | File | null | undefined) => {
+        if (img instanceof File) {
+            URL.revokeObjectURL(img as any);
+        }
+    });
+});
+
 
 const submitForm = () => {
-  emit('submit');
+    cargando.value = true;
+    emit('submit');
 };
-
 </script>
 
 <style scoped>

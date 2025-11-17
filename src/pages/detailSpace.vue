@@ -1,168 +1,222 @@
 <template>
   <MainHeader />
-  <div class="flex flex-col bg-secondary xl:w-11/12 mx-auto md:gap-4 mt-16 md:mt-0">
+
+  <!-- Skeleton mientras carga -->
+  <SpaceDetailsSkeleton v-if="spaceStore.loading" />
+
+  <div v-else-if="space" class="flex flex-col bg-secondary xl:w-11/12 mx-auto md:gap-4 mt-16 md:mt-0">
 
     <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
-      <div v-if="espacio?.images?.length">
 
-        <!-- Carrusel en móviles -->
-        <Carousel :images="espacio.images" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
+      <!-- Carrusel en móviles -->
+      <Carousel :images="carouselImages" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
 
-        <!-- Info del anfitrión -->
-        <section v-if="espacio?.host"
-          class="col-span-3 bg-secondary p-6 px-10 rounded-xl lg:shadow-md mt-6 font-normal">
-          <div class="flex flex-row items-center gap-4">
-            <img :src="hostImage" alt="Imagen del anfitrión" class="w-16 h-16 rounded-full shadow-md" />
-            <div class="flex flex-col pl-4 md:pl-0 md:flex-row sm:justify-around w-full text-gray-800 text-sm">
-              <div class="flex flex-row gap-1 items-center">
-                <p class="text-lg font-semibold">Anfitrión: </p><span>{{ espacio.host.name }} {{ espacio.host.last_name
-                }}</span>
+      <!-- Info del anfitrión -->
+      <section v-if="space?.host"
+        class="col-span-3 bg-white p-6 px-10 rounded-xl shadow-md mt-6 font-normal border border-gray-200 transition-all hover:shadow-xl">
+        <div class="flex flex-row items-center gap-6">
+          <img :src="hostImage" alt="Imagen del anfitrión"
+            class="w-20 h-20 rounded-full shadow-lg border-2 border-primary object-cover" @error="onHostImageError" />
+          <div class="flex flex-col gap-2 w-full text-gray-800 text-base">
+            <div class="flex flex-row gap-2 items-center text-lg">
+              <span class="font-bold text-primary">Anfitrión:</span>
+              <span class="font-semibold">{{ space.host.name }} {{ space.host.last_name }}</span>
+            </div>
+            <div v-if="space.host.phone" class="flex flex-row gap-2 items-center">
+              <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-600" />
+              <span class="font-medium">+549{{ space.host.phone }}</span>
+            </div>
+            <div class="text-md md:text-md flex flex-row gap-2 items-center">
+              <span class="font-medium">email: {{ space.host.email }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Título + Favorito + Compartir -->
+      <div
+        class="flex flex-row items-center justify-between mt-4 px-6 md:px-2 sticky top-0 bg-white z-10 rounded-xl shadow-sm py-2">
+        <h1 class="text-2xl sm:text-xl font-bold text-primary pl-2">{{ capitalizeFirst(space.name) }}</h1>
+        <div class="flex flex-row items-center gap-4">
+          <button @click="toggleFavourite"
+            class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-200 hover:scale-110 bg-white border-2 border-gray-200 hover:border-red-400"
+            :class="activedFavouriteIcon ? 'bg-red-100 text-red-500' : 'bg-gray-100 text-gray-700'"
+            title="Agregar a favoritos">
+            <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" class="text-2xl" />
+          </button>
+          <button @click="sharePublication"
+            class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-200 hover:scale-110 bg-white border-2 border-gray-200 hover:border-blue-400 text-gray-700 hover:text-primary"
+            title="Compartir publicación">
+            <font-awesome-icon :icon="['fas', 'share-alt']" class="text-xl" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Galería de imágenes grande -->
+      <div v-if="space?.images && space.images.length > 0"
+        class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-4 h-[400px]">
+
+        <div class="col-span-4 row-span-8">
+          <img :src="space.images?.[0] || someImg" alt="Principal"
+            class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer transition-transform duration-200 hover:scale-105"
+            @click="openImageModal(0)" @error="onImageError" />
+        </div>
+
+        <div
+          v-for="(img, index) in space.images?.slice(1, space.images.length) || [someImg, someImg, someImg, someImg]"
+          :key="index">
+          <div :class="imageGridPosition(index)">
+            <img :src="img || someImg" alt="Espacio"
+              class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer transition-transform duration-200 hover:scale-105"
+              @click="openImageModal(index + 1)" @error="onImageError" />
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- Modal -->
+      <ImageModal v-if="!imageErrorOccurred" :visible="isImageModalOpen" :images="space.images"
+        :startIndex="currentImageIndex" @close="isImageModalOpen = false" />
+
+
+      <!-- Info general + Formulario -->
+      <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
+        <!-- Información del espacio -->
+        <div class="md:col-span-6 md:grid md:grid-cols-3 gap-4 p-10">
+          <div class="flex flex-row md:col-span-3 justify-between items-center text-xl mb-4 gap-2">
+            <span :class="avgRating ? 'text-yellow-600' : 'text-gray-400'">
+              <div v-for="v in avgRating ? Math.round(avgRating) : 5" :key="v" class="inline-block">
+                ⭐
               </div>
-              <div class="flex flex-row gap-1 items-center">
-                <p v-if="espacio.host.phone">
-                  <font-awesome-icon :icon="['fab', 'whatsapp']" class="text-2xl text-green-800" />
-                  <span>+549{{ espacio.host.phone }}</span>
+            </span>
+            <div class="flex flex-row gap-2">
+              <span class="text-black">{{ totalReviews > 0 ? avgRating.toFixed(1) : '5.0' }}</span>
+              <span class="font-sans cursor-pointer hover:underline text-lg md:text-md" @click="openReviews">
+                ({{ totalReviews > 0 ? `${totalReviews} calificaciones` : "Sin calificaciones" }})
+              </span>
+            </div>
+          </div>
+          <div class="col-span-2">
+            <p v-if="space.location" class="text-2xl md:text-md font-bold text-gray-800 mb-1">
+              {{ space.location.split(',')[1] || '' }}
+            </p>
+            <p class="text-xl md:text-lg text-gray-500 font-semibold mb-4">{{ space.location.split(',')[0] }}</p>
+            <div class="my-4 flex flex-col gap-3">
+              <div v-for="v in space.vehicle_capacities" :key="v.type"
+                class="p-3 px-6 border-2 rounded-xl shadow-md bg-gray-50 flex flex-col gap-1">
+                <p class="font-semibold text-xl flex items-center gap-2">
+                  <font-awesome-icon :icon="['fas', getVehicleType(v.type)]" class="text-primary" />
+                  {{ getVehicleType(v.type) }}
                 </p>
-              </div>
-              <div class="flex flex-row gap-1 items-center">
-                <p class="font-semibold">Email: </p><span>{{ espacio.host.email }}</span>
+                <span v-if="v.price_per_hour"
+                  class="inline-block bg-blue-100 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                  ${{ v.price_per_hour.toLocaleString() }} / hora
+                </span>
               </div>
             </div>
-            <BackButton class="md:hidden" />
+            <!-- Días disponibles -->
+            <div class="mt-4">
+              <p class="text-xl md:text-lg font-semibold text-gray-800 flex items-center gap-2 mb-2">
+                <font-awesome-icon icon="calendar-days" class="text-primary text-xl" />
+                Disponibilidad:
+              </p>
+
+              <!-- Si está disponible todos los días -->
+
+
+              <div class="flex flex-wrap gap-2 my-2">
+                <template v-if="disponibilidad?.days?.length">
+                  <div class="flex flex-wrap gap-2">
+                    <span v-for="(day, i) in disponibilidad.days" :key="i"
+                      class="px-3 py-1 text-sm rounded-full border border-primary/30 bg-primary/10 text-primary font-medium">
+                      {{ capitalizeDay(day) }}
+                    </span>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <span
+                    class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full font-medium shadow-sm">
+                    <font-awesome-icon icon="check-circle" />
+                    Todos los días
+                  </span>
+                </template>
+              </div>
+              <span v-if="disponibilidad.start && disponibilidad.end"
+                class="day-chip border border-primary/30 bg-primary/10 text-primary flex-wrap">
+                Horario: {{ disponibilidad.start }} - {{ disponibilidad.end }}</span>
+            </div>
           </div>
+        </div>
+
+        <!-- Formulario reserva -->
+        <FormReservation v-if="!isOwner && isLogged" class="col-span-10 lg:col-span-4 order-5 lg:order-3"
+          :tipoVehiculo="tipoVehiculo" :tipoPlazoReserva="tipoPlazoReserva" :tiempoInicial="tiempoInicial"
+          :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
+          @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
+          @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event" @reservar="reservar"
+          :availability="disponibilidad" />
+
+        <!-- Botón para dueño -->
+        <div v-else-if="isOwner"
+          class="col-span-10 lg:col-span-4 flex justify-center items-start p-6 order-5 lg:order-3">
+          <button @click="editPublication()"
+            class="px-8 py-4 rounded-full bg-gradient-to-r from-indigo-500 to-primary text-white font-bold shadow-lg hover:from-indigo-600 hover:to-primary transition-all duration-300 text-xl">
+            ✏️ Editar publicación
+          </button>
+        </div>
+
+        <!-- No logueado -->
+        <div v-else-if="!isLogged"
+          class="col-span-10 lg:col-span-4 flex flex-col items-center justify-center p-8 bg-white lg:rounded-xl shadow-lg border border-gray-200 text-center order-5 lg:order-3">
+          <font-awesome-icon icon="user-lock" class="text-4xl text-primary mb-2" />
+          <h2 class="text-2xl font-bold text-primary mb-2">¡Inicia sesión para reservar!</h2>
+          <p class="text-gray-600 mb-6">Debes estar autenticado para poder seleccionar un vehículo y completar tu
+            reserva.</p>
+          <router-link to="/login"
+            class="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary-dark transition-all font-semibold">Iniciar
+            sesión</router-link>
+          <router-link to="/login" class="mt-3 text-primary underline">¿No tienes cuenta? Regístrate
+            aquí</router-link>
+        </div>
+
+        <!-- Descripción -->
+        <section class="col-span-10 border border-gray-300 p-6 rounded-xl text-xl order-6 bg-white shadow-md">
+          <p class="font-semibold flex items-center gap-2">
+            <font-awesome-icon icon="info-circle" class="text-primary" />
+            Descripción:
+          </p>
+          <p class="text-gray-600 font-medium mt-2">{{ space.description }}</p>
         </section>
 
-        <!-- Título + Favorito -->
-        <div class="flex flex-row items-center justify-between mt-4 px-6 md:px-2">
-          <h1 class="text-3xl sm:text-2xl font-bold p-2 text-primary">{{ capitalizeFirst(espacio.name) }}</h1>
-          <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" :class="[
-            activedFavouriteIcon ? 'text-red-500 scale-110' : 'text-gray-700',
-            'text-3xl cursor-pointer transition-transform duration-300 ease-in-out',
-            isAnimating ? 'animate-ping-once' : ''
-          ]" @click="toggleFavourite" />
+        <!-- Mapa -->
+        <div
+          class="col-span-10 flex flex-col justify-center items-start h-[350px] order-7 relative overflow-hidden p-4 rounded-xl bg-white shadow-md border border-gray-200">
+          <p class="px-4 font-semibold mb-2">Ubicación en el mapa:</p>
+          <CustomGoogleMap :center="{ lat: Number(space.latitude), lng: Number(space.longitude) }" :locateUser="false"
+            class="absolute inset-0 w-full h-full rounded-xl overflow-hidden shadow-md">
+            <GMapMarker :position="{ lat: Number(space.latitude), lng: Number(space.longitude) }"
+              :icon="{ url: carMarker, scaledSize: { width: 40, height: 40 } }" />
+          </CustomGoogleMap>
         </div>
 
-        <!-- Galería de imágenes grande -->
-        <div class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-4 h-[400px]">
-          <div class="col-span-4 row-span-8">
-            <img :src="espacio.images[0]" alt="Principal"
-              class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer"
-              @click="openImageModal(0)" />
-          </div>
-          <template v-for="(img, index) in espacio.images.slice(1, 5)" :key="index">
-            <div :class="imageGridPosition(index)">
-              <img :src="img" alt="Espacio"
-                class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer"
-                @click="openImageModal(index + 1)" />
-            </div>
-          </template>
-        </div>
-
-        <!-- Modal -->
-        <ImageModal :visible="isImageModalOpen" :images="espacio.images" :startIndex="currentImageIndex"
-          @close="isImageModalOpen = false" />
-
-
-        <!-- Info general + Formulario -->
-        <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
-          <!-- Información del espacio -->
-          <div class="col-span-6 grid grid-cols-3 gap-1 sm:gap-4 p-10">
-            <div class="col-span-2">
-              <p v-if="espacio.location" class="text-md font-bold text-gray-800">
-                {{ espacio.location.split(',')[1] || '' }}
-              </p>
-              <p class="text-sm md:text-2xl text-gray-500 font-semibold">{{ espacio.location.split(',')[0] }}</p>
-              <div class="my-4">
-                <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="p-2 px-6 border-2 shadow-xl">
-                  <p class="font-semibold text-2xl">{{ vehicleTypeTranslations[v.type] || v.type }}</p>
-                  <p v-if="v.price_per_hour" class="font-normal">Precio por hora: ${{ v.price_per_hour.toLocaleString()
-                  }}</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-start-3 flex flex-col items-end text-xl">
-              <span :class="formattedRating ? 'text-yellow-600' : 'text-gray-400'">
-                ★ <span class="text-black">{{ formattedRating ?? '0.0' }}</span>
-              </span>
-
-              <span class="font-sans cursor-pointer hover:underline text-xs sm:text-md">
-                {{ opinionesTexto }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Formulario reserva -->
-          <FormReservation v-if="!isOwner && isLogged" class="col-span-10 lg:col-span-4 order-5 lg:order-3"
-            :tipoVehiculo="tipoVehiculo" :tipoPlazoReserva="tipoPlazoReserva" :tiempoInicial="tiempoInicial"
-            :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
-            @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
-            @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event"
-            @reservar="reservar" :availability="disponibilidad" />
-
-          <!-- Botón para dueño -->
-          <div v-else-if="isOwner"
-            class="col-span-10 lg:col-span-4 flex justify-center items-start p-6 order-5 lg:order-3">
-            <button @click="editPublication()"
-              class="px-6 py-3 rounded-full bg-gradient-to-r from-indigo-500 to-primary text-white font-semibold shadow-lg hover:from-indigo-600 hover:to-primary transition-all duration-300">
-              ✏️ Editar publicación
-            </button>
-          </div>
-
-          <!-- No logueado -->
-          <div v-else-if="!isLogged"
-            class="col-span-10 lg:col-span-4 flex flex-col items-center justify-center p-6 bg-white lg:rounded-xl shadow-lg border border-gray-200 text-center order-5 lg:order-3">
-            <h2 class="text-2xl font-bold text-primary mb-2">¡Inicia sesión para reservar!</h2>
-            <p class="text-gray-600 mb-6">Debes estar autenticado para poder seleccionar un vehículo y completar tu
-              reserva.</p>
-            <router-link to="/login"
-              class="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary-dark transition-all">Iniciar
-              sesión</router-link>
-            <router-link to="/register" class="mt-3 text-primary underline">¿No tienes cuenta? Regístrate
-              aquí</router-link>
-          </div>
-
-          <!-- Descripción -->
-          <section class="col-span-10 lg:border border-gray-300 p-4 lg:rounded-lg text-xl order-6">
-            <p class="font-semibold">Descripción:</p>
-            <p class="text-gray-600 font-medium">{{ espacio.description }}</p>
-          </section>
-
-          <!-- Mapa -->
-          <div
-            class="col-span-10 flex flex-col justify-center items-start h-[350px] order-7 relative overflow-hidden p-4 rounded-xl">
-            <p class="px-4 font-semibold">Ubicación en el mapa:</p>
-            <CustomGoogleMap :center="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-              class="absolute inset-0 w-full h-full rounded-xl overflow-hidden shadow-md">
-              <GMapMarker :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="{
-                url: carMarker,
-                scaledSize: { width: 40, height: 40 }
-              }" />
-            </CustomGoogleMap>
-          </div>
-
-        </div>
       </div>
     </main>
   </div>
-  <EditPublications :visible="openEditModal" :spaceId="route.params.id" @close="openEditModal = false" />
+  <EditPublications :visible="openEditModal" :spaceId="space?.id" @close="openEditModal = false" />
 
   <SessionExpired :sessionExpired="isSessionInvalid" />
 
+  <ReviewsModal :show="showReviewsModal" :reviews="reviews" :avgRating="avgRating" :totalReviews="totalReviews"
+    @close="showReviewsModal = false" />
+
   <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-    icon="/src/assets/logo.png" @close="showErrorModal = false" :isHtml="modalIsHtml" />
+    icon="/src/assets/logo.png" :isHtml="modalIsHtml" :buttonText="requiresTerms ? 'Aceptar términos' : 'Cerrar'"
+    @close="showErrorModal = false" @confirm="requiresTerms ? redirigirATerminos() : showErrorModal = false" />
 
-  <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario"
-    :vehicleType="reverseVehicleTypeTranslations[tipoVehiculo]" @selected="onSelectedVehicle" :isHtml="modalIsHtml"
-    @close="showVehicleModal = false" />
-
-  <!-- ✅ Mini Toast -->
-  <transition name="fade">
-    <div v-if="toast.show" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-white"
-      :class="toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'">
-      {{ toast.text }}
-    </div>
-  </transition>
+  <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario" :vehicleType="getVehicleKey(tipoVehiculo)"
+    @selected="onSelectedVehicle" :isHtml="modalIsHtml" @close="showVehicleModal = false" />
 
 </template>
 
@@ -173,15 +227,12 @@ import { useRouter, useRoute } from 'vue-router';
 import CustomGoogleMap from '../components/layout/GoogleMap.vue';
 import MainHeader from "../components/layout/header/MainHeader.vue";
 import carMarker from '../assets/logo.png';
-import user_icon_primary from "../assets/user_icon_primary.png";
-import { getSpaceById } from '../services/spaceService';
 import Carousel from '../components/common/Carousel.vue';
 import { useReservationStore } from '../store/reservationStore';
-import BackButton from "../components/common/BackButton.vue";
 import { useVerifyToken } from '../logic/useVerifyToken';
 import SessionExpired from '../components/common/SessionExpired.vue';
 import { useUserStore } from '../store/userStore';
-import vehicleLabel from '../logic/useVehicleLabel';
+import vehicleLabel, { getVehicleKey } from '../logic/useVehicleLabel';
 import { getAllVehicles } from '../services/vehicleService';
 import VehicleSelectModal from '../components/pages/detailSpacePage/VehicleSelectModal.vue';
 import FormReservation from '../components/forms/FormReservation.vue';
@@ -190,19 +241,30 @@ import { capitalizeFirst } from '../utils/capitalizeFirstCharAt';
 import EditPublications from '../components/pages/profilePage/UI/EditPublications.vue';
 import ImageModal from '../components/common/ImageModal.vue';
 import { addFavorite, removeFavorite, getUserFavorites } from '../services/favoriteService';
+import { getVehicleType } from '../utils/vehicleTypeIconTraslation';
+import { showToast } from '../utils/toast';
+import { formatLocalDateTime } from '../utils/FormatDate';
+import { imageGridPosition } from '../utils/imageGrid';
+import { getReviewsBySpace } from "../services/reviewService";
+import ReviewsModal from '../components/common/ReviewsModal.vue';
+import { storeToRefs } from 'pinia'
+import { useSpaceStore } from '../store/spaceStore'
+import SpaceDetailsSkeleton from '../components/layout/skeletons/SpaceDetailsSkeleton.vue';
+import someImg from '../assets/img-haylugar.jpeg';
+import defaultProfile from '../assets/user_icon_primary.png';
 
+const spaceStore = useSpaceStore()
+const { selectedSpace: space, favorites } = storeToRefs(spaceStore)
+const reservationStore = useReservationStore();
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
-const reservationStore = useReservationStore();
 const tiempoInicial = ref(null);
 const tiempoFinal = ref(null);
 const tipoVehiculo = ref('');
 const tipoPlazoReserva = ref('Por hora');
-const espacio = ref(null);
 const deadLine = ref(null);
 const activedFavouriteIcon = ref(false);
-const isAnimating = ref(false);
 
 const showVehicleModal = ref(false);
 const vehiculosUsuario = ref([]);
@@ -214,13 +276,36 @@ const showErrorModal = ref(false);
 const errorMessage = ref('');
 const modalIsHtml = ref(false);
 const openEditModal = ref(false);
-
+const requiresTerms = ref(false);
 const isImageModalOpen = ref(false);
 const currentImageIndex = ref(0);
 
+const showReviewsModal = ref(false);
+const reviews = ref([]);
+const avgRating = ref(0);
+const totalReviews = ref(0);
+
+const imageErrorOccurred = ref(false);
+
+const carouselImages = computed(() => {
+  if (!space.value?.images || space.value.images.length === 0) {
+    return [someImg];
+  }
+  return space.value.images;
+});
+
+const onImageError = (e) => {
+  e.target.src = someImg;
+  imageErrorOccurred.value = true;
+};
+
+const onHostImageError = (e) => {
+  e.target.src = defaultProfile;
+};
+
 const ownerIdFromSpace = computed(() => {
-  if (!espacio.value) return null;
-  return espacio.value.owner_id ?? espacio.value.host?.id ?? espacio.value.host?.user_id ?? null;
+  if (!space.value) return null;
+  return space.value.owner_id ?? space.value.host?.id ?? space.value.host?.user_id ?? null;
 });
 
 const isOwner = computed(() => {
@@ -232,48 +317,73 @@ const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 // Espacio disponible del espacio
 const disponibilidad = computed(() => {
-  if (!espacio.value?.availability) return {};
-  return typeof espacio.value.availability === 'string'
-    ? JSON.parse(espacio.value.availability)
-    : espacio.value.availability;
+  if (!space.value?.availability) return {};
+  return typeof space.value.availability === 'string'
+    ? JSON.parse(space.value.availability)
+    : space.value.availability;
 });
 
 const obtenerEspacio = async () => {
-  try {
-    const id = route.params.id;
-    const space = await getSpaceById(id);
-    console.log(space);
-    return espacio.value = space;
-  } catch (error) {
-    console.error("Error al obtener el espacio:", error);
+  const slug = route.params.slug
+  const space = await spaceStore.fetchSpaceBySlug(slug)
+  if (!space) return
+
+  avgRating.value = space.average_rating || 5
+  fetchReviews(space.id)
+
+  if (isLogged.value) {
+    await spaceStore.fetchFavoriteSpaces()
+    activedFavouriteIcon.value = await spaceStore.isFavorite(space.id)
   }
 };
 
 onMounted(async () => {
   await obtenerEspacio();
-  console.log(espacio.value);
-
-  // if (isLogged.value) {
-  //   const favs = await getUserFavorites();
-  //   activedFavouriteIcon.value = favs.data.some(f => f.space_id === espacio.value.id);
-  // }
 });
 
-// const markerIcon = computed(() => {
-//   const tipo = espacio.value?.vehicle_types?.[0]?.toLowerCase?.();
-//   switch (tipo) {
-//     case 'car':
-//       return { url: carMarker, scaledSize: { width: 40, height: 40 } };
-//     case 'van':
-//       return { url: truckMarker, scaledSize: { width: 40, height: 40 } };
-//     case 'bicycle':
-//       return { url: bicycleMarker, scaledSize: { width: 40, height: 40 } };
-//     case 'motorcycle':
-//       return { url: truckMarker, scaledSize: { width: 40, height: 40 } };
-//     default:
-//       return null;
-//   }
-// });
+const openReviews = () => {
+  showReviewsModal.value = true;
+}
+
+const fetchReviews = async (SpaceId) => {
+  try {
+    const { reviews: r, totalReviews: total } = await getReviewsBySpace(SpaceId);
+    reviews.value = r;
+    totalReviews.value = total;
+  } catch (e) {
+    console.error("Error al cargar opiniones", e);
+  }
+};
+
+const sharePublication = async () => {
+  if (!space.value) return;
+
+  try {
+    const url = `${window.location.origin}/espacio/${space.value.slug}`;
+
+    if (navigator.share) {
+      // Usa el API nativo de compartir (móvil/compatible)
+      await navigator.share({
+        title: space.value.name,
+        text: '¡Mirá este espacio que encontré para estacionar!',
+        url,
+      });
+    } else {
+      // Copiar al portapapeles en escritorio
+      await navigator.clipboard.writeText(url);
+      showToast('Enlace copiado al portapapeles', 'success');
+    }
+  } catch (err) {
+    console.error('Error al compartir:', err);
+    showToast('No se pudo compartir', 'error');
+  }
+};
+
+
+const redirigirATerminos = () => {
+  showErrorModal.value = false;
+  router.push('/aceptar-terminos');
+};
 
 const reservar = async () => {
   if (isOwner.value) {
@@ -283,9 +393,17 @@ const reservar = async () => {
     return;
   }
 
-  if (!espacio.value || !tiempoInicial.value || !tiempoFinal.value || !tipoVehiculo.value) {
+  if (!space.value || !tiempoInicial.value || !tiempoFinal.value || !tipoVehiculo.value) {
     errorMessage.value = 'Faltan completar campos para la reserva';
     modalIsHtml.value = false;
+    showErrorModal.value = true;
+    return;
+  }
+
+  if (userStore.terms?.mustReaccept) {
+    errorMessage.value = 'Todavía no aceptaste los Términos y Condiciones de HayLugar';
+    modalIsHtml.value = false;
+    requiresTerms.value = true; // 👈 solo en este caso
     showErrorModal.value = true;
     return;
   }
@@ -295,7 +413,7 @@ const reservar = async () => {
 
   try {
     const vehiculos = await getAllVehicles();
-    vehiculosUsuario.value = vehiculos.filter(v => v.type === reverseVehicleTypeTranslations[tipoVehiculo.value]);
+    vehiculosUsuario.value = vehiculos.filter(v => v.type === getVehicleKey(tipoVehiculo.value));
 
     if (vehiculosUsuario.value.length === 0) {
       errorMessage.value = `No tenés vehículos registrados para este tipo.<br/>
@@ -313,13 +431,11 @@ const reservar = async () => {
 
 const onSelectedVehicle = (vehicle) => {
   vehiculoSeleccionado.value = vehicle;
-  console.log('Ingreso y entrada: ', formatLocalDateTime(new Date(tiempoInicial.value)), formatLocalDateTime(new Date(tiempoFinal.value)));
-  console.log(vehicle);
   const payload = {
-    owner_id: espacio.value.owner_id,
-    space_id: espacio.value.id,
+    owner_id: space.value.owner_id,
+    space_id: space.value.id,
     vehicle_id: vehiculoSeleccionado.value.id,
-    vehicle_type: reverseVehicleTypeTranslations[tipoVehiculo.value],
+    vehicle_type: getVehicleKey(tipoVehiculo.value),
     start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
     end_time: formatLocalDateTime(new Date(tiempoFinal.value)),
     dead_line: deadLine.value,
@@ -332,7 +448,7 @@ const onSelectedVehicle = (vehicle) => {
 };
 
 const totalCalculado = computed(() => {
-  if (!tiempoInicial.value || !tiempoFinal.value || !espacio.value || !tipoVehiculo.value) return 0;
+  if (!tiempoInicial.value || !tiempoFinal.value || !space.value || !tipoVehiculo.value) return 0;
 
   const inicio = new Date(tiempoInicial.value);
   const fin = new Date(tiempoFinal.value);
@@ -346,9 +462,9 @@ const totalCalculado = computed(() => {
 
   // Buscar la tarifa del vehículo seleccionado
   let precioHora = 0;
-  if (Array.isArray(espacio.value.vehicle_capacities)) {
-    const tipoOriginal = reverseVehicleTypeTranslations[tipoVehiculo.value];
-    const vehicle = espacio.value.vehicle_capacities.find(v => v.type === tipoOriginal);
+  if (Array.isArray(space.value.vehicle_capacities)) {
+    const tipoOriginal = getVehicleKey(tipoVehiculo.value);
+    const vehicle = space.value.vehicle_capacities.find(v => v.type === tipoOriginal);
     if (vehicle) {
       precioHora = Number(vehicle.price_per_hour);
     }
@@ -380,59 +496,17 @@ const totalCalculado = computed(() => {
 });
 
 const vehicleOptions = computed(() => {
-  if (!espacio.value?.vehicle_capacities) return [];
+  if (!space.value?.vehicle_capacities) return [];
 
-  return espacio.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
+  return space.value.vehicle_capacities.map(v => (vehicleLabel(v.type)));
 });
-
-
-const vehicleTypeTranslations = {
-  car: 'Auto',
-  motorcycle: 'Moto',
-  van: 'Camioneta',
-  bicycle: 'Bicicleta',
-  // truck: 'Camión',
-  // suv: 'SUV',
-};
-
-// Formateo de puntuación
-const formattedRating = computed(() => {
-  if (espacio.value?.average_rating == null) {
-    return null;
-  }
-  return Number(espacio.value.average_rating).toFixed(1);
-});
-
-const opinionesTexto = computed(() => {
-  if (!espacio.value?.reviews?.comment) {
-    return 'Sin opiniones';
-  }
-  return `${espacio.value?.reviews?.comment} Opiniones`;
-});
-
-function formatLocalDateTime(date) {
-  const pad = (n) => n.toString().padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
-}
-
-const reverseVehicleTypeTranslations = Object.fromEntries(
-  Object.entries(vehicleTypeTranslations).map(([en, es]) => [es, en])
-);
 
 const hostImage = computed(() => {
-  console.log("Host:", espacio.value.host);
-  return espacio.value.host?.profile_picture || user_icon_primary;
+  if (space.value?.host?.profile_image) {
+    return space.value.host.profile_image;
+  }
+  return defaultProfile;
 });
-
-const imageGridPosition = (index) => {
-  const positions = [
-    'col-start-5 row-start-1',
-    'col-start-7 row-start-1',
-    'col-start-5 row-start-5',
-    'col-start-7 row-start-5'
-  ];
-  return `col-span-4 md:col-span-2 row-span-4 ${positions[index] || ''}`;
-};
 
 const openImageModal = (index) => {
   currentImageIndex.value = index;
@@ -440,46 +514,57 @@ const openImageModal = (index) => {
 };
 
 const editPublication = () => {
-  openEditModal.value = true;
+  openEditModal.value = true
 };
 
-const toast = ref({
-  show: false,
-  text: "",
-  type: "success", // "success" o "error"
-});
-
-function showToast(message, type = "success") {
-  toast.value = { show: true, text: message, type };
-  setTimeout(() => {
-    toast.value.show = false;
-  }, 2000); // ⏳ se oculta después de 2 segundos
-}
-
 const toggleFavourite = async () => {
-  await verifyToken();
-  if (isSessionInvalid.value) return;
+  await verifyToken()
+  if (isSessionInvalid.value) return
 
   try {
-    if (!activedFavouriteIcon.value) {
-      // No estaba en favoritos → agregar
-      await addFavorite(espacio.value.id);
-      activedFavouriteIcon.value = true;
-    } else {
-      // Ya estaba en favoritos → eliminar
-      await removeFavorite(espacio.value.id);
-      activedFavouriteIcon.value = false;
-    }
+    const spaceId = space.value.id
+    const isFav = await spaceStore.isFavorite(spaceId);
 
-    isAnimating.value = true;
-    setTimeout(() => {
-      isAnimating.value = false;
-    }, 400);
+    if (!isFav) {
+      await addFavorite(spaceId)
+      await spaceStore.fetchFavoriteSpaces()
+      activedFavouriteIcon.value = true;
+      showToast("Agregado a mis favoritos", "success")
+    } else {
+      await removeFavorite(spaceId)
+      await spaceStore.fetchFavoriteSpaces()
+      activedFavouriteIcon.value = false;
+      showToast("Eliminado de mis favoritos", "error")
+    }
   } catch (err) {
-    console.error('Error en toggleFavourite', err);
+    console.error("Error en toggleFavourite", err)
+    showToast("Ocurrió un error, intenta de nuevo", "error")
   }
+}
+
+
+
+const capitalizeDay = (day) => {
+  const map = {
+    monday: "Lunes",
+    tuesday: "Martes",
+    wednesday: "Miércoles",
+    thursday: "Jueves",
+    friday: "Viernes",
+    saturday: "Sábado",
+    sunday: "Domingo",
+  };
+  return map[day.toLowerCase()] || day;
 };
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.day-chip {
+  @apply px-3 py-1 rounded-full text-sm font-semibold transition-all;
+}
+
+.day-chip:hover {
+  @apply bg-primary text-white;
+}
+</style>
