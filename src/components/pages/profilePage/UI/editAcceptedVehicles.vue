@@ -1,12 +1,12 @@
 <template>
     <div v-if="visible" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 md:p-8 transform transition-all">
+        <div class="bg-white/10 border-white/10 rounded-2xl shadow-xl w-full max-w-2xl p-6 md:p-8 transform transition-all">
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl md:text-3xl font-bold text-primary">
                     Vehículos aceptados
                 </h2>
-                <button @click="$emit('close')" class="text-gray-500 hover:text-gray-700">
+                <button @click="$emit('close')" class="text-gray-400 hover:text-white">
                     ✕
                 </button>
             </div>

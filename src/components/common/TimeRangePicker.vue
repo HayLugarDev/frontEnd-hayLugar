@@ -1,24 +1,38 @@
 <template>
-  <div class="p-4 border rounded-lg bg-gray-50">
-    <legend class="text-lg font-semibold text-black mb-2">Horario de disponibilidad</legend>
+  <div class="p-6 bg-white/5 backdrop-blur-xl border border-white/10 
+           rounded-2xl shadow-xl text-white">
+    <!-- Título -->
+    <legend class="text-xl font-bold text-white mb-3">
+      Horario de disponibilidad
+    </legend>
 
-    <div class="flex justify-between mb-2 text-sm font-medium">
-      <span>Desde: <strong>{{ formattedStart }}</strong></span>
-      <span>Hasta: <strong>{{ formattedEnd }}</strong></span>
+    <!-- Rango -->
+    <div class="flex justify-between mb-4 text-sm font-medium text-gray-300">
+      <span>
+        Desde:
+        <strong class="text-white">{{ formattedStart }}</strong>
+      </span>
+
+      <span>
+        Hasta:
+        <strong class="text-white">{{ formattedEnd }}</strong>
+      </span>
     </div>
 
-    <div class="grid grid-cols-6 md:grid-cols-12 gap-1 select-none">
-      <div v-for="(hour, index) in hours" :key="index"
-           @click="toggleHour(hour)"
-           :class="[
-              'h-6 flex items-center justify-center text-xs cursor-pointer rounded-md transition-all duration-150',
-              selectedHours.includes(hour) ? 'bg-primary text-white font-semibold' : 'bg-gray-200 hover:bg-gray-300'
-           ]">
+    <!-- Horas -->
+    <div class="grid grid-cols-6 md:grid-cols-12 gap-2 select-none">
+      <div v-for="(hour, index) in hours" :key="index" @click="toggleHour(hour)" :class="[
+        'h-8 flex items-center justify-center text-xs cursor-pointer rounded-md transition-all duration-150 border',
+        selectedHours.includes(hour)
+          ? 'bg-[#00B4D8] text-white border-[#00B4D8] shadow font-semibold'
+          : 'bg-white/10 border-white/10 text-gray-300 hover:bg-white/20'
+      ]">
         {{ hour }}
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, computed, watch, defineProps, defineEmits } from 'vue';
@@ -42,7 +56,7 @@ const hours = computed(() => {
   const result: string[] = [];
   let hour = start[0], minute = start[1];
   while (hour < end[0] || (hour === end[0] && minute <= end[1])) {
-    result.push(`${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`);
+    result.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
     minute += props.step;
     if (minute >= 60) { hour++; minute = 0; }
   }

@@ -1,38 +1,49 @@
 <template>
   <transition name="fade">
-    <div v-if="visible" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Califica tu experiencia</h2>
+    <div v-if="visible" class="fixed inset-0 flex items-center justify-center 
+             bg-black/60 backdrop-blur-sm z-50">
+      <div class="bg-white/5 backdrop-blur-xl border border-white/10 
+               shadow-2xl rounded-2xl p-6 md:p-8 max-w-md w-full
+               transform transition-all animate-fadeInUp">
 
-        <p class="text-gray-700 mb-6 text-sm">
-          Haz click sobre las estrellas para calificar<br> (Mínimo 1 estrella, máximo 5 estrellas).
+        <!-- Título -->
+        <h2 class="text-2xl font-bold text-white mb-3 text-center">
+          Califica tu experiencia
+        </h2>
+
+        <p class="text-gray-300 mb-6 text-sm text-center">
+          Haz click sobre las estrellas para calificar<br>
+          (Mínimo 1 estrella, máximo 5 estrellas).
         </p>
 
         <!-- Estrellas -->
-        <div class="flex justify-center gap-2 mb-4">
-          <button v-for="i in 5" :key="i" @click="setRating(i)" class="focus:outline-none transition-transform"
-            :class="{ 'scale-110': rating === i }">
-            <font-awesome-icon :icon="[rating >= i ? 'fas' : 'far', 'star']" class="text-yellow-400 text-3xl" />
+        <div class="flex justify-center gap-3 mb-6">
+          <button v-for="i in 5" :key="i" @click="setRating(i)"
+            class="transition-transform duration-200 active:scale-95" :class="{ 'scale-125': rating === i }">
+            <font-awesome-icon :icon="[rating >= i ? 'fas' : 'far', 'star']" class="text-4xl transition-all"
+              :class="rating >= i ? 'text-yellow-400 drop-shadow-glow' : 'text-gray-500'" />
           </button>
         </div>
 
-        <!-- Opinión opcional -->
-        <textarea v-model="opinion" placeholder="Escribe un comentario (opcional)" rows="3"
-          class="w-full p-3 border rounded-lg text-gray-700 focus:ring-2 focus:ring-primary focus:outline-none mb-4">
-        </textarea>
-
+        <!-- Comentario opcional -->
+        <textarea v-model="opinion" placeholder="Escribe un comentario (opcional)" rows="3" class="w-full p-3 bg-white/5 text-gray-200 border border-white/10 
+                 rounded-xl focus:ring-2 focus:ring-[#00B4D8] outline-none 
+                 placeholder:text-gray-400"></textarea>
 
         <!-- Botones -->
-        <div class="flex justify-end gap-3">
-          <button @click="$emit('close')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+        <div class="flex justify-end gap-3 mt-6">
+          <button @click="$emit('close')" class="px-4 py-2 rounded-lg border border-white/20
+                   text-gray-300 hover:bg-white/10 transition active:scale-95">
             Cancelar
           </button>
-          <button @click="submit"
-            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-            :disabled="rating === 0">
+
+          <button @click="submit" :disabled="rating === 0" class="px-5 py-2 bg-[#00B4D8] text-white rounded-lg font-semibold
+                   shadow hover:bg-[#06D6A0] transition active:scale-95 
+                   disabled:opacity-40">
             Enviar
           </button>
         </div>
+
       </div>
     </div>
   </transition>

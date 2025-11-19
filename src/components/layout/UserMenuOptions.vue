@@ -1,5 +1,5 @@
 <template>
-  <ul class="flex flex-col divide-y divide-gray-200 text-gray-700 text-2xl md:text-base z-50">
+  <ul class="flex flex-col divide-y divide-gray-200 text-gray-200 text-2xl md:text-base z-50">
     <li v-if="route.path !== '/dashboard'" @click="$emit('navigate', '/dashboard')" class="menu-item">
       <font-awesome-icon icon="house" /> <span>Inicio</span>
     </li>
@@ -44,6 +44,6 @@ const emit = defineEmits(['navigate']);
 
 <style scoped>
 .menu-item {
-  @apply flex items-center gap-3 px-6 py-4 hover:bg-gray-100 transition-colors cursor-pointer;
+  @apply flex items-center gap-3 px-6 py-4 hover:bg-gray-700 transition-colors cursor-pointer;
 }
 </style>

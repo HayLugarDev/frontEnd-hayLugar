@@ -1,78 +1,95 @@
 <template>
-  <section class="lg:bg-white p-2 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3 border border-gray-200">
-    <!-- Título -->
-    <div class="flex items-center justify-between mb-4">
-      <div>
-        <h2 class="text-2xl font-bold text-primary">💖 Mis Favoritos</h2>
-        <p class="text-sm text-gray-600 px-4">Accedé rápidamente a tus espacios preferidos</p>
-      </div>
-    </div>
-
-    <!-- Loading -->
-    <div v-if="loading" class="space-y-4">
-      <ItemSkeleton />
-      <ItemSkeleton />
-    </div>
-
-    <!-- Sin favoritos -->
-    <div v-else-if="favorites.length === 0" class="text-gray-500 text-center py-10 text-sm">
-      Aún no tienes favoritos.  
-      <br />
-      <span class="text-primary font-medium">¡Explorá y guardá tus espacios preferidos!</span>
-    </div>
-
-    <!-- Lista de favoritos -->
-    <div v-else class="grid gap-6">
-      <div
-        v-for="f in favorites"
-        :key="f.id"
-        @click="$router.push(`/espacio/${f.space.id}`)"
-        class="flex flex-col md:flex-row gap-4 border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all cursor-pointer overflow-hidden"
-      >
-        <!-- Imagen -->
-        <div class="relative md:w-48 w-full">
-          <img
-            :src="getImageUrl(f.space.images)"
-            alt="Imagen del espacio"
-            class="w-full h-48 md:h-full object-cover rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none"
-          />
-          <div
-            class="absolute top-2 right-2 bg-white bg-opacity-80 backdrop-blur-md rounded-full p-2 shadow-sm hover:bg-opacity-100 transition-all"
-          >
+  <section class="p-4 md:p-8 w-full md:w-2/3">
+    <!-- Contenedor con fondo glass & modo oscuro -->
+    <div
+      class="bg-white/10 border-white/10 border rounded-2xl shadow-xl overflow-hidden"
+    >
+      <!-- Título -->
+      <div class="flex items-center justify-between px-6 py-4">
+        <div>
+          <h2 class="hidden text-2xl font-bold text-white md:flex items-center gap-2">
             <font-awesome-icon icon="heart" class="text-primary" />
-          </div>
+            Mis Favoritos
+          </h2>
+          <p class="text-sm text-gray-300 mt-1">
+            Accedé rápidamente a tus espacios preferidos
+          </p>
         </div>
+      </div>
 
-        <!-- Info -->
-        <div class="flex flex-col justify-between flex-1 p-4">
-          <!-- Encabezado -->
-          <div>
-            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-              <font-awesome-icon icon="warehouse" class="text-primary" />
-              {{ f.space.name }}
-            </h3>
-            <p class="text-sm text-gray-500">{{ f.space.location.split(',')[0] }}</p>
-            <p class="text-sm text-gray-400 capitalize mt-1">
-              Tipo: {{ getSpanishCategory(f.space.type) }} · Superficie: {{ f.space.parking_type }}
-            </p>
+      <!-- Loading -->
+      <div v-if="loading" class="space-y-4 px-6 pb-6">
+        <ItemSkeletonDark />
+        <ItemSkeletonDark />
+      </div>
+
+      <!-- Sin favoritos -->
+      <div
+        v-else-if="favorites.length === 0"
+        class="text-gray-400 text-center py-10 text-sm px-6"
+      >
+        Aún no tienes favoritos.  
+        <br />
+        <span class="text-primary font-medium">¡Explorá y guardá tus espacios preferidos!</span>
+      </div>
+
+      <!-- Lista de favoritos -->
+      <div v-else class="space-y-4 px-6 pb-6">
+        <div
+          v-for="f in favorites"
+          :key="f.id"
+          @click="$router.push(`/espacio/${f.space.slug}`)"
+          class="flex flex-col md:flex-row gap-4 bg-white/10 border-white/10 border
+                 rounded-2xl shadow-md hover:shadow-2xl transition-all cursor-pointer overflow-hidden"
+        >
+          <!-- Imagen -->
+          <div class="relative md:w-48 w-full h-48 md:h-auto">
+            <img
+              :src="getImageUrl(f.space.images)"
+              alt="Imagen del espacio"
+              class="w-full h-full object-cover rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none"
+            />
+            <div
+              class="absolute top-2 right-2 bg-white/20 backdrop-blur-md p-2 rounded-full shadow-sm 
+                     hover:bg-white/30 transition-all"
+            >
+              <font-awesome-icon icon="heart" class="text-primary text-lg" />
+            </div>
           </div>
 
-          <!-- Datos inferiores -->
-          <div class="flex items-center justify-between mt-4">
-            <!-- Precio estimado -->
-            <div class="text-sm">
-              <p class="font-semibold text-primary">
-                ${{ f.space.vehicle_capacities?.[0]?.price_per_hour?.toLocaleString() }}/hora
+          <!-- Info -->
+          <div class="flex flex-col justify-between flex-1 p-4">
+            <!-- Encabezado -->
+            <div>
+              <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                <font-awesome-icon icon="warehouse" class="text-primary" />
+                {{ f.space.name }}
+              </h3>
+              <p class="text-sm text-gray-300 mt-1">
+                {{ f.space.location.split(',')[0] }}
               </p>
-              <p class="text-xs text-gray-400">
-                Publicado desde: {{ formatDate(f.space.created_at) }}
+              <p class="text-sm text-gray-400 capitalize mt-1">
+                Tipo: {{ getSpanishCategory(f.space.type) }} · Superficie: {{ f.space.parking_type }}
               </p>
             </div>
 
-            <!-- Rating -->
-            <div class="flex items-center gap-1 text-yellow-500 font-semibold">
-              <font-awesome-icon icon="star" />
-              <span class="text-gray-700 text-sm">{{ f.space.average_rating.toFixed(1) }}</span>
+            <!-- Datos inferiores: precio y rating -->
+            <div class="flex items-center justify-between mt-4">
+              <!-- Precio estimado -->
+              <div>
+                <p class="text-sm font-semibold text-[#06D6A0]">
+                  ${{ f.space.vehicle_capacities?.[0]?.price_per_hour?.toLocaleString() }}/h
+                </p>
+                <p class="text-xs text-gray-400 mt-1">
+                  Publicado desde: {{ formatDate(f.space.created_at) }}
+                </p>
+              </div>
+
+              <!-- Rating -->
+              <div class="flex items-center gap-1">
+                <font-awesome-icon icon="star" class="text-yellow-400" />
+                <span class="text-gray-200 text-sm">{{ f.space.average_rating.toFixed(1) }}</span>
+              </div>
             </div>
           </div>
         </div>

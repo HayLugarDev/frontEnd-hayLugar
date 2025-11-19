@@ -1,143 +1,128 @@
 <template>
-  <div class="relative min-h-screen bg-secondary">
-    <MainHeader />
 
-    <!-- Encabezado + tabs -->
-    <div class="px-6 pt-20 md:pt-4 flex items-center gap-3">
-      <h2 class="text-2xl sm:text-3xl font-bold text-primary">
+  <!-- HEADER SOLO EN DESKTOP -->
+  <MainHeader class="hidden md:block" />
+
+  <!-- MENÚ INFERIOR MOBILE -->
+  <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
+
+  <div class="relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white">
+
+    <!-- Encabezado + Tabs -->
+    <div class="px-6 py-6 flex items-center gap-3">
+      <h2 class="text-2xl sm:text-3xl font-bold text-white drop-shadow">
         Estacionamientos Inteligentes — UTN
       </h2>
+
       <div class="ml-auto flex items-center gap-2">
-        <button
-          class="px-3 py-1.5 rounded-full text-sm font-medium border bg-white hover:bg-gray-50 transition"
-          :class="showMap ? 'text-primary border-primary/30' : 'text-gray-700 border-gray-300'"
-          @click="showMap = true"
-        >
-          Mapa
+        <button class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
+                 backdrop-blur-md bg-white/10 hover:bg-white/20" :class="showMap ? 'text-[#06D6A0]' : 'text-gray-300'"
+          @click="showMap = true">
+          Ver mapa
         </button>
-        <button
-          class="px-3 py-1.5 rounded-full text-sm font-medium border bg-white hover:bg-gray-50 transition"
-          :class="!showMap ? 'text-primary border-primary/30' : 'text-gray-700 border-gray-300'"
-          @click="showMap = false"
-        >
-          Lista
+
+        <button class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
+                 backdrop-blur-md bg-white/10 hover:bg-white/20" :class="!showMap ? 'text-[#06D6A0]' : 'text-gray-300'"
+          @click="showMap = false">
+          Ver lista
         </button>
       </div>
     </div>
 
     <!-- Filtros -->
-    <div class="px-4 mt-3 flex flex-wrap gap-2 items-center">
-      <button
-        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
-        :class="filters.groups.students ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-white text-gray-700 border-gray-300'"
-        @click="toggleGroup('students')"
-      >
+    <div class="px-6 mt-6 py-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 
+             flex flex-wrap gap-3 items-center container mx-auto">
+      <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+               backdrop-blur-sm" :class="filters.groups.students
+                ? 'bg-[#06D6A0]/30 text-[#06D6A0]'
+                : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="toggleGroup('students')">
         🎓 Alumnos
       </button>
-      <button
-        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
-        :class="filters.groups.staff ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white text-gray-700 border-gray-300'"
-        @click="toggleGroup('staff')"
-      >
+
+      <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+               backdrop-blur-sm" :class="filters.groups.staff
+                ? 'bg-[#00B4D8]/30 text-[#00B4D8]'
+                : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="toggleGroup('staff')">
         🧑‍🏫 Docentes
       </button>
-      <button
-        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
-        :class="filters.onlyAvailable ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-white text-gray-700 border-gray-300'"
-        @click="filters.onlyAvailable = !filters.onlyAvailable"
-      >
+
+      <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+               backdrop-blur-sm" :class="filters.onlyAvailable
+                ? 'bg-amber-300/20 text-amber-300'
+                : 'bg-white/5 text-gray-300 hover:bg-white/10'"
+        @click="filters.onlyAvailable = !filters.onlyAvailable">
         ✅ Sólo disponibles
       </button>
 
-      <span class="ml-auto text-xs text-gray-500">
+      <span class="ml-auto text-xs text-[#B0BEC5]">
         Última actualización: {{ lastUpdatedText }}
       </span>
     </div>
 
-    <div class="p-4 z-30">
-      <div v-if="error" class="text-red-500 mb-4">{{ error }}</div>
-
+    <div class="p-6 container mx-auto">
       <!-- MAPA -->
-      <div v-if="showMap" class="w-full h-[68vh] relative rounded-xl overflow-hidden shadow">
+      <div v-if="showMap" class="w-full h-[68vh] relative rounded-2xl overflow-hidden shadow-xl border border-white/10">
         <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions" :locateUser="true">
-          <!-- Zonas exactas (polígonos) -->
-          <GMapPolygon
-            v-for="(zona, i) in zonasFiltradas"
-            :key="'zone-'+i"
-            :paths="zona.paths"
-            :options="{ ...zona.options, clickable: false, zIndex: 1 }"
-          />
 
-          <!-- Pin fijo de la Universidad (UTN FRT) -->
-          <GMapMarker
-            :position="utnMarkerPosition"
-            :icon="universityIcon"
-            :options="{ zIndex: 3, clickable: false }"
-          />
+          <!-- Polígonos -->
+          <GMapPolygon v-for="(zona, i) in zonasFiltradas" :key="'zone-' + i" :paths="zona.paths"
+            :options="{ ...zona.options, clickable: false, zIndex: 1 }" />
 
-          <!-- Marcadores con iconos por grupo/estado y clic habilitado -->
-          <GMapMarker
-            v-for="(espacio, idx) in espaciosFiltrados"
-            :key="'mk-'+espacio.id+'-'+idx"
-            :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-            :icon="getMarkerIcon(espacio)"
-            :options="{ zIndex: 2, clickable: true }"
-            @mouseover="setHovered(espacio)"
-            @mouseout="clearHovered"
-            @click="openAccessModal(espacio)"
-          />
+          <!-- Icono UTN -->
+          <GMapMarker :position="utnMarkerPosition" :icon="universityIcon" :options="{ zIndex: 3, clickable: false }" />
+
+          <!-- Marcadores -->
+          <GMapMarker v-for="(espacio, idx) in espaciosFiltrados" :key="'mk-' + espacio.id + '-' + idx"
+            :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="getMarkerIcon(espacio)"
+            :options="{ zIndex: 2, clickable: true }" @mouseover="setHovered(espacio)" @mouseout="clearHovered"
+            @click="openAccessModal(espacio)" />
         </CustomGoogleMap>
 
-        <!-- Panel lateral (hover) -->
+        <!-- Panel lateral hover -->
         <transition name="slide-fade">
-          <div
-            v-if="hoveredSpace"
-            class="absolute right-4 top-4 w-[320px] bg-white border border-gray-200 rounded-xl shadow-lg p-4"
-          >
+          <div v-if="hoveredSpace" class="absolute right-4 top-4 w-[320px] bg-[#1B263B]/80 backdrop-blur-md border border-white/10 
+                   rounded-xl shadow-xl p-5">
             <div class="flex items-start gap-3">
-              <div
-                class="px-2 py-0.5 rounded text-xs font-semibold"
-                :class="badgeClass(hoveredSpace)"
-              >
+              <div class="px-2 py-0.5 rounded text-xs font-semibold" :class="badgeClass(hoveredSpace)">
                 {{ groupLabel(hoveredSpace) }}
               </div>
-              <div class="ml-auto text-xs" :class="hoveredSpace.capacity > 0 ? 'text-emerald-600' : 'text-rose-600'">
+
+              <div class="ml-auto text-xs" :class="hoveredSpace.capacity > 0 ? 'text-[#06D6A0]' : 'text-rose-400'">
                 {{ hoveredSpace.capacity > 0 ? 'Disponible' : 'Completo' }}
               </div>
             </div>
 
-            <h3 class="mt-2 text-lg font-semibold text-gray-900 leading-tight">
+            <h3 class="mt-2 text-lg font-semibold text-white leading-tight">
               {{ hoveredSpace.name }}
             </h3>
-            <p class="text-sm text-gray-600 mt-1">📍 {{ hoveredSpace.location }}</p>
+            <p class="text-sm text-[#B0BEC5] mt-1">📍 {{ hoveredSpace.location }}</p>
 
-            <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
-              <div class="p-2 rounded bg-gray-50">
-                <div class="text-gray-500">Capacidad</div>
-                <div class="font-semibold">
+            <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+              <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                <div class="text-[#B0BEC5]">Capacidad</div>
+                <div class="font-semibold text-white">
                   {{ hoveredSpace.capacity ?? capacityFromVehicle(hoveredSpace) }}
                 </div>
               </div>
-              <div class="p-2 rounded bg-gray-50">
-                <div class="text-gray-500">Grupo</div>
-                <div class="font-semibold">{{ groupLabel(hoveredSpace) }}</div>
+
+              <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                <div class="text-[#B0BEC5]">Grupo</div>
+                <div class="font-semibold text-white">{{ groupLabel(hoveredSpace) }}</div>
               </div>
             </div>
 
             <button
-              class="mt-4 w-full bg-primary text-white font-semibold rounded-lg py-2 hover:bg-primary-dark transition"
-              @click="openAccessModal(hoveredSpace)"
-            >
+              class="mt-4 w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-dark font-semibold rounded-xl py-2 transition-all"
+              @click="openAccessModal(hoveredSpace)">
               Confirmar acceso
             </button>
           </div>
         </transition>
 
         <!-- Leyenda -->
-        <div
-          class="absolute left-4 bottom-4 bg-white/90 backdrop-blur border border-gray-200 rounded-lg shadow p-3 text-xs text-gray-700"
-        >
-          <div class="font-semibold mb-2">Leyenda</div>
+        <div class="absolute left-4 bottom-4 bg-[#1B263B]/80 backdrop-blur-md border border-white/10 
+                 rounded-xl shadow-xl p-4 text-xs text-gray-200">
+          <div class="font-semibold mb-2 text-white">Leyenda</div>
 
           <div class="flex items-center gap-2 mb-1">
             <span class="inline-block w-3 h-3 rounded-full bg-emerald-500"></span>
@@ -149,43 +134,43 @@
           </div>
 
           <div class="flex items-center gap-2 mb-1">
-            <img :src="icons.students.available" class="w-4 h-4" alt="Alumno disponible" />
+            <img :src="icons.students.available" class="w-4 h-4" />
             <span>Alumno — Disponible</span>
           </div>
+
           <div class="flex items-center gap-2 mb-1">
-            <img :src="icons.students.full" class="w-4 h-4" alt="Alumno completo" />
+            <img :src="icons.students.full" class="w-4 h-4" />
             <span>Alumno — Completo</span>
           </div>
+
           <div class="flex items-center gap-2 mb-1">
-            <img :src="icons.staff.available" class="w-4 h-4" alt="Docente disponible" />
+            <img :src="icons.staff.available" class="w-4 h-4" />
             <span>Docente — Disponible</span>
           </div>
+
           <div class="flex items-center gap-2">
-            <img :src="icons.staff.full" class="w-4 h-4" alt="Docente completo" />
+            <img :src="icons.staff.full" class="w-4 h-4" />
             <span>Docente — Completo</span>
           </div>
         </div>
       </div>
 
       <!-- LISTA -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <SpaceCard
-          v-for="espacio in espaciosFiltrados"
-          :key="espacio.id"
-          :espacio="espacio"
-        />
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SpaceCard v-for="espacio in espaciosFiltrados" :key="espacio.id" :espacio="espacio" />
       </div>
     </div>
 
-    <!-- Modal Confirmar Acceso (legajo + patente) -->
-    <ConfirmAccessModal
-      :open="modalOpen"
-      :space="selectedSpace"
-      @close="modalOpen = false"
-      @success="onAccessSuccess"
-    />
+    <ConfirmAccessModal :open="modalOpen" :space="selectedSpace" @close="modalOpen = false"
+      @success="onAccessSuccess" />
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="text-center text-[#B0BEC5] text-sm py-8 border-t border-white/10">
+      © {{ new Date().getFullYear() }} HayLugar — Universidad Inteligente
+    </footer>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
@@ -195,6 +180,10 @@ import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue'
 import { getUniversitySpaces } from '../services/universityService'
 import { useUniversityMap } from '../logic/useUniversityMap'
 import ConfirmAccessModal from '../components/confirmAccessDialog.vue'
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
 
 /** ICONOS (SVG en data-URI) */
 const icons = {
@@ -206,9 +195,9 @@ const icons = {
   },
   staff: {
     available:
-     'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23E8F7EF"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%2310B981"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%2322C55E"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%2310B981"/></svg>',
+      'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23E8F7EF"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%2310B981"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%2322C55E"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%2310B981"/></svg>',
     full:
-     'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23FDECEC"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%23DC2626"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%23EF4444"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%23DC2626"/></svg>'
+      'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23FDECEC"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%23DC2626"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%23EF4444"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%23DC2626"/></svg>'
   },
   university:
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQxDogY_QPvIai_GqjWgiHGJVSL7TwaMS4jA&s'
@@ -289,7 +278,7 @@ const capacityFromVehicle = (esp) => {
 
 // Normalización de access_group (backend puede mandar docentes/teacher/etc.)
 const normalizeGroup = (g) =>
-  (g && ['staff','docentes','teacher','profesor','profesores'].includes(String(g).toLowerCase()))
+  (g && ['staff', 'docentes', 'teacher', 'profesor', 'profesores'].includes(String(g).toLowerCase()))
     ? 'staff'
     : 'students'
 
@@ -366,6 +355,7 @@ onMounted(async () => {
 .slide-fade-leave-active {
   transition: all .18s ease;
 }
+
 .slide-fade-enter-from,
 .slide-fade-leave-to {
   opacity: 0;

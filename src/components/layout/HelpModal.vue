@@ -3,7 +3,7 @@
     <transition name="fade">
         <div v-if="showHelp" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50">
             <div
-                class="relative bg-white text-gray-800 rounded-3xl shadow-2xl border border-white/30 w-11/12 max-w-3xl p-10 overflow-y-auto max-h-[90vh] backdrop-blur-lg animate-fade-in">
+                class="relative bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-gray-200 rounded-3xl shadow-2xl border border-white/30 w-11/12 max-w-3xl p-10 overflow-y-auto max-h-[90vh] backdrop-blur-lg animate-fade-in">
                 <!-- Luces decorativas -->
                 <div class="absolute -top-32 -right-32 h-64 w-64 bg-primary/20 blur-3xl rounded-full"></div>
                 <div class="absolute -bottom-40 -left-40 h-56 w-56 bg-accent/30 blur-3xl rounded-full"></div>
@@ -18,7 +18,7 @@
                             ×
                         </button>
                     </div>
-                    <p class="text-gray-500 mb-4">
+                    <p class="text-gray-200 mb-4">
                         Todo lo que necesitás saber para usar <span class="font-semibold text-primary">HayLugar</span>
                         🚗✨
                     </p>
@@ -26,16 +26,16 @@
                     <!-- Secciones de ayuda -->
                     <div class="space-y-8">
                         <section>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">👤 Registro e inicio de sesión</h3>
-                            <ul class="list-disc ml-5 text-gray-600 space-y-1">
+                            <h3 class="text-xl font-semibold text-gray-300 mb-2">👤 Registro e inicio de sesión</h3>
+                            <ul class="list-disc ml-5 text-gray-400 space-y-1">
                                 <li>Podés registrarte fácilmente con tu cuenta de Google.</li>
                                 <li>Una vez registrado, podrás utilizar todas las funciones disponibles.</li>
                             </ul>
                         </section>
 
                         <section>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">🅿️ Buscar y reservar espacios</h3>
-                            <ul class="list-disc ml-5 text-gray-600 space-y-1">
+                            <h3 class="text-xl font-semibold text-gray-300 mb-2">🅿️ Buscar y reservar espacios</h3>
+                            <ul class="list-disc ml-5 text-gray-400 space-y-1">
                                 <li>Explorá los diferentes espacios para estacionar publicados por nuestros Anfitriones.
                                 </li>
                                 <li>Usá el mapa interactivo o el buscador para encontrar espacios de estacionamiento
@@ -50,8 +50,8 @@
                         </section>
 
                         <section>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">🏠 Publicar tu propio espacio</h3>
-                            <ul class="list-disc ml-5 text-gray-600 space-y-1">
+                            <h3 class="text-xl font-semibold text-gray-300 mb-2">🏠 Publicar tu propio espacio</h3>
+                            <ul class="list-disc ml-5 text-gray-400 space-y-1">
                                 <li>Desde la sección <strong>“Publicá tu espacio”</strong> podés agregar un nuevo
                                     espacio de estacionamiento.</li>
                                 <li>Completá los datos de ubicación, tipo de superficie, días y horarios disponibles,
@@ -68,8 +68,8 @@
                         </section>
 
                         <section>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">💳 Pagos y métodos disponibles</h3>
-                            <ul class="list-disc ml-5 text-gray-600 space-y-1">
+                            <h3 class="text-xl font-semibold text-gray-300 mb-2">💳 Pagos y métodos disponibles</h3>
+                            <ul class="list-disc ml-5 text-gray-400 space-y-1">
                                 <li>Por el momento solo se acepta MercadoPago como método de pago.</li>
                                 <li>Podés pagar con tarjeta de crédito o débito.</li>
                                 <li>Las transacciones son seguras y protegidas.</li>
@@ -77,8 +77,8 @@
                         </section>
 
                         <section>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">🔔 Notificaciones</h3>
-                            <ul class="list-disc ml-5 text-gray-600 space-y-1">
+                            <h3 class="text-xl font-semibold text-gray-300 mb-2">🔔 Notificaciones</h3>
+                            <ul class="list-disc ml-5 text-gray-400 space-y-1">
                                 <li>Recibí alertas en tiempo real dentro de la app a través del ícono de la
                                     <strong>campanita</strong> 🔔 ubicado en la parte superior del menú.
                                 </li>
@@ -93,8 +93,8 @@
 
 
                         <section>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">⭐ Favoritos y reseñas</h3>
-                            <ul class="list-disc ml-5 text-gray-600 space-y-1">
+                            <h3 class="text-xl font-semibold text-gray-300 mb-2">⭐ Favoritos y reseñas</h3>
+                            <ul class="list-disc ml-5 text-gray-400 space-y-1">
                                 <li>Guardá tus espacios favoritos para acceder a ellos más rápido en futuras reservas.
                                 </li>
                                 <li>Como <strong>usuario</strong>, podés dejar una reseña y calificar el espacio una vez
@@ -107,8 +107,8 @@
                         </section>
 
                         <section>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">📱 Perfil y configuración</h3>
-                            <ul class="list-disc ml-5 text-gray-600 space-y-1">
+                            <h3 class="text-xl font-semibold text-gray-300 mb-2">📱 Perfil y configuración</h3>
+                            <ul class="list-disc ml-5 text-gray-400 space-y-1">
                                 <li>Gestioná toda tu información personal desde tu perfil: nombre, foto, y datos de
                                     contacto.</li>
                                 <li>Accedé fácilmente a tus <strong>vehículos registrados</strong>, <strong>reservas
@@ -123,10 +123,10 @@
 
 
                         <section>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">🧭 Soporte y contacto</h3>
-                            <ul class="list-disc ml-5 text-gray-600 space-y-1">
+                            <h3 class="text-xl font-semibold text-gray-300 mb-2">🧭 Soporte y contacto</h3>
+                            <ul class="list-disc ml-5 text-gray-400 space-y-1">
                                 <li>Si necesitás ayuda adicional, podés enviar un correo a <span
-                                        class="text-primary font-medium">soportehaylugar@gmail.com</span>.</li>
+                                        class="text-[#06D6A0] font-medium">soportehaylugar@gmail.com</span>.</li>
                             </ul>
                         </section>
                     </div>

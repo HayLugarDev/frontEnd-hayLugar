@@ -1,21 +1,21 @@
 <template>
-  <section class="lg:bg-white p-2 md:p-8 rounded-lg w-full md:w-2/3">
+  <section class="bg-white/10 border-white/10 p-2 md:p-8 rounded-lg w-full md:w-2/3">
     <div class="p-4 flex flex-col gap-4" v-if="!loadingUser">
       <!-- Header -->
-      <section class="bg-gray-50 p-6 md:p-8 rounded-2xl shadow-lg">
+      <section class="bg-white/10 border-white/10 p-6 md:p-8 rounded-2xl shadow-lg">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <h2 class="text-2xl font-semibold text-primary flex items-center gap-2">
               <font-awesome-icon icon="university" />
               Cuentas de cobro
             </h2>
-            <p class="text-gray-500 mt-1">
+            <p class="text-gray-200 mt-1">
               Administra tus cuentas para recibir retiros de tu billetera.
             </p>
           </div>
 
           <button @click="openCreate()"
-            class="inline-flex items-center bg-accent text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition">
+            class="inline-flex items-center bg-[#06D6A0]/20 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition">
             <font-awesome-icon icon="plus" class="mr-2" />
             Nueva cuenta
           </button>
@@ -23,15 +23,15 @@
       </section>
 
       <!-- Listado -->
-      <section class="bg-gray-50 p-6 md:p-8 rounded-2xl shadow-lg">
+      <section class="bg-white/10 border-white/10 p-6 md:p-8 rounded-2xl shadow-lg">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-xl font-semibold text-primary">Mis cuentas</h3>
-          <div v-if="isLoading" class="text-sm text-gray-500">Cargando…</div>
+          <div v-if="isLoading" class="text-sm text-gray-400">Cargando…</div>
         </div>
 
-        <div v-if="accounts.length === 0 && !isLoading" class="text-center py-10 text-gray-500">
+        <div v-if="accounts.length === 0 && !isLoading" class="text-center py-10 text-gray-400">
           Aún no cargaste cuentas de cobro.
-          <button class="ml-2 text-primary underline" @click="openCreate()">Crear ahora</button>
+          <button class="ml-2 text-[#06D6A0] underline" @click="openCreate()">Crear ahora</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4" v-if="accounts.length">
@@ -58,7 +58,7 @@
                     <div class="text-sm text-gray-500">Verificada</div>
                     <div class="text-gray-900">
                       <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
-                        :class="acc.verified_at ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-600'">
+                        :class="acc.verified_at ? 'bg-emerald-100 text-[#06D6A0]' : 'bg-gray-200 text-gray-600'">
                         {{ acc.verified_at ? 'Sí' : 'No' }}
                       </span>
                     </div>
@@ -67,7 +67,7 @@
 
                 <div class="mt-3">
                   <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
-                    :class="acc.is_default ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'">
+                    :class="acc.is_default ? 'bg-green-100 text-[#06D6A0]' : 'bg-gray-200 text-gray-600'">
                     {{ acc.is_default ? 'Principal' : 'Secundaria' }}
                   </span>
                 </div>
@@ -111,7 +111,7 @@
     <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
       <div class="absolute inset-0 bg-black/40" @click="closeModal()"></div>
 
-      <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 md:p-8">
+      <div class="relative w-full max-w-2xl bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-xl p-6 md:p-8">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-xl font-semibold text-primary">
             {{ editingId ? 'Editar cuenta' : 'Nueva cuenta' }}
@@ -124,41 +124,41 @@
         <form @submit.prevent="submitForm" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="md:col-span-2">
-              <label class="block text-sm text-gray-600 mb-1">Alias o CBU/CVU</label>
+              <label class="block text-sm text-gray-200 mb-1">Alias o CBU/CVU</label>
               <input v-model.trim="form.alias_cbu" type="text"
-                class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none font-mono"
+                class="bg-white/10 border-white/10 selection:w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none font-mono"
                 placeholder="mi.alias.banco ó 2850XXXXXXXXXXXXXXX" />
               <p v-if="errors.alias_cbu" class="text-xs text-rose-600 mt-1">{{ errors.alias_cbu }}</p>
-              <p class="text-xs text-gray-500 mt-1">
+              <p class="text-xs text-gray-400 mt-1">
                 Podés ingresar un <strong>alias</strong> (ej: <em>mi.alias.banco</em>) o un <strong>CBU/CVU</strong> (22
                 dígitos).
               </p>
             </div>
 
             <div>
-              <label class="block text-sm text-gray-600 mb-1">Banco (opcional)</label>
+              <label class="block text-sm text-gray-200 mb-1">Banco (opcional)</label>
               <input v-model.trim="form.bank_name" type="text"
-                class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none"
+                class="bg-white/10 border-white/10 w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none"
                 placeholder="Banco Ejemplo" />
             </div>
 
             <div>
-              <label class="block text-sm text-gray-600 mb-1">Titular (opcional)</label>
+              <label class="block text-sm text-gray-200 mb-1">Titular (opcional)</label>
               <input v-model.trim="form.account_holder" type="text"
-                class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none"
+                class="bg-white/10 border-white/10 w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none"
                 placeholder="Nombre y apellido" />
-            </div>
+            </div> 
 
             <div>
-              <label class="block text-sm text-gray-600 mb-1">CUIT/CUIL (opcional)</label>
+              <label class="block text-sm text-gray-200 mb-1">CUIT/CUIL (opcional)</label>
               <input v-model.trim="form.tax_id" type="text"
-                class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none"
+                class="bg-white/10 border-white/10 w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none"
                 placeholder="20-12345678-9" />
             </div>
           </div>
 
           <div class="flex items-center justify-end gap-3 pt-2">
-            <button type="button" class="px-4 py-2 rounded-lg border border-gray-300" @click="closeModal()">
+            <button type="button" class="bg-[#06D6A0]/20 px-4 py-2 rounded-lg border border-gray-300" @click="closeModal()">
               Cancelar
             </button>
             <button type="submit"

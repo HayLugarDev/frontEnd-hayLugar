@@ -15,7 +15,7 @@
           @click="router.push('/impact-dashboard')"
           class="px-5 py-2 rounded-xl bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold transition shadow-md hover:shadow-lg"
         >
-          Ver Impacto Global
+          Impacto Global
         </button>
       </div>
 

@@ -15,51 +15,52 @@
         <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover" />
 
         <!-- PRICE BADGE -->
-        <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl">
+        <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl
+                    flex items-baseline gap-1 border border-white/10">
           <span class="text-[#06D6A0] font-bold text-sm">${{ getMinPrice() }}</span>
           <span class="text-gray-300 text-[10px]">/h</span>
         </div>
       </div>
 
       <!-- CONTENIDO -->
-      <div class="flex flex-col flex-1 p-4">
+      <div class="flex flex-col flex-1 p-4 rounded-2xl">
 
         <!-- TITULO -->
-        <h3 class="text-white font-semibold text-base leading-tight line-clamp-1">
+        <h3 class="text-white font-semibold text-2xl md:text-base leading-tight line-clamp-1">
           {{ capitalizeFirst(espacio.name) }}
         </h3>
 
         <!-- UBICACIÓN -->
-        <p class="text-gray-300 text-xs mt-1 line-clamp-1">
+        <p class="text-gray-300 text-md md:text-xs mt-1 line-clamp-1">
           {{ ciudad }}
         </p>
-        <p class="text-gray-400 text-[11px] -mt-1 line-clamp-1">
+        <p class="text-gray-400 text-sm md:text-[11px] -mt-1 line-clamp-1">
           {{ calle }}
         </p>
 
         <!-- DISTANCIA -->
         <p v-if="espacio.distancia"
-           class="text-[11px] text-gray-400 mt-2 flex items-center gap-1">
+           class="text-md md:text-[11px] text-gray-400 mt-2 flex items-center gap-1">
           📍 A {{ espacio.distancia.toFixed(1) }} km
         </p>
 
         <!-- ICONOS VEHÍCULOS -->
-        <div class="flex flex-row justify-start gap-2 mt-3">
+        <div class="flex flex-row justify-start gap-2 mt-3 flex-wrap">
           <div
             v-for="v in espacio.vehicle_capacities"
             :key="v.type"
             class="flex items-center gap-1 bg-white/5 border border-white/10 
-                   px-2 py-1 rounded-lg text-white"
+                   px-2 py-1 rounded-lg text-gray-300"
           >
-            <font-awesome-icon :icon="['fas', `${getVehicleIcon(v.type)}`]" class="text-xs" />
-            <span v-if="v.price_per_hour" class="text-[10px]">
+            <font-awesome-icon :icon="['fas', `${getVehicleIcon(v.type)}`]" class="text-md md:text-xs " />
+            <span v-if="v.price_per_hour" class="text-lg md:text-[10px]">
               ${{ v.price_per_hour }}/h
             </span>
           </div>
         </div>
 
         <!-- RATING -->
-        <div class="flex items-center justify-end mt-2 text-xs gap-1">
+        <div class="flex items-center justify-end mt-2 text-xl md:text-xs gap-1">
           <span :class="espacio.average_rating ? 'text-yellow-400' : 'text-gray-500'">⭐</span>
           <span class="text-gray-200 font-medium">
             {{ espacio.space_reviews.length > 0 ? espacio.average_rating.toFixed(1) : '5.0' }}
@@ -72,7 +73,7 @@
                  flex items-center justify-between"
         >
           <div class="flex items-center gap-1">
-            <span class="text-xs text-[#00B4D8] font-semibold uppercase">
+            <span class="text-sm md:text-xs text-[#00B4D8] font-semibold uppercase">
               {{ labelHorario }}
             </span>
           </div>
@@ -83,7 +84,9 @@
             </template>
 
             <template v-else>
-              {{ disponibilidad.start }} - {{ disponibilidad.end }} hs
+              <div class="text-sm md:text-xs">
+                {{ disponibilidad.start }} - {{ disponibilidad.end }} hs
+              </div>
             </template>
           </div>
         </div>

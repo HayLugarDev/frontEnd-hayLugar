@@ -1,27 +1,30 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-secondary text-gray-800 lexend xl:w-11/12 mx-auto">
+  <div
+    class="flex flex-col min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white font-lexend w-full max-w-7xl mx-auto px-4">
     <MainHeader />
 
-    <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto py-6">
-      <BackButton class="lg:hidden mb-2" />
+    <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full py-6">
+      <BackButton class="lg:hidden mb-2 text-end" />
 
-      <section class="grid md:grid-cols-9 gap-6">
+      <!-- Usamos grid-cols-1 por defecto y md:grid-cols-9 en desktop -->
+      <section class="grid grid-cols-1 md:grid-cols-9 gap-6">
         <!-- 🧾 Título -->
-        <h1 class="text-primary text-2xl md:text-3xl col-span-9 font-bold mb-2">
+        <h1 class="text-primary text-3xl col-span-full font-bold mb-2">
           Confirmá tu Pago
         </h1>
 
         <!-- 📋 Resumen -->
         <div class="md:col-span-4 flex flex-col gap-5">
           <!-- Espacio -->
-          <div class="bg-white p-5 rounded-2xl shadow-md flex items-start gap-5 hover:shadow-lg transition">
-            <img v-if="espacio?.images?.[0]" :src="espacio.images[0]" alt="Imagen del espacio"
-              class="w-28 h-28 object-cover rounded-lg shadow-sm" />
+          <div class="bg-white/10 border border-white/10 p-5 rounded-2xl shadow-md flex items-start gap-5 hover:shadow-lg transition">
+            <!-- Imagen responsiva: tamaños relativos a breakpoint -->
+            <img v-if="espacio?.images?.[0]" :src="espacio.images[0]"
+              class="w-20 h-20 md:w-28 md:h-28 object-cover rounded-lg shadow-sm" />
             <div>
               <h3 class="text-lg font-semibold">{{ espacio?.name }}</h3>
-              <p class="text-gray-600 text-sm">{{ espacio?.location }}</p>
+              <p class="text-gray-400 text-sm">{{ espacio?.location }}</p>
 
-              <div class="flex items-center gap-1 text-gray-700 text-sm mt-1">
+              <div class="flex items-center gap-1 text-gray-200 text-sm mt-1">
                 <span><span class="text-yellow-600">★</span> {{ espacio?.space_reviews > 0 ?
                   espacio.average_rating.toFixed(1) : '5.0' }}</span>
                 <span>({{ espacio?.space_reviews?.length || 0 }})</span>
@@ -31,30 +34,30 @@
           </div>
 
           <!-- Conceptos -->
-          <div class="bg-white p-5 rounded-2xl shadow-md border-t-2">
+          <div class="bg-white/10 border border-white/10 p-5 rounded-2xl shadow-md border-t-2">
             <p class="text-xl font-semibold border-b pb-2 mb-2">Conceptos facturados</p>
 
             <div class="grid grid-cols-2 gap-y-3">
-              <p class="text-gray-600">Precio por {{ hours }}:{{ minutes }} hrs</p>
+              <p class="text-gray-400">Precio por {{ hours }}:{{ minutes }} hrs</p>
               <p class="text-end font-medium">{{ formatARS(baseAmount) }}</p>
 
-              <p class="text-gray-600">Cargo por servicio</p>
+              <p class="text-gray-400">Cargo por servicio</p>
               <p class="text-end font-medium">{{ formatARS(serviceFeeAmount) }}</p>
             </div>
           </div>
 
           <!-- Total -->
-          <div class="bg-white p-6 rounded-2xl shadow-md border-t-2 grid grid-cols-2 items-center">
+          <div class="bg-white/10 border border-white/10 p-6 rounded-2xl shadow-md border-t-2 grid grid-cols-2 items-center">
             <p class="text-lg font-semibold">Total a pagar</p>
             <p class="text-2xl font-bold text-end text-primary">
               {{ formatARS(totalGuestPays) }}
             </p>
-            <p class="col-span-2 text-xs text-gray-500 mt-3">
+            <p class="col-span-2 text-xs text-gray-300 mt-3">
               * Si el estacionamiento se extiende más allá del horario reservado, podrían aplicarse cargos adicionales
               por sobretiempo.
             </p>
 
-            <p class="col-span-2 text-xs text-gray-500 mt-4">
+            <p class="col-span-2 text-xs text-gray-300 mt-4">
               Al confirmar el pago, aceptás nuestros
               <a href="/terminos-y-condiciones" target="_blank" class="text-primary underline">Términos y
                 Condiciones</a>
@@ -66,16 +69,16 @@
         </div>
 
         <!-- 🧍 Datos de facturación -->
-        <div class="bg-white p-6 rounded-2xl shadow-md md:col-span-5 flex flex-col gap-4">
+        <div class="bg-white/10 border border-white/10 p-6 rounded-2xl shadow-md md:col-span-5 flex flex-col gap-4">
           <!-- Vehículo -->
-          <div v-if="reserva.vehicle_type" class="bg-gray-100 p-4 rounded-lg border border-gray-200 shadow-sm">
+          <div v-if="reserva.vehicle_type" class="bg-white/10 border-white/10 p-4 rounded-lg border border-gray-200 shadow-sm">
             <div class="flex justify-between items-center mb-2">
-              <h3 class="text-md font-semibold text-gray-700">Vehículo Seleccionado</h3>
+              <h3 class="text-md font-semibold text-white">Vehículo Seleccionado</h3>
               <font-awesome-icon
                 :icon="reserva.vehicle_type === 'car' ? 'car' : reserva.vehicle_type === 'motorcycle' ? 'motorcycle' : 'bicycle'"
-                class="text-gray-600" />
+                class="text-white" />
             </div>
-            <div v-if="vehiculoSeleccionado">
+            <div v-if="vehiculoSeleccionado" class="text-gray-200">
               <p>Marca: {{ vehiculoSeleccionado.brand }}</p>
               <p>Modelo: {{ vehiculoSeleccionado.model }}</p>
               <p>Patente: {{ vehiculoSeleccionado.license_plate ?? 'No aplica' }}</p>
@@ -104,14 +107,14 @@
 
       <!-- 💳 Método de pago -->
       <div v-if="datosCompletos && selectedMethod" class="w-full flex flex-col items-center gap-4 mt-10 mb-6">
-        <h2 class="text-lg font-semibold text-gray-700">Seleccioná el método de pago</h2>
+        <h2 class="text-lg font-semibold text-gray-200">Seleccioná el método de pago</h2>
 
         <div class="flex flex-wrap justify-center gap-4">
           <button @click="verifyPaymentMethod('tarjeta')" :class="[
             'flex items-center gap-3 px-6 py-3 rounded-2xl font-medium border transition-all duration-300 shadow-sm hover:shadow-lg',
             metodoPago === 'tarjeta'
               ? 'bg-primary text-white border-primary scale-105'
-              : 'bg-white text-gray-700 border-gray-300 hover:border-primary/40'
+              : 'bg-white/10 border border-white/10 text-gray-200 border-gray-300 hover:border-primary/40'
           ]">
             <font-awesome-icon icon="credit-card" class="text-xl" />
             <span>Tarjeta de crédito / débito</span>
@@ -121,7 +124,7 @@
             'flex items-center gap-3 px-6 py-3 rounded-2xl font-medium border transition-all duration-300 shadow-sm hover:shadow-lg',
             metodoPago === 'cuenta_mp'
               ? 'bg-[#009ee3] text-white border-[#009ee3] scale-105'
-              : 'bg-white text-gray-700 border-gray-300 hover:border-[#009ee3]/40'
+              : 'bg-white/10 border border-white/10 text-gray-200 border-gray-300 hover:border-[#009ee3]/40'
           ]">
             <img src="../assets/logo-mercadopago.png" alt="Mercado Pago" class="h-8 w-auto" />
             <span>Cuenta Mercado Pago</span>
@@ -141,6 +144,12 @@
     <StatusModal :visible="showErrorModal" type="error" title="Faltan datos" :message="errorMessage"
       icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
   </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="text-center text-[#B0BEC5] text-sm py-8 border-t border-white/10">
+    © {{ new Date().getFullYear() }} HayLugar — Logística Inteligente
+  </footer>
+
 </template>
 
 
