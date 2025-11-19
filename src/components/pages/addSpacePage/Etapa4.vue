@@ -1,12 +1,12 @@
 <template>
   <div
-    class="flex flex-col max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
+    class="flex flex-col max-w-3xl mx-auto bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-lg p-8 gap-6 md:min-h-[80vh] animate-fade-in">
     <!-- Título -->
     <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-4">
       Completá los detalles de tu espacio
     </h1>
 
-    <p class="text-gray-500 text-center mb-6">
+    <p class="text-gray-300 text-center mb-6">
       Ingresá toda la información para que tus clientes tengan claro tu espacio.
     </p>
 
@@ -14,16 +14,16 @@
 
       <!-- Nombre del espacio -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre del espacio</label>
+        <label class="block text-sm font-semibold text-gray-200 mb-2">Nombre del espacio</label>
         <input type="text" v-model="name" placeholder="Ej: Estacionamiento privado en Palermo"
-          class="w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary focus:outline-none transition" />
+          class="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition" />
       </div>
 
       <!-- Tipo de parking -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de estacionamiento</label>
+        <label class="block text-sm font-semibold text-gray-200 mb-2">Tipo de estacionamiento</label>
         <select v-model="parking_type"
-          class="w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary focus:outline-none transition">
+          class="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition">
           <option value="">Selecciona una opción</option>
           <option value="cubierto">Cubierto</option>
           <option value="descubierto">Descubierto</option>
@@ -32,26 +32,26 @@
 
       <!-- Descripción -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+        <label class="block text-sm font-semibold text-gray-200 mb-2">Descripción</label>
         <textarea v-model="description" rows="4" placeholder="Escribe una descripción detallada del espacio..."
-          class="w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary focus:outline-none transition"></textarea>
+          class="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition"></textarea>
       </div>
 
       <!-- Tipo de plazo -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
+        <label class="block text-sm font-semibold text-gray-200 mb-2">
           Tipo de plazo ofrecido
         </label>
 
         <div
-          class="flex items-center justify-between gap-2 bg-gray-50 rounded-2xl p-1 border border-gray-200 shadow-sm">
+          class="flex items-center justify-between gap-2 bg-white/10 border-white/10 rounded-2xl p-1 border border-gray-200 shadow-sm">
           <label v-for="unit in priceUnits" :key="unit.value" class="flex-1 cursor-pointer">
             <input type="radio" name="reservation_period" class="hidden peer" :value="unit.value"
               v-model="reservation_period" @change="updateAvailabilityFields" />
 
             <div class="text-center px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 
                peer-checked:bg-primary peer-checked:text-white 
-               peer-checked:shadow-md text-gray-700 hover:bg-gray-100">
+               peer-checked:shadow-md text-gray-200 hover:bg-primary/20">
               {{ unit.label }}
             </div>
           </label>
@@ -61,15 +61,15 @@
 
       <!-- Horario de disponibilidad -->
       <fieldset v-if="price_unit === 'hour'" class="border border-gray-200 p-4 rounded-2xl">
-        <legend class="text-lg font-semibold text-gray-800">Horario de Disponibilidad</legend>
+        <legend class="text-lg font-semibold text-gray-200">Horario de Disponibilidad</legend>
         <div class="grid grid-cols-2 gap-4 mt-2">
           <div>
-            <label class="block text-sm mb-1">Desde:</label>
+            <label class="block text-sm mb-1 text-white">Desde:</label>
             <DatePicker v-model:value="availabilityStartRaw" type="time" format="HH:mm" placeholder="Hora inicio"
               class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
           </div>
           <div>
-            <label class="block text-sm mb-1">Hasta:</label>
+            <label class="block text-sm mb-1 text-white">Hasta:</label>
             <DatePicker v-model:value="availabilityEndRaw" type="time" format="HH:mm" placeholder="Hora fin"
               class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
           </div>
@@ -78,9 +78,9 @@
 
       <!-- Días disponibles -->
       <div class="mt-4">
-        <fieldset class="border border-gray-200 p-4 rounded-2xl">
-          <legend class="text-lg font-semibold text-gray-800">Días disponibles</legend>
-          <p class="text-xs text-gray-500 mb-2">
+        <fieldset class="border border-gray-200 p-4 rounded-2xl text-gray-200">
+          <legend class="text-lg font-semibold text-gray-200">Días disponibles</legend>
+          <p class="text-xs text-gray-300 mb-2">
             Seleccioná los días disponibles o marcá <b>Todos los días</b>.
           </p>
           <div class="mb-2">
@@ -102,19 +102,19 @@
 
       <div v-if="price_unit" :class="[
         'p-4 rounded-xl text-sm',
-        price_unit === 'hour' ? 'bg-blue-50 text-blue-700' : 'bg-yellow-50 text-yellow-700'
+        price_unit === 'hour' ? 'bg-white/10 border border-white/10 text-blue-300' : 'bg-white/10 border border-white/10 text-yellow-200'
       ]">
         <p v-html="currentMessage"></p>
       </div>
 
       <!-- Resumen -->
-      <div v-if="price_unit" class="mt-6 p-5 bg-white rounded-2xl shadow-sm border border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+      <div v-if="price_unit" class="mt-6 p-5 bg-white/10 border-white/10 rounded-2xl shadow-sm border border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-200 mb-3 flex items-center gap-2">
           <span class="inline-block w-2 h-2 bg-primary rounded-full"></span>
           Resumen de disponibilidad
         </h3>
 
-        <div class="space-y-1 text-gray-700 text-sm leading-relaxed">
+        <div class="space-y-1 text-gray-400 text-sm leading-relaxed">
           <div v-if="reservation_period === 'hour' && availabilityStartRaw && availabilityEndRaw">
             <p><span class="font-medium">Días disponible para reservar:</span> {{ selectedDaysLabels ?
               selectedDaysLabels : 'Todos los días' }}</p>
@@ -128,7 +128,7 @@
             <p><span class="font-medium">Días disponible para reservar:</span> Todos los días</p>
           </div>
 
-          <div v-else class="text-red-600 font-medium">
+          <div v-else class="text-red-400 font-medium">
             Aún no has seleccionado días u horarios de disponibilidad.
           </div>
         </div>
@@ -136,11 +136,11 @@
 
       <!-- Imágenes -->
       <div>
-        <p class="text-gray-500 mb-4 text-sm">
+        <p class="text-gray-300 mb-4 text-sm">
           <strong>Atención:</strong> Debes subir al menos 5 imágenes de tu espacio.
         </p>
         <input type="file" multiple accept="image/*" @change="handleFileUpload"
-          class="w-full border border-gray-300 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-primary transition" />
+          class="w-full border border-gray-300 rounded-xl p-4 text-gray-200 focus:ring-2 focus:ring-primary transition" />
         <div class="mt-3 flex flex-wrap gap-3">
           <img v-for="(img, index) in previewImages" :key="index" :src="img"
             class="w-24 h-24 object-cover rounded-xl shadow-md ring-1 ring-gray-200" />

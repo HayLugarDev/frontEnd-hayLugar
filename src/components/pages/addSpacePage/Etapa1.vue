@@ -1,14 +1,14 @@
 <template>
     <div
-        class="flex flex-col max-w-xl mx-auto bg-white h-screen rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
+        class="flex flex-col max-w-xl mx-auto bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] h-screen rounded-2xl shadow-lg p-8 gap-6 md:min-h-[80vh] animate-fade-in">
 
         <!-- Título -->
         <h1 class="text-primary text-xl sm:text-4xl font-bold text-center mb-4">
             ¿Qué tipo de espacio vas a ofrecer como estacionamiento?
         </h1>
 
-        <p class="text-gray-500 text-center sm:mb-6 text-xs sm:text-base">
-            Elegí la opción que mejor describa el lugar donde los vehículos se van a guardar.
+        <p class="text-gray-300 text-center sm:mb-6 text-xs sm:text-base">
+            Elegí la opción que mejor describa el lugar donde se guardaran los vehículos.
         </p>
 
         <!-- Opciones -->

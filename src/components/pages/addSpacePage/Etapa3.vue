@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
+    class="flex flex-col max-w-xl mx-auto bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-lg p-8 gap-6 min-h-[80vh] animate-fade-in">
 
     <!-- Título -->
     <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-2">
@@ -8,7 +8,7 @@
     </h1>
 
     <!-- Subtítulo / Advertencia -->
-    <p class="text-gray-500 text-center mb-6 text-sm">
+    <p class="text-gray-300 text-center mb-6 text-sm">
       <strong>Atención:</strong> No publiques más espacios de los que realmente tenés disponibles.
       Así nos aseguramos de que cada vehículo cuente con su lugar sin problemas y que ninguna reserva se superponga con
       otra.

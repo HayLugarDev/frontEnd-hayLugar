@@ -1,5 +1,5 @@
 <template>
-  <section class="bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white p-4 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3">
+  <section class="bg-white/10 border border-white/10 text-white p-4 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3">
 
     <div class="flex items-center justify-between mb-4">
       <div>

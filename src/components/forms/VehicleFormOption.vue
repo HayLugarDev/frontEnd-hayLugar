@@ -31,7 +31,7 @@
             Capacidad
           </label>
           <input type="number" v-model="localConfig.capacity"
-            class="bg-white/10 border-white/10 w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+            class="text-gray-300 bg-white/10 border-white/10 w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
             placeholder="Cantidad de vehículos" />
         </div>
 
@@ -40,7 +40,7 @@
             Precio por hora ($)
           </label>
           <input type="number" v-model="localConfig.price_per_hour"
-            class="bg-white/10 border-white/10 w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+            class="text-gray-300 bg-white/10 border-white/10 w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
             placeholder="Precio" />
         </div>
 

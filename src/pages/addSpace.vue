@@ -1,6 +1,6 @@
 <template>
   <MainHeader class="hidden md:block" />
-  <BackButton class="absolute top-4 right-6 md:top-8 md:left-8 z-50" />
+  <BackButton class="absolute top-2 right-6 md:top-8 md:left-8 z-50" />
   <div class="relative w-full h-full mx-auto py-4 md:py-6">
     <!-- Instrucciones iniciales -->
     <transition name="fade-step" mode="out-in">
@@ -8,7 +8,7 @@
         <!-- Paso 0: Instrucciones para publicar un espacio -->
         <div v-if="currentStep === 0" class="rounded-lg border-gray-300">
           <header>
-            <h1 class="text-3xl font-bold text-center text-primary mb-8 mt-4 md:mt-0 border-b md:border-none py-2">
+            <h1 class="text-2xl md:text-3xl font-bold text-center text-primary mb-8 mt-4 md:mt-0 py-2">
               Publicá tu espacio en HayLugar
             </h1>
           </header>
@@ -18,33 +18,33 @@
             <div class="flex flex-col gap-6 px-4 xl:px-12">
               <!-- Tarjeta 1 -->
               <div
-                class="flex items-start gap-4 p-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:shadow-md transition">
+                class="flex items-start gap-4 p-4 bg-white/10 border border-white/10 rounded-lg shadow-sm hover:shadow-md transition">
                 <div class="text-primary text-3xl">📍</div>
                 <div>
-                  <h2 class="font-semibold text-xl text-black mb-1">Contanos sobre tu espacio</h2>
-                  <p class="text-gray-700">Ingresá la dirección, tipo de espacio, tipo de superficie, y qué vehículos
+                  <h2 class="font-semibold text-xl text-white mb-1">Contanos sobre tu espacio</h2>
+                  <p class="text-gray-300">Ingresá la dirección, tipo de espacio, tipo de superficie, y qué vehículos
                     pueden estacionar.</p>
                 </div>
               </div>
 
               <!-- Tarjeta 2 -->
               <div
-                class="flex items-start gap-4 p-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:shadow-md transition">
+                class="flex items-start gap-4 p-4 border bg-white/10 ber border-white/10 rounded-lg shadow-sm hover:shadow-md transition">
                 <div class="text-primary text-3xl">🖼️</div>
                 <div>
-                  <h2 class="font-semibold text-xl text-black mb-1">Agregá información útil</h2>
-                  <p class="text-gray-700">Subí fotos, croquis, detalles de disponibilidad y formas de pago para que los
+                  <h2 class="font-semibold text-xl text-white mb-1">Agregá información útil</h2>
+                  <p class="text-gray-300">Subí fotos, croquis, detalles de disponibilidad y formas de pago para que los
                     usuarios elijan con confianza.</p>
                 </div>
               </div>
 
               <!-- Tarjeta 3 -->
               <div
-                class="flex items-start gap-4 p-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:shadow-md transition">
+                class="flex items-start gap-4 p-4 border bg-white/10 border-white/10 rounded-lg shadow-sm hover:shadow-md transition">
                 <div class="text-primary text-3xl">✅</div>
                 <div>
-                  <h2 class="font-semibold text-xl text-black mb-1">Revisá y publicá</h2>
-                  <p class="text-gray-700">Confirmá el precio, revisá los datos ingresados y ¡listo! Tu espacio estará
+                  <h2 class="font-semibold text-xl text-white mb-1">Revisá y publicá</h2>
+                  <p class="text-gray-300">Confirmá el precio, revisá los datos ingresados y ¡listo! Tu espacio estará
                     disponible para miles de usuarios.</p>
                 </div>
               </div>
@@ -82,6 +82,11 @@
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage" :icon="logo"
       @confirm="showErrorModal = false" />
   </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="text-center text-[#B0BEC5] text-sm py-8 border-t border-white/10">
+    © {{ new Date().getFullYear() }} HayLugar — Movilidad Inteligente
+  </footer>
 </template>
 
 <script setup>
