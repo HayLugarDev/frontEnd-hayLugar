@@ -1,18 +1,18 @@
 <template>
-  <section class="lg:bg-white p-4 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3 border border-gray-200 flex flex-col gap-6">
+  <section class="bg-white/10 border-white/10 p-4 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3 border border-gray-200 flex flex-col gap-6">
 
     <!-- Header y saldo -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+        <h2 class="hidden text-2xl font-bold text-primary md:flex items-center gap-2">
           <font-awesome-icon icon="wallet" />
           Mi Billetera
         </h2>
-        <p class="text-gray-500 mt-1">Resumen y movimientos de tu cuenta</p>
+        <p class="text-gray-400 mt-1">Resumen y movimientos de tu cuenta</p>
       </div>
       <div class="md:text-right">
-        <span class="block text-gray-500 text-sm">Saldo actual</span>
-        <span class="text-4xl font-extrabold text-green-600 tracking-tight">{{ formatARS(balance) }}</span>
+        <span class="block text-white text-sm">Saldo actual</span>
+        <span class="text-4xl font-extrabold text-[#06D6A0] tracking-tight">{{ formatARS(balance) }}</span>
       </div>
     </div>
 
@@ -23,17 +23,17 @@
 
     <!-- KPIs rápidos -->
     <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="rounded-2xl border border-gray-200 p-4 bg-gradient-to-b from-gray-50 to-white shadow-sm hover:shadow-md transition">
-        <div class="text-sm text-gray-500">Ingresos (período)</div>
-        <div class="text-xl font-semibold text-green-600">{{ formatARS(sumIn) }}</div>
+      <div class="rounded-2xl border border-gray-200 p-4 bg-white/10 border-white/10 shadow-sm hover:shadow-md transition">
+        <div class="text-sm text-gray-400">Ingresos (período)</div>
+        <div class="text-xl font-semibold text-[#06D6A0]">{{ formatARS(sumIn) }}</div>
       </div>
-      <div class="rounded-2xl border border-gray-200 p-4 bg-gradient-to-b from-gray-50 to-white shadow-sm hover:shadow-md transition">
-        <div class="text-sm text-gray-500">Egresos (período)</div>
+      <div class="rounded-2xl border border-gray-200 p-4 bg-white/10 border-white/10 shadow-sm hover:shadow-md transition">
+        <div class="text-sm text-gray-400">Egresos (período)</div>
         <div class="text-xl font-semibold text-red-600">{{ formatARS(Math.abs(sumOut)) }}</div>
       </div>
-      <div class="rounded-2xl border border-gray-200 p-4 bg-gradient-to-b from-gray-50 to-white shadow-sm hover:shadow-md transition">
-        <div class="text-sm text-gray-500">Neto (período)</div>
-        <div class="text-xl font-semibold" :class="netPeriod >= 0 ? 'text-green-700' : 'text-red-700'">
+      <div class="rounded-2xl border border-gray-200 p-4 bg-white/10 border-white/10 shadow-sm hover:shadow-md transition">
+        <div class="text-sm text-gray-400">Neto (período)</div>
+        <div class="text-xl font-semibold" :class="netPeriod >= 0 ? 'text-[#06D6A0]' : 'text-red-700'">
           {{ formatARS(netPeriod) }}
         </div>
       </div>
@@ -46,19 +46,19 @@
           class="px-3 py-1.5 rounded-full text-sm font-medium transition border"
           :class="activeFilter === f.value
             ? 'bg-primary text-white border-transparent'
-            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'">
+            : 'bg-white/10 border-white/10 text-gray-200 border-gray-300 hover:bg-gray-500'">
           {{ f.label }}
         </button>
       </div>
       <div class="flex items-center gap-2 flex-wrap">
-        <label class="text-sm text-gray-600">Período:</label>
-        <select v-model="days" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 text-sm focus:outline-none">
+        <label class="text-sm text-gray-200">Período:</label>
+        <select v-model="days" class="px-3 py-2 rounded-lg border border-gray-300 bg-white/10 border-white/10 text-gray-400 text-sm focus:outline-none">
           <option :value="7">Últimos 7 días</option>
           <option :value="30">Últimos 30 días</option>
           <option :value="90">Últimos 90 días</option>
         </select>
-        <label class="text-sm text-gray-600">Mostrar:</label>
-        <select v-model="limit" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 text-sm focus:outline-none">
+        <label class="text-sm text-gray-200">Mostrar:</label>
+        <select v-model="limit" class="px-3 py-2 rounded-lg border border-gray-300 bg-white/10 border-white/10 text-gray-400 text-sm focus:outline-none">
           <option :value="10">10</option>
           <option :value="25">25</option>
           <option :value="50">50</option>
@@ -67,9 +67,9 @@
     </div>
 
     <!-- Movimientos -->
-    <div class="mt-6">
+    <div class="mt-6 space-y-2">
       <h3 class="text-xl font-semibold text-primary mb-2">Movimientos</h3>
-      <div v-if="filteredTx.length === 0" class="p-6 text-center text-gray-500 rounded-2xl border bg-gray-50">
+      <div v-if="filteredTx.length === 0" class="p-6 text-center text-gray-400 rounded-2xl border bg-white/10 border-white/10">
         Sin movimientos para los filtros seleccionados
       </div>
 
@@ -77,13 +77,13 @@
       <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-gray-100">
-              <th class="p-3 text-sm font-semibold text-gray-600">Fecha</th>
-              <th class="p-3 text-sm font-semibold text-gray-600">Tipo</th>
-              <th class="p-3 text-sm font-semibold text-gray-600">Descripción</th>
-              <!-- <th class="p-3 text-sm font-semibold text-gray-600">Ref</th> -->
-              <th class="p-3 text-sm font-semibold text-gray-600 text-right">Monto</th>
-              <th class="p-3 text-sm font-semibold text-gray-600">Estado</th>
+            <tr class="bg-white/10 border-white/10">
+              <th class="p-3 text-sm font-semibold text-gray-400">Fecha</th>
+              <th class="p-3 text-sm font-semibold text-gray-400">Tipo</th>
+              <th class="p-3 text-sm font-semibold text-gray-400">Descripción</th>
+              <!-- <th class="p-3 text-sm font-semibold text-gray-400">Ref</th> -->
+              <th class="p-3 text-sm font-semibold text-gray-400 text-right">Monto</th>
+              <th class="p-3 text-sm font-semibold text-gray-400">Estado</th>
             </tr>
           </thead>
           <tbody>
@@ -96,7 +96,7 @@
               </td>
               <td class="p-3 text-gray-700">{{ tx.description || '—' }}</td>
               <!-- <td class="p-3 text-gray-500">{{ tx.reference_id || '—' }}</td> -->
-              <td class="p-3 text-right font-semibold" :class="tx.amount >= 0 ? 'text-green-600' : 'text-red-600'">
+              <td class="p-3 text-right font-semibold" :class="tx.amount >= 0 ? 'text-[#06D6A0]' : 'text-red-600'">
                 {{ signedARS(tx.amount) }}
               </td>
               <td class="p-3 capitalize">
@@ -125,7 +125,7 @@
               <!-- <div class="text-xs text-gray-400 font-mono">{{ tx.reference_id || '' }}</div> -->
             </div>
             <div class="text-right">
-              <div class="text-lg font-semibold" :class="tx.amount >= 0 ? 'text-green-600' : 'text-red-600'">
+              <div class="text-lg font-semibold" :class="tx.amount >= 0 ? 'text-[#06D6A0]' : 'text-red-600'">
                 {{ signedARS(tx.amount) }}
               </div>
               <div class="mt-1">
@@ -140,7 +140,7 @@
 
       <!-- Retiro de fondos -->
       <button @click="withdrawFunds"
-        class="w-full md:w-auto mt-4 flex items-center justify-center bg-accent text-white px-4 py-2 rounded-2xl shadow hover:shadow-lg transition">
+        class="w-full md:w-auto mt-4 flex items-center justify-center bg-[#06D6A0]/20 text-white px-4 py-2 rounded-2xl shadow hover:shadow-lg transition">
         <font-awesome-icon icon="arrow-down" class="mr-2" /> Retirar fondos
       </button>
 

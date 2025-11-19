@@ -1,13 +1,13 @@
 <template>
   <div class="relative">
     <button @click="toggleMenu"
-      class="hidden md:flex items-center gap-2 hover:shadow-lg hover:bg-gray-50 px-4 py-2 rounded-full">
-      <font-awesome-icon :icon="open ? 'fa-angle-up' : 'fa-angle-down'" class="text-gray-500" />
+      class="hidden md:flex items-center gap-2 hover:shadow-xl px-4 py-2 rounded-full">
+      <font-awesome-icon :icon="open ? 'fa-angle-up' : 'fa-angle-down'" class="text-gray-400" />
       <img :src="hostImage" alt="ProfileIMG" class="w-9 rounded-full" />
     </button>
 
     <ul v-if="open"
-      class="absolute bg-white rounded-xl flex flex-col py-2 top-14 -left-20 z-50 cursor-pointer shadow-xl min-w-48">
+      class="absolute bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] border-2 rounded-xl flex flex-col py-2 top-14 -left-20 z-50 cursor-pointer shadow-xl min-w-48">
       <UserMenuOptions @navigate="$emit('navigate', $event)" />
     </ul>
   </div>

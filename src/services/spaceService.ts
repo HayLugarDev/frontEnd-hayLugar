@@ -79,7 +79,31 @@ export const getUniversitySpaces = async () => {
     return [];
   }
 };
+/**
+ * 🔹 🏭 NUEVO: Espacios industriales y logísticos
+ * Soporta subcategorías (warehouse, dock, yard, cold_storage, logistics)
+ */
+export const getIndustrialSpaces = async (params?: {
+  searchQuery?: string;
+  subcategory?: string;
+}) => {
+  try {
+    const response = await api.get("/spaces/getAll", {
+      params: {
+        category: "industrial",
+        searchQuery: params?.searchQuery,
+        subcategory: params?.subcategory,
+      },
+    });
 
+    const raw = response.data;
+    if (!Array.isArray(raw)) return [];
+    return raw;
+  } catch (error) {
+    console.error("Error al obtener los espacios industriales:", error);
+    return [];
+  }
+};
 export const getSpaceById = async (id: number) => {
   try {
     const response = await api.get(`/spaces/getbyid/${id}`);

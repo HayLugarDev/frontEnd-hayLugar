@@ -1,50 +1,81 @@
 <template>
-  <div v-if="show" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+  <transition name="fade">
     <div
-      class="bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]"
+      v-if="show"
+      class="fixed inset-0 flex items-center justify-center 
+             bg-black/60 backdrop-blur-sm z-50"
     >
-      <!-- Cerrar -->
-      <button
-        class="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-        aria-label="Cerrar"
-        @click="$emit('close')"
+      <div
+        class="bg-white/5 backdrop-blur-xl border border-white/10 
+               shadow-2xl rounded-2xl p-6 md:p-8 w-full max-w-2xl 
+               transform transition-all scale-100 animate-fadeInUp 
+               max-h-[80vh] overflow-y-auto"
       >
-        ✖
-      </button>
 
-      <h2 class="text-2xl font-bold mb-2">Calificaciones</h2>
+        <!-- Botón cerrar -->
+        <button
+          class="absolute top-4 right-4 text-gray-300 hover:text-white 
+                 text-lg transition active:scale-95"
+          aria-label="Cerrar"
+          @click="$emit('close')"
+        >
+          ✖
+        </button>
 
-      <!-- Resumen -->
-      <div class="flex items-center gap-2 mb-6">
-        <span class="text-yellow-500 text-xl">★</span>
-        <span class="font-semibold text-lg">{{ avgRating.toFixed(1) }}</span>
-        <span class="text-gray-500">({{ totalReviews }} opiniones)</span>
-      </div>
+        <!-- Título -->
+        <h2 class="text-3xl font-bold text-white mb-4 text-center drop-shadow">
+          Calificaciones
+        </h2>
 
-      <!-- Reseñas -->
-      <div v-if="reviews.length > 0" class="space-y-4">
-        <div v-for="r in reviews" :key="r.id" class="border-b pb-3">
-          <div class="flex items-center gap-3">
-            <img
-              :src="r.reviewer?.profile_picture || defaultAvatar"
-              alt="Avatar usuario"
-              class="w-10 h-10 rounded-full shadow"
-            />
-            <div>
-              <p class="font-semibold">{{ r.reviewer?.name || "Usuario" }}</p>
-              <div class="flex text-yellow-500 text-sm">
-                <span v-for="i in 5" :key="i">{{ i <= r.rating ? "★" : "☆" }}</span>
+        <!-- Resumen -->
+        <div class="flex items-center justify-center gap-2 mb-6">
+          <span class="text-yellow-400 text-2xl drop-shadow">★</span>
+          <span class="font-semibold text-xl text-white">{{ avgRating.toFixed(1) }}</span>
+          <span class="text-gray-300 text-sm">({{ totalReviews }} opiniones)</span>
+        </div>
+
+        <!-- Reseñas -->
+        <div v-if="reviews.length > 0" class="space-y-6">
+          <div
+            v-for="r in reviews"
+            :key="r.id"
+            class="border-b border-white/10 pb-4"
+          >
+            <div class="flex items-center gap-4">
+              <img
+                :src="r.reviewer?.profile_picture || defaultAvatar"
+                alt="Avatar usuario"
+                class="w-12 h-12 rounded-full shadow-lg border border-white/10"
+              />
+              <div>
+                <p class="font-semibold text-white text-lg">
+                  {{ r.reviewer?.name || "Usuario" }}
+                </p>
+
+                <!-- estrellas -->
+                <div class="flex text-yellow-400 text-base drop-shadow">
+                  <span v-for="i in 5" :key="i">
+                    {{ i <= r.rating ? "★" : "☆" }}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <!-- Comentario separado -->
-          <p class="mt-2 text-gray-600 ml-12">{{ r.comment }}</p>
-        </div>
-      </div>
 
-      <p v-else class="text-gray-500">Aún no hay opiniones.</p>
+            <!-- Comentario -->
+            <p class="mt-3 text-gray-300 ml-16 leading-relaxed">
+              {{ r.comment }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Sin reseñas -->
+        <p v-else class="text-gray-300 text-center">
+          Aún no hay opiniones.
+        </p>
+
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script setup lang="ts">
@@ -57,3 +88,20 @@ defineProps<{
   totalReviews: number;
 }>();
 </script>
+
+<style>
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.35s ease-out;
+}
+</style>

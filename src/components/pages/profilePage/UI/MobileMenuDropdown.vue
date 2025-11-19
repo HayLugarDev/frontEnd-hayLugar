@@ -1,65 +1,74 @@
 <template>
-  <div class="relative col-span-2 text-gray-800 font-semibold">
-    <div @click="toggleMenu"
-      class="flex flex-row p-2 px-4 items-center justify-between cursor-pointer shadow-sm text-lg">
-      <span class="font-bold">
-        {{ (options.find(opt => opt.value === model)?.label || title).toUpperCase() }}
-      </span>
-      <font-awesome-icon :icon="openMenu ? 'fa-angle-up' : 'fa-angle-down'" class="text-gray-500 ml-2" />
-    </div>
+  <div class="relative w-full">
+    <!-- Botón principal -->
+    <button @click="toggleMenu"
+      class="flex items-center justify-between w-full bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] backdrop-blur-md border border-white/20 text-primary font-semibold px-4 py-4 rounded-b-2xl shadow-md hover:bg-white/20 transition-all duration-300">
+      <div class="flex items-center gap-2">
+        <font-awesome-icon icon="list" class="text-lg" />
+        <span>{{ currentLabel }}</span>
+      </div>
+      <font-awesome-icon :icon="openMenu ? 'fa-chevron-up' : 'fa-chevron-down'"
+        class="text-gray-300 text-sm transition-transform duration-300" :class="{ 'rotate-180': openMenu }" />
+    </button>
 
-    <ul v-if="openMenu" class="absolute z-10 mt-2 bg-white border rounded-md w-full shadow-md animate-fade-in">
-      <li v-for="(option, index) in options" :key="index" @click="selectOption(option)"
-        class="p-2 hover:bg-gray-100 cursor-pointer transition-colors font-semibold">
-        {{ option.label.toUpperCase() }}
-      </li>
-    </ul>
+    <!-- Menú desplegable -->
+    <transition name="fade-slide">
+      <ul v-if="openMenu"
+        class="absolute left-0 mt-2 w-full bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-xl overflow-hidden z-50 border border-gray-200 backdrop-blur-md">
+        <li v-for="(option, index) in options" :key="index" @click="selectOption(option)"
+          class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-primary hover:text-white transition-all duration-200">
+          <div class="flex items-center gap-2">
+            <span>{{ option.label }}</span>
+          </div>
+        </li>
+      </ul>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, computed } from 'vue'
 
 const model = defineModel()
 
 const props = defineProps({
-  modelValue: String, // <- Para que v-model funcione
+  modelValue: String,
   options: {
     type: Array,
     required: true
-  },
-  title: {
-    type: String,
-    default: 'Seleccionar'
   }
 })
 
 const openMenu = ref(false)
-
-const toggleMenu = () => {
-  openMenu.value = !openMenu.value
-}
+const toggleMenu = () => (openMenu.value = !openMenu.value)
 
 const selectOption = (option) => {
   model.value = option.value
   openMenu.value = false
 }
+
+const currentLabel = computed(() => {
+  return props.options.find(opt => opt.value === model.value)?.label || 'Seleccionar'
+})
+
+const currentIcon = computed(() => {
+  return props.options.find(opt => opt.value === model.value)?.icon || 'fa-user-circle'
+})
 </script>
 
-<style>
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.25s ease;
 }
 
-.animate-fade-in {
-  animation: fade-in 0.2s ease-out;
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
 }
 </style>

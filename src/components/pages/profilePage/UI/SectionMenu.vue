@@ -1,24 +1,33 @@
 <template>
   <!-- Modo desktop -->
-  <div class="hidden md:block w-11/12 px-4 space-y-1">
-    <button v-for="section in sections" :key="section.value" @click="$emit('update:activeSection', section.value)"
+  <div class="hidden md:flex flex-col w-11/12 px-4 space-y-2">
+    <button
+      v-for="section in sections"
+      :key="section.value"
+      @click="$emit('update:activeSection', section.value)"
       :class="[
-        'w-full py-2 rounded text-center',
-        activeSection === section.value ? 'bg-gray-200' : 'hover:bg-gray-200'
-      ]">
-      {{ section.label }}
+        'w-full flex items-center justify-start gap-3 py-3 px-4 rounded-2xl font-semibold text-base transition-all duration-300',
+        activeSection === section.value
+          ? 'bg-primary text-white shadow-md scale-[1.02]'
+          : 'bg-white/10 text-gray-200 hover:bg-white/20 hover:scale-[1.01]'
+      ]"
+    >
+      <span>{{ section.label }}</span>
     </button>
   </div>
 
   <!-- Modo mobile: dropdown -->
-  <div class="block md:hidden w-full">
-    <MobileMenuDropdown :modelValue="activeSection" @update:modelValue="$emit('update:activeSection', $event)"
-      :options="sections"/>
+  <div class="block md:hidden w-full bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-primary">
+    <MobileMenuDropdown
+      :modelValue="activeSection"
+      @update:modelValue="$emit('update:activeSection', $event)"
+      :options="sections"
+    />
   </div>
 </template>
 
 <script setup>
-import MobileMenuDropdown from './MobileMenuDropdown.vue';
+import MobileMenuDropdown from './MobileMenuDropdown.vue'
 
 defineProps({
   activeSection: String,
@@ -27,7 +36,7 @@ defineProps({
     required: true,
     default: () => []
   }
-});
+})
 
-defineEmits(['update:activeSection']);
+defineEmits(['update:activeSection'])
 </script>

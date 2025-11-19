@@ -5,7 +5,7 @@
       class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
     >
       <div
-        class="relative bg-white text-gray-800 rounded-3xl shadow-2xl border border-white/30 w-11/12 max-w-lg p-10 text-center backdrop-blur-lg overflow-hidden"
+        class="relative bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-gray-200 rounded-3xl shadow-2xl border border-white/30 w-11/12 max-w-lg p-10 text-center backdrop-blur-lg overflow-hidden"
       >
         <!-- Luces decorativas -->
         <div class="absolute -top-20 -right-20 h-56 w-56 bg-primary/20 blur-3xl rounded-full"></div>
@@ -24,17 +24,17 @@
           <h1 class="text-3xl font-bold mb-2 opacity-0 animate-title">
             Bienvenido a <span class="text-primary">HayLugar</span>
           </h1>
-          <p class="text-gray-500 text-sm mb-6 opacity-0 animate-subtitle">
+          <p class="text-gray-200 text-sm mb-6 opacity-0 animate-subtitle">
             Movilidad inteligente para un mundo en movimiento 🌎
           </p>
 
           <!-- Texto principal -->
-          <p class="text-gray-600 mb-6 leading-relaxed opacity-0 animate-body">
+          <p class="text-gray-400 mb-6 leading-relaxed opacity-0 animate-body">
             Nos alegra tenerte a bordo.  
             Con <span class="font-semibold text-primary">HayLugar</span> podés descubrir, reservar y gestionar tus espacios de estacionamiento de forma simple y rápida.
           </p>
 
-          <p class="text-gray-500 text-sm mb-8 opacity-0 animate-body-delay">
+          <p class="text-gray-400 text-sm mb-8 opacity-0 animate-body-delay">
             Explorá, conectá y movete con libertad 🚗✨
           </p>
 

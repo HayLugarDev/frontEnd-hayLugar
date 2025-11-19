@@ -1,9 +1,9 @@
 <template>
-  <section class="lg:bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+  <section class="bg-white/10 border-white/10 p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h2 class="text-2xl font-bold text-primary">📅 Tus reservas</h2>
-        <p class="text-sm text-gray-600 px-4">Revisá el estado y detalles de tus reservas activas o pasadas</p>
+        <h2 class="hidden md:block text-2xl font-bold text-white">📅 Tus reservas</h2>
+        <p class="text-sm text-gray-400 px-4">Revisá el estado y detalles de tus reservas activas o pasadas</p>
       </div>
     </div>
 
@@ -14,17 +14,17 @@
 
     <div v-if="reservations.length" class="space-y-4">
       <div v-for="(reservation, index) in reservations" :key="index" :class="[
-        'border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden',
+        'border border-gray-200 rounded-2xl bg-white/10 border-white/10 shadow-md hover:shadow-lg transition-all overflow-hidden',
         ['cancelled', 'completed', 'failed'].includes(reservation.status) && reservation.hasRating
           ? 'opacity-70 pointer-events-none'
           : '']">
-        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-white/10 border border-white/10">
           <div>
-            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <h3 class="text-lg font-bold text-gray-200 flex items-center gap-2">
               <font-awesome-icon icon="calendar-check" class="text-primary" />
               Reserva #{{ reservation.id }}
             </h3>
-            <p class="text-xs text-gray-500">{{ formatDate(reservation.created_at) }}</p>
+            <p class="text-xs text-gray-400">{{ formatDate(reservation.created_at) }}</p>
           </div>
           <span :class="[
             'px-3 py-1 rounded-full text-xs font-semibold',
@@ -34,7 +34,7 @@
           </span>
         </div>
 
-        <div class="p-5 space-y-3 text-sm text-gray-700">
+        <div class="p-5 space-y-3 text-sm text-gray-200">
           <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
             <p><span class="font-semibold">📍 Espacio:</span> {{ reservation.space.name }}</p>
             <p><span class="font-semibold">📫 Dirección:</span> {{ reservation.space.location.split(',')[0] }}</p>
@@ -46,7 +46,7 @@
             </p>
           </div>
 
-          <p class="text-gray-600 text-sm italic mt-2">
+          <p class="text-red-400 text-sm italic mt-2">
             {{ getStatusInfo(reservation.status).message }}
           </p>
 
@@ -63,7 +63,7 @@
 
         <div v-if="!['cancelled', 'completed', 'failed'].includes(reservation.status)">
 
-          <div class="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 bg-gray-50">
+          <div class="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 bg-white/10 border-white/10">
 
             <!-- Check-in -->
             <button v-if="reservation.status === 'approved'" @click="checkInInit(reservation)"
@@ -96,16 +96,16 @@
       </div>
     </div>
 
-    <p v-else class="text-gray-500 text-center py-10 text-sm">
+    <p v-else class="text-gray-200 text-center py-10 text-sm">
       No tienes reservas realizadas aún.
     </p>
 
     <!-- Modal CheckIn -->
-    <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-white/10 border border-white/10 z-50">
       <div class="bg-white rounded-lg shadow-lg p-6 w-96">
         <h2 class="text-lg font-bold mb-4">Verificar Check-In</h2>
 
-        <p class="text-sm text-gray-600 mb-2">
+        <p class="text-sm text-gray-200 mb-2">
           Ingresa el código de verificación proporcionado por el anfitrión (Solo mayúsculas):
         </p>
 
@@ -116,7 +116,7 @@
           <button @click="showCheckInModal = false" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300">
             Cancelar
           </button>
-          <button @click="confirmCheckIn" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+          <button @click="confirmCheckIn" class="px-4 py-2 rounded-lg bg-[#06D6A0]/20 hover:bg-[#06D6A0]/30 text-white">
             Confirmar
           </button>
         </div>
