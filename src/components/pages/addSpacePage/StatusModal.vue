@@ -1,16 +1,16 @@
 <template>
   <transition name="fade">
-    <div v-if="visible" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
+    <div v-if="visible" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50">
+      <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
         <div class="flex flex-col items-center">
           <img v-if="icon" :src="icon" alt="icono" class="w-20 h-20 mb-4" />
-          <h2 :class="['text-3xl font-bold mb-2', type === 'error' ? 'text-red-600' : 'text-primary']">
+          <h2 :class="['text-3xl font-bold mb-2', type === 'error' ? 'text-red-500' : 'text-primary']">
             {{ title }}
           </h2>
 
           <!-- Contenido HTML o no -->
-          <p v-if="isHtml" class="text-lg text-gray-700 text-center mb-6" v-html="message"></p>
-          <p v-else class="text-lg text-gray-700 text-center mb-6">{{ message }}</p>
+          <p v-if="isHtml" class="text-lg text-gray-200 text-center mb-6" v-html="message"></p>
+          <p v-else class="text-lg text-gray-300 text-center mb-6">{{ message }}</p>
 
           <div class="flex gap-4">
             <!-- Botón principal -->

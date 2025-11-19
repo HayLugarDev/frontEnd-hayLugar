@@ -1,10 +1,10 @@
 <template>
   <!-- HEADER SOLO EN DESKTOP -->
-      <MainHeader class="hidden md:block" />
+  <MainHeader class="hidden md:block" />
 
-      <!-- MENÚ INFERIOR MOBILE -->
-      <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
-        :showMap="showMap" />
+  <!-- MENÚ INFERIOR MOBILE -->
+  <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
+    :showMap="showMap" />
 
   <!-- Skeleton mientras carga -->
   <SpaceDetailsSkeleton v-if="spaceStore.loading" />
@@ -261,9 +261,9 @@
   <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario" :vehicleType="getVehicleKey(tipoVehiculo)"
     @selected="onSelectedVehicle" :isHtml="modalIsHtml" @close="showVehicleModal = false" />
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="text-center text-[#B0BEC5] text-sm py-8 border-t border-white/10">
-    © {{ new Date().getFullYear() }} HayLugar — Logística Inteligente
+  <!-- FOOTER -->
+  <footer class="text-center text-[#B0BEC5] text-sm py-6 border-t border-white/10 bg-black/20 backdrop-blur-xl">
+    © {{ new Date().getFullYear() }} HayLugar — Movilidad Inteligente
   </footer>
 </template>
 

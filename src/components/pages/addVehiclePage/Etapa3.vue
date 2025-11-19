@@ -1,8 +1,8 @@
 <template>
-    <div class="flex flex-col md:w-3/4 mx-auto gap-2">
+    <div class="flex flex-col w-full mx-auto gap-2 px-6">
         <div v-if="showSummary"
-            class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 max-w-xl mx-auto animate-fade-in">
-            <h2 class="text-2xl font-bold text-primary text-center mb-6">
+            class="rounded-2xl shadow-lg p-8 max-w-xl animate-fade-in">
+            <h2 class="text-2xl md:text-3xl font-bold text-primary text-center mb-6">
                 Resumen antes de guardar
             </h2>
 
@@ -14,9 +14,9 @@
                     { label: 'Color', value: modelValue.color },
                     { label: 'Patente', value: modelValue.type !== 'bicycle' ? modelValue.license_plate : 'No aplica' }
                 ]" :key="index"
-                    class="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-xl px-5 py-3 hover:bg-gray-100 transition-all">
-                    <span class="text-gray-500 font-medium">{{ item.label }}</span>
-                    <span class="text-gray-800 font-semibold">{{ item.value || '—' }}</span>
+                    class="flex items-center justify-between bg-white/10 border-white/10 rounded-xl px-5 py-3 transition-all">
+                    <span class="text-white font-medium">{{ item.label }}</span>
+                    <span class="text-gray-400 font-semibold">{{ item.value || '—' }}</span>
                 </div>
             </div>
 
@@ -26,7 +26,7 @@
                     Guardar vehículo
                 </button>
                 <button @click="showSummary = false"
-                    class="border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-xl hover:bg-gray-100 transition-colors">
+                    class="border border-gray-300 text-white font-medium px-6 py-3 rounded-xl hover:bg-gray-100 transition-colors">
                     Volver a editar
                 </button>
             </div>
