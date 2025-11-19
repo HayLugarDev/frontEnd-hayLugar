@@ -1,41 +1,41 @@
 <template>
     <div
-        class="flex flex-col max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
+        class="flex flex-col max-w-xl mx-auto h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-lg p-8 gap-6 md:min-h-[80vh] animate-fade-in">
         <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-4">
             Completá los detalles de tu vehículo
         </h1>
 
-        <p class="text-gray-500 text-center mb-6">
+        <p class="text-gray-300 text-center mb-6">
             Ingresá la información básica para identificar tu vehículo correctamente.
         </p>
 
         <div class="space-y-6 flex-1">
             <!-- Marca -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Marca</label>
+                <label class="block text-sm font-semibold text-gray-200 mb-2">Marca</label>
                 <input type="text" v-model="brand" placeholder="Ej: Fiat"
-                    class="w-full border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 rounded-xl p-4 text-gray-800 placeholder-gray-400 transition-all outline-none" />
+                    class="w-full bg-white/10 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/30 rounded-xl p-4 text-gray-400 placeholder-gray-400 transition-all outline-none" />
             </div>
 
             <!-- Modelo -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Modelo</label>
+                <label class="block text-sm font-semibold text-gray-200 mb-2">Modelo</label>
                 <input type="text" v-model="model" placeholder="Ej: Cronos Drive 1.3"
-                    class="w-full border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 rounded-xl p-4 text-gray-800 placeholder-gray-400 transition-all outline-none" />
+                    class="w-full bg-white/10 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/30 rounded-xl p-4 text-gray-400 placeholder-gray-400 transition-all outline-none" />
             </div>
 
             <!-- Color -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Color</label>
+                <label class="block text-sm font-semibold text-gray-200 mb-2">Color</label>
                 <input type="text" v-model="color" placeholder="Ej: Rojo"
-                    class="w-full border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 rounded-xl p-4 text-gray-800 placeholder-gray-400 transition-all outline-none" />
+                    class="w-full bg-white/10 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/30 rounded-xl p-4 text-gray-400 placeholder-gray-400 transition-all outline-none" />
             </div>
         </div>
 
         <!-- Botones de navegación -->
         <div class="flex justify-between mt-auto gap-4">
             <button @click="emit('prev')"
-                class="w-1/2 border border-gray-300 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-100 transition-all">
+                class="w-1/2 border border-gray-300 text-gray-200 font-medium py-3 rounded-xl hover:bg-gray-100 transition-all">
                 ⬅ Anterior
             </button>
             <button @click="brand && model && color ? $emit('next') : (showErrorModal = true)"

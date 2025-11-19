@@ -1,9 +1,9 @@
 <template>
   <div class="p-6 border-2 w-full md:w-11/12 mx-auto flex flex-col rounded-2xl cursor-pointer transition-colors duration-200"
-    :class="isSelected ? 'border-gray-900 bg-gray-200' : 'border-gray-300 hover:border-gray-500'"
+    :class="isSelected ? 'bg-white/10 border border-white/10' : 'border-gray-300 hover:border-gray-500'"
     @click="$emit('update:modelValue', value)">
-    <span class="text-xl sm:text-2xl text-gray-800">{{ title }}</span>
-    <span class="text-gray-500 text-sm sm:text-lg font-normal">{{ text }}</span>
+    <span class="text-xl sm:text-2xl text-gray-200">{{ title }}</span>
+    <span class="text-gray-400 text-sm sm:text-lg font-normal">{{ text }}</span>
   </div>
 </template>
 
