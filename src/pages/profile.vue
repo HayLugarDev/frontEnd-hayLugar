@@ -1,7 +1,14 @@
 <template>
-  <MainHeader />
-  <div class="min-h-screen bg-secondary md:p-10" v-if="!userStore.loading">
-    <div class="flex flex-col pt-20 md:pt-0 md:flex-row w-full items-start">
+  <!-- HEADER SOLO EN DESKTOP -->
+  <MainHeader class="hidden md:block" />
+
+  <!-- MENÚ INFERIOR MOBILE -->
+  <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
+
+  <div
+    class="min-h-screen md:p-10 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden"
+    v-if="!userStore.loading">
+    <div class="flex flex-col md:pt-0 md:flex-row w-full items-start">
 
       <!-- Encabezado del Perfil -->
       <header class="hidden w-full md:w-1/3 md:flex flex-col justify-between items-center">
@@ -14,7 +21,7 @@
       </header>
 
       <!-- Selector móvil (no botón contenedor para evitar eventos raros anidados) -->
-      <div class="w-full md:hidden items-center justify-center border-2 shadow-md bg-white px-6 py-2 mb-4 rounded-full">
+      <div class="w-full md:hidden items-center justify-center mb-4">
         <SectionMenu :activeSection="activeSection" :sections="menuSectionsComputed"
           @update:activeSection="handleSectionChange" />
       </div>
@@ -22,9 +29,9 @@
       <transition name="fade-step" mode="out-in">
         <KeepAlive>
           <section v-if="activeSection === 'datos'" key="datos"
-            class="w-full md:w-2/3 bg-white p-10 md:p-12 rounded-2xl shadow-xl border border-gray-100 transition-all">
+            class="w-full md:w-2/3 bg-white/10 border-white/10 p-10 md:p-12 rounded-2xl shadow-xl border border-gray-100 transition-all">
             <!-- Encabezado con foto y datos -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="flex flex-row items-center justify-between gap-8">
               <div class="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto">
                 <!-- Foto de perfil -->
                 <div class="relative group">
@@ -40,14 +47,14 @@
 
                 <!-- Datos del usuario -->
                 <div class="text-center sm:text-left">
-                  <h2 class="text-2xl font-bold text-gray-800">
+                  <h2 class="text-2xl font-bold text-gray-200">
                     {{ usuario.name }} {{ usuario.last_name }}
                   </h2>
-                  <p class="text-gray-600 flex items-center justify-center sm:justify-start mt-1">
+                  <p class="text-gray-200 flex items-center justify-center sm:justify-start mt-1">
                     <font-awesome-icon icon="envelope" class="mr-2 text-primary" />
                     {{ usuario.email }}
                   </p>
-                  <p v-if="usuario.dni" class="text-gray-600 flex items-center justify-center sm:justify-start mt-1">
+                  <p v-if="usuario.dni" class="text-gray-200 flex items-center justify-center sm:justify-start mt-1">
                     <font-awesome-icon icon="id-card" class="mr-2 text-primary" />
                     DNI: {{ usuario.dni }}
                   </p>
@@ -61,7 +68,7 @@
 
               <!-- Botón de cerrar sesión (solo móvil) -->
               <button @click="verifyToken('/quit')"
-                class="p-2 text-red-600 md:hidden border-2 border-transparent rounded-xl hover:border-red-600 hover:bg-red-50 transition font-semibold">
+                class="md:hidden bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-800 transition flex items-center gap-2">
                 Cerrar sesión
               </button>
             </div>
@@ -78,7 +85,7 @@
             <!-- Botón Guardar -->
             <div class="mt-8">
               <button @click="guardarTodo"
-                class="w-full bg-primary text-white py-4 rounded-xl text-lg font-semibold shadow-md hover:shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                class="w-full bg-primary text-gray-200 py-4 rounded-xl text-lg font-semibold shadow-md hover:shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
                 <font-awesome-icon icon="save" class="text-lg" />
                 Guardar Cambios
               </button>
@@ -112,37 +119,12 @@
     </div>
 
     <!-- Modales -->
-    <transition name="fade">
-      <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-          <div class="flex flex-col items-center">
-            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-            <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
-            <p class="text-lg text-gray-700 text-center mb-6">Los cambios se han guardado correctamente.</p>
-            <button @click="closeSuccessModal"
-              class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-              Continuar
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
+    <StatusModal :visible="showSuccessModal" type="success" title="¡Éxito!"
+      message="Los cambios se han guardado correctamente." icon="/src/assets/logo.png" @confirm="closeSuccessModal" />
 
-    <transition name="fade">
-      <div v-if="showErrorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-          <div class="flex flex-col items-center">
-            <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-            <h2 class="text-3xl font-bold text-red-600 mb-2">¡Error!</h2>
-            <p class="text-lg text-gray-700 text-center mb-6">{{ errorMessage }}</p>
-            <button @click="closeErrorModal"
-              class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-800 transition">
-              Intentar de Nuevo
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
+      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+
   </div>
 
   <div v-else class="min-h-screen flex items-center justify-center">
@@ -172,6 +154,8 @@ import AdminWithdrawals from './AdminWithdrawals.vue';
 import walletProfile from './wallet.vue';
 import UserReviews from '../components/pages/profilePage/UserReviews.vue';
 import Favorites from '../components/pages/profilePage/Favorites.vue';
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
+import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -297,10 +281,26 @@ const cambiarFoto = (): void => {
 };
 
 const guardarTodo = async (): Promise<void> => {
+
+  const payload = {
+    name: usuario.value.name,
+    last_name: usuario.value.last_name,
+    email: usuario.value.email,
+    dni: usuario.value.dni,
+    address: usuario.value.address,
+    profile_picture: typeof usuario.value.profile_picture === "string"
+      ? usuario.value.profile_picture
+      : userStore.user.profile_picture
+  };
+
+  console.log(payload)
   try {
-    const response = await api.put(`/users/update/${usuario.value.id}`, usuario.value, {
-      withCredentials: true
-    });
+    const response = await api.put(
+      `/users/update/${usuario.value.id}`,
+      payload,
+      { withCredentials: true }
+    );
+
     userStore.setUser(response.data);
     showSuccessModal.value = true;
   } catch (error) {

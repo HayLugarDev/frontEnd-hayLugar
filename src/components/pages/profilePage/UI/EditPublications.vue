@@ -1,10 +1,10 @@
 <template>
   <transition name="fade">
     <div v-if="visible" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div class="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-8 relative overflow-y-auto max-h-[90vh]">
+      <div class="bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] w-full max-w-3xl rounded-2xl shadow-xl p-8 relative overflow-y-auto max-h-[90vh]">
 
         <!-- Botón cerrar -->
-        <button @click="close" class="absolute top-4 right-4 text-gray-600 hover:text-black">✖</button>
+        <button @click="close" class="absolute top-4 right-4 text-gray-400 hover:text-white">✖</button>
 
         <!-- Encabezado -->
         <h2 class="text-3xl font-bold text-primary mb-6">Editá tu espacio</h2>
@@ -20,15 +20,15 @@
 
         <!-- Tipo de plazo -->
         <div class="mt-6">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de plazo ofrecido</label>
+          <label class="block text-sm font-semibold text-gray-200 mb-2">Tipo de plazo ofrecido</label>
           <div
-            class="flex items-center justify-between gap-2 bg-gray-50 rounded-2xl p-1 border border-gray-200 shadow-sm">
+            class="flex items-center justify-between gap-2 bg-white/10 border-white/10 rounded-2xl p-1 border border-gray-200 shadow-sm">
             <label v-for="unit in priceUnits" :key="unit.value" class="flex-1 cursor-pointer">
               <input type="radio" name="reservation_period" class="hidden peer" :value="unit.value"
                 v-model="formData.reservation_period" @change="updateAvailabilityFields" />
               <div class="text-center px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200
                           peer-checked:bg-primary peer-checked:text-white
-                          peer-checked:shadow-md text-gray-700 hover:bg-gray-100">
+                          peer-checked:shadow-md text-gray-200 hover:bg-primary/50">
                 {{ unit.label }}
               </div>
             </label>
@@ -37,7 +37,7 @@
 
         <!-- Horario de disponibilidad -->
         <fieldset v-if="formData.reservation_period === 'hour'" class="border border-gray-200 p-4 rounded-2xl mt-4">
-          <legend class="text-lg font-semibold text-gray-800">Horario de Disponibilidad</legend>
+          <legend class="text-lg font-semibold text-gray-200">Horario de Disponibilidad</legend>
           <div class="grid grid-cols-2 gap-4 mt-2">
             <div>
               <label class="block text-sm mb-1">Desde:</label>
@@ -74,7 +74,7 @@
         </div>
 
         <!-- Mensaje informativo -->
-        <div v-if="formData.reservation_period" class="mt-4 p-4 rounded-xl text-sm bg-blue-50 text-blue-700"
+        <div v-if="formData.reservation_period" class="mt-4 p-4 rounded-xl text-sm bg-white/10 border-white/10 text-[#06D6A0]"
           v-html="currentMessage">
         </div>
 
@@ -102,7 +102,7 @@
 
         <!-- Botones -->
         <div class="mt-8 flex justify-end gap-4">
-          <button @click="close" class="px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+          <button @click="close" class="px-6 py-3 bg-[#06D6A0]/20 hover:bg-[#06D6A0]/30 rounded-lg">Cancelar</button>
           <button @click="guardarCambios" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700">Guardar
             Cambios</button>
         </div>

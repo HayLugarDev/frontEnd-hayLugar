@@ -2,8 +2,8 @@
   <div v-if="userStore.user" class="relative">
     <!-- Botón de campana -->
     <button @click="toggleMenu"
-            class="relative w-12 h-12 flex items-center justify-center rounded-full transition duration-200">
-      <font-awesome-icon icon="fa-regular fa-bell" class="text-2xl text-gray-400 " />
+            class="relative w-12 h-12 flex items-center justify-center rounded-full transition duration-200 hover:shadow-xl">
+      <font-awesome-icon icon="fa-regular fa-bell" class="text-xl text-gray-400 " />
       <!-- Punto rojo si hay notificaciones sin leer -->
       <span v-if="hasUnreadNotifications && !viewNotification"
             class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping">
@@ -12,7 +12,7 @@
 
     <!-- Dropdown de notificaciones -->
     <ul v-if="openMenu"
-        class="absolute right-0 mt-2 text-md text-gray-800 bg-gray-50 border-2 rounded-xl z-50 w-60 max-h-64 overflow-y-auto animate-fade-in">
+        class="absolute right-0 mt-2 text-md text-gray-200 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] border-2 rounded-xl z-50 w-60 max-h-64 overflow-y-auto animate-fade-in">
       <li v-if="pendingNotifications.length === 0" class="p-4 text-center">
         No hay notificaciones nuevas.
       </li>

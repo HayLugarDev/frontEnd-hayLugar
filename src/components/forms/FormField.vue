@@ -1,6 +1,6 @@
 <template>
-    <label class="block text-gray-500">
-    <span class="text-md font-semibold text-black">{{ label }}</span>
+    <label class="block text-gray-300">
+    <span class="text-md font-semibold text-gray-200">{{ label }}</span>
     <input
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
@@ -8,7 +8,7 @@
       :required="required"
       :placeholder="placeholder"
       :min="'1'"
-      class="input-field"
+      class="input-field bg-white/10 border-white/10"
     />
   </label>
 </template>

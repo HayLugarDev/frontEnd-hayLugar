@@ -1,70 +1,123 @@
 <template>
-  <section class="shadow-xl p-8 xl:p-10 md:rounded-2xl h-max border border-gray-200 bg-white space-y-2">
-    <h2 class="text-2xl font-bold text-primary mb-2">📅 Reservá tu espacio</h2>
-    <p class="text-sm text-gray-600">Completá los siguientes pasos para confirmar tu reserva</p>
+  <section
+    class="p-8 xl:p-10 rounded-2xl bg-[#1B263B]/60 backdrop-blur-xl border border-white/10 shadow-2xl space-y-6 text-white"
+  >
+    <!-- Título -->
+    <div>
+      <h2 class="text-3xl font-bold text-[#00B4D8] tracking-wide">Reservá tu espacio</h2>
+      <p class="text-sm text-gray-300 mt-1">Completá los siguientes pasos para confirmar tu reserva</p>
+    </div>
 
     <!-- Disponibilidad -->
-    <div class="bg-blue-50 border border-blue-300 text-blue-800 rounded-lg px-4 py-3 text-sm font-medium">
-      <div v-if="availability.dateRange && availability.dateRange?.length === 2">
-        <span class="font-semibold">📆 Fechas disponibles:</span>
-        {{ availability.dateRange[0] }} - {{ availability.dateRange[1] }}
-      </div>
-      <div>
-        <span class="font-semibold">⏰ Horarios disponibles:</span>
-        <span v-if="availability.start && availability.end">
-          {{ availability.start }} - {{ availability.end }} hs
+    <div
+      class="bg-[#00B4D8]/10 border border-[#00B4D8]/20 rounded-xl px-5 py-4 text-sm font-medium shadow-lg"
+    >
+      <div v-if="availability.dateRange?.length === 2">
+        <span class="font-semibold text-[#06D6A0]">📆 Fechas disponibles:</span>
+        <span class="text-gray-200 ml-1">
+          {{ availability.dateRange[0] }} → {{ availability.dateRange[1] }}
         </span>
-        <span v-else>No especificados</span>
+      </div>
+
+      <div class="mt-1">
+        <span class="font-semibold text-[#06D6A0]">⏰ Horarios:</span>
+        <span class="text-gray-200 ml-1">
+          {{ availability.start && availability.end
+            ? `${availability.start} - ${availability.end} hs`
+            : "No especificados" }}
+        </span>
       </div>
     </div>
 
     <!-- Selección vehículo y plazo -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <MenuDropdown :modelValue="tipoVehiculo" @update:modelValue="$emit('update:tipoVehiculo', $event)"
-        :options="vehicleOptions" title="🚗 Seleccioná tu vehículo" class="border border-gray-300 rounded-xl" />
-      <MenuDropdown :modelValue="tipoPlazoReserva" @update:modelValue="$emit('update:tipoPlazoReserva', $event)"
-        :options="plazoOptions" title="⏳ ¿Por cuánto tiempo?" class="border border-gray-300 rounded-xl" />
+      <MenuDropdown
+        :modelValue="tipoVehiculo"
+        @update:modelValue="$emit('update:tipoVehiculo', $event)"
+        :options="vehicleOptions"
+        title="🚗 Seleccioná tu vehículo"
+        class="rounded-xl bg-white/5 border border-white/10 text-white"
+      />
+      <MenuDropdown
+        :modelValue="tipoPlazoReserva"
+        @update:modelValue="$emit('update:tipoPlazoReserva', $event)"
+        :options="plazoOptions"
+        title="⏳ ¿Por cuánto tiempo?"
+        class="rounded-xl bg-white/5 border border-white/10 text-white"
+      />
     </div>
 
-    <!-- Selección de fechas -->
+    <!-- Selección fechas -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <!-- CheckIn -->
-      <div class="flex flex-col border border-gray-200 rounded-xl p-3 bg-gray-50">
-        <label class="font-semibold mb-1">Check-in</label>
-        <Datepicker :modelValue="tiempoInicial" @update:modelValue="$emit('update:tiempoInicial', $event)"
-          :enable-time-picker="tipoPlazoReserva === 'Por hora'" :is24="true" :model-type="'timestamp'"
-          :min-date="getMinDate()" :max-date="availability.dateRange ? availability.dateRange[1] : undefined"
-          :min-time="parseTimeString(availability.start)" :max-time="parseTimeString(availability.end)"
-          placeholder="Entrada" />
+      <div
+        class="flex flex-col rounded-xl p-4 bg-white/5 border border-white/10 shadow-md"
+      >
+        <label class="font-semibold text-gray-200 mb-2">Check-in</label>
+
+        <Datepicker
+          :modelValue="tiempoInicial"
+          @update:modelValue="$emit('update:tiempoInicial', $event)"
+          :enable-time-picker="tipoPlazoReserva === 'Por hora'"
+          :is24="true"
+          model-type="timestamp"
+          :min-date="getMinDate()"
+          :max-date="availability.dateRange?.[1]"
+          :min-time="parseTimeString(availability.start)"
+          :max-time="parseTimeString(availability.end)"
+          placeholder="Seleccionar entrada"
+        />
       </div>
 
       <!-- CheckOut -->
-      <div class="flex flex-col border border-gray-200 rounded-xl p-3 bg-gray-50">
-        <label class="font-semibold mb-1">Check-out</label>
-        <Datepicker :modelValue="tiempoFinal" @update:modelValue="$emit('update:tiempoFinal', $event)"
-          :enable-time-picker="tipoPlazoReserva === 'Por hora'" :is24="true" :model-type="'timestamp'"
-          :min-date="tipoPlazoReserva === 'Por hora' && tiempoInicial ? new Date(tiempoInicial) : (availability.dateRange ? availability.dateRange[0] : undefined)"
-          :max-date="tipoPlazoReserva === 'Por hora' && tiempoInicial ? new Date(tiempoInicial) : (availability.dateRange ? availability.dateRange[1] : undefined)"
-          :min-time="tipoPlazoReserva === 'Por hora' && tiempoInicial ? parseTimeString(formatHour(new Date(tiempoInicial))) : parseTimeString(availability.start)"
-          :max-time="parseTimeString(availability.end)" placeholder="Salida" />
+      <div
+        class="flex flex-col rounded-xl p-4 bg-white/5 border border-white/10 shadow-md"
+      >
+        <label class="font-semibold text-gray-200 mb-2">Check-out</label>
+
+        <Datepicker
+          :modelValue="tiempoFinal"
+          @update:modelValue="$emit('update:tiempoFinal', $event)"
+          :enable-time-picker="tipoPlazoReserva === 'Por hora'"
+          :is24="true"
+          model-type="timestamp"
+          :min-date="tipoPlazoReserva === 'Por hora' && tiempoInicial
+            ? new Date(tiempoInicial)
+            : availability.dateRange?.[0]"
+          :max-date="availability.dateRange?.[1]"
+          :min-time="tipoPlazoReserva === 'Por hora' && tiempoInicial
+            ? parseTimeString(formatHour(new Date(tiempoInicial)))
+            : parseTimeString(availability.start)"
+          :max-time="parseTimeString(availability.end)"
+          placeholder="Seleccionar salida"
+        />
       </div>
     </div>
 
     <!-- Tarifa -->
-    <div class="border border-gray-300 rounded-xl px-6 py-4 text-center bg-gray-50">
-      <span class="block text-sm font-semibold text-gray-600">Total estimado</span>
-      <span class="text-3xl font-extrabold text-primary">${{ totalCalculado }}</span>
-      <p class="text-xs text-gray-500 mt-1">El precio puede variar según el plazo y vehículo seleccionado</p>
+    <div
+      class="rounded-xl px-6 py-5 bg-white/5 border border-white/10 text-center shadow-lg"
+    >
+      <span class="block text-sm text-gray-300 mb-1">Total estimado</span>
+      <span class="text-4xl font-extrabold text-[#06D6A0]">
+        ${{ totalCalculado }}
+      </span>
+      <p class="text-xs text-gray-400 mt-1">
+        El precio puede variar según el plazo y vehículo seleccionado
+      </p>
     </div>
 
     <!-- Botón reservar -->
-    <button @click="$emit('reservar')"
-      class="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-indigo-500 to-primary text-white px-6 py-3 rounded-xl text-lg font-bold shadow-md hover:shadow-xl transition-all">
+    <button
+      @click="$emit('reservar')"
+      class="w-full flex justify-center items-center gap-3 bg-gradient-to-r from-[#00B4D8] to-[#06D6A0] text-[#0D1B2A] px-6 py-3 rounded-xl text-xl font-bold shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all"
+    >
       <font-awesome-icon icon="calendar-check" class="text-xl" />
       Reservar Ahora
     </button>
   </section>
 </template>
+
 
 <script setup>
 import MenuDropdown from "../layout/MenuDropdown.vue";

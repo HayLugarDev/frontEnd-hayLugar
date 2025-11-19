@@ -1,98 +1,119 @@
-<!-- src/views/LandingHayLugar.vue -->
 <template>
-  <div class="min-h-screen text-white bg-dark selection:bg-accent/30 selection:text-white">
-    <!-- ===== HERO ===== -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-dark">
-      <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+  <div class="min-h-screen bg-dark text-white selection:bg-accent/30 selection:text-white">
+
+    <!-- ============================ HERO ============================ -->
+    <section class="relative overflow-hidden pt-28 pb-32 bg-gradient-to-br from-primary via-primary/80 to-dark">
+      <div aria-hidden class="pointer-events-none absolute inset-0 -z-10">
         <div class="halo halo--lg"></div>
         <div class="halo halo--sm"></div>
       </div>
 
-      <header class="container mx-auto px-6 pt-10 md:pt-24 pb-12 md:pb-16 grid lg:grid-cols-[1.1fr_.9fr] gap-10 items-center">
+      <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+
+        <!-- IZQUIERDA -->
         <div>
-          <div class="flex items-center gap-4 group">
-            <img :src="logo" alt="HayLugar" class="h-16 w-16 md:h-24 md:w-24 xl:h-28 xl:w-28 transition-transform duration-300 ease-out group-hover:scale-110" />
-            <h1 class="font-extrabold tracking-tight text-4xl md:text-6xl xl:text-7xl leading-[0.95]">
-              Encontrá tu lugar.
+          <div class="flex items-center gap-4">
+            <img :src="logo" alt="HayLugar" class="h-20 w-20 md:h-28 md:w-28 drop-shadow-xl" />
+            <h1 class="font-extrabold tracking-tight leading-[0.9] text-5xl md:text-6xl xl:text-7xl">
+              Movilidad inteligente para un país en movimiento.
             </h1>
           </div>
 
-          <p class="mt-4 text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl">
-            HayLugar conecta personas: quienes necesitan estacionar con quienes tienen un espacio libre.  
-            Una red creada en Argentina que impulsa la microeconomía urbana con confianza, tecnología y comunidad.
+          <p class="mt-6 text-xl text-white/90 leading-relaxed max-w-2xl">
+            HayLugar es la plataforma argentina que integra estacionamientos de <span class="font-bold text-accent">eventos, universidades, industria, calles medidas, playas y cocheras particulares</span> en un único ecosistema en tiempo real.  
+            Tecnología local con impacto urbano real.
           </p>
 
-          <div class="mt-6 flex flex-wrap items-center gap-2">
-            <span class="badge-solid bg-emerald-500">Pagos seguros</span>
-            <span class="badge-solid bg-blue-500">Usuarios verificados</span>
-            <span class="badge-solid bg-amber-500">Soporte humano</span>
-            <span class="badge-solid bg-blue-400">100% argentino</span>
+          <!-- BOTONES -->
+          <div class="mt-8 flex flex-col sm:flex-row gap-3 max-w-lg">
+            <button class="btn btn--accent" @click="goTo('/dashboard')">
+              Ver espacios disponibles
+            </button>
+            <button class="btn btn--ghost" @click="goTo('/login')">
+              Compartir mi espacio
+            </button>
           </div>
 
-          <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-xl">
-            <button class="btn btn--accent w-full sm:w-auto" @click="goTo('/dashboard')">Buscar estacionamiento</button>
-            <button class="btn btn--ghost w-full sm:w-auto" @click="goTo('/login')">Compartir mi espacio</button>
-          </div>
-
-          <div class="mt-6">
-            <p class="text-sm uppercase tracking-wide text-white/90 mb-2">Zonas activas</p>
-            <div class="flex flex-wrap items-center gap-2 text-sm ">
-              <span v-for="(z,i) in zonas" :key="i" class="chip text-white/90">{{ z }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- MAP -->
-        <div>
-          <div class="card glass text-primary">
-            <div class="flex items-center justify-between">
-              <h3 class="h3">Mapa en tiempo real</h3>
-              <span class="text-xs text-white/70">Vista demo</span>
-            </div>
-
-            <div ref="mapWrap" class="mt-4 rounded-lg overflow-hidden shadow-md h-[380px] w-full bg-white/5 ring-1 ring-white/10">
-              <transition name="fade">
-                <CustomGoogleMap
-                  v-if="mapReady"
-                  class="h-full w-full"
-                  :center="center"
-                  :zoom="zoom"
-                  :options="mapOptions"
-                  :locateUser="true"
-                >
-                  <GMapMarker
-                    v-for="espacio in espacios"
-                    :key="espacio.id"
-                    :options="getMarkerOptions(espacio)"
-                    @click="() => handleMarkerClick(espacio)"
-                  />
-                </CustomGoogleMap>
-              </transition>
-              <div v-if="!mapReady" class="h-full w-full grid place-items-center">
-                <div class="skeleton w-10/12 h-4 rounded mb-2"></div>
-                <div class="skeleton w-9/12 h-4 rounded mb-2"></div>
-                <div class="skeleton w-8/12 h-4 rounded"></div>
-              </div>
-            </div>
-
-            <div class="mt-3 flex items-center justify-between">
-              <p class="text-xs text-white/80">* Cada punto representa un espacio compartido por la comunidad.</p>
-              <button class="btn btn--tiny" @click="setCenterToUserLocation">Usar mi ubicación</button>
-            </div>
+          <!-- BADGES -->
+          <div class="mt-6 flex flex-wrap gap-3">
+            <span class="badge bg-emerald-500">Pagos seguros</span>
+            <span class="badge bg-accent">100% argentino</span>
+            <span class="badge bg-blue-500">Usuarios verificados</span>
+            <span class="badge bg-amber-500">Soporte real</span>
           </div>
         </div>
-      </header>
+
+        <!-- DERECHA — MAPA VISUAL -->
+        <div class="relative">
+          <div class="mapCard group">
+            <h3 class="h3">Ecosistema HayLugar</h3>
+            <p class="text-sm text-white/70">Visualización conceptual</p>
+
+            <div class="mapContainer mt-6">
+              <img :src="mapaVisual" alt="Mapa conceptual" class="mapImage" />
+            </div>
+
+            <p class="mt-4 text-xs text-white/80">
+              * Mapa conceptual del ecosistema: eventos, industria, universidades, calles y playas.
+            </p>
+
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- ===== COMO FUNCIONA ===== -->
-    <section class="py-16 bg-white text-gray-900">
+    <!-- ============================ SECCION VERTICALES ============================ -->
+    <section class="py-24 bg-dark/90">
       <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center">¿Cómo funciona HayLugar?</h2>
-        <p class="text-center text-gray-600 mt-2">Tecnología simple para hacer más fácil la vida urbana.</p>
+        <h2 class="text-center text-4xl font-bold mb-4">Un solo país. Muchas realidades.</h2>
+        <p class="text-center text-white/70 max-w-2xl mx-auto">
+          Cada vertical de HayLugar responde a un problema real de movilidad.  
+          Todo en un mismo ecosistema.
+        </p>
 
-        <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div v-for="(p,i) in pasos" :key="i" class="card-step">
-            <div class="step-number">{{ i+1 }}</div>
+        <div class="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+          <!-- EVENTOS -->
+          <div class="verticalCard">
+            <img :src="imgEventos" class="verticalImg" alt="Eventos">
+            <h3 class="verticalTitle">Eventos Masivos</h3>
+            <p class="verticalDesc">Festivales, recitales y estadios con estacionamientos organizados y precios claros.</p>
+          </div>
+
+          <!-- INDUSTRIAL -->
+          <div class="verticalCard">
+            <img :src="imgIndustrial" class="verticalImg" alt="Industrial">
+            <h3 class="verticalTitle">Parques Industriales</h3>
+            <p class="verticalDesc">Gestión de flotas, accesos, turnos y espacios logísticos internos.</p>
+          </div>
+
+          <!-- UNIVERSIDADES -->
+          <div class="verticalCard">
+            <img :src="imgUniversidades" class="verticalImg" alt="Universidades">
+            <h3 class="verticalTitle">Universidades</h3>
+            <p class="verticalDesc">Acceso por legajo, capacidad en tiempo real y movilidad estudiantil ordenada.</p>
+          </div>
+
+          <!-- MEDIDO -->
+          <div class="verticalCard">
+            <img :src="imgMedido" class="verticalImg" alt="Medido">
+            <h3 class="verticalTitle">Estacionamiento Medido</h3>
+            <p class="verticalDesc">Calles con disponibilidad real y pagos integrados en segundos.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ COMO FUNCIONA ============================ -->
+    <section class="py-24 bg-white text-gray-900">
+      <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center">¿Cómo funciona?</h2>
+        <p class="text-center text-gray-600 mt-2">Una única lógica, múltiples verticales.</p>
+
+        <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div v-for="(p, i) in pasos" :key="i" class="card-step">
+            <div class="step-number">{{ i + 1 }}</div>
             <h4 class="title">{{ p.title }}</h4>
             <p class="desc">{{ p.desc }}</p>
           </div>
@@ -100,131 +121,162 @@
       </div>
     </section>
 
-    <!-- ===== TESTIMONIOS ===== -->
-    <section class="py-16 bg-gray-50 text-gray-900">
+    <!-- ============================ TESTIMONIOS ============================ -->
+    <section class="py-24 bg-gray-100 text-gray-900">
       <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center">Lo que dicen quienes ya usan HayLugar</h2>
-        <p class="text-center text-gray-600 mt-2">Confianza real, historias reales.</p>
+        <h2 class="text-3xl font-bold text-center">Historias reales.</h2>
+        <p class="text-center text-gray-600 mt-2">Impacto real en ciudades reales.</p>
 
         <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="(t,i) in testimonios" :key="i" class="testimonial-card">
+          <div v-for="(t, i) in testimonios" :key="i" class="testimonial-card">
             <p class="text-gray-700 italic leading-relaxed">“{{ t.text }}”</p>
             <div class="flex items-center gap-3 mt-4">
-              <div>
-                <p class="font-semibold text-gray-900">{{ t.name }}</p>
-                <p class="text-sm text-gray-600">{{ t.city }}</p>
-              </div>
+              <p class="font-semibold text-gray-900">{{ t.name }}</p>
+              <p class="text-sm text-gray-600">{{ t.city }}</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===== CTA FINAL ===== -->
-    <section class="py-16 bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
-      <div class="container mx-auto px-6 text-center">
-        <h3 class="text-3xl md:text-4xl font-bold">Un movimiento que empezó en los barrios y llega a todo el país</h3>
-        <p class="mt-3 text-white/90 max-w-2xl mx-auto">
-          Sumate a la red inteligente de estacionamientos.  
-          Porque cuando compartimos espacio, ganamos todos.
+    <!-- ============================ CTA FINAL ============================ -->
+    <section class="py-20 bg-gradient-to-br from-primary via-primary/80 to-dark text-white">
+      <div class="container mx-auto px-6 text-center max-w-3xl">
+        <h3 class="text-4xl font-bold">
+          Estacionar nunca fue tan simple.  
+          Compartir nunca fue tan útil.
+        </h3>
+
+        <p class="mt-4 text-white/90">
+          Sumate a la movilidad inteligente de Argentina: más eficiente, más humana, más conectada.
         </p>
-        <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <button class="btn btn--accent w-full sm:w-auto" @click="goTo('/dashboard')">Buscar estacionamiento</button>
-          <button class="btn btn--ghost w-full sm:w-auto" @click="goTo('/login')">Compartir mi espacio</button>
+
+        <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+          <button class="btn btn--accent" @click="goTo('/dashboard')">Explorar espacios</button>
+          <button class="btn btn--ghost" @click="goTo('/login')">Ofrecer mi espacio</button>
         </div>
       </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
+    <!-- FOOTER -->
     <footer class="border-t border-white/10 bg-dark text-white/70">
       <div class="container mx-auto px-6 py-6 text-center text-sm">
-        © {{ currentYear }} HayLugar · La nueva microeconomía urbana — Tecnología argentina con impacto social
-      </div>
-      <div class="border-t border-white/10">
-        <div class="container mx-auto px-6 py-4 text-center text-sm flex flex-col md:flex-row items-center justify-center gap-3">
-          <RouterLink to="/cookies" class="hover:text-white transition-colors">Política de Cookies</RouterLink>
-          <RouterLink to="/PrivacyPolicy" class="hover:text-white transition-colors">Política de Privacidad</RouterLink>
-          <RouterLink to="/termsConditions" class="hover:text-white transition-colors">Términos y Condiciones</RouterLink>
-          <RouterLink to="/FAQView" class="hover:text-white transition-colors">Preguntas Frecuentes</RouterLink>
-        </div>
+        © {{ currentYear }} HayLugar · Movilidad inteligente — Argentina
       </div>
     </footer>
 
     <CookieBanner />
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import CustomGoogleMap from '../components/layout/GoogleMap.vue'
-import CookieBanner from '../components/common/CookieBanner.vue'
-import logo from '../assets/logo.png'
-import logoMarker from '../assets/logo.png'
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 
-type Espacio = { id: number; name: string; latitude: number; longitude: number; price_per_hour: number }
+import CookieBanner from "../components/common/CookieBanner.vue";
+import logo from "../assets/logo.png";
 
-const router = useRouter()
-const goTo = (path: string) => router.push(path)
-const currentYear = computed(() => new Date().getFullYear())
-const zonas = ['Centro', 'Plaza', 'Costanera', 'Parque']
+
+import mapaVisual from "../../assets/mapa-visual.png";
+
+// Verticales
+import imgEventos from "../../assets/industry.png";
+import imgIndustrial from "../../assets/events.png";
+import imgUniversidades from "../../assets/universidad.png";
+import imgMedido from "../../assets/medido.png";
+
+const router = useRouter();
+const goTo = (path: string) => router.push(path);
+
+const currentYear = computed(() => new Date().getFullYear());
 
 const pasos = ref([
-  { title: 'Encontrá un espacio', desc: 'Abrí el mapa y elegí el lugar más cercano.' },
-  { title: 'Reservá desde tu celular', desc: 'En segundos, sin efectivo ni llamadas.' },
-  { title: 'Estacioná tranquilo', desc: 'Tu lugar te espera y tu pago está asegurado.' },
-  { title: 'Generá ingresos', desc: 'Si tenés un espacio libre, compartilo y ganá.' },
-])
+  { title: "Elegí tu espacio", desc: "Eventos, calles, universidades, industria o cocheras privadas." },
+  { title: "Reservá al instante", desc: "Pagos seguros con tarjeta, QR o saldo HayLugar." },
+  { title: "Accedé sin demoras", desc: "Códigos, QR o acceso directo según vertical." },
+  { title: "Generá ingresos", desc: "Compartí tu lugar cuando no lo usás." },
+]);
 
 const testimonios = ref([
-  { text: 'Empecé compartiendo la cochera de mi casa en Yerba Buena. En un mes ya tenía ingresos fijos y vecinos nuevos.', name: 'Laura M.', city: 'Yerba Buena, Tucumán' },
-  { text: 'Trabajo en el centro y perdía horas buscando lugar. Con HayLugar reservo antes de salir y estaciono sin vueltas.', name: 'Diego R.', city: 'Córdoba Capital' },
-  { text: 'Soy estudiante y alquilo mi cochera cuando no la uso. Es ingreso extra y ayuda a otros.', name: 'Lucía F.', city: 'San Miguel de Tucumán' },
-])
-
-const center = ref({ lat: -34.6037, lng: -58.3816 })
-const zoom = ref(13)
-const mapOptions = ref({
-  styles: [{ elementType: 'geometry', stylers: [{ color: '#eaeaea' }] }],
-  disableDefaultUI: true,
-  zoomControl: true,
-})
-const espacios = ref([
-  { id: 1, name: 'Centro', latitude: -34.6037, longitude: -58.3816, price_per_hour: 500 },
-  { id: 2, name: 'Parque', latitude: -34.601, longitude: -58.385, price_per_hour: 400 },
-])
-const handleMarkerClick = (espacio: Espacio) => router.push({ path: '/dashboard', query: { lat: espacio.latitude, lng: espacio.longitude } })
-const getMarkerOptions = (espacio: Espacio) => ({ position: { lat: espacio.latitude, lng: espacio.longitude }, icon: { url: logoMarker, scaledSize: { width: 40, height: 40 } as any } })
-const setCenterToUserLocation = () => { if (!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(pos => (center.value = { lat: pos.coords.latitude, lng: pos.coords.longitude })) }
-
-const mapReady = ref(false)
-const mapWrap = ref<HTMLElement | null>(null)
-onMounted(() => {
-  if (!mapWrap.value) return
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { mapReady.value = true; io.disconnect() } })
-  }, { rootMargin: '200px' })
-  io.observe(mapWrap.value)
-})
+  { text: "En los recitales perdíamos una hora estacionando. HayLugar ordenó todo.", name: "Martín S.", city: "Córdoba" },
+  { text: "En mi parque industrial ahora los camiones entran con turnos y todo fluye.", name: "Valeria G.", city: "Tucumán" },
+  { text: "Soy estudiante y por fin consigo lugar en el campus sin dar vueltas.", name: "Luisa P.", city: "Salta" },
+]);
 </script>
 
 <style scoped>
-.btn{ @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 font-semibold transition-all duration-200; }
-.btn--ghost{ @apply bg-white/10 text-white border border-white/30 hover:bg-white/15 hover:shadow; }
-.btn--accent{ @apply bg-accent text-white hover:bg-accent/90 hover:shadow; }
-.btn--tiny{ @apply text-xs px-3 py-1 rounded-full border border-white/70 hover:border-accent; }
-.badge-solid{ @apply text-xs font-semibold tracking-wide uppercase rounded-full px-3 py-1 shadow-sm; }
-.chip{ @apply rounded-full px-3 py-1 border border-white/20 bg-white/10 backdrop-blur-sm shadow-sm; }
-.card{ @apply rounded-2xl bg-white/80 backdrop-blur-md p-6 shadow ring-1 ring-white/10; }
-.card-step{ @apply bg-white rounded-2xl p-6 shadow ring-1 ring-gray-100 text-center; }
-.step-number{ @apply h-10 w-10 mx-auto mb-3 rounded-full bg-accent/10 text-accent font-bold grid place-items-center; }
-.testimonial-card{ @apply bg-white rounded-2xl p-6 shadow ring-1 ring-gray-100 transition hover:-translate-y-1 hover:shadow-lg; }
-.h3{ @apply text-xl font-bold text-gray-900; }
-.halo{ @apply absolute rounded-full blur-3xl; animation: float 12s ease-in-out infinite; }
-.halo--lg{ @apply -right-40 -top-40 h-[28rem] w-[28rem] bg-white/10; }
-.halo--sm{ @apply -left-32 -bottom-40 h-[26rem] w-[26rem] bg-accent/20; }
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(12px)}}
-.skeleton{ @apply animate-pulse bg-gradient-to-r from-white/10 via-white/5 to-white/10 rounded; }
-.fade-enter-active,.fade-leave-active{transition:opacity .25s ease;}
-.fade-enter-from,.fade-leave-to{opacity:0;}
+/* Buttons */
+.btn {
+  @apply inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold transition-all duration-200;
+}
+.btn--ghost {
+  @apply bg-white/10 text-white border border-white/30 hover:bg-white/20 hover:shadow;
+}
+.btn--accent {
+  @apply bg-accent text-white hover:bg-accent/90 hover:shadow-lg;
+}
+.badge {
+  @apply text-xs font-semibold uppercase rounded-full px-3 py-1 shadow-sm;
+}
+
+/* Map */
+.mapCard {
+  @apply rounded-2xl bg-white/10 backdrop-blur-md p-6 shadow-xl border border-white/10 transition transform;
+}
+.mapContainer {
+  @apply rounded-xl overflow-hidden bg-black/20 p-3 shadow-md;
+}
+.mapImage {
+  @apply w-full h-full object-cover rounded-xl drop-shadow-lg;
+}
+
+/* Vertical cards */
+.verticalCard {
+  @apply bg-white/5 rounded-2xl p-5 shadow-lg border border-white/10 hover:border-accent/60 hover:shadow-xl transition;
+}
+.verticalImg {
+  @apply rounded-xl mb-4 w-full h-40 object-cover;
+}
+.verticalTitle {
+  @apply text-xl font-bold mb-2;
+}
+.verticalDesc {
+  @apply text-white/70;
+}
+
+/* Steps */
+.card-step {
+  @apply bg-white rounded-2xl p-6 shadow-md text-center ring-1 ring-gray-100;
+}
+.step-number {
+  @apply h-12 w-12 mx-auto mb-3 rounded-full bg-accent/10 text-accent font-bold grid place-items-center text-lg;
+}
+.title {
+  @apply font-bold text-gray-900 mb-1;
+}
+.desc {
+  @apply text-gray-700;
+}
+
+/* Testimonials */
+.testimonial-card {
+  @apply bg-white rounded-2xl p-6 shadow ring-1 ring-gray-100 hover:shadow-lg transition;
+}
+
+/* Halos */
+.halo {
+  @apply absolute rounded-full blur-3xl;
+  animation: float 12s ease-in-out infinite;
+}
+.halo--lg {
+  @apply -right-40 -top-40 h-[28rem] w-[28rem] bg-white/10;
+}
+.halo--sm {
+  @apply -left-32 -bottom-40 h-[26rem] w-[26rem] bg-accent/20;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(12px); }
+}
 </style>

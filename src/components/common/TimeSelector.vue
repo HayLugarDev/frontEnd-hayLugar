@@ -1,29 +1,51 @@
 <template>
   <Teleport to="body">
-    <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div class="bg-white rounded-2xl shadow-xl w-[300px] max-h-[80vh] flex flex-col overflow-hidden">
-        <div class="px-4 py-3 border-b text-primary font-bold text-lg">Seleccioná horario</div>
+    <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center 
+             bg-black/40 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl shadow-xl w-[300px] max-h-[80vh] 
+               flex flex-col overflow-hidden border border-gray-200">
+        <!-- Header -->
+        <div class="px-4 py-3 border-b bg-gray-50 text-primary font-bold text-lg">
+          Seleccioná horario
+        </div>
 
+        <!-- Content -->
         <div class="flex justify-center items-center flex-1 overflow-hidden">
           <div class="flex gap-4 px-4 py-6">
+
             <!-- Horas -->
-            <select v-model="selectedHour" class="scroll-picker">
-              <option v-for="h in validHours" :key="h" :value="h">{{ h.toString().padStart(2, '0') }}</option>
+            <select v-model="selectedHour" class="scroll-picker bg-gray-100 text-black rounded-xl px-3 py-2 
+                     border border-gray-300 shadow-sm focus:ring-2 
+                     focus:ring-primary/50 focus:border-primary transition">
+              <option v-for="h in validHours" :key="h" :value="h">
+                {{ h.toString().padStart(2, '0') }}
+              </option>
             </select>
 
-            <span class="text-xl font-bold">:</span>
+            <span class="text-xl font-bold text-gray-600">:</span>
 
             <!-- Minutos -->
-            <select v-model="selectedMinute" class="scroll-picker">
-              <option v-for="m in validMinutes" :key="m" :value="m">{{ m.toString().padStart(2, '0') }}</option>
+            <select v-model="selectedMinute" class="scroll-picker bg-gray-100 text-black rounded-xl px-3 py-2 
+                     border border-gray-300 shadow-sm focus:ring-2 
+                     focus:ring-primary/50 focus:border-primary transition">
+              <option v-for="m in validMinutes" :key="m" :value="m">
+                {{ m.toString().padStart(2, '0') }}
+              </option>
             </select>
+
           </div>
         </div>
 
-        <div class="border-t px-4 py-3 flex justify-between">
-          <button @click="close" class="text-sm text-gray-500 hover:text-primary">Cancelar</button>
-          <button @click="confirm" class="text-sm text-primary font-semibold">Confirmar</button>
+        <!-- Footer -->
+        <div class="border-t px-4 py-3 flex justify-between bg-gray-50">
+          <button @click="close" class="text-sm text-gray-500 hover:text-primary transition">
+            Cancelar
+          </button>
+          <button @click="confirm" class="text-sm text-primary font-semibold hover:opacity-80 transition">
+            Confirmar
+          </button>
         </div>
+
       </div>
     </div>
   </Teleport>
@@ -101,6 +123,7 @@ function confirm() {
   text-align: center;
   appearance: none;
 }
+
 .scroll-picker::-webkit-scrollbar {
   width: 0;
 }

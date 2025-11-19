@@ -1,6 +1,6 @@
 <template>
   <header
-    class="bg-gray-50 gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 pt-6 pb-2 xl:px-16 fixed md:static shadow-md md:shadow-none rounded-b-xl">
+    class="bg-gray-900/90 border-t border-white/20  gap-4 w-full z-50 hidden md:flex md:flex-row justify-between items-center border-b-2 px-6 pt-6 pb-2 xl:px-16 fixed md:static shadow-md md:shadow-none rounded-b-xl">
     <Logo width="12" @click="router.push('/dashboard')"
       class="hidden md:block" />
       <div v-if="routeConfig.showSalirButton" @click="router.push('/dashboard')" class="w-full flex flex-row justify-end">
@@ -15,7 +15,7 @@
         <div class="">
           <!-- Botón visible solo en mobile -->
           <button @click="showMobileMenu = true"
-            class="block md:hidden w-12 h-12 rounded-full text-2xl">
+            class="block md:hidden w-12 h-12 rounded-full text-2xl hover:shadow-xl">
             <font-awesome-icon icon="fa-align-justify" />
           </button>
 
@@ -25,7 +25,7 @@
       </div>
       <div class="flex flex-row gap-1">
         <font-awesome-icon icon="fa-regular fa-circle-question"
-          class="p-3 w-6 h-6 rounded-full cursor-pointer text-gray-400" @click="openHelp" />
+          class="p-3 w-5 h-5 flex justify-center rounded-full cursor-pointer text-gray-400" @click="openHelp" />
         <NotificationDropdown v-if="routeConfig.showNotificationButton" />
         <MapButton :text="buttonText" color="gray-800" @click="toggleMap" class="md:hidden" />
         <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />

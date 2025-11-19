@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex flex-col max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
+        class="flex flex-col max-w-xl mx-auto h-screen bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
         <!-- Título -->
         <div class="text-center">
             <h1 class="text-primary text-3xl sm:text-4xl font-bold mb-2">

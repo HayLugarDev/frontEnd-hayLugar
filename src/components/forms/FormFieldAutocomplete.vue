@@ -1,8 +1,8 @@
 <template>
-  <label class="block mt-4 text-gray-500">
-    <span class="text-md font-semibold text-black">{{ label }}</span>
+  <label class="block mt-4 text-gray-400">
+    <span class="text-md font-semibold text-gray-200">{{ label }}</span>
     <GMapAutocomplete
-      class="input-field"
+      class="input-field bg-white/10 border-white/10"
       :placeholder="modelValue"
       @place_changed="setAddress"
     />
