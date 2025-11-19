@@ -1,15 +1,15 @@
 <template>
   <div
-    class="border border-gray-200 bg-white rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md relative overflow-hidden">
+    class="border border-gray-200 bg-white/10 border-white/10 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md relative overflow-hidden">
     <div class="flex justify-between items-center cursor-pointer px-5 py-4" @click="toggleExpanded">
       <div>
-        <h2 class="text-lg sm:text-xl font-semibold text-gray-800">
+        <h2 class="text-lg sm:text-xl font-semibold text-gray-200">
           {{ title }}
         </h2>
-        <p class="text-gray-500 text-sm">{{ text }}</p>
+        <p class="text-gray-400 text-sm">{{ text }}</p>
 
         <transition name="fade">
-          <p v-if="configured" class="text-emerald-600 mt-1 text-sm font-medium">
+          <p v-if="configured" class="text-[#06D6A0] mt-1 text-sm font-medium">
             ✅ Configurado: capacidad {{ configuration.capacity }},
             ${{ configuration.price_per_hour }}/hora
           </p>
@@ -25,28 +25,28 @@
     </div>
 
     <transition name="expand">
-      <div v-if="expanded" class="px-5 pb-5 space-y-3 bg-gray-50 rounded-b-2xl">
+      <div v-if="expanded" class="px-5 pb-5 space-y-3 bg-white/10 border-white/10 rounded-b-2xl">
         <div class="pt-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium text-gray-200 mb-1">
             Capacidad
           </label>
           <input type="number" v-model="localConfig.capacity"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+            class="bg-white/10 border-white/10 w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
             placeholder="Cantidad de vehículos" />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium text-gray-200 mb-1">
             Precio por hora ($)
           </label>
           <input type="number" v-model="localConfig.price_per_hour"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+            class="bg-white/10 border-white/10 w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
             placeholder="Precio" />
         </div>
 
         <div class="flex justify-end gap-2 pt-2">
           <button
-            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 active:scale-95 transition-all"
+            class="px-4 py-2 bg-[#06D6A0]/20 text-white rounded-lg text-sm font-medium hover:bg-gray-300 active:scale-95 transition-all"
             @click="cancel">
             Cancelar
           </button>

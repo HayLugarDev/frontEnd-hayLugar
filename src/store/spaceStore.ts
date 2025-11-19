@@ -293,7 +293,7 @@ export const useSpaceStore = defineStore('space', {
 
     async isFavorite(spaceId: number) {
       if (this.favorites.length === 0) await this.fetchFavoriteSpaces();
-      return this.favorites.some((fav: any) => fav.id === spaceId);
+      return this.favorites.some((fav: any) => fav.space_id === spaceId);
     },
 
     /**

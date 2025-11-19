@@ -1,10 +1,15 @@
-<!-- src/views/IndustrialDashboard.vue -->
 <template>
+
+  <!-- HEADER SOLO EN DESKTOP -->
+  <MainHeader class="hidden md:block" />
+
+  <!-- MENÚ INFERIOR MOBILE -->
+  <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
+
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
     <!-- ===== HEADER ===== -->
     <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <img :src="logo" alt="HayLugar" class="h-10 w-10" />
         <h1 class="text-2xl md:text-3xl font-semibold tracking-wide">Parques Industriales</h1>
       </div>
 
@@ -192,6 +197,8 @@ import { useSpaceStore } from '../store/spaceStore'
 import { storeToRefs } from 'pinia'
 import logo from '../assets/logo.png'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue'
+import MainHeader from '../components/layout/header/MainHeader.vue'
 
 const router = useRouter()
 const spaceStore = useSpaceStore()

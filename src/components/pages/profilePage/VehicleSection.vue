@@ -1,13 +1,13 @@
 <template>
-  <section class="lg:bg-white p-4 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3">
+  <section class="bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white p-4 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3">
 
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+        <h2 class="hidden text-2xl font-bold text-gray-200 md:flex items-center gap-2">
           <font-awesome-icon :icon="['fas', 'car']" />
           Vehículos
         </h2>
-        <p class="text-sm text-gray-600 px-4">Gestioná tus vehículos para poder realizar reseras en HayLugar</p>
+        <p class="text-sm text-gray-400 px-4">Gestioná tus vehículos para poder realizar reseras en HayLugar</p>
       </div>
     </div>
 
@@ -26,7 +26,7 @@
           Agregar
         </button>
         <button v-if="!modoEdicion && vehiculos.length" @click="editVehicles"
-          class="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded-xl shadow hover:bg-yellow-500 transition-all">
+          class="flex items-center gap-2 bg-[#06D6A0]/30 hover:bg-[#06D6A0]/40 text-white px-4 py-2 rounded-xl shadow transition-all">
           <font-awesome-icon :icon="['fas', 'pen-to-square']" />
           Editar
         </button>
@@ -41,7 +41,7 @@
     <!-- Lista de Vehículos -->
     <div v-if="vehiculos.length" class="space-y-2">
       <div v-for="(vehiculo, index) in vehiculos" :key="index"
-        class="border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 bg-gradient-to-b from-white to-gray-50">
+        class="rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 bg-white/5 backdrop-blur-sm">
         <!-- Vista normal -->
         <div v-if="!modoEdicion" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
           <div v-for="(item, i) in [
@@ -50,13 +50,13 @@
             { icon: 'palette', label: 'Color', value: vehiculo.color || 'No especificado' },
             { icon: 'id-card', label: 'Patente', value: vehiculo.license_plate || 'No aplica' }
           ]" :key="i"
-            class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-all">
+            class="flex items-center gap-3 p-3 bg-white/10 border-white/10 rounded-xl border transition-all">
             <div class="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-full">
-              <font-awesome-icon :icon="item.icon" class="text-primary text-md" />
+              <font-awesome-icon :icon="item.icon" class="text-[#06D6A0] text-md" />
             </div>
-            <div class="flex flex-col">
-              <span class="text-sm text-gray-500 font-medium">{{ item.label }}</span>
-              <span class="text-base font-semibold text-gray-800">{{ item.value }}</span>
+            <div class="flex flex-col ">
+              <span class="text-sm text-gray-200 font-medium">{{ item.label }}</span>
+              <span class="text-base font-semibold text-gray-100">{{ item.value }}</span>
             </div>
           </div>
         </div>

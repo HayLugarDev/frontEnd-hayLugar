@@ -1,7 +1,7 @@
 <template>
   <button @click="goBack"
-    class="md:hidden text-gray-600 sm:text-md hover:shadow-lg py-2 px-4 rounded-full cursor-pointer">
-    Atrás
+    class="md:hidden text-gray-400 sm:text-md py-2 px-4 rounded-full cursor-pointer">
+    Regresar
   </button>
 </template>
 

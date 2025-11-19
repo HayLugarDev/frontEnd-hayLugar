@@ -7,7 +7,7 @@
 @layer components {
   /* Inputs */
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg
+    @apply w-full px-4 py-2 border border-gray-300 bg-gray-300 rounded-lg
       focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
       transition-all duration-200;
   }
@@ -192,3 +192,34 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.35s ease-out;
+}
+
+/* Glow para estrellas activas */
+.drop-shadow-glow {
+  filter: drop-shadow(0 0 6px #facc15aa);
+}
+
