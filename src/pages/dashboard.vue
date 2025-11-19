@@ -37,11 +37,7 @@
         class="hidden md:grid md:grid-cols-11 px-8 py-4 items-center gap-4
                bg-white/5 backdrop-blur-xl shadow-xl border-b border-white/10"
       >
-        <span class="anton-regular col-span-6 lg:text-4xl text-3xl text-white px-4">
-          <font-awesome-icon icon="map-marker-alt" class="text-4xl text-[#06D6A0]" />
-          Encontrá tu próximo estacionamiento...
-        </span>
-
+       
         <CustomInputGroup
           v-model:searchQuery="searchQuery"
           v-model:checkIn="checkIn"
@@ -70,7 +66,7 @@
                    bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl
                    hover:bg-white/20 hover:border-[#00B4D8] hover:shadow-[0_0_20px_#00B4D855]
                    transition-all duration-300">
-            <ParkingSquare class="w-7 h-7 text-[#00B4D8]" />
+            <ParkingMeter class="w-7 h-7 text-[#00B4D8]" />
             <span class="text-white font-semibold text-sm mt-1">Medido</span>
             <span class="text-gray-300 text-xs">Calles en tiempo real</span>
           </button>
@@ -94,7 +90,15 @@
             <span class="text-white font-semibold text-sm mt-1">Industrial</span>
             <span class="text-gray-300 text-xs">Operaciones en tiempo real</span>
           </button>
-
+            <button @click="router.push('/playa-dashboard')"
+            class="flex flex-col items-center justify-center px-5 py-4 min-w-[150px]
+                   bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl
+                   hover:bg-white/20 hover:border-[#8ECAE6] hover:shadow-[0_0_20px_#8ECAE655]
+                   transition-all duration-300">
+            <ParkingSquare class="w-7 h-7 text-[#8ECAE6]" />
+            <span class="text-white font-semibold text-sm mt-1">Playas de Estacionamientos</span>
+            <span class="text-gray-300 text-xs">Operaciones en tiempo real</span>
+          </button>
         </div>
       </div>
 
@@ -199,7 +203,7 @@ import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobi
 import WelcomeSpeech from '../components/layout/WelcomeSpeech.vue';
 import { useSpaceStore } from '../store/spaceStore';
 import { storeToRefs } from 'pinia'
-import { School, ParkingSquare, Ticket, Factory } from 'lucide-vue-next'
+import { School, ParkingSquare, Ticket, Factory, ParkingMeter } from 'lucide-vue-next'
 
 const router = useRouter();
 const spaceStore = useSpaceStore();

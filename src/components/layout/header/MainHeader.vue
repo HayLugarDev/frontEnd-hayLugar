@@ -1,55 +1,78 @@
 <template>
   <header
-    class="bg-gray-50 gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 pt-6 pb-2 xl:px-16 fixed md:static shadow-md md:shadow-none rounded-b-xl">
-    <Logo width="12" @click="router.push('/dashboard')"
-      class="hidden md:block" />
-      <div v-if="routeConfig.showSalirButton" @click="router.push('/dashboard')" class="w-full flex flex-row justify-end">
-        <button
-          class="text-gray-600 sm:text-md hover:shadow-lg py-2 px-4 rounded-full cursor-pointer">
-          Salir
-        </button>
-      </div>
-    <div v-if="authChecked" class="flex flex-row justify-between gap-2">
-      <div v-if="route.path !== '/add-space' && route.path !== '/add-vehicle'"
-        class="relative flex flex-row sm:gap-2 items-center max-h-12 text-gray-800">
-        <div class="">
-          <!-- Botón visible solo en mobile -->
-          <button @click="showMobileMenu = true"
-            class="block md:hidden w-12 h-12 rounded-full text-2xl">
-            <font-awesome-icon icon="fa-align-justify" />
-          </button>
+    class="w-full z-50 fixed md:static top-0 left-0
+           bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+           text-white border-b border-white/10 shadow-lg md:shadow-none
+           px-6 pt-5 pb-4 xl:px-16 flex items-center justify-between gap-6">
 
-          <!-- Menú lateral en mobile -->
-          <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
-        </div>
-      </div>
-      <div class="flex flex-row gap-1">
-        <font-awesome-icon icon="fa-regular fa-circle-question"
-          class="p-3 w-6 h-6 rounded-full cursor-pointer text-gray-400" @click="openHelp" />
-        <NotificationDropdown v-if="routeConfig.showNotificationButton" />
-        <MapButton :text="buttonText" color="gray-800" @click="toggleMap" class="md:hidden" />
-        <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
-        <BackButton v-if="routeConfig.showBackButton" />
-      </div>
+    <!-- LEFT: LOGO + TITULO -->
+    <div class="flex items-center gap-4 cursor-pointer" @click="router.push('/dashboard')">
+      <Logo width="14" class="drop-shadow-lg" />
+
+      <!-- Texto principal -->
+      <span
+        class="hidden md:block font-bold tracking-tight text-xl lg:text-3xl 
+               text-white hover:text-accent transition-colors duration-200">
+        Encontrá tu próximo estacionamiento
+      </span>
     </div>
-    <template v-else>
-      <!-- Skeleton Loader -->
-      <div
-        class="hidden md:flex justify-between items-center border-b-2 px-4 pt-6 md:pt-2 xl:px-10 xl:mx-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
-        <!-- Logo placeholder -->
-        <div class="w-16 h-10 bg-gray-400 rounded"></div>
 
-        <!-- Botones de usuario placeholder -->
-        <div class="flex gap-4 items-center">
-          <div class="w-24 h-10 bg-gray-400 rounded-full"></div>
-          <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
-        </div>
+    <!-- RIGHT AREA: MENÚ/ BOTONES -->
+    <div v-if="authChecked" class="flex items-center gap-2 md:gap-3">
+
+      <!-- Botón menú mobile -->
+      <button 
+        @click="showMobileMenu = true"
+        class="block md:hidden w-12 h-12 rounded-full text-2xl text-white/80 hover:text-white"
+      >
+        <font-awesome-icon icon="fa-align-justify" />
+      </button>
+
+      <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
+
+      <!-- Botón ayuda -->
+      <font-awesome-icon 
+        icon="fa-regular fa-circle-question"
+        class="p-3 w-6 h-6 rounded-full cursor-pointer text-white/50 hover:text-white transition"
+        @click="openHelp"
+      />
+
+      <!-- Notificaciones -->
+      <NotificationDropdown v-if="routeConfig.showNotificationButton" />
+
+      <!-- Botón mapa (mobile only) -->
+      <MapButton 
+        :text="buttonText"
+        color="white" 
+        background="primary"
+        @click="toggleMap"
+        class="md:hidden"
+      />
+
+      <!-- Menú usuario -->
+      <UserMenu 
+        v-if="routeConfig.showUserMenuButton"
+        @navigate="handleNavigate"
+      />
+
+      <!-- Botón volver -->
+      <BackButton v-if="routeConfig.showBackButton" />
+    </div>
+
+    <!-- LOADER -->
+    <template v-else>
+      <div class="flex items-center gap-4 animate-pulse">
+        <div class="w-10 h-10 bg-white/20 rounded-full"></div>
+        <div class="w-24 h-8 bg-white/20 rounded-lg"></div>
       </div>
     </template>
+
   </header>
+
   <HelpModal :visible="activatedModal" @close="activatedModal = false" />
   <SessionExpired :sessionExpired="isSessionInvalid" />
 </template>
+
 
 <script setup lang="ts">
 import Logo from '../Logo.vue';
