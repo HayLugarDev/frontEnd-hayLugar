@@ -7,7 +7,7 @@
 
     <!-- LEFT: LOGO + TITULO -->
     <div class="flex items-center gap-4 cursor-pointer" @click="router.push('/dashboard')">
-      <Logo width="14" class="drop-shadow-lg" />
+      <Logo width="20" class="drop-shadow-lg" />
 
       <!-- Texto principal -->
       <span

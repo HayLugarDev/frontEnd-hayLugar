@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-[#0D1B2A] to-[#1B263B] text-white relative">
     <!-- Header -->
+      <MainHeader class="hidden md:block" />
     <header
       class="sticky top-0 z-30 flex items-center justify-between px-6 md:px-12 py-4 border-b border-white/10 backdrop-blur-md bg-[#0D1B2A]/80"
     >
@@ -313,6 +314,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import MainHeader from '../components/layout/header/MainHeader.vue'
 import {
   getEvent,
   getZones,

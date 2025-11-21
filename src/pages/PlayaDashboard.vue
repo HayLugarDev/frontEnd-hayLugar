@@ -1,21 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
     <!-- ===== HEADER ===== -->
-    <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img :src="logo" alt="HayLugar" class="h-10 w-10" />
-        <h1 class="text-2xl md:text-3xl font-semibold tracking-wide">
-          Playas de Estacionamiento
-        </h1>
-      </div>
-
-      <button
-        class="hidden md:flex items-center gap-2 bg-[#00B4D8]/15 hover:bg-[#00B4D8]/25 px-4 py-2 rounded-xl transition-all"
-      >
-       
-        <span class="text-sm font-medium">Movilidad Urbana Inteligente</span>
-      </button>
-    </header>
+    <MainHeader class="hidden md:block" />
 
     <!-- ===== HERO ===== -->
     <section class="relative w-full h-[240px] md:h-[320px] overflow-hidden flex items-center justify-center">
@@ -214,6 +200,7 @@ import logo from '../assets/logo.png'
 import logoMarker from '../assets/logo.png'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
 import { getAllParkingLots } from '../services/playaService'
+import MainHeader from '../components/layout/header/MainHeader.vue'
 
 const router = useRouter()
 

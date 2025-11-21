@@ -34,10 +34,6 @@
       <!-- BUSCADOR DESKTOP -->
       <div class="hidden md:grid md:grid-cols-11 px-8 py-4 items-center gap-4
                bg-white/5 backdrop-blur-xl shadow-xl border-b border-white/10">
-        <span class="anton-regular col-span-8 lg:text-4xl text-3xl text-white px-4">
-          <font-awesome-icon icon="map-marker-alt" class="text-4xl text-[#06D6A0]" />
-          Encontrá tu próximo estacionamiento...
-        </span>
 
         <CustomInputGroup v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
           :onSearch="buscar" />

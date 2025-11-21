@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-[#020617] text-white selection:bg-accent/30 selection:text-white">
-
+ <MainHeader class="hidden md:block" />
     <!-- ============================ HERO OSCURO ============================ -->
     <section class="relative overflow-hidden pt-28 pb-28 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#020617]">
       <!-- Halos -->
@@ -8,17 +8,14 @@
         <div class="halo halo--lg"></div>
         <div class="halo halo--sm"></div>
       </div>
+      
+      <div class="container mx-auto px-6 grid lg:grid-cols-2">
 
-      <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
-
-        <!-- IZQUIERDA -->
+       
         <div>
+            
           <div class="flex items-center gap-4 mb-4">
-            <img
-              :src="logo"
-              alt="HayLugar"
-              class="h-20 w-20 md:h-24 md:w-24 drop-shadow-2xl"
-            />
+          
             <h1
               class="font-extrabold tracking-tight leading-[0.9] text-4xl md:text-6xl xl:text-7xl">
               Movilidad inteligente para un país en movimiento.
@@ -102,7 +99,7 @@
             </div>
 
             <p class="mt-3 text-[0.7rem] text-white/70">
-              Integración visual de las principales verticales: recitales, campus, zonas industriales,
+              Recitales, campus, zonas industriales,
               estacionamiento medido, playas y cocheras privadas.
             </p>
           </div>
@@ -293,9 +290,9 @@
 <script setup>
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-
+import MainHeader from '../components/layout/header/MainHeader.vue';
 import CookieBanner from "../components/common/CookieBanner.vue";
-import logo from "../assets/logo.png";
+import Logo from '../components/layout/Logo.vue';
 
 // Mapa ilustrado conceptual
 import mapaVisual from "../../assets/mapa-visual.png";
