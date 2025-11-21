@@ -44,7 +44,7 @@
         <div class="flex gap-4 w-full">
 
           <!-- Playas de estacionamiento -->
-          <button :disabled="!features.playas" @click="features.playas && router.push('/parkingLots')" :class="[
+          <!-- <button :disabled="!features.playas" @click="features.playas && router.push('/parkingLots')" :class="[
             'flex flex-col items-center justify-center p-2 min-w-[150px] bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300',
             features.playas
               ? 'hover:bg-white/20 hover:border-[#90BE6D] hover:shadow-[0_0_20px_#90BE6D55]'
@@ -53,7 +53,7 @@
             <ParkingCircleIcon class="w-7 h-7 text-[#90BE6D]" />
             <span class="text-white font-semibold text-[11px] md:text-sm mt-1">Playas</span>
             <span class="text-gray-300 text-[10px] md:text-xs">Estacionamientos</span>
-          </button>
+          </button> -->
 
           <!-- Universidades -->
           <button :disabled="!features.universidades" @click="features.universidades && router.push('/universidades')"
