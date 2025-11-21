@@ -34,10 +34,6 @@
       <!-- BUSCADOR DESKTOP -->
       <div class="hidden md:grid md:grid-cols-11 px-8 py-4 items-center gap-4
                bg-white/5 backdrop-blur-xl shadow-xl border-b border-white/10">
-        <span class="anton-regular col-span-8 lg:text-4xl text-3xl text-white px-4">
-          <font-awesome-icon icon="map-marker-alt" class="text-4xl text-[#06D6A0]" />
-          Encontrá tu próximo estacionamiento...
-        </span>
 
         <CustomInputGroup v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
           :onSearch="buscar" />
@@ -109,7 +105,15 @@
             <span class="text-white font-semibold text-[11px] md:text-sm mt-1">Industrial</span>
             <span class="text-gray-300 text-[10px] md:text-xs">Operaciones en tiempo real</span>
           </button>
-
+            <button @click="router.push('/playa-dashboard')"
+            class="flex flex-col items-center justify-center px-5 py-4 min-w-[150px]
+                   bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl
+                   hover:bg-white/20 hover:border-[#8ECAE6] hover:shadow-[0_0_20px_#8ECAE655]
+                   transition-all duration-300">
+            <ParkingSquare class="w-7 h-7 text-[#8ECAE6]" />
+            <span class="text-white font-semibold text-sm mt-1">Playas de Estacionamientos</span>
+            <span class="text-gray-300 text-xs">Operaciones en tiempo real</span>
+          </button>
         </div>
       </div>
 

@@ -24,7 +24,7 @@
       <div
         v-for="r in reviews"
         :key="r.id"
-        class="border border-gray-200 rounded-2xl bg-white/10 border-white/10 shadow-md hover:shadow-lg transition-all overflow-hidden p-5"
+        class="border border-gray-200 rounded-2xl bg-white/10 border-white/30 shadow-md hover:shadow-lg transition-all overflow-hidden p-5"
       >
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-3">
           <div class="flex items-center gap-3">

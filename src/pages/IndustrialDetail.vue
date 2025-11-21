@@ -3,6 +3,7 @@
     v-if="space"
     class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white flex flex-col"
   >
+   <MainHeader class="hidden md:block" />
     <!-- ===== HEADER ===== -->
     <header
       class="flex items-center justify-between px-6 md:px-12 py-6 border-b border-white/10 bg-[#0D1B2A]/70 backdrop-blur-lg shadow-lg"
@@ -218,6 +219,7 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
+import MainHeader from '../components/layout/header/MainHeader.vue'
 
 const route = useRoute()
 const router = useRouter()
