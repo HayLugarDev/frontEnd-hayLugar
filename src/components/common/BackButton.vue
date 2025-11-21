@@ -1,8 +1,10 @@
 <template>
-  <button @click="goBack"
-    class="md:hidden text-gray-400 sm:text-md py-2 px-4 rounded-full cursor-pointer">
-    Regresar
-  </button>
+   <button
+          @click="goBack"
+          class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+        >
+          ← Volver
+        </button>
 </template>
 
 <script setup>

@@ -39,9 +39,6 @@
     <section class="relative w-full h-[260px] md:h-[440px] overflow-hidden">
       <Swiper
         :modules="[Navigation, Pagination, Autoplay]"
-        :autoplay="{ delay: 4000, disableOnInteraction: false }"
-        :pagination="{ clickable: true }"
-        :navigation="true"
         class="w-full h-full"
       >
         <SwiperSlide
@@ -216,9 +213,6 @@ import api from '../services/apiService'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
 import MainHeader from '../components/layout/header/MainHeader.vue'
 
 const route = useRoute()
