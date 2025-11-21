@@ -1,23 +1,23 @@
 <template>
     <div
-        class="flex flex-col max-w-xl mx-auto h-screen bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
+        class="flex flex-col max-w-xl mx-auto h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-lg p-8 gap-6 md:min-h-[80vh] animate-fade-in">
         <!-- Título -->
         <div class="text-center">
             <h1 class="text-primary text-3xl sm:text-4xl font-bold mb-2">
                 ¿Dónde está ubicado tu espacio?
             </h1>
-            <p class="text-gray-500 text-sm sm:text-base">
+            <p class="text-gray-300 text-sm sm:text-base">
                 Seleccioná la dirección exacta para que los usuarios puedan encontrarlo fácilmente.
             </p>
         </div>
 
         <!-- Autocomplete -->
         <div v-if="!modelValue.direccion">
-            <label class="block text-sm font-semibold text-gray-900 mb-1">Calle</label>
+            <label class="block text-sm font-semibold text-gray-200 mb-1">Calle</label>
 
             <!-- GMapAutocomplete con el input visible -->
             <GMapAutocomplete v-model="direccion" :value="direccion"
-                class="text-gray-900 mt-1 block w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-primary focus:outline-none transition"
+                class="text-gray-400 bg-white/10 border border-white/10 mt-1 block w-full border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-primary focus:outline-none transition"
                 placeholder="Ingresá tu dirección" @place_changed="handlePlaceChanged" />
         </div>
 
