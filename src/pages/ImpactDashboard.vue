@@ -7,16 +7,7 @@
     </div>
 
     <!-- HEADER -->
-    <header class="flex items-center justify-between px-8 py-6 border-b border-white/10 backdrop-blur-md bg-[#0D1B2A]/60">
-      <div class="flex items-center gap-3">
-        <img :src="logo" alt="HayLugar" class="h-10 w-10" />
-        <h1 class="text-2xl font-semibold tracking-wide">Impacto Inteligente</h1>
-      </div>
-      <div class="flex items-center gap-2 text-[#B0BEC5] text-sm">
-        <i class="fa-solid fa-circle text-[#06D6A0] animate-pulse"></i>
-        <span>Monitoreo en tiempo real</span>
-      </div>
-    </header>
+ <MainHeader class="hidden md:block" />
 
     <!-- KPIs PRINCIPALES -->
     <section class="container mx-auto px-6 md:px-12 py-10 grid gap-6 md:grid-cols-3">
@@ -71,7 +62,7 @@ import { ref, onMounted } from 'vue'
 import { getImpact, getImpactSeries, type ImpactSnapshot } from '../services/eventService'
 import Chart from 'chart.js/auto'
 import logo from '../assets/logo.png'
-
+import MainHeader from '../components/layout/header/MainHeader.vue'
 const impact = ref<ImpactSnapshot | null>(null)
 const impactSeries = ref<ImpactSnapshot[]>([])
 

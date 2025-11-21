@@ -119,7 +119,7 @@
         >
           <div class="relative h-52 overflow-hidden">
             <img
-              :src="space.images?.[0] || '/assets/warehouse_default.jpg'"
+              :src=" '/assets/industrial_cover.jpg'"
               :alt="space.name"
               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />

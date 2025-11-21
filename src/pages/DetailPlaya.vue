@@ -1,4 +1,5 @@
 <template>
+   <MainHeader class="hidden md:block" />
   <div class="px-4 sm:px-8 py-6 bg-secondary min-h-screen">
     <template v-if="loading">
       <div class="text-center py-10 text-gray-500">Cargando datos...</div>
@@ -106,6 +107,7 @@ import { getParkingLotById, reservarSpotEnPlaya } from '../services/playaService
 import { getAllVehicles } from '../services/vehicleService.ts';
 import GoogleMap from '../components/layout/GoogleMap.vue';
 import { useUserStore } from '../store/userStore';
+import MainHeader from '../components/layout/header/MainHeader.vue';
 
 const route = useRoute();
 const router = useRouter();

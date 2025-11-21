@@ -1,6 +1,6 @@
 <template>
   <!-- Si hay imágenes -->
-  <div v-if="displayedImages.length" class="relative w-full overflow-hidden mb-2 lg:rounded-xl">
+  <div v-if="displayedImages.length" class="relative w-full overflow-hidden mb-2">
     <div class="flex transition-transform duration-500" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
       <div v-for="(img, index) in displayedImages" :key="index" class="w-full flex-shrink-0 aspect-square">
         <img :src="img" class="w-full h-full object-cover" alt="Imagen del espacio" @error="onImageError(index)" />

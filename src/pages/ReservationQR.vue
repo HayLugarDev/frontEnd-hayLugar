@@ -76,7 +76,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import QrcodeVue from 'qrcode.vue'
+import QrcodeVue from 'qrcode'
 import logo from '../assets/logo.png';
 
 const router = useRouter();

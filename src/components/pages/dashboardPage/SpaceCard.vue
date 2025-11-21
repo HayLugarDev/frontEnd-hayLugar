@@ -1,21 +1,15 @@
 <template>
-  <router-link
-    :to="`/espacio/${espacio.slug}`"
-    class="block transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
-  >
-    <div
-      class="bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden 
-             shadow-md flex flex-col h-full transition-all duration-300"
-    >
+  <router-link :to="`/espacio/${espacio.slug}`"
+    class="block transition-all duration-300 hover:-translate-y-1 hover:shadow-xl" @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave">
+    <div class="rounded-2xl shadow-md flex flex-col h-full transition-all duration-300 overflow-visible">
 
       <!-- IMAGEN + CONTROLES -->
-      <div class="relative w-full h-44 overflow-hidden">
+      <div class="relative w-full h-52 overflow-hidden">
         <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover" />
 
         <!-- PRICE BADGE -->
-        <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl
+        <div class="absolute bottom-4 right-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl
                     flex items-baseline gap-1 border border-white/10">
           <span class="text-[#06D6A0] font-bold text-sm">${{ getMinPrice() }}</span>
           <span class="text-gray-300 text-[10px]">/h</span>
@@ -23,7 +17,8 @@
       </div>
 
       <!-- CONTENIDO -->
-      <div class="flex flex-col flex-1 p-4 rounded-2xl">
+      <div class="flex flex-col flex-1 p-4 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/10
+         -mt-3 relative z-10 shadow-lg">
 
         <!-- TITULO -->
         <h3 class="text-white font-semibold text-2xl md:text-base leading-tight line-clamp-1">
@@ -39,19 +34,26 @@
         </p>
 
         <!-- DISTANCIA -->
-        <p v-if="espacio.distancia"
-           class="text-md md:text-[11px] text-gray-400 mt-2 flex items-center gap-1">
+        <p v-if="espacio.distancia" class="text-md md:text-[11px] text-gray-400 mt-2 flex items-center gap-1">
           📍 A {{ espacio.distancia.toFixed(1) }} km
         </p>
 
+        <!-- RATING -->
+        <div class="flex mt-2 md:mt-0">
+          <div v-if="espacio.space_reviews.length > 0" class="mr-2 text-gray-200 font-medium">
+            <font-awesome-icon v-for="i in 5" :key="i" :icon="['fas', 'star']"
+              :class="i <= Math.round(espacio.average_rating ?? 5) ? 'text-yellow-400' : 'text-gray-400'"
+              class="text-sm" />
+          </div>
+          <div v-else>
+            <font-awesome-icon v-for="i in 5" :key="i" :icon="['fas', 'star']" class="text-sm text-yellow-400" />
+          </div>
+        </div>
+
         <!-- ICONOS VEHÍCULOS -->
         <div class="flex flex-row justify-start gap-2 mt-3 flex-wrap">
-          <div
-            v-for="v in espacio.vehicle_capacities"
-            :key="v.type"
-            class="flex items-center gap-1 bg-white/5 border border-white/10 
-                   px-2 py-1 rounded-lg text-gray-300"
-          >
+          <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="flex items-center gap-1 bg-white/5 border border-white/10 
+                   px-2 py-1 rounded-lg text-gray-300">
             <font-awesome-icon :icon="['fas', `${getVehicleIcon(v.type)}`]" class="text-md md:text-xs " />
             <span v-if="v.price_per_hour" class="text-lg md:text-[10px]">
               ${{ v.price_per_hour }}/h
@@ -59,19 +61,9 @@
           </div>
         </div>
 
-        <!-- RATING -->
-        <div class="flex items-center justify-end mt-2 text-xl md:text-xs gap-1">
-          <span :class="espacio.average_rating ? 'text-yellow-400' : 'text-gray-500'">⭐</span>
-          <span class="text-gray-200 font-medium">
-            {{ espacio.space_reviews.length > 0 ? espacio.average_rating.toFixed(1) : '5.0' }}
-          </span>
-        </div>
-
         <!-- AVAILABILITY BADGE -->
-        <div
-          class="mt-3 bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-gray-200 
-                 flex items-center justify-between"
-        >
+        <div class="mt-3 bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-gray-200 
+                 flex items-center justify-between">
           <div class="flex items-center gap-1">
             <span class="text-sm md:text-xs text-[#00B4D8] font-semibold uppercase">
               {{ labelHorario }}

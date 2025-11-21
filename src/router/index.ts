@@ -25,6 +25,7 @@ import ReservationQR from '../pages/ReservationQR.vue'
 import ImpactDashboard from '../pages/ImpactDashboard.vue'
 import IndustrialDashboard from '../pages/IndustrialDashboard.vue'
 import AdminPage from '../pages/AdminPage.vue'
+import PlayaDashboard from '../pages/PlayaDashboard.vue'
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -82,6 +83,8 @@ const routes: RouteRecordRaw[] = [
 { path: '/impact-dashboard', name: 'ImpactDashboard', component: ImpactDashboard },
 
 { path: '/industrial-dashboard', name: 'IndustrialDashboard', component:IndustrialDashboard },
+
+{ path: '/playa-dashboard', name: 'PlayaDashboard', component:PlayaDashboard },
 
 // Admin Page
 { path: '/admin-page', name: 'adminPage', component: AdminPage, meta: { requiresAuth: true } },
