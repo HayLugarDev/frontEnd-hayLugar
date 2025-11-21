@@ -1,13 +1,13 @@
 <template>
   <header
-    class="w-full z-50 fixed md:static top-0 left-0
+    class="hidden w-full z-50 fixed md:static top-0 left-0
            bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
            text-white border-b border-white/10 shadow-lg md:shadow-none
-           px-6 pt-5 pb-4 xl:px-16 flex items-center justify-between gap-6">
+           px-6 pt-5 pb-4 xl:px-16 md:flex items-center justify-between gap-6">
 
     <!-- LEFT: LOGO + TITULO -->
     <div class="flex items-center gap-4 cursor-pointer" @click="router.push('/dashboard')">
-      <Logo width="20" class="drop-shadow-lg" />
+      <Logo width="14" class="drop-shadow-lg" />
 
       <!-- Texto principal -->
       <span
