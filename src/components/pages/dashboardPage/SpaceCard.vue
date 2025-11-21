@@ -17,7 +17,7 @@
       </div>
 
       <!-- CONTENIDO -->
-      <div class="flex flex-col flex-1 p-4 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/10
+      <div class="flex flex-col flex-1 p-4 rounded-2xl bg-gray-800
          -mt-3 relative z-10 shadow-lg">
 
         <!-- TITULO -->
