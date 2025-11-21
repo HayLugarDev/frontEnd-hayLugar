@@ -286,8 +286,8 @@
         <h3 class="text-lg font-semibold">Tu pase digital</h3>
         <p class="text-[#B0BEC5] text-sm mt-1">QR/Token firmado — válido en las fechas seleccionadas</p>
 
-        <div class="mt-5 bg-[#1B263B] rounded-xl p-4 break-all text-xs text-[#B0BEC5] max-h-48 overflow-auto">
-          {{ lastReservation?.qr_token }}
+        <div class="mt-5 bg-[#1B263B] rounded-xl p-4 break-all text-xs text-[#B0BEC5] h-auto overflow-auto flex flex-row justify-center">
+          <img v-if="lastReservation?.qr_token" :src="lastReservation.qr_token" class="w-64 h-64 object-contain" />
         </div>
 
         <div class="mt-4 flex items-center gap-3">
@@ -305,7 +305,7 @@
 
     <!-- Footer -->
     <footer class="py-10 text-center text-[#B0BEC5] text-xs border-t border-white/10">
-      © {{ new Date().getFullYear() }} HayLugar — Red de Movilidad Inteligente
+      © {{ new Date().getFullYear() }} HayLugar — Movilidad Inteligente
     </footer>
   </div>
 </template>
