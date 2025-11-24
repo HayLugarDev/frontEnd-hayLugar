@@ -6,8 +6,9 @@
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
-    <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between">
+    <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between md:hidden">
       <div class="flex items-center gap-3">
+        <img :src="logo" alt="HayLugar" class="h-10 w-10 md:hidden" />
         <h1 class="text-2xl md:text-3xl font-semibold tracking-wide">Eventos Inteligentes</h1>
       </div>
       <button

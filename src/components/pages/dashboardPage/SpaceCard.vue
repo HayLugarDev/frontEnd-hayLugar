@@ -34,8 +34,8 @@
         </p>
 
         <!-- DISTANCIA -->
-        <p v-if="espacio.distancia" class="text-md md:text-[11px] text-gray-400 mt-2 flex items-center gap-1">
-          📍 A {{ espacio.distancia.toFixed(1) }} km
+        <p v-if="espacio.distancia" class="text-md md:text-[11px] text-gray-500 mt-2 flex items-center gap-1">
+          📍 A {{ espacio.distancia.toFixed(1) }} km de distancia
         </p>
 
         <!-- RATING -->

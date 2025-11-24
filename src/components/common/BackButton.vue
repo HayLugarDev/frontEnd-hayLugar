@@ -1,7 +1,7 @@
 <template>
    <button
           @click="goBack"
-          class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+          class="text-gray-200 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
         >
           ← Volver
         </button>
