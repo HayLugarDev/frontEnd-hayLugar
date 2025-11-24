@@ -1,7 +1,8 @@
 <template>
-  <nav class="fixed bottom-0 left-0 right-0 md:hidden z-50 
-           backdrop-blur-xl bg-black/70 border-t border-white/10 
-           transition-transform duration-400" :class="isHidden ? 'translate-y-full' : 'translate-y-0'">
+  <nav class="bottom-safe fixed bottom-0 left-0 right-0 md:hidden z-50 
+         backdrop-blur-xl bg-black/70 border-t border-white/10 
+         transition-transform duration-400" :class="isHidden ? 'translate-y-full' : 'translate-y-0'">
+
     <ul class="flex justify-around items-center py-2">
 
       <!-- INICIO -->
@@ -11,7 +12,8 @@
       </li>
 
       <!-- MAPA / LISTA -->
-      <li @click="route.path !== '/dashboard' ? $emit('navigate', '/dashboard') : $emit('toggle-map')" class="flex flex-col items-center text-xs cursor-pointer"
+      <li @click="route.path !== '/dashboard' ? $emit('navigate', '/dashboard') : $emit('toggle-map')"
+        class="flex flex-col items-center text-xs cursor-pointer"
         :class="props.showMap ? 'text-primary font-semibold' : isActive('/mapa')">
         <font-awesome-icon :icon="props.showMap ? 'list' : 'map'" class="text-xl mb-1" />
       </li>
@@ -24,8 +26,8 @@
       </li>
 
       <!-- NOTIFICACIONES -->
-      <li v-if="userStore.user" @click="$emit('navigate', '/notifications')" class="flex flex-col items-center text-xs cursor-pointer"
-        :class="isActive('/notifications')">
+      <li v-if="userStore.user" @click="$emit('navigate', '/notifications')"
+        class="flex flex-col items-center text-xs cursor-pointer" :class="isActive('/notifications')">
         <font-awesome-icon icon="bell" class="text-xl mb-1" />
       </li>
 
@@ -36,8 +38,8 @@
       </li>
 
       <!-- PERFIL -->
-      <li @click="userStore.user ? $emit('navigate', '/profile') : $emit('navigate', '/login')" class="flex flex-col items-center text-xs cursor-pointer"
-        :class="isActive('/profile')">
+      <li @click="userStore.user ? $emit('navigate', '/profile') : $emit('navigate', '/login')"
+        class="flex flex-col items-center text-xs cursor-pointer" :class="isActive('/profile')">
         <font-awesome-icon icon="user" class="text-xl mb-1" />
       </li>
 
