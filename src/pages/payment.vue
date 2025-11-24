@@ -4,7 +4,7 @@
     <MainHeader />
 
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full py-6">
-      <BackButton class="lg:hidden mb-2 text-end" />
+      <BackButton class="md:hidden mb-2 text-end" />
 
       <!-- Usamos grid-cols-1 por defecto y md:grid-cols-9 en desktop -->
       <section class="grid grid-cols-1 md:grid-cols-9 gap-6">

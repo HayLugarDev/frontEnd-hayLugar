@@ -1,7 +1,15 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
-    <!-- ===== HEADER ===== -->
+
     <MainHeader class="hidden md:block" />
+
+    <!-- ===== HEADER ===== -->
+    <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between md:hidden">
+      <div class="flex items-center gap-3">
+        <img :src="logo" alt="HayLugar" class="h-10 w-10 md:hidden" />
+        <h1 class="text-2xl md:text-3xl font-semibold tracking-wide">Playas de estacionamiento</h1>
+      </div>
+    </header>
 
     <!-- ===== HERO ===== -->
     <section class="relative w-full h-[240px] md:h-[320px] overflow-hidden flex items-center justify-center">
@@ -134,7 +142,7 @@
             {{ formatSchedule(playa.schedule) }}
           </p>
 
-          <div class="mt-3 rounded-xl overflow-hidden shadow-md ring-1 ring-white/10 group-hover:ring-accent">
+          <div class="mt-3 rounded-xl overflow-hidden shadow-md max-h-96 ring-1 ring-white/10 group-hover:ring-accent">
             <CustomGoogleMap
               :center="{ lat: parseFloat(playa.lat), lng: parseFloat(playa.lng) }"
               :zoom="16"
