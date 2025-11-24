@@ -1,6 +1,6 @@
 <template>
   <MainHeader class="hidden md:block" />
-  <BackButton class="absolute top-2 right-6 md:top-8 md:left-8 z-50" />
+  <BackButton class="absolute top-2 right-6 md:top-8 md:left-8 z-50 md:hidden" />
   <div class="relative w-full h-full mx-auto py-4 md:py-6">
     <!-- Instrucciones iniciales -->
     <transition name="fade-step" mode="out-in">

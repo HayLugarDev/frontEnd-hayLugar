@@ -55,8 +55,6 @@
         @navigate="handleNavigate"
       />
 
-      <!-- Botón volver -->
-      <BackButton v-if="routeConfig.showBackButton" />
     </div>
 
     <!-- LOADER -->

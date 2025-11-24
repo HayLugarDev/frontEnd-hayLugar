@@ -11,7 +11,8 @@ onMounted(async ()=> userStore.fetchUser());
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen raleway bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]">
+  <div class="safe-area-container flex flex-col min-h-screen raleway bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]">
+
     <router-view />
     <CookieBanner />
     <Toast />

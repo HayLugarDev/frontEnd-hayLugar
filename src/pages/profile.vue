@@ -17,8 +17,9 @@
           <SectionMenu :activeSection="activeSection" :sections="menuSectionsComputed"
             @update:activeSection="handleSectionChange" />
         </div>
-        <BackButton />
       </header>
+
+      <BackButton class="absolute right-11 top-24 z-50 md:hidden" />
 
       <!-- Selector móvil (no botón contenedor para evitar eventos raros anidados) -->
       <div class="w-full md:hidden items-center justify-center mb-4">
