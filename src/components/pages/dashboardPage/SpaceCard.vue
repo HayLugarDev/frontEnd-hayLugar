@@ -6,7 +6,7 @@
 
       <!-- IMAGEN + CONTROLES -->
       <div class="relative w-full h-52 overflow-hidden">
-        <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover" />
+        <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover rounded-t-xl" />
 
         <!-- PRICE BADGE -->
         <div class="absolute bottom-4 right-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl

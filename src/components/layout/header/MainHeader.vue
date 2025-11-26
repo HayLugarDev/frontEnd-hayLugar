@@ -3,15 +3,15 @@
     class="hidden w-full z-50 fixed md:static top-0 left-0
            bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
            text-white border-b border-white/10 shadow-lg md:shadow-none
-           px-6 pt-5 pb-4 xl:px-16 md:flex items-center justify-between gap-6">
+           px-6 py-4 xl:px-16 md:flex items-center justify-between gap-6">
 
     <!-- LEFT: LOGO + TITULO -->
     <div class="flex items-center gap-4 cursor-pointer" @click="router.push('/dashboard')">
-      <Logo width="14" class="drop-shadow-lg" />
+      <Logo width="12" class="drop-shadow-lg" />
 
       <!-- Texto principal -->
       <span
-        class="hidden md:block font-bold tracking-tight text-xl lg:text-3xl 
+        class="hidden md:block font-bold tracking-tight text-xl lg:text-2xl 
                text-white hover:text-accent transition-colors duration-200">
         Encontrá tu próximo estacionamiento
       </span>
@@ -33,7 +33,7 @@
       <!-- Botón ayuda -->
       <font-awesome-icon 
         icon="fa-regular fa-circle-question"
-        class="p-3 w-6 h-6 rounded-full cursor-pointer text-white/50 hover:text-white transition"
+        class="p-3 w-6 h-6 rounded-full cursor-pointer text-gray-100 hover:text-white transition"
         @click="openHelp"
       />
 
