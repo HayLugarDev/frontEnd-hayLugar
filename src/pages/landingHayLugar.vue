@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-[#020617] text-white selection:bg-accent/30 selection:text-white">
  <MainHeader class="hidden md:block" />
     <!-- ============================ HERO OSCURO ============================ -->
-    <section class="relative overflow-hidden pt-28 pb-28 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#020617]">
+    <section class="relative overflow-hidden pt-10 pb-28 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#020617]">
       <!-- Halos -->
       <div class="pointer-events-none absolute inset-0 -z-10">
         <div class="halo halo--lg"></div>
