@@ -5,7 +5,7 @@
     <div class="rounded-2xl shadow-md flex flex-col h-full transition-all duration-300 overflow-visible">
 
       <!-- IMAGEN + CONTROLES -->
-      <div class="relative w-full h-52 overflow-hidden">
+      <div class="relative w-full h-52 sm:h-40 overflow-hidden">
         <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover rounded-t-xl" />
 
         <!-- PRICE BADGE -->
