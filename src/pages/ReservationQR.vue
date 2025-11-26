@@ -83,7 +83,7 @@
           Política de Privacidad
         </router-link>
 
-        <router-link to="/terminos-y-condiciones" class="hover:text-white transition-colors duration-200">
+        <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
           Términos y Condiciones
         </router-link>
       </div>
