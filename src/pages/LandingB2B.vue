@@ -196,12 +196,34 @@
       </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="border-t border-white/10 bg-[#0F172A] text-white/70">
-      <div class="container mx-auto px-6 py-6 text-center text-sm">
-        © {{ currentYear }} HayLugar for Business — Tecnología argentina para movilidad urbana
-      </div>
-    </footer>
+    <!-- ===== FOOTER ===== -->
+      <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+
+          <!-- Branding -->
+          <div class="flex items-center gap-2">
+            <span class="text-white font-semibold tracking-wide">HayLugar</span>
+            <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
+          </div>
+
+          <!-- Links -->
+          <div class="flex gap-6">
+            <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+              Política de Privacidad
+            </router-link>
+
+            <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+              Términos y Condiciones
+            </router-link>
+          </div>
+
+          <!-- Extra -->
+          <div class="text-xs text-[#78909C]">
+            HayLugar for Business — Tecnología argentina para movilidad urbana
+          </div>
+        </div>
+      </footer>
 
   </div>
 </template>

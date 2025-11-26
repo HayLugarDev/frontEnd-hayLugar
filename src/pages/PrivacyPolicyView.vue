@@ -1,9 +1,10 @@
 <template>
+  <MainHeader class="hidden md:block" />
   <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
     <section class="py-16 px-6 text-center max-w-4xl mx-auto">
       <h1 class="text-3xl md:text-4xl font-bold mb-2">Política de Privacidad</h1>
       <p class="text-gray-300">Última actualización: <span class="font-semibold">10 de octubre de 2025</span></p>
-      <p class="text-gray-400 mt-2 text-sm">
+      <p class="text-gray-300 mt-2 text-sm">
         Esta Política complementa los
         <RouterLink to="/termsConditions" class="text-accent underline">Términos y Condiciones</RouterLink>
         y la
@@ -130,6 +131,8 @@
 </template>
 
 <script setup>
+import MainHeader from '../components/layout/header/MainHeader.vue';
+
 /* Solo usa RouterLink desde el router principal */
 </script>
 
