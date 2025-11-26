@@ -80,7 +80,7 @@
                 <input type="checkbox" v-model="accepted" required />
                 <span>
                   Acepto los
-                  <router-link to="/terminos-y-condiciones" target="_blank" class="underline text-primary">
+                  <router-link to="/termsConditions" target="_blank" class="underline text-primary">
                     Términos y Condiciones de HayLugar (v1.1)
                   </router-link>
                 </span>

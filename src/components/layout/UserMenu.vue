@@ -2,8 +2,8 @@
   <div class="relative">
     <button @click="toggleMenu"
       class="hidden md:flex items-center gap-2 hover:shadow-xl px-4 py-2 rounded-full">
-      <font-awesome-icon :icon="open ? 'fa-angle-up' : 'fa-angle-down'" class="text-gray-400" />
-      <img :src="hostImage" alt="ProfileIMG" class="w-9 rounded-full" />
+      <font-awesome-icon :icon="open ? 'fa-angle-up' : 'fa-angle-down'" class="text-gray-100" />
+      <img :src="hostImage" alt="ProfileIMG" class="w-9 rounded-full bg-gray-200 border border-white" />
     </button>
 
     <ul v-if="open"

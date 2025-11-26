@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-[#020617] text-white selection:bg-accent/30 selection:text-white">
  <MainHeader class="hidden md:block" />
     <!-- ============================ HERO OSCURO ============================ -->
-    <section class="relative overflow-hidden pt-28 pb-28 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#020617]">
+    <section class="relative overflow-hidden pt-10 pb-28 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#020617]">
       <!-- Halos -->
       <div class="pointer-events-none absolute inset-0 -z-10">
         <div class="halo halo--lg"></div>
@@ -276,12 +276,34 @@
       </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="border-t border-gray-200 bg-white text-gray-600">
-      <div class="container mx-auto px-6 py-6 text-center text-sm">
-        © {{ currentYear }} HayLugar · Movilidad inteligente — Argentina
+    <!-- ===== FOOTER ===== -->
+  <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+
+      <!-- Branding -->
+      <div class="flex items-center gap-2">
+        <span class="text-white font-semibold tracking-wide">HayLugar</span>
+        <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
       </div>
-    </footer>
+
+      <!-- Links -->
+      <div class="flex gap-6">
+        <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+          Política de Privacidad
+        </router-link>
+
+        <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+          Términos y Condiciones
+        </router-link>
+      </div>
+
+      <!-- Extra -->
+      <div class="text-xs text-[#78909C]">
+        Movilidad inteligente
+      </div>
+    </div>
+  </footer>
 
     <CookieBanner />
   </div>
