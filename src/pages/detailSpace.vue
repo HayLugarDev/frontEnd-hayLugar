@@ -19,10 +19,11 @@
 
       <!-- Info del anfitrión -->
       <section v-if="space?.host"
-        class="col-span-3 bg-white/10 border-white/10 p-6 px-10 rounded-xl shadow-md mt-6 font-normal border border-gray-200 transition-all hover:shadow-xl">
+        class="col-span-3 sm:bg-white/10 sm:border sm:border-white/10 p-6 px-10 rounded-xl shadow-md md:mt-6 font-normal transition-all hover:shadow-xl">
         <div class="flex flex-row items-center gap-6">
           <img :src="hostImage" alt="Imagen del anfitrión"
-            class="w-20 h-20 rounded-full shadow-lg border-2 border-primary object-cover" @error="onHostImageError" />
+            class="w-20 h-20 rounded-full shadow-lg sm:border-2 sm:border-primary object-cover bg-white/50"
+            @error="onHostImageError" />
           <div class="flex flex-col gap-2 w-full text-white text-base">
             <div class="flex flex-row gap-2 items-center text-lg">
               <span class="font-bold text-primary">Anfitrión:</span>
@@ -33,7 +34,7 @@
               <span class="font-medium">+549{{ space.host.phone }}</span>
             </div>
             <div class="text-md md:text-md flex flex-row gap-2 items-center">
-              <span class="font-medium">email: {{ space.host.email }}</span>
+              <span class="font-medium">{{ space.host.email }}</span>
             </div>
           </div>
         </div>
@@ -41,14 +42,14 @@
 
       <!-- Título + Favorito + Compartir -->
       <div
-        class="flex flex-row items-center justify-between mt-4 px-6 md:px-2 sticky top-0 bg-white/10 border border-white/10 z-10 rounded-xl shadow-sm py-2">
-        <h1 class="text-2xl sm:text-xl font-bold text-primary pl-2">{{ capitalizeFirst(space.name) }}</h1>
+        class="flex flex-row items-center justify-between mt-4 px-6 md:px-2 sticky top-0 sm:bg-white/10 sm:border sm:border-white/10 z-10 rounded-xl shadow-xl py-2">
+        <h1 class="text-2xl sm:text-xl font-bold text-white sm:text-primary pl-2">{{ capitalizeFirst(space.name) }}</h1>
         <div class="flex flex-row items-center gap-4">
           <button @click="toggleFavourite" :class="[
             // CLASES FIJAS
-            'flex items-center justify-center w-12 h-12 rounded-full shadow-lg',
+            'flex items-center justify-center w-12 h-12 rounded-full shadow-xl',
             'transition-transform duration-200 hover:scale-110',
-            'bg-black/40 border border-white/10',
+            'bg-black/20 border border-white/10',
 
             // CLASE DINÁMICA DEL ICONO
             activedFavouriteIcon ? 'text-red-500' : 'text-gray-300',
@@ -63,7 +64,7 @@
 
 
           <button @click="sharePublication" class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-200 hover:scale-110
-         bg-black/40 border border-white/10 hover:border-primary text-gray-300 hover:text-primary"
+         bg-black/20 border border-white/10 hover:border-primary text-gray-300 hover:text-primary"
             title="Compartir publicación">
             <font-awesome-icon :icon="['fas', 'share-alt']" class="text-xl" />
           </button>
@@ -74,17 +75,16 @@
       <!-- Galería de imágenes grande -->
       <div v-if="space?.images && space.images.length > 0"
         class="hidden lg:grid grid-cols-8 grid-rows-8 gap-2 py-4 h-[400px]">
-        <div class="col-span-4 row-span-8">
+        <div class="col-start-1 row-start-1 col-span-4 row-span-8">
           <img :src="space.images?.[0] || someImg" alt="Principal"
             class="h-full w-full object-cover rounded-lg shadow-md border cursor-pointer" @click="openImageModal(0)"
             @error="onImageError" />
         </div>
 
-        <div v-for="(img, index) in space.images?.slice(1, 5) || [someImg, someImg, someImg, someImg]" :key="index">
-          <div :class="imageGridPosition(index)">
-            <img :src="img || someImg" alt="Espacio" class="h-full w-full object-cover rounded-lg shadow-md border"
-              @click="openImageModal(index + 1)" @error="onImageError" />
-          </div>
+        <div v-for="(img, index) in space.images?.slice(1, 5) || [someImg, someImg, someImg, someImg]" :key="index"
+          :class="imageGridPosition(index)">
+          <img :src="img || someImg" alt="Espacio" class="h-full w-full rounded-lg shadow-md border object-cover"
+            @click="openImageModal(index + 1)" @error="onImageError" />
         </div>
       </div>
 
@@ -117,7 +117,7 @@
 
           <!-- Ubicación -->
           <div class="mt-6">
-            <p class="text-2xl font-bold text-white tracking-wide">
+            <p class="text-2xl font-bold text-gray-200 tracking-wide">
               {{ space.location.split(',')[1] || '' }}
             </p>
             <p class="text-lg text-gray-400 font-medium">
