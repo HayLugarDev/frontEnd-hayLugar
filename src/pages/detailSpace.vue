@@ -1,6 +1,7 @@
 <template>
   <!-- HEADER SOLO EN DESKTOP -->
   <MainHeader class="hidden md:block" />
+  <BackButton class="absolute top-2 right-6 md:top-8 md:left-8 z-50 md:hidden" />
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
@@ -324,6 +325,7 @@ import SpaceDetailsSkeleton from '../components/layout/skeletons/SpaceDetailsSke
 import someImg from '../assets/img-haylugar.jpeg';
 import defaultProfile from '../assets/user_icon_primary.png';
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
+import BackButton from '../components/common/BackButton.vue';
 
 const spaceStore = useSpaceStore()
 const { selectedSpace: space, favorites } = storeToRefs(spaceStore)
