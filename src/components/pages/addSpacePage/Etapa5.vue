@@ -1,6 +1,6 @@
 <template>
   <div
-    class="md:min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white animate-fade-in"
+    class="md:min-h-[80vh] flex flex-col items-center justify-center px-8 sm:px-6 py-12 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white animate-fade-in"
   >
     <!-- Capa decorativa -->
     <div class="pointer-events-none absolute inset-0 overflow-hidden -z-10">
@@ -10,7 +10,7 @@
 
     <!-- Contenedor principal -->
     <div
-      class="rounded-2xl shadow-2xl backdrop-blur-lg w-full max-w-3xl space-y-8"
+      class="rounded-2xl shadow-2xl backdrop-blur-lg w-full max-w-3xl space-y-8 "
     >
       <!-- Título -->
       <div class="text-center">
