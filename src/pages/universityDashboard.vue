@@ -1,153 +1,205 @@
 <template>
-
   <!-- HEADER SOLO EN DESKTOP -->
   <MainHeader class="hidden md:block" />
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
-  <div class="relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white">
+  <div
+    class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+           text-white overflow-hidden"
+  >
+    <!-- ===== HEADER + TABS ===== -->
+    <header
+      class="relative z-10 px-6 py-4 md:px-12 flex items-center justify-between
+             bg-gradient-to-b from-black/20 to-transparent md:hidden"
+    >
+      <div class="flex items-center gap-3">
+        <img :src="logo" alt="HayLugar" class="h-10 w-10" />
+        <h1 class="text-2xl font-semibold tracking-wide drop-shadow">
+          Universidades Inteligentes – UTN
+        </h1>
+      </div>
 
-    <!-- Encabezado + Tabs -->
-    <div class="px-6 py-6 flex items-center gap-3">
-      <h2 class="text-2xl sm:text-3xl font-bold text-white drop-shadow">
-        Estacionamientos Inteligentes — UTN
-      </h2>
-
-      <div class="ml-auto flex items-center gap-2">
-        <button class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
-                 backdrop-blur-md bg-white/10 hover:bg-white/20" :class="showMap ? 'text-[#06D6A0]' : 'text-gray-300'"
-          @click="showMap = true">
-          Ver mapa
+      <!-- Tabs en mobile -->
+      <div class="flex items-center gap-2 ml-auto">
+        <button
+          class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
+                 backdrop-blur-md bg-white/10 hover:bg-white/20 shadow-md"
+          :class="showMap ? 'text-[#06D6A0]' : 'text-gray-300'"
+          @click="showMap = true"
+        >
+          Mapa
         </button>
 
-        <button class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
-                 backdrop-blur-md bg-white/10 hover:bg-white/20" :class="!showMap ? 'text-[#06D6A0]' : 'text-gray-300'"
-          @click="showMap = false">
-          Ver lista
+        <button
+          class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
+                 backdrop-blur-md bg-white/10 hover:bg-white/20 shadow-md"
+          :class="!showMap ? 'text-[#06D6A0]' : 'text-gray-300'"
+          @click="showMap = false"
+        >
+          Lista
         </button>
       </div>
-    </div>
+    </header>
 
-    <!-- Filtros -->
-    <div class="px-6 mt-6 py-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 
-             flex flex-wrap gap-3 items-center container mx-auto">
-      <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
-               backdrop-blur-sm" :class="filters.groups.students
-                ? 'bg-[#06D6A0]/30 text-[#06D6A0]'
-                : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="toggleGroup('students')">
-        🎓 Alumnos
-      </button>
+    <!-- ===== FILTROS ===== -->
+    <section
+      class="mt-6 px-6 container mx-auto py-4 rounded-2xl bg-white/5 
+             backdrop-blur-xl border border-white/10 shadow-lg"
+    >
+      <div class="flex flex-wrap gap-3 items-center">
+        <!-- Botones -->
+        <button
+          class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+                 backdrop-blur-sm shadow-sm"
+          :class="filters.groups.students
+            ? 'bg-[#06D6A0]/30 text-[#06D6A0]'
+            : 'bg-white/5 text-gray-300 hover:bg-white/10'"
+          @click="toggleGroup('students')"
+        >
+          🎓 Alumnos
+        </button>
 
-      <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
-               backdrop-blur-sm" :class="filters.groups.staff
-                ? 'bg-[#00B4D8]/30 text-[#00B4D8]'
-                : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="toggleGroup('staff')">
-        🧑‍🏫 Docentes
-      </button>
+        <button
+          class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+                 backdrop-blur-sm shadow-sm"
+          :class="filters.groups.staff
+            ? 'bg-[#00B4D8]/30 text-[#00B4D8]'
+            : 'bg-white/5 text-gray-300 hover:bg-white/10'"
+          @click="toggleGroup('staff')"
+        >
+          🧑‍🏫 Docentes
+        </button>
 
-      <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
-               backdrop-blur-sm" :class="filters.onlyAvailable
-                ? 'bg-amber-300/20 text-amber-300'
-                : 'bg-white/5 text-gray-300 hover:bg-white/10'"
-        @click="filters.onlyAvailable = !filters.onlyAvailable">
-        ✅ Sólo disponibles
-      </button>
+        <button
+          class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+                 backdrop-blur-sm shadow-sm"
+          :class="filters.onlyAvailable
+            ? 'bg-amber-300/20 text-amber-300'
+            : 'bg-white/5 text-gray-300 hover:bg-white/10'"
+          @click="filters.onlyAvailable = !filters.onlyAvailable"
+        >
+          ✅ Disponibles
+        </button>
 
-      <span class="ml-auto text-xs text-[#B0BEC5]">
-        Última actualización: {{ lastUpdatedText }}
-      </span>
-    </div>
+        <!-- Actualización -->
+        <span class="ml-auto text-xs text-[#B0BEC5]">
+          Última actualización: {{ lastUpdatedText }}
+        </span>
+      </div>
+    </section>
 
-    <div class="p-6 container mx-auto">
-      <!-- MAPA -->
-      <div v-if="showMap" class="w-full h-[68vh] relative rounded-2xl overflow-hidden shadow-xl border border-white/10">
+    <!-- ===== CONTENIDO MAPA / LISTA ===== -->
+    <section class="p-6 container mx-auto">
+      <!-- ===== MAPA ===== -->
+      <div
+        v-if="showMap"
+        class="w-full h-[68vh] relative rounded-2xl overflow-hidden shadow-2xl 
+               bg-[#0D1B2A]/60 border border-white/10 backdrop-blur-xl"
+      >
         <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions" :locateUser="true">
+          <GMapPolygon
+            v-for="(zona, i) in zonasFiltradas"
+            :key="'zone-' + i"
+            :paths="zona.paths"
+            :options="{ ...zona.options, clickable: false, zIndex: 1 }"
+          />
 
-          <!-- Polígonos -->
-          <GMapPolygon v-for="(zona, i) in zonasFiltradas" :key="'zone-' + i" :paths="zona.paths"
-            :options="{ ...zona.options, clickable: false, zIndex: 1 }" />
+          <GMapMarker
+            :position="utnMarkerPosition"
+            :icon="universityIcon"
+            :options="{ zIndex: 3, clickable: false }"
+          />
 
-          <!-- Icono UTN -->
-          <GMapMarker :position="utnMarkerPosition" :icon="universityIcon" :options="{ zIndex: 3, clickable: false }" />
-
-          <!-- Marcadores -->
-          <GMapMarker v-for="(espacio, idx) in espaciosFiltrados" :key="'mk-' + espacio.id + '-' + idx"
-            :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="getMarkerIcon(espacio)"
-            :options="{ zIndex: 2, clickable: true }" @mouseover="setHovered(espacio)" @mouseout="clearHovered"
-            @click="openAccessModal(espacio)" />
+          <GMapMarker
+            v-for="(espacio, idx) in espaciosFiltrados"
+            :key="'mk-' + espacio.id + '-' + idx"
+            :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
+            :icon="getMarkerIcon(espacio)"
+            :options="{ zIndex: 2 }"
+            @mouseover="setHovered(espacio)"
+            @mouseout="clearHovered"
+            @click="openAccessModal(espacio)"
+          />
         </CustomGoogleMap>
 
-        <!-- Panel lateral hover -->
+        <!-- ===== PANEL HOVER ===== -->
         <transition name="slide-fade">
-          <div v-if="hoveredSpace" class="absolute right-4 top-4 w-[320px] bg-[#1B263B]/80 backdrop-blur-md border border-white/10 
-                   rounded-xl shadow-xl p-5">
+          <aside
+            v-if="hoveredSpace"
+            class="absolute right-4 top-4 w-[320px]
+                   bg-[#1B263B]/80 backdrop-blur-xl border border-white/10 
+                   rounded-2xl shadow-2xl p-5"
+          >
             <div class="flex items-start gap-3">
-              <div class="px-2 py-0.5 rounded text-xs font-semibold" :class="badgeClass(hoveredSpace)">
+              <span class="px-3 py-1 rounded-lg text-xs font-semibold" :class="badgeClass(hoveredSpace)">
                 {{ groupLabel(hoveredSpace) }}
-              </div>
+              </span>
 
-              <div class="ml-auto text-xs" :class="hoveredSpace.capacity > 0 ? 'text-[#06D6A0]' : 'text-rose-400'">
+              <span
+                class="ml-auto text-xs font-semibold"
+                :class="hoveredSpace.capacity > 0 ? 'text-[#06D6A0]' : 'text-rose-400'"
+              >
                 {{ hoveredSpace.capacity > 0 ? 'Disponible' : 'Completo' }}
-              </div>
+              </span>
             </div>
 
-            <h3 class="mt-2 text-lg font-semibold text-white leading-tight">
+            <h3 class="mt-3 text-lg font-semibold leading-tight">
               {{ hoveredSpace.name }}
             </h3>
+
             <p class="text-sm text-[#B0BEC5] mt-1">📍 {{ hoveredSpace.location }}</p>
 
+            <!-- Datos -->
             <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+              <div class="p-3 rounded-xl bg-white/5 border border-white/10 shadow-inner">
                 <div class="text-[#B0BEC5]">Capacidad</div>
-                <div class="font-semibold text-white">
-                  {{ hoveredSpace.capacity ?? capacityFromVehicle(hoveredSpace) }}
-                </div>
+                <div class="font-semibold">{{ hoveredSpace.capacity }}</div>
               </div>
 
-              <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+              <div class="p-3 rounded-xl bg-white/5 border border-white/10 shadow-inner">
                 <div class="text-[#B0BEC5]">Grupo</div>
-                <div class="font-semibold text-white">{{ groupLabel(hoveredSpace) }}</div>
+                <div class="font-semibold">{{ groupLabel(hoveredSpace) }}</div>
               </div>
             </div>
 
             <button
-              class="mt-4 w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-dark font-semibold rounded-xl py-2 transition-all"
-              @click="openAccessModal(hoveredSpace)">
+              class="mt-4 w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-dark font-semibold 
+                     rounded-xl py-2 transition-all shadow-md"
+              @click="openAccessModal(hoveredSpace)"
+            >
               Confirmar acceso
             </button>
-          </div>
+          </aside>
         </transition>
 
-        <!-- Leyenda -->
-        <div class="absolute left-4 bottom-4 bg-[#1B263B]/80 backdrop-blur-md border border-white/10 
-                 rounded-xl shadow-xl p-4 text-xs text-gray-200">
-          <div class="font-semibold mb-2 text-white">Leyenda</div>
+        <!-- ===== LEYENDA ===== -->
+        <div
+          class="absolute left-4 bottom-4 p-4 rounded-xl bg-[#1B263B]/80 backdrop-blur-xl
+                 border border-white/10 shadow-xl text-xs text-gray-200"
+        >
+          <div class="font-semibold text-white mb-2">Leyenda</div>
 
           <div class="flex items-center gap-2 mb-1">
-            <span class="inline-block w-3 h-3 rounded-full bg-emerald-500"></span>
-            <span>Zona Alumnos</span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500"></span><span>Zona Alumnos</span>
           </div>
           <div class="flex items-center gap-2 mb-2">
-            <span class="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-            <span>Zona Docentes</span>
+            <span class="w-3 h-3 rounded-full bg-blue-500"></span><span>Zona Docentes</span>
           </div>
 
           <div class="flex items-center gap-2 mb-1">
             <img :src="icons.students.available" class="w-4 h-4" />
             <span>Alumno — Disponible</span>
           </div>
-
           <div class="flex items-center gap-2 mb-1">
             <img :src="icons.students.full" class="w-4 h-4" />
             <span>Alumno — Completo</span>
           </div>
-
           <div class="flex items-center gap-2 mb-1">
             <img :src="icons.staff.available" class="w-4 h-4" />
             <span>Docente — Disponible</span>
           </div>
-
           <div class="flex items-center gap-2">
             <img :src="icons.staff.full" class="w-4 h-4" />
             <span>Docente — Completo</span>
@@ -155,53 +207,47 @@
         </div>
       </div>
 
-      <!-- LISTA -->
+      <!-- ===== LISTA ===== -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <SpaceCard v-for="espacio in espaciosFiltrados" :key="espacio.id" :espacio="espacio" />
       </div>
-    </div>
+    </section>
 
-    <ConfirmAccessModal :open="modalOpen" :space="selectedSpace" @close="modalOpen = false"
-      @success="onAccessSuccess" />
+    <ConfirmAccessModal :open="modalOpen" :space="selectedSpace" @close="modalOpen = false" @success="onAccessSuccess" />
 
     <!-- ===== FOOTER ===== -->
-  <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
-              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+    <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+      <div
+        class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+                gap-4 px-6 py-8 text-[#B0BEC5] text-sm"
+      >
+        <div class="flex items-center gap-2">
+          <span class="text-white font-semibold tracking-wide">HayLugar</span>
+          <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
+        </div>
 
-      <!-- Branding -->
-      <div class="flex items-center gap-2">
-        <span class="text-white font-semibold tracking-wide">HayLugar</span>
-        <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
+        <div class="flex gap-6">
+          <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+            Política de Privacidad
+          </router-link>
+
+          <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+            Términos y Condiciones
+          </router-link>
+        </div>
+
+        <div class="text-xs text-[#78909C]">Universidad inteligente</div>
       </div>
-
-      <!-- Links -->
-      <div class="flex gap-6">
-        <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
-          Política de Privacidad
-        </router-link>
-
-        <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
-          Términos y Condiciones
-        </router-link>
-      </div>
-
-      <!-- Extra -->
-      <div class="text-xs text-[#78909C]">
-        Universidad inteligente
-      </div>
-    </div>
-  </footer>
-
+    </footer>
   </div>
 </template>
-
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import MainHeader from '../components/layout/header/MainHeader.vue'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
 import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue'
+import logo from '../assets/logo.png'
 import { getUniversitySpaces } from '../services/universityService'
 import { useUniversityMap } from '../logic/useUniversityMap'
 import ConfirmAccessModal from '../components/confirmAccessDialog.vue'

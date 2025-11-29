@@ -579,8 +579,8 @@ const vehicleOptions = computed(() => {
 });
 
 const hostImage = computed(() => {
-  if (space.value?.host?.profile_image) {
-    return space.value.host.profile_image;
+  if (space.value?.host?.profile_picture) {
+    return space.value.host.profile_picture;
   }
   return defaultProfile;
 });
