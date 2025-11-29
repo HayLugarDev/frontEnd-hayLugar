@@ -40,8 +40,13 @@
       </div>
 
       <!-- NAVBAR -->
-      <div class="flex overflow-x-auto px-4 py-4">
-        <div class="flex gap-4 w-full">
+<div 
+  class="flex overflow-x-auto overflow-y-hidden px-4 py-4 
+         scrollbar-none scroll-smooth snap-x snap-mandatory">
+  
+  <!-- CONTENEDOR ITEMS -->
+  <div 
+    class="flex flex-nowrap gap-4 min-w-max">
 
           <!-- Playas de estacionamiento -->
           <!-- <button :disabled="!features.playas" @click="features.playas && router.push('/parkingLots')" :class="[
