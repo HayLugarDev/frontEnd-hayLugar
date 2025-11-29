@@ -6,7 +6,7 @@
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
-    <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between md:hidden">
+    <header class="relative z-10 px-6 py-4 md:p-8 md:px-12 flex items-center justify-between md:hidden">
       <div class="flex items-center gap-3">
         <img :src="logo" alt="HayLugar" class="h-10 w-10 md:hidden" />
         <h1 class="text-2xl md:text-3xl font-semibold tracking-wide">Eventos Inteligentes</h1>
@@ -19,7 +19,7 @@
     </header>
 
     <!-- ===== HERO ===== -->
-    <section class="relative w-full h-[240px] md:h-[360px] overflow-hidden flex items-center justify-center">
+    <section class="relative w-full h-[240px] md:h-[360px] overflow-hidden flex items-center justify-center pt-10">
       <video autoplay muted loop playsinline poster="/assets/events.png"
         class="absolute inset-0 w-full h-full object-cover brightness-75">
 
