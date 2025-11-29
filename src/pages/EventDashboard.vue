@@ -6,8 +6,9 @@
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
-    <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between">
+    <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between md:hidden">
       <div class="flex items-center gap-3">
+        <img :src="logo" alt="HayLugar" class="h-10 w-10 md:hidden" />
         <h1 class="text-2xl md:text-3xl font-semibold tracking-wide">Eventos Inteligentes</h1>
       </div>
       <button
@@ -75,8 +76,32 @@
     </section>
 
     <!-- ===== FOOTER ===== -->
-    <footer class="text-center text-[#B0BEC5] text-sm py-8">
-      © {{ new Date().getFullYear() }} HayLugar — Movilidad Inteligente Argentina
+    <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+
+        <!-- Branding -->
+        <div class="flex items-center gap-2">
+          <span class="text-white font-semibold tracking-wide">HayLugar</span>
+          <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
+        </div>
+
+        <!-- Links -->
+        <div class="flex gap-6">
+          <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+            Política de Privacidad
+          </router-link>
+
+          <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+            Términos y Condiciones
+          </router-link>
+        </div>
+
+        <!-- Extra -->
+        <div class="text-xs text-[#78909C]">
+          Movilidad inteligente
+        </div>
+      </div>
     </footer>
   </div>
 </template>

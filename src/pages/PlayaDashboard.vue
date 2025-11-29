@@ -1,15 +1,20 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
-    <!-- ===== HEADER ===== -->
+
     <MainHeader class="hidden md:block" />
+
+    <!-- ===== HEADER ===== -->
+    <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between md:hidden">
+      <div class="flex items-center gap-3">
+        <img :src="logo" alt="HayLugar" class="h-10 w-10 md:hidden" />
+        <h1 class="text-2xl md:text-3xl font-semibold tracking-wide">Playas de estacionamiento</h1>
+      </div>
+    </header>
 
     <!-- ===== HERO ===== -->
     <section class="relative w-full h-[240px] md:h-[320px] overflow-hidden flex items-center justify-center">
-      <img
-        src="/assets/playa-banner.jpg"
-        alt="Playas de estacionamiento HayLugar"
-        class="absolute inset-0 w-full h-full object-cover brightness-75"
-      />
+      <img src="/assets/playa-banner.jpg" alt="Playas de estacionamiento HayLugar"
+        class="absolute inset-0 w-full h-full object-cover brightness-75" />
       <div class="absolute inset-0 bg-gradient-to-t from-[#0D1B2A]/95 via-transparent"></div>
 
       <div class="relative z-10 text-center px-4">
@@ -17,7 +22,7 @@
           Playas conectadas en tiempo real
         </h2>
         <p class="text-base md:text-lg text-white/85 max-w-2xl mx-auto">
-          Tarifas claras, capacidad disponible y acceso guiado.  
+          Tarifas claras, capacidad disponible y acceso guiado.
           Una vista profesional de las playas de estacionamiento de tu ciudad.
         </p>
       </div>
@@ -25,31 +30,15 @@
 
     <!-- ===== FILTROS ===== -->
     <section
-      class="container mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row flex-wrap items-center gap-4 justify-center bg-white/5 rounded-2xl backdrop-blur-sm mt-6"
-    >
-      <input
-        v-model="filters.search"
-        type="text"
-        placeholder="Buscar por nombre o dirección..."
-        class="bg-white/10 border border-white/10 rounded-xl px-4 py-2 w-full md:w-1/3 placeholder-gray-400 text-sm
-               focus:outline-none focus:ring-2 focus:ring-[#00B4D8]"
-      />
+      class="container mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row flex-wrap items-center gap-4 justify-center bg-white/5 rounded-2xl backdrop-blur-sm mt-6">
+      <input v-model="filters.search" type="text" placeholder="Buscar por nombre o dirección..." class="bg-white/10 border border-white/10 rounded-xl px-4 py-2 w-full md:w-1/3 placeholder-gray-400 text-sm
+               focus:outline-none focus:ring-2 focus:ring-[#00B4D8]" />
 
-      <input
-        v-model.number="filters.minCapacity"
-        type="number"
-        placeholder="Capacidad mín."
-        class="bg-white/10 border border-white/10 rounded-xl px-4 py-2 w-full md:w-32 placeholder-gray-400 text-sm
-               focus:outline-none focus:ring-2 focus:ring-[#00B4D8]"
-      />
+      <input v-model.number="filters.minCapacity" type="number" placeholder="Capacidad mín." class="bg-white/10 border border-white/10 rounded-xl px-4 py-2 w-full md:w-32 placeholder-gray-400 text-sm
+               focus:outline-none focus:ring-2 focus:ring-[#00B4D8]" />
 
-      <input
-        v-model.number="filters.maxPrice"
-        type="number"
-        placeholder="Precio máx."
-        class="bg-white/10 border border-white/10 rounded-xl px-4 py-2 w-full md:w-36 placeholder-gray-400 text-sm
-               focus:outline-none focus:ring-2 focus:ring-[#00B4D8]"
-      />
+      <input v-model.number="filters.maxPrice" type="number" placeholder="Precio máx." class="bg-white/10 border border-white/10 rounded-xl px-4 py-2 w-full md:w-36 placeholder-gray-400 text-sm
+               focus:outline-none focus:ring-2 focus:ring-[#00B4D8]" />
 
       <div class="flex items-center gap-3 text-sm text-[#B0BEC5]">
         <label class="flex items-center gap-2">
@@ -63,17 +52,13 @@
       </div>
 
       <div class="flex items-center gap-3 mt-2 md:mt-0">
-        <button
-          @click="applyFilters"
-          class="bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 text-sm transition-all"
-        >
+        <button @click="applyFilters"
+          class="bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 text-sm transition-all">
           Aplicar filtros
         </button>
 
-        <button
-          @click="toggleView"
-          class="bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl px-4 py-2 text-sm flex items-center gap-2 transition-all"
-        >
+        <button @click="toggleView"
+          class="bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl px-4 py-2 text-sm flex items-center gap-2 transition-all">
           <i :class="viewMode === 'list' ? 'fa-solid fa-map' : 'fa-solid fa-list'"></i>
           {{ viewMode === 'list' ? 'Ver mapa' : 'Ver lista' }}
         </button>
@@ -93,89 +78,68 @@
         {{ error }}
       </div>
 
-     <!-- LISTA -->
-<section v-else-if="viewMode === 'list' && filteredPlayas.length">
-  <transition-group
-    name="fade-up"
-    tag="div"
-    class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center"
-  >
-    <router-link
-      v-for="playa in filteredPlayas"
-      :key="playa.id"
-      :to="`/playa/${playa.id}`"
-      class="block group w-full max-w-sm transition-transform duration-300 hover:scale-[1.02]"
-    >
-      <div
-        class="bg-[#1B263B]/75 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg 
+      <!-- LISTA -->
+      <section v-else-if="viewMode === 'list' && filteredPlayas.length">
+        <transition-group name="fade-up" tag="div"
+          class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
+          <router-link v-for="playa in filteredPlayas" :key="playa.id" :to="`/playa/${playa.id}`"
+            class="block group w-full max-w-sm transition-transform duration-300 hover:scale-[1.02]">
+            <div class="bg-[#1B263B]/75 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg 
                hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2
-               border border-white/10 group-hover:border-accent"
-      >
-        <div class="p-4 flex flex-col gap-2">
-          <h3 class="text-lg font-semibold leading-tight">
-            {{ playa.name }}
-          </h3>
-          <p class="text-[#B0BEC5] text-xs truncate">
-            {{ playa.address }}
-          </p>
+               border border-white/10 group-hover:border-accent">
+              <div class="p-4 flex flex-col gap-2">
+                <h3 class="text-lg font-semibold leading-tight">
+                  {{ playa.name }}
+                </h3>
+                <p class="text-[#B0BEC5] text-xs truncate">
+                  {{ playa.address }}
+                </p>
 
-          <div class="flex justify-between mt-2 text-xs text-white/90">
-            <span>
-              <span class="font-semibold text-accent">Capacidad:</span>
-              {{ playa.capacity }} lugares
-            </span>
-            <span class="font-semibold text-[#00B4D8]">
-              ${{ playa.hourly_rate }} / hora
-            </span>
-          </div>
+                <div class="flex justify-between mt-2 text-xs text-white/90">
+                  <span>
+                    <span class="font-semibold text-accent">Capacidad:</span>
+                    {{ playa.capacity }} lugares
+                  </span>
+                  <span class="font-semibold text-[#00B4D8]">
+                    ${{ playa.hourly_rate }} / hora
+                  </span>
+                </div>
 
-          <p class="mt-1 text-[11px] text-[#B0BEC5]">
-            <span class="font-semibold text-accent">Horario:</span>
-            {{ formatSchedule(playa.schedule) }}
-          </p>
+                <p class="mt-1 text-[11px] text-[#B0BEC5]">
+                  <span class="font-semibold text-accent">Horario:</span>
+                  {{ formatSchedule(playa.schedule) }}
+                </p>
 
-          <div class="mt-3 rounded-xl overflow-hidden shadow-md ring-1 ring-white/10 group-hover:ring-accent">
-            <CustomGoogleMap
-              :center="{ lat: parseFloat(playa.lat), lng: parseFloat(playa.lng) }"
-              :zoom="16"
-              class="w-full h-[150px]"
-            >
-              <GMapMarker :options="getMarkerOptions(playa)" />
-            </CustomGoogleMap>
-          </div>
+                <div
+                  class="mt-3 rounded-xl overflow-hidden shadow-md max-h-96 ring-1 ring-white/10 group-hover:ring-accent">
+                  <CustomGoogleMap :center="{ lat: parseFloat(playa.lat), lng: parseFloat(playa.lng) }" :zoom="16"
+                    class="w-full h-[150px]">
+                    <GMapMarker :options="getMarkerOptions(playa)" />
+                  </CustomGoogleMap>
+                </div>
 
-          <button
-            class="mt-3 w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-4 py-2 text-xs transition-all"
-          >
-            Ver detalle
-          </button>
-        </div>
-      </div>
-    </router-link>
-  </transition-group>
-</section>
+                <button
+                  class="mt-3 w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-4 py-2 text-xs transition-all">
+                  Ver detalle
+                </button>
+              </div>
+            </div>
+          </router-link>
+        </transition-group>
+      </section>
 
       <!-- MAPA -->
       <section v-else-if="viewMode === 'map'" class="py-4">
         <div class="rounded-2xl overflow-hidden shadow-lg border border-white/10 h-[600px]">
-          <CustomGoogleMap
-            :center="mapCenter"
-            :zoom="13"
-            :options="{ disableDefaultUI: true, zoomControl: true }"
-          >
-            <GMapMarker
-              v-for="playa in filteredPlayas"
-              :key="playa.id"
-              :position="{ lat: parseFloat(playa.lat), lng: parseFloat(playa.lng) }"
-              :options="{
+          <CustomGoogleMap :center="mapCenter" :zoom="13" :options="{ disableDefaultUI: true, zoomControl: true }">
+            <GMapMarker v-for="playa in filteredPlayas" :key="playa.id"
+              :position="{ lat: parseFloat(playa.lat), lng: parseFloat(playa.lng) }" :options="{
                 title: playa.name,
                 icon: {
                   url: logoMarker,
                   scaledSize: { width: 38, height: 38 }
                 }
-              }"
-              @click="goToDetail(playa.id)"
-            />
+              }" @click="goToDetail(playa.id)" />
           </CustomGoogleMap>
         </div>
       </section>
@@ -187,9 +151,34 @@
     </div>
 
     <!-- ===== FOOTER ===== -->
-    <footer class="text-center text-[#B0BEC5] text-sm py-8 border-t border-white/10">
-      © {{ new Date().getFullYear() }} HayLugar — Playas de Estacionamiento Inteligentes
+    <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+
+        <!-- Branding -->
+        <div class="flex items-center gap-2">
+          <span class="text-white font-semibold tracking-wide">HayLugar</span>
+          <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
+        </div>
+
+        <!-- Links -->
+        <div class="flex gap-6">
+          <router-link to="/privacidad" class="hover:text-white transition-colors duration-200">
+            Política de Privacidad
+          </router-link>
+
+          <router-link to="/terminos" class="hover:text-white transition-colors duration-200">
+            Términos y Condiciones
+          </router-link>
+        </div>
+
+        <!-- Extra -->
+        <div class="text-xs text-[#78909C]">
+          Playas de Estacionamiento Inteligentes
+        </div>
+      </div>
     </footer>
+
   </div>
 </template>
 
@@ -314,10 +303,12 @@ onMounted(fetchPlayas)
 .fade-up-leave-active {
   transition: all 0.6s ease;
 }
+
 .fade-up-enter-from {
   opacity: 0;
   transform: translateY(20px);
 }
+
 .fade-up-leave-to {
   opacity: 0;
   transform: translateY(-20px);

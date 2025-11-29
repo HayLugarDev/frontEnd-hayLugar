@@ -4,7 +4,7 @@
     <MainHeader />
 
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full py-6">
-      <BackButton class="lg:hidden mb-2 text-end" />
+      <BackButton class="md:hidden mb-2 text-end" />
 
       <!-- Usamos grid-cols-1 por defecto y md:grid-cols-9 en desktop -->
       <section class="grid grid-cols-1 md:grid-cols-9 gap-6">
@@ -59,7 +59,7 @@
 
             <p class="col-span-2 text-xs text-gray-300 mt-4">
               Al confirmar el pago, aceptás nuestros
-              <a href="/terminos-y-condiciones" target="_blank" class="text-primary underline">Términos y
+              <a href="/termsConditions" target="_blank" class="text-primary underline">Términos y
                 Condiciones</a>
               y
               <a href="/politica-de-privacidad" target="_blank" class="text-primary underline">Política de
@@ -146,8 +146,32 @@
   </div>
 
   <!-- ===== FOOTER ===== -->
-  <footer class="text-center text-[#B0BEC5] text-sm py-8 border-t border-white/10">
-    © {{ new Date().getFullYear() }} HayLugar — Logística Inteligente
+  <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+
+      <!-- Branding -->
+      <div class="flex items-center gap-2">
+        <span class="text-white font-semibold tracking-wide">HayLugar</span>
+        <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
+      </div>
+
+      <!-- Links -->
+      <div class="flex gap-6">
+        <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+          Política de Privacidad
+        </router-link>
+
+        <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+          Términos y Condiciones
+        </router-link>
+      </div>
+
+      <!-- Extra -->
+      <div class="text-xs text-[#78909C]">
+        Logística inteligente
+      </div>
+    </div>
   </footer>
 
 </template>

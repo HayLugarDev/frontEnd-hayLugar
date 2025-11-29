@@ -5,8 +5,8 @@
     <div class="rounded-2xl shadow-md flex flex-col h-full transition-all duration-300 overflow-visible">
 
       <!-- IMAGEN + CONTROLES -->
-      <div class="relative w-full h-52 overflow-hidden">
-        <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover" />
+      <div class="relative w-full h-52 sm:h-40 overflow-hidden">
+        <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover rounded-t-xl" />
 
         <!-- PRICE BADGE -->
         <div class="absolute bottom-4 right-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl
@@ -17,7 +17,7 @@
       </div>
 
       <!-- CONTENIDO -->
-      <div class="flex flex-col flex-1 p-4 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/10
+      <div class="flex flex-col flex-1 p-4 rounded-2xl bg-gray-800
          -mt-3 relative z-10 shadow-lg">
 
         <!-- TITULO -->
@@ -34,8 +34,8 @@
         </p>
 
         <!-- DISTANCIA -->
-        <p v-if="espacio.distancia" class="text-md md:text-[11px] text-gray-400 mt-2 flex items-center gap-1">
-          📍 A {{ espacio.distancia.toFixed(1) }} km
+        <p v-if="espacio.distancia" class="text-md md:text-[11px] text-gray-500 mt-2 flex items-center gap-1">
+          📍 A {{ espacio.distancia.toFixed(1) }} km de distancia
         </p>
 
         <!-- RATING -->

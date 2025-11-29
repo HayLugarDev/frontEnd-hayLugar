@@ -48,18 +48,6 @@
   <div 
     class="flex flex-nowrap gap-4 min-w-max">
 
-          <!-- Playas de estacionamiento -->
-          <!-- <button :disabled="!features.playas" @click="features.playas && router.push('/parkingLots')" :class="[
-            'flex flex-col items-center justify-center p-2 min-w-[150px] bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300',
-            features.playas
-              ? 'hover:bg-white/20 hover:border-[#90BE6D] hover:shadow-[0_0_20px_#90BE6D55]'
-              : 'opacity-40 pointer-events-none'
-          ]">
-            <ParkingCircleIcon class="w-7 h-7 text-[#90BE6D]" />
-            <span class="text-white font-semibold text-[11px] md:text-sm mt-1">Playas</span>
-            <span class="text-gray-300 text-[10px] md:text-xs">Estacionamientos</span>
-          </button> -->
-
           <!-- Universidades -->
           <button :disabled="!features.universidades" @click="features.universidades && router.push('/universidades')"
             :class="[
@@ -69,8 +57,8 @@
                 : 'opacity-40 pointer-events-none'
             ]">
             <School class="w-7 h-7 text-[#06D6A0]" />
-            <span class="text-white font-semibold text-[11px] md:text-sm mt-1">Universidades</span>
-            <span class="text-gray-300 text-[10px] md:text-xs">Campus Inteligentes</span>
+            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Universidades</span>
+            <span class="text-gray-300 text-[8px] md:text-[9px]">Campus Inteligentes</span>
           </button>
 
           <!-- Medido -->
@@ -82,8 +70,8 @@
                 : 'opacity-40 pointer-events-none'
             ]">
             <ParkingSquare class="w-7 h-7 text-[#00B4D8]" />
-            <span class="text-white font-semibold text-[11px] md:text-sm mt-1">Medido</span>
-            <span class="text-gray-300 text-[10px] md:text-xs">Calles en tiempo real</span>
+            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Medido</span>
+            <span class="text-gray-300 text-[8px] md:text-[9px]">Calles en tiempo real</span>
           </button>
 
           <!-- Eventos -->
@@ -94,8 +82,8 @@
               : 'opacity-40 pointer-events-none'
           ]">
             <Ticket class="w-7 h-7 text-[#FFD166]" />
-            <span class="text-white font-semibold text-[11px] md:text-sm mt-1">Eventos</span>
-            <span class="text-gray-300 text-[10px] md:text-xs">Festivales & shows</span>
+            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Eventos</span>
+            <span class="text-gray-300 text-[8px] md:text-[9px]">Festivales & shows</span>
           </button>
 
           <!-- Industrial -->
@@ -107,26 +95,30 @@
                 : 'opacity-40 pointer-events-none'
             ]">
             <Factory class="w-7 h-7 text-[#8ECAE6]" />
-            <span class="text-white font-semibold text-[11px] md:text-sm mt-1">Industrial</span>
-            <span class="text-gray-300 text-[10px] md:text-xs">Operaciones en tiempo real</span>
+            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Industrial</span>
+            <span class="text-gray-300 text-[8px] md:text-[9px]">Operaciones en tiempo real</span>
           </button>
-            <button @click="router.push('/playa-dashboard')"
-            class="flex flex-col items-center justify-center px-5 py-4 min-w-[150px]
-                   bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl
-                   hover:bg-white/20 hover:border-[#8ECAE6] hover:shadow-[0_0_20px_#8ECAE655]
-                   transition-all duration-300">
-            <ParkingSquare class="w-7 h-7 text-[#8ECAE6]" />
-            <span class="text-white font-semibold text-sm mt-1">Playas de Estacionamientos</span>
-            <span class="text-gray-300 text-xs">Operaciones en tiempo real</span>
+
+          <!-- Playas de Estacionamientos -->
+          <button :disabled="!features.playas" @click="features.playas && router.push('/playa-dashboard')" :class="[
+            'flex flex-col items-center justify-center p-2 min-w-[150px] bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300',
+            features.playas
+              ? 'hover:bg-white/20 hover:border-[#90BE6D] hover:shadow-[0_0_20px_#90BE6D55]'
+              : 'opacity-40 pointer-events-none'
+          ]">
+            <ParkingSquare class="w-7 h-7 text-[#90BE6D]" />
+            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Playas</span>
+            <span class="text-gray-300 text-[8px] md:text-[9px]">Estacionamientos en tiempo real</span>
           </button>
+
         </div>
       </div>
 
       <!-- RESULTADOS -->
-      <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-4 md:p-8">
+      <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-4 md:py-0 md:px-8">
 
         <!-- LISTA -->
-        <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 
+        <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 
                  gap-6 justify-items-center">
 
           <div v-if="error" class="absolute inset-0 flex justify-center items-center text-red-400 text-xl">
@@ -157,19 +149,43 @@
 
       </div>
 
-      <!-- FOOTER -->
-      <footer class="text-center text-[#B0BEC5] text-sm py-6 border-t border-white/10 bg-black/20 backdrop-blur-xl">
-        © {{ new Date().getFullYear() }} HayLugar — Movilidad Inteligente
+      <!-- ===== FOOTER ===== -->
+      <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+
+          <!-- Branding -->
+          <div class="flex items-center gap-2">
+            <span class="text-white font-semibold tracking-wide">HayLugar</span>
+            <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
+          </div>
+
+          <!-- Links -->
+          <div class="flex gap-6">
+            <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+              Política de Privacidad
+            </router-link>
+
+            <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+              Términos y Condiciones
+            </router-link>
+          </div>
+
+          <!-- Extra -->
+          <div class="text-xs text-[#78909C]">
+            Movilidad inteligente
+          </div>
+        </div>
       </footer>
 
-      <WelcomeSpeech />
+      <!-- BOTÓN MAPA (DESKTOP) -->
+      <MapButton v-if="spaces && spaces.length" :text="buttonText" @toggle="toggleMap" class="fixed" />
 
+      <WelcomeSpeech />
     </div>
 
   </div>
 
-  <!-- BOTÓN MAPA (DESKTOP) -->
-  <MapButton v-if="spaces && spaces.length" :text="buttonText" @toggle="toggleMap" class="fixed" />
 
 </template>
 

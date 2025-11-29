@@ -1,10 +1,11 @@
 <template>
+  <MainHeader class="hidden md:block" />
   <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
     <!-- Header -->
     <section class="py-16 px-6 text-center max-w-4xl mx-auto">
       <h1 class="text-3xl md:text-4xl font-bold mb-2">Términos y Condiciones de Uso</h1>
       <p class="text-gray-300">Última actualización: <span class="font-semibold">10/10/2025</span></p>
-      <p class="text-gray-400 mt-2 text-sm">
+      <p class="text-gray-300 mt-2 text-sm">
         Este documento forma parte integral de la
         <RouterLink to="/PrivacyPolicy" class="text-accent underline">Política de Privacidad</RouterLink>
         y la
@@ -120,7 +121,7 @@
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">15. Autoridades y Contacto</h2>
           <ul class="list-disc ml-6 space-y-1">
-            <li>Soporte: <a href="mailto:apphaylugar@gmail.com" class="text-primary underline font-semibold">apphaylugar@gmail.com</a></li>
+            <li>Soporte: <a href="mailto:apphaylugar@gmail.com" class="text-primary underline font-semibold">soportehaylugar@gmail.com</a></li>
             <li>Defensa del Consumidor: <a href="https://www.argentina.gob.ar/defensadelconsumidor" target="_blank" class="text-primary underline font-semibold">https://www.argentina.gob.ar/defensadelconsumidor</a></li>
           </ul>
         </div>
@@ -136,6 +137,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import MainHeader from '../components/layout/header/MainHeader.vue';
 const currentYear = computed(() => new Date().getFullYear())
 </script>
 
