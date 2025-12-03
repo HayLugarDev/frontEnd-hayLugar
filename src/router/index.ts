@@ -26,6 +26,10 @@ import ImpactDashboard from '../pages/ImpactDashboard.vue'
 import IndustrialDashboard from '../pages/IndustrialDashboard.vue'
 import AdminPage from '../pages/AdminPage.vue'
 import PlayaDashboard from '../pages/PlayaDashboard.vue'
+import IndustrialDetail from '../pages/IndustrialDetail.vue'
+import IndustrialSpaceCreate from '../pages/IndustrialSpaceCreate.vue'
+import IndustrialParkCreate from '../pages/IndustrialParkCreate.vue'
+import IndustrialReservation from '../pages/IndustrialReservation.vue'
 
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -77,6 +81,19 @@ const routes: RouteRecordRaw[] = [
   meta: { requiresAuth: true },
   props: true, // 👈 habilita recibir "id" como prop
 },
+{ path: '/industrial/new-park', component: IndustrialParkCreate },
+{ path: '/industrial/new-space', component: IndustrialSpaceCreate },
+{
+  path: '/industrial/:slug',
+  name: 'IndustrialDetail',
+   component: IndustrialDetail
+},
+{
+  path: '/industrial/:slug/industrial-reservation',
+  name: 'IndustrialReservatio',
+   component: IndustrialReservation
+},
+
 
 { path: '/event-qr/:token', name: 'ReservationQR', component: ReservationQR },
 

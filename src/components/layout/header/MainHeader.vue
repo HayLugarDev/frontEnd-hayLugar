@@ -29,7 +29,26 @@
       </button>
 
       <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
+            <button
+    @click="router.push('/add-space')"
+    class="bg-[#06D6A0] hover:bg-[#00B4D8] text-[#0D1B2A] font-semibold px-4 py-2 rounded-xl shadow-lg text-sm transition-all"
+  >
+    + Publica tu espacio
+  </button>
 
+        <!-- <button
+    @click="router.push('/industrial/new-space')"
+    class="bg-[#06D6A0] hover:bg-[#00B4D8] text-[#0D1B2A] font-semibold px-4 py-2 rounded-xl shadow-lg text-sm transition-all"
+  >
+    + Crear Espacio
+  </button> -->
+  <!-- <button
+    @click="router.push('/industrial/new-park')"
+    class="bg-white/10 hover:bg-white/20 text-sm px-4 py-2 rounded-xl border border-white/20 transition-all"
+  >
+    + Crear Parque
+  </button> -->
+  
       <!-- Botón ayuda -->
       <font-awesome-icon 
         icon="fa-regular fa-circle-question"

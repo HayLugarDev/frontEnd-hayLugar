@@ -1,107 +1,210 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white">
-    <!-- Header -->
-    <header class="flex items-center justify-between px-6 md:px-12 py-6 border-b border-white/10 bg-[#0D1B2A]/70 backdrop-blur">
+  <div
+    class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white flex flex-col"
+  >
+    <MainHeader class="hidden md:block" />
+
+    <!-- HEADER -->
+    <header
+      class="flex items-center justify-between px-6 md:px-12 py-6 border-b border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl shadow-lg"
+    >
       <div class="flex items-center gap-3">
         <img :src="logo" alt="HayLugar" class="h-10 w-10" />
-        <h1 class="text-xl md:text-2xl font-semibold tracking-wide">Confirmar reserva</h1>
+        <div>
+          <p class="text-xs md:text-sm text-[#A0B0C0] tracking-wide">
+            Reserva industrial · Paso 1
+          </p>
+          <h1 class="text-xl md:text-2xl font-semibold tracking-wide">
+            Confirmar reserva del espacio
+          </h1>
+        </div>
       </div>
-      <button @click="router.back()" class="text-sm bg-white/10 hover:bg-white/15 px-4 py-2 rounded-xl border border-white/10">
+
+      <button
+        @click="router.back()"
+        class="text-xs md:text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl border border-white/10 transition-all"
+      >
         ← Volver
       </button>
     </header>
 
-    <!-- ===== MAIN ===== -->
-    <section class="container mx-auto px-6 md:px-12 py-8 grid md:grid-cols-3 gap-8">
-      <!-- Columna izquierda -->
-      <div class="md:col-span-2 space-y-6">
-        <!-- Summary -->
-        <div class="bg-[#1B263B]/60 border border-white/10 rounded-2xl p-6">
-          <h2 class="text-lg font-semibold mb-2">{{ space?.name || 'Cargando…' }}</h2>
+    <!-- MAIN -->
+    <section class="container mx-auto px-6 md:px-12 py-10 grid md:grid-cols-3 gap-10">
+
+      <!-- ======================== COLUMNA IZQUIERDA ======================== -->
+      <div class="md:col-span-2 flex flex-col gap-8">
+
+        <!-- === RESUMEN DEL ESPACIO === -->
+        <div class="bg-[#1B263B]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
+          <h2 class="text-xl font-semibold">{{ space?.name }}</h2>
           <p class="text-[#B0BEC5] text-sm">{{ space?.location }}</p>
-          <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-[#B0BEC5]">
-            <div class="bg-white/5 rounded-xl p-3 flex items-center justify-between">
-              <i class="fa-solid fa-layer-group text-[#FFD166]"></i>
-              <span>{{ formatType(space?.subcategory) }}</span>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 text-sm">
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-1">
+              <span class="text-[10px] text-[#78909C] uppercase">Tipo</span>
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-[#FFD166]"></i>
+                <span class="font-medium">{{ formatType(space?.subcategory) }}</span>
+              </div>
             </div>
-            <div class="bg-white/5 rounded-xl p-3 flex items-center justify-between">
-              <i class="fa-solid fa-ruler-combined text-[#06D6A0]"></i>
-              <span>{{ space?.capacity_m2 ?? '—' }} m²</span>
+
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-1">
+              <span class="text-[10px] text-[#78909C] uppercase">Superficie</span>
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-ruler-combined text-[#06D6A0]"></i>
+                <span class="font-medium">{{ space?.capacity_m2 }} m²</span>
+              </div>
             </div>
-            <div class="bg-white/5 rounded-xl p-3 flex items-center justify-between">
-              <i class="fa-solid fa-up-down text-[#00B4D8]"></i>
-              <span>{{ space?.height_m ?? '—' }} m</span>
+
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-1">
+              <span class="text-[10px] text-[#78909C] uppercase">Altura útil</span>
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-up-down text-[#00B4D8]"></i>
+                <span class="font-medium">{{ space?.height_m ?? '—' }} m</span>
+              </div>
             </div>
-            <div class="bg-white/5 rounded-xl p-3 flex items-center justify-between">
-              <i class="fa-solid fa-bolt text-[#06D6A0]"></i>
-              <span>Trifásica {{ space?.energy_3phase ? '✔' : '—' }}</span>
+
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-1">
+              <span class="text-[10px] text-[#78909C] uppercase">Energía</span>
+              <div class="flex items-center gap-2">
+                <i
+                  class="fa-solid fa-bolt"
+                  :class="space?.energy_3phase ? 'text-[#FFD166]' : 'text-[#607D8B]'"
+                ></i>
+                <span class="font-medium">{{ space?.energy_3phase ? 'Trifásica' : 'No trifásica' }}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Formulario -->
-        <div class="bg-[#1B263B]/60 border border-white/10 rounded-2xl p-6 space-y-5">
+        <!-- === FORMULARIO === -->
+        <div class="bg-[#1B263B]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl space-y-6">
+
+          <!-- Fechas -->
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">Desde</label>
-              <input type="datetime-local" v-model="startDate" class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#00B4D8] outline-none" />
+              <input
+                v-model="startDate"
+                type="datetime-local"
+                class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#00B4D8] outline-none"
+              />
+              <p v-if="errors.startDate" class="text-xs text-red-400 mt-1">{{ errors.startDate }}</p>
             </div>
+
             <div>
               <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">Hasta</label>
-              <input type="datetime-local" v-model="endDate" class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#00B4D8] outline-none" />
+              <input
+                v-model="endDate"
+                type="datetime-local"
+                class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#00B4D8] outline-none"
+              />
+              <p v-if="errors.endDate" class="text-xs text-red-400 mt-1">{{ errors.endDate }}</p>
             </div>
           </div>
 
+          <!-- PRECIOS + MÉTODO -->
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">Unidad de precio</label>
-              <select v-model="pricingUnit" class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm">
+              <select
+                v-model="pricingUnit"
+                class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#00B4D8]"
+              >
                 <option value="hour">Hora</option>
                 <option value="day">Día</option>
                 <option value="week">Semana</option>
                 <option value="month">Mes</option>
               </select>
             </div>
+
             <div>
-              <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">Método</label>
-              <select v-model="method" class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm">
+              <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">Método de pago</label>
+              <select
+                v-model="method"
+                class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#00B4D8]"
+              >
                 <option value="wallet">Billetera HayLugar</option>
                 <option value="mercadopago">Mercado Pago</option>
-                <option value="manual_contract">Contrato (reservar sin pagar)</option>
+                <option value="manual_contract">Contrato (sin pago)</option>
               </select>
             </div>
           </div>
 
+          <!-- DESCRIPCIÓN DE OPERACIÓN -->
           <div>
-            <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">Notas (opcional)</label>
-            <textarea v-model="notes" rows="3" placeholder="Ej: Detallar horarios de carga/descarga, requerimientos de acceso, etc."
-              class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm placeholder-gray-400"></textarea>
+            <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">
+              Descripción de la operación
+            </label>
+            <textarea
+              v-model="operationDetails"
+              rows="3"
+              class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#00B4D8] outline-none resize-none placeholder-gray-400"
+              placeholder="Ej: 45 pallets semanal, carga seca, ingreso de flota 3 unidades..."
+            ></textarea>
+            <p v-if="errors.operationDetails" class="text-xs text-red-400 mt-1">{{ errors.operationDetails }}</p>
+          </div>
+
+          <!-- RESPONSABLE -->
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">Responsable</label>
+              <input
+                v-model="contactName"
+                type="text"
+                class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#00B4D8]"
+                placeholder="Nombre y apellido"
+              />
+              <p v-if="errors.contactName" class="text-xs text-red-400 mt-1">{{ errors.contactName }}</p>
+            </div>
+
+            <div>
+              <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">Teléfono / WhatsApp</label>
+              <input
+                v-model="contactPhone"
+                type="text"
+                class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#00B4D8]"
+                placeholder="+54 9 ..."
+              />
+              <p v-if="errors.contactPhone" class="text-xs text-red-400 mt-1">{{ errors.contactPhone }}</p>
+            </div>
           </div>
         </div>
 
-        <!-- Disponibilidad -->
-        <div class="bg-[#1B263B]/60 border border-white/10 rounded-2xl p-6">
-          <h3 class="text-lg font-semibold mb-3">Disponibilidad</h3>
+        <!-- === VENTANA OPERATIVA === -->
+        <div class="bg-[#1B263B]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
+          <h3 class="text-lg font-semibold mb-3">Ventana operativa</h3>
+
           <div class="grid grid-cols-7 gap-2 text-xs">
-            <div v-for="d in demoDays" :key="d.label" class="rounded-lg px-2 py-3 text-center border"
-                 :class="d.available ? 'bg-[#06D6A0]/15 border-[#06D6A0]/30' : 'bg-white/5 border-white/10 text-[#B0BEC5]'">
+            <div
+              v-for="d in demoDays"
+              :key="d.label"
+              class="rounded-lg px-2 py-3 text-center border"
+              :class="d.available ? 'bg-[#06D6A0]/15 border-[#06D6A0]/30' : 'bg-white/5 border-white/10 text-[#B0BEC5]'"
+            >
               <div class="font-semibold">{{ d.label }}</div>
               <div class="opacity-80">{{ d.range }}</div>
             </div>
           </div>
-          <p class="text-[#B0BEC5] text-xs mt-2">* Vista ilustrativa según ventana operativa informada por el anfitrión.</p>
+
+          <p class="text-[#B0BEC5] text-xs mt-2">
+            * Orientativo según disponibilidad general del parque industrial.
+          </p>
         </div>
       </div>
 
-      <!-- Columna derecha -->
-      <aside class="bg-[#1B263B]/60 border border-white/10 rounded-2xl p-6 h-fit sticky top-8">
+      <!-- ======================== COLUMNA DERECHA ======================== -->
+      <aside
+        class="bg-[#1B263B]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 h-fit sticky top-8 shadow-xl"
+      >
         <h4 class="text-lg font-semibold mb-4">Resumen</h4>
+
         <ul class="space-y-2 text-sm text-[#B0BEC5]">
           <li class="flex justify-between"><span>Espacio</span><span class="text-white">{{ space?.name }}</span></li>
           <li class="flex justify-between"><span>Desde</span><span class="text-white">{{ startDate || '—' }}</span></li>
           <li class="flex justify-between"><span>Hasta</span><span class="text-white">{{ endDate || '—' }}</span></li>
           <li class="flex justify-between"><span>Unidad</span><span class="text-white capitalize">{{ pricingUnit }}</span></li>
-          <li class="flex justify-between"><span>Precio unidad</span><span class="text-white">${{ pricePerUnit || 0 }}</span></li>
+          <li class="flex justify-between"><span>Precio unidad</span><span class="text-white">${{ pricePerUnit }}</span></li>
           <li class="flex justify-between"><span>Método</span><span class="text-white">{{ methodLabel }}</span></li>
         </ul>
 
@@ -115,138 +218,207 @@
         <button
           :disabled="!canConfirm"
           @click="openConfirm = true"
-          class="w-full mt-5 bg-gradient-to-r from-[#00B4D8] to-[#06D6A0] hover:opacity-90 text-[#0D1B2A] font-semibold py-3 rounded-xl transition-all disabled:opacity-50"
+          class="w-full mt-6 bg-gradient-to-r from-[#00B4D8] to-[#06D6A0] hover:opacity-90 text-[#0D1B2A] font-semibold py-3 rounded-xl transition-all shadow-md hover:shadow-xl disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Continuar
         </button>
 
-        <p class="text-[11px] text-[#B0BEC5] mt-3">
-          La confirmación final y cobro (si aplica) se realizará cuando conectemos con el backend.
+        <p class="text-[11px] text-[#90A4AE] mt-4">
+          No se realiza ningún cobro en esta instancia.
         </p>
       </aside>
     </section>
 
-    <!-- Modal Confirmación -->
-    <div v-if="openConfirm" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-6">
-      <div class="bg-[#0D1B2A] border border-white/10 rounded-2xl p-6 w-full max-w-lg">
+    <!-- ======================== MODAL ======================== -->
+    <div
+      v-if="openConfirm"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-6"
+    >
+      <div class="bg-[#0D1B2A] border border-white/10 rounded-2xl p-6 w-full max-w-lg shadow-2xl">
         <h3 class="text-lg font-semibold">Confirmar reserva</h3>
-        <p class="text-[#B0BEC5] text-sm mt-1">
-          Revisá los datos antes de confirmar. Este paso no realiza cobros reales.
-        </p>
+        <p class="text-[#B0BEC5] text-sm mt-1">Revisá los datos antes de continuar.</p>
 
-        <div class="mt-4 bg-[#1B263B] rounded-xl p-4 text-sm text-[#CFD8DC] space-y-2">
+        <div class="bg-[#1B263B] p-4 rounded-xl mt-4 text-sm space-y-2 border border-white/10">
           <div class="flex justify-between"><span>Espacio</span><span class="text-white">{{ space?.name }}</span></div>
-          <div class="flex justify-between"><span>Período</span><span class="text-white">{{ startDate }} → {{ endDate }}</span></div>
+          <div class="flex justify-between">
+            <span>Período</span>
+            <span class="text-white">{{ startDate }} → {{ endDate }}</span>
+          </div>
           <div class="flex justify-between"><span>Método</span><span class="text-white">{{ methodLabel }}</span></div>
-          <div class="flex justify-between"><span>Total estimado</span><span class="text-[#00B4D8] font-semibold">${{ estimation }}</span></div>
-          <div v-if="method==='manual_contract'" class="text-xs text-[#FFD166]">
-            * “Reserva sin pago”: el equipo comercial te contactará para formalizar contrato.
+          <div class="flex justify-between">
+            <span>Total</span>
+            <span class="text-[#00B4D8] font-semibold">${{ estimation }}</span>
+          </div>
+          <div
+            v-if="method === 'manual_contract'"
+            class="text-xs text-[#FFD166]"
+          >
+            * El equipo comercial se pondrá en contacto para formalizar contrato.
           </div>
         </div>
 
-        <div class="mt-5 flex items-center gap-3">
-          <button @click="confirmReservation" class="px-4 py-2 rounded-xl bg-white text-[#0D1B2A] font-semibold hover:opacity-90">
+        <div class="flex items-center gap-3 mt-5">
+          <button
+            @click="confirmReservation"
+            class="px-4 py-2 bg-white text-[#0D1B2A] rounded-xl font-semibold hover:opacity-90"
+          >
             Confirmar
           </button>
-          <button @click="openConfirm=false" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">
+
+          <button
+            @click="openConfirm = false"
+            class="px-4 py-2 bg-white/10 border border-white/10 rounded-xl hover:bg-white/20"
+          >
             Cancelar
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ===== FOOTER ===== -->
-      <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
-              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
-
-          <!-- Branding -->
-          <div class="flex items-center gap-2">
-            <span class="text-white font-semibold tracking-wide">HayLugar</span>
-            <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
-          </div>
-
-          <!-- Links -->
-          <div class="flex gap-6">
-            <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
-              Política de Privacidad
-            </router-link>
-
-            <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
-              Términos y Condiciones
-            </router-link>
-          </div>
-
-          <!-- Extra -->
-          <div class="text-xs text-[#78909C]">
-            Logística inteligente
-          </div>
+    <!-- FOOTER -->
+    <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+      <div
+        class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+              gap-4 px-6 py-8 text-[#B0BEC5] text-sm"
+      >
+        <div class="flex items-center gap-2">
+          <span class="text-white font-semibold tracking-wide">HayLugar</span>
+          <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
         </div>
-      </footer>
+        <div class="flex gap-6">
+          <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+            Política de Privacidad
+          </router-link>
+          <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+            Términos y Condiciones
+          </router-link>
+        </div>
+        <div class="text-xs text-[#78909C]">
+          Logística inteligente
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import logo from '../assets/logo.png'
-import api from '../services/apiService'
-import { useSpaceStore } from '../store/spaceStore'
-import { useReservationIndustrialStore } from '../store/reservationIndustrialStore' // ✅ nuevo
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-const route = useRoute()
-const router = useRouter()
-const spaceStore = useSpaceStore()
-const reservationStore = useReservationIndustrialStore() // ✅
+import logo from "../assets/logo.png";
+import MainHeader from "../components/layout/header/MainHeader.vue";
 
-const space = ref<any>(null)
-const startDate = ref('')
-const endDate = ref('')
-const pricingUnit = ref<'hour'|'day'|'week'|'month'>('day')
-const method = ref<'wallet'|'mercadopago'|'manual_contract'>('wallet')
-const notes = ref('')
-const openConfirm = ref(false)
+import api from "../services/apiService";
+import { useSpaceStore } from "../store/spaceStore";
+import { useReservationIndustrialStore } from "../store/reservationIndustrialStore";
 
-const pricePerUnit = computed(() => Number(space.value?.price_per_unit || 0))
-const methodLabel = computed(() =>
-  method.value === 'wallet' ? 'Billetera HayLugar'
-  : method.value === 'mercadopago' ? 'Mercado Pago'
-  : 'Contrato (sin pago)'
-)
+const route = useRoute();
+const router = useRouter();
+
+// Stores
+const spaceStore = useSpaceStore();
+const reservationStore = useReservationIndustrialStore();
+
+// Data refs
+const space = ref<any>(null);
+
+const startDate = ref("");
+const endDate = ref("");
+
+const pricingUnit = ref<"hour" | "day" | "week" | "month">("day");
+const method = ref<"wallet" | "mercadopago" | "manual_contract">("wallet");
+
+const operationDetails = ref("");
+const contactName = ref("");
+const contactPhone = ref("");
+
+const notes = ref("");
+const openConfirm = ref(false);
+
+const errors = ref<any>({});
+
+// Computed
+const pricePerUnit = computed(() => Number(space.value?.price_per_unit || 0));
+
+const methodLabel = computed(() => {
+  return method.value === "wallet"
+    ? "Billetera HayLugar"
+    : method.value === "mercadopago"
+    ? "Mercado Pago"
+    : "Contrato (sin pago)";
+});
 
 const estimation = computed(() =>
-  spaceStore.estimateCost(pricingUnit.value, pricePerUnit.value, startDate.value, endDate.value)
-)
-const canConfirm = computed(() => Boolean(space.value && startDate.value && endDate.value))
+  spaceStore.estimateCost(
+    pricingUnit.value,
+    pricePerUnit.value,
+    startDate.value,
+    endDate.value
+  )
+);
+
+const canConfirm = computed(
+  () => !!space.value && !!startDate.value && !!endDate.value
+);
 
 const demoDays = computed(() => {
-  const base = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
+  const base = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
   return base.map((label, i) => ({
     label,
-    range: space.value?.availability?.start && space.value?.availability?.end
-      ? `${space.value.availability.start}–${space.value.availability.end}`
-      : '08:00–18:00',
-    available: i < 5
-  }))
-})
+    range:
+      space.value?.availability?.start && space.value?.availability?.end
+        ? `${space.value.availability.start}–${space.value.availability.end}`
+        : "08:00–18:00",
+    available: i < 5,
+  }));
+});
 
+// On mount
 onMounted(async () => {
-  const slug = route.params.slug as string
-  const res = await api.get(`/spaces/getbyslug/${slug}`)
-  const sp = res.data
-  let imgs = sp?.images
-  if (typeof imgs === 'string') { try { imgs = JSON.parse(imgs) } catch { imgs = [] } }
-  space.value = { ...sp, images: Array.isArray(imgs) ? imgs : [] }
+  const slug = route.params.slug as string;
 
-  pricingUnit.value = (space.value?.pricing_unit || 'day')
-  startDate.value = new Date().toISOString().slice(0,16)
-  const end = new Date(); end.setDate(end.getDate()+1)
-  endDate.value = end.toISOString().slice(0,16)
-})
+  const res = await api.get(`industrial/spaces/slug/${slug}`);
+  const sp = res.data;
 
+  let imgs = sp?.images;
+  if (typeof imgs === "string") {
+    try {
+      imgs = JSON.parse(imgs);
+    } catch {
+      imgs = [];
+    }
+  }
+
+  space.value = { ...sp, images: Array.isArray(imgs) ? imgs : [] };
+
+  pricingUnit.value = space.value?.pricing_unit || "day";
+
+  startDate.value = new Date().toISOString().slice(0, 16);
+  const end = new Date();
+  end.setDate(end.getDate() + 1);
+  endDate.value = end.toISOString().slice(0, 16);
+});
+
+// Validate
+function validateForm() {
+  errors.value = {};
+
+  if (!startDate.value) errors.value.startDate = "Ingresá la fecha de inicio.";
+  if (!endDate.value) errors.value.endDate = "Ingresá la fecha de fin.";
+  if (!operationDetails.value || operationDetails.value.length < 10)
+    errors.value.operationDetails = "Describí brevemente tu operación.";
+  if (!contactName.value) errors.value.contactName = "Ingresá un responsable.";
+  if (!contactPhone.value) errors.value.contactPhone = "Ingresá teléfono de contacto.";
+
+  return Object.keys(errors.value).length === 0;
+}
+
+// Confirm reservation
 async function confirmReservation() {
+  if (!validateForm()) return;
+
   reservationStore.setReservationData({
-    space_id: space.value?.id,
+    space_id: space.value.id,
     slug: route.params.slug as string,
     start_time: new Date(startDate.value).toISOString(),
     end_time: new Date(endDate.value).toISOString(),
@@ -255,26 +427,33 @@ async function confirmReservation() {
     estimated_total: estimation.value,
     method: method.value,
     notes: notes.value,
-  })
+    operation_details: operationDetails.value,
+    contact_name: contactName.value,
+    contact_phone: contactPhone.value,
+  });
 
   try {
-    const res = await reservationStore.submitIndustrialReservation()
-    console.log('✅ Reserva creada correctamente:', res)
-    openConfirm.value = false
-    router.push({ name: 'IndustrialDetail', params: { slug: route.params.slug } })
+    await reservationStore.submitIndustrialReservation();
+    openConfirm.value = false;
+
+    router.push({
+      name: "IndustrialDetail",
+      params: { slug: route.params.slug },
+    });
   } catch (err) {
-    console.error('❌ Error al crear la reserva industrial:', err)
+    console.error("Error al crear reserva industrial:", err);
   }
 }
 
+// Format
 function formatType(type?: string) {
   const map: Record<string, string> = {
-    warehouse: 'Depósito',
-    dock: 'Dársena',
-    yard: 'Patio Logístico',
-    cold_storage: 'Cámara Fría',
-    logistics: 'Centro Logístico',
-  }
-  return type ? (map[type] || 'Industrial') : 'Industrial'
+    warehouse: "Depósito",
+    dock: "Dársena",
+    yard: "Patio Logístico",
+    cold_storage: "Cámara Fría",
+    logistics: "Centro Logístico",
+  };
+  return type ? map[type] || "Industrial" : "Industrial";
 }
 </script>
