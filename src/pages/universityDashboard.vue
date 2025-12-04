@@ -1,6 +1,11 @@
 <template>
-  <!-- HEADER SOLO EN DESKTOP -->
-  <MainHeader class="hidden md:block" />
+
+  <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  
+  <MainHeader />
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
@@ -11,7 +16,7 @@
   >
     <!-- ===== HEADER + TABS ===== -->
     <header
-      class="relative z-10 px-6 py-4 md:px-12 flex items-center justify-between
+      class="relative z-10 px-6 pt-16 py-4 md:px-12 flex flex-col items-center
              bg-gradient-to-b from-black/20 to-transparent md:hidden"
     >
       <div class="flex items-center gap-3">
@@ -26,7 +31,7 @@
         <button
           class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
                  backdrop-blur-md bg-white/10 hover:bg-white/20 shadow-md"
-          :class="showMap ? 'text-[#06D6A0]' : 'text-gray-300'"
+          :class="showMap ? 'text-newgreen' : 'text-gray-300'"
           @click="showMap = true"
         >
           Mapa
@@ -35,7 +40,7 @@
         <button
           class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
                  backdrop-blur-md bg-white/10 hover:bg-white/20 shadow-md"
-          :class="!showMap ? 'text-[#06D6A0]' : 'text-gray-300'"
+          :class="!showMap ? 'text-newgreen' : 'text-gray-300'"
           @click="showMap = false"
         >
           Lista
@@ -54,7 +59,7 @@
           class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
                  backdrop-blur-sm shadow-sm"
           :class="filters.groups.students
-            ? 'bg-[#06D6A0]/30 text-[#06D6A0]'
+            ? 'bg-newgreen/30 text-newgreen'
             : 'bg-white/5 text-gray-300 hover:bg-white/10'"
           @click="toggleGroup('students')"
         >
@@ -139,7 +144,7 @@
 
               <span
                 class="ml-auto text-xs font-semibold"
-                :class="hoveredSpace.capacity > 0 ? 'text-[#06D6A0]' : 'text-rose-400'"
+                :class="hoveredSpace.capacity > 0 ? 'text-newgreen' : 'text-rose-400'"
               >
                 {{ hoveredSpace.capacity > 0 ? 'Disponible' : 'Completo' }}
               </span>
@@ -165,7 +170,7 @@
             </div>
 
             <button
-              class="mt-4 w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-dark font-semibold 
+              class="mt-4 w-full bg-[#00B4D8] hover:bg-newgreen text-dark font-semibold 
                      rounded-xl py-2 transition-all shadow-md"
               @click="openAccessModal(hoveredSpace)"
             >
@@ -253,6 +258,7 @@ import { useUniversityMap } from '../logic/useUniversityMap'
 import ConfirmAccessModal from '../components/confirmAccessDialog.vue'
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue'
 import { useRouter } from 'vue-router'
+import BackButton from '../components/common/BackButton.vue'
 
 const router = useRouter();
 

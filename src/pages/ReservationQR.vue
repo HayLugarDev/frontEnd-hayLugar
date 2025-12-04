@@ -2,7 +2,7 @@
   <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white p-6 relative overflow-hidden">
     <!-- Fondo decorativo -->
     <div class="absolute inset-0 -z-10 opacity-20">
-      <div class="absolute top-0 left-0 w-64 h-64 bg-[#06D6A0]/30 blur-[160px]"></div>
+      <div class="absolute top-0 left-0 w-64 h-64 bg-newgreen/30 blur-[160px]"></div>
       <div class="absolute bottom-0 right-0 w-64 h-64 bg-[#00B4D8]/30 blur-[160px]"></div>
     </div>
 
@@ -13,7 +13,7 @@
         <span>Volver</span>
       </button>
       <h1 class="text-lg font-semibold tracking-wide">Pase Digital</h1>
-      <span class="text-xs text-[#06D6A0] uppercase font-medium">Activo</span>
+      <span class="text-xs text-newgreen uppercase font-medium">Activo</span>
     </header>
 
     <!-- TARJETA QR -->
@@ -47,7 +47,7 @@
       <div class="mt-6 flex flex-col gap-3 w-full">
         <button
           @click="copyToken"
-          class="w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 transition"
+          class="w-full bg-[#00B4D8] hover:bg-newgreen text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 transition"
         >
           Copiar token
         </button>
@@ -60,7 +60,7 @@
       </div>
 
       <transition name="fade">
-        <p v-if="copied" class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[#06D6A0] text-xs font-semibold animate-bounce">
+        <p v-if="copied" class="absolute bottom-4 left-1/2 -translate-x-1/2 text-newgreen text-xs font-semibold animate-bounce">
           ¡Token copiado!
         </p>
       </transition>

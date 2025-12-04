@@ -1,6 +1,12 @@
 <template>
-  <MainHeader class="hidden md:block" />
-  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
+
+  <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  <MainHeader />
+  
+  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-0">
     <!-- Header -->
     <section class="py-16 px-6 text-center max-w-4xl mx-auto">
       <h1 class="text-3xl md:text-4xl font-bold mb-2">Términos y Condiciones de Uso</h1>
@@ -138,6 +144,7 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import MainHeader from '../components/layout/header/MainHeader.vue';
+import BackButton from '../components/common/BackButton.vue';
 const currentYear = computed(() => new Date().getFullYear())
 </script>
 

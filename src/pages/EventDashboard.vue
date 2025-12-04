@@ -1,19 +1,24 @@
 <template>
-  <!-- HEADER SOLO EN DESKTOP -->
-  <MainHeader class="hidden md:block" />
+
+  <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  
+  <MainHeader />
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
-    <header class="relative z-10 px-6 py-4 md:p-8 md:px-12 flex items-center justify-between md:hidden">
+    <header class="relative z-10 px-6 pt-16 py-4 md:p-8 md:px-12 flex items-center justify-between md:hidden">
       <div class="flex items-center gap-3">
         <img :src="logo" alt="HayLugar" class="h-10 w-10 md:hidden" />
         <h1 class="text-2xl md:text-3xl font-semibold tracking-wide">Eventos Inteligentes</h1>
       </div>
       <button
-        class="hidden md:flex items-center gap-2 bg-[#06D6A0]/20 hover:bg-[#06D6A0]/30 px-4 py-2 rounded-xl transition-all">
-        <i class="fa-solid fa-leaf text-[#06D6A0]"></i>
+        class="hidden md:flex items-center gap-2 bg-newgreen/20 hover:bg-newgreen/30 px-4 py-2 rounded-xl transition-all">
+        <i class="fa-solid fa-leaf text-newgreen"></i>
         <span class="text-sm font-medium">Impacto sustentable</span>
       </button>
     </header>
@@ -51,7 +56,7 @@
             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
           <div class="absolute inset-0 bg-gradient-to-t from-[#0D1B2A]/80 via-transparent"></div>
           <div class="absolute bottom-3 left-3 text-sm text-white">
-            <span class="bg-[#06D6A0]/20 px-3 py-1 rounded-full font-medium uppercase tracking-wider">
+            <span class="bg-newgreen/20 px-3 py-1 rounded-full font-medium uppercase tracking-wider">
               {{ formatType(event.type) }}
             </span>
           </div>
@@ -62,12 +67,12 @@
           <p class="text-[#B0BEC5] text-sm">{{ formatDateRange(event.start_date, event.end_date) }}</p>
 
           <div class="flex items-center justify-between mt-2">
-            <span class="text-[#06D6A0] text-sm font-medium">Zonas disponibles</span>
+            <span class="text-newgreen text-sm font-medium">Zonas disponibles</span>
             <span class="text-[#00B4D8] text-xs uppercase tracking-wide">Activa</span>
           </div>
 
           <button @click="goToDetail(event.id)"
-            class="mt-4 bg-[#00B4D8] hover:bg-[#06D6A0] text-dark font-semibold rounded-xl px-4 py-2 transition-all text-sm">
+            class="mt-4 bg-[#00B4D8] hover:bg-newgreen text-dark font-semibold rounded-xl px-4 py-2 transition-all text-sm">
             Ver más
           </button>
         </div>
@@ -113,6 +118,7 @@ import logo from '../assets/logo.png';
 import { useRouter } from 'vue-router';
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
 import MainHeader from '../components/layout/header/MainHeader.vue';
+import BackButton from '../components/common/BackButton.vue';
 
 const router = useRouter();
 const events = ref<EventItem[]>([]);

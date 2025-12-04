@@ -2,7 +2,7 @@
   <div class="relative w-full">
     <!-- Botón principal -->
     <button @click="toggleMenu"
-      class="flex items-center justify-between w-full bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] backdrop-blur-md border border-white/20 text-primary font-semibold px-4 py-4 rounded-b-2xl shadow-md hover:bg-white/20 transition-all duration-300">
+      class="flex items-center justify-between p-2 w-full transition-all duration-300">
       <div class="flex items-center gap-2">
         <font-awesome-icon icon="list" class="text-lg" />
         <span>{{ currentLabel }}</span>

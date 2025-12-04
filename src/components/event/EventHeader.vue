@@ -6,7 +6,7 @@
     </div>
 
     <div class="flex items-center gap-3 mt-4 md:mt-0">
-      <span class="bg-[#06D6A0]/20 text-[#06D6A0] px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide">
+      <span class="bg-newgreen/20 text-newgreen px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide">
         {{ typeLabel }}
       </span>
       <span class="bg-[#00B4D8]/20 text-[#00B4D8] px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide">

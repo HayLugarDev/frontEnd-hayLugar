@@ -1,10 +1,15 @@
 <template>
+
+  <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
 
-    <MainHeader class="hidden md:block" />
+    <MainHeader />
 
     <!-- ===== HEADER ===== -->
-    <header class="relative z-10 px-6 py-8 md:px-12 flex items-center justify-between md:hidden">
+    <header class="relative z-10 px-6 pt-16 py-8 md:px-12 flex items-center justify-between md:hidden">
       <div class="flex items-center gap-3">
         <img :src="logo" alt="HayLugar" class="h-10 w-10 md:hidden" />
         <h1 class="text-2xl md:text-3xl font-semibold tracking-wide">Playas de estacionamiento</h1>
@@ -42,18 +47,18 @@
 
       <div class="flex items-center gap-3 text-sm text-[#B0BEC5]">
         <label class="flex items-center gap-2">
-          <input v-model="filters.covered" type="checkbox" class="accent-[#06D6A0]" />
+          <input v-model="filters.covered" type="checkbox" class="accent-newgreen" />
           Cubierto
         </label>
         <label class="flex items-center gap-2">
-          <input v-model="filters.twentyFourSeven" type="checkbox" class="accent-[#06D6A0]" />
+          <input v-model="filters.twentyFourSeven" type="checkbox" class="accent-newgreen" />
           24 hs
         </label>
       </div>
 
       <div class="flex items-center gap-3 mt-2 md:mt-0">
         <button @click="applyFilters"
-          class="bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 text-sm transition-all">
+          class="bg-[#00B4D8] hover:bg-newgreen text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 text-sm transition-all">
           Aplicar filtros
         </button>
 
@@ -119,7 +124,7 @@
                 </div>
 
                 <button
-                  class="mt-3 w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-4 py-2 text-xs transition-all">
+                  class="mt-3 w-full bg-[#00B4D8] hover:bg-newgreen text-[#0D1B2A] font-semibold rounded-xl px-4 py-2 text-xs transition-all">
                   Ver detalle
                 </button>
               </div>
@@ -190,6 +195,7 @@ import logoMarker from '../assets/logo.png'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
 import { getAllParkingLots } from '../services/playaService'
 import MainHeader from '../components/layout/header/MainHeader.vue'
+import BackButton from '../components/common/BackButton.vue'
 
 const router = useRouter()
 

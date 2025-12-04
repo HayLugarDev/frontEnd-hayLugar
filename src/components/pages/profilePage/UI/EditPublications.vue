@@ -74,7 +74,7 @@
         </div>
 
         <!-- Mensaje informativo -->
-        <div v-if="formData.reservation_period" class="mt-4 p-4 rounded-xl text-sm bg-white/10 border-white/10 text-[#06D6A0]"
+        <div v-if="formData.reservation_period" class="mt-4 p-4 rounded-xl text-sm bg-white/10 border-white/10 text-newgreen"
           v-html="currentMessage">
         </div>
 
@@ -102,7 +102,7 @@
 
         <!-- Botones -->
         <div class="mt-8 flex justify-end gap-4">
-          <button @click="close" class="px-6 py-3 bg-[#06D6A0]/20 hover:bg-[#06D6A0]/30 rounded-lg">Cancelar</button>
+          <button @click="close" class="px-6 py-3 bg-newgreen/20 hover:bg-newgreen/30 rounded-lg">Cancelar</button>
           <button @click="guardarCambios" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700">Guardar
             Cambios</button>
         </div>
@@ -113,9 +113,9 @@
 
   <!-- Modales -->
   <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-    icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+    :icon="logo" @confirm="showErrorModal = false" />
   <StatusModal :visible="showSuccessModal" title="¡Éxito!" :message="successMessage"
-    icon="/src/assets/logo.png" @confirm="closeSuccess" />
+    :icon="logo" @confirm="closeSuccess" />
 </template>
 
 <script setup lang="ts">
@@ -130,6 +130,7 @@ import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import { getAllDays } from '../../../../utils/daysTraslation';
 import { useSpaceStore } from '../../../../store/spaceStore';
+import logo from "../../../../assets/logo.png";
 
 // Props y eventos
 const props = defineProps<{ visible: boolean, spaceId: number | null }>();

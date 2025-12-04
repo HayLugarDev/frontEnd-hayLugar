@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
+  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-0">
+
+    <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+      <BackButton />
+    </div>
+
     <MainHeader />
 
     <!-- Hero -->
@@ -31,9 +36,8 @@
           <h2 class="text-xl font-bold text-primary mb-2">1. Use of cookies</h2>
           <p>
             The website
-            <a href="https://haylugar.com.ar" target="_blank" class="text-accent font-semibold underline"
-              >https://haylugar.com.ar</a
-            >
+            <a href="https://haylugar.com.ar" target="_blank"
+              class="text-accent font-semibold underline">https://haylugar.com.ar</a>
             uses cookies and similar technologies to ensure proper functionality, improve security, optimize navigation,
             and deliver a better user experience.
           </p>
@@ -90,28 +94,16 @@
           </p>
           <ul class="list-disc ml-6 mt-2 space-y-1">
             <li>
-              <a
-                href="https://policies.google.com/privacy"
-                target="_blank"
-                class="text-primary underline font-semibold"
-                >Google Privacy Policy</a
-              >
+              <a href="https://policies.google.com/privacy" target="_blank"
+                class="text-primary underline font-semibold">Google Privacy Policy</a>
             </li>
             <li>
-              <a
-                href="https://www.cloudflare.com/privacypolicy/"
-                target="_blank"
-                class="text-primary underline font-semibold"
-                >Cloudflare Privacy Policy</a
-              >
+              <a href="https://www.cloudflare.com/privacypolicy/" target="_blank"
+                class="text-primary underline font-semibold">Cloudflare Privacy Policy</a>
             </li>
             <li>
-              <a
-                href="https://www.mercadopago.com.ar/privacidad"
-                target="_blank"
-                class="text-primary underline font-semibold"
-                >Mercado Pago Privacy Policy</a
-              >
+              <a href="https://www.mercadopago.com.ar/privacidad" target="_blank"
+                class="text-primary underline font-semibold">Mercado Pago Privacy Policy</a>
             </li>
           </ul>
         </div>
@@ -121,15 +113,13 @@
           <h2 class="text-xl font-bold text-primary mb-2">5. User rights</h2>
           <p>
             You may exercise your rights to access, update, correct, or delete your personal data by contacting us at
-            <a href="mailto:apphaylugar@gmail.com" class="text-primary font-semibold underline"
-              >apphaylugar@gmail.com</a
-            >.
+            <a href="mailto:apphaylugar@gmail.com"
+              class="text-primary font-semibold underline">apphaylugar@gmail.com</a>.
           </p>
           <p class="mt-2">
             The supervisory authority is the
-            <a href="https://www.argentina.gob.ar/aaip" target="_blank" class="text-primary underline font-semibold"
-              >Argentine Agency for Access to Public Information (AAIP)</a
-            >.
+            <a href="https://www.argentina.gob.ar/aaip" target="_blank"
+              class="text-primary underline font-semibold">Argentine Agency for Access to Public Information (AAIP)</a>.
           </p>
         </div>
 
@@ -151,12 +141,14 @@
 <script setup>
 import MainHeader from '../components/layout/header/MainHeader.vue'
 import CookieBannerEn from '../components/common/CookieBannerEn.vue'
+import BackButton from '../components/common/BackButton.vue';
 </script>
 
 <style scoped>
 a {
   transition: color 0.3s ease;
 }
+
 a:hover {
   color: #0ea5e9;
 }

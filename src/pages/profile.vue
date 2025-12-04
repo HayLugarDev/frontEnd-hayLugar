@@ -1,63 +1,54 @@
 <template>
-  <!-- HEADER SOLO EN DESKTOP -->
-  <MainHeader class="hidden md:block" />
+
+  <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  
+  <MainHeader />
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
-  <div
-    class="min-h-screen md:p-10 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden"
-    v-if="!userStore.loading">
+  <div class="min-h-screen md:p-10 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] 
+      text-white overflow-hidden border-b border-white/10 pt-8" v-if="!userStore.loading">
     <div class="flex flex-col md:pt-0 md:flex-row w-full items-start">
 
       <!-- Encabezado del Perfil -->
       <header class="hidden w-full md:w-1/3 md:flex flex-col justify-between items-center">
-        <h1 class="w-1/3 text-4xl text-center mb-6 text-primary">Perfil</h1>
+        <h1 class="w-1/3 text-4xl text-center mb-6 text-newgreen">Perfil</h1>
         <div class="w-11/12 px-4 space-y-1">
           <SectionMenu :activeSection="activeSection" :sections="menuSectionsComputed"
             @update:activeSection="handleSectionChange" />
         </div>
       </header>
 
-      <BackButton class="absolute right-11 top-24 z-50 md:hidden" />
-
-      <!-- Selector móvil (no botón contenedor para evitar eventos raros anidados) -->
-      <div class="w-full md:hidden items-center justify-center mb-4">
+      <!-- MENU MOBILE -->
+      <div class="w-full sm:hidden items-center justify-center pt-20 px-8">
         <SectionMenu :activeSection="activeSection" :sections="menuSectionsComputed"
           @update:activeSection="handleSectionChange" />
       </div>
 
-      <transition name="fade-step" mode="out-in">
-        <KeepAlive>
-          <section v-if="activeSection === 'datos'" key="datos"
-            class="w-full md:w-2/3 bg-white/10 border-white/10 p-10 md:p-12 rounded-2xl shadow-xl border border-gray-100 transition-all">
+      <KeepAlive>
+        <transition name="fade-step" mode="out-in">
+          <section v-if="activeSection === 'resume'" key="resume"
+            class="w-full md:w-2/3 sm:bg-white/10 sm:border-b p-10 md:p-12 sm:rounded-2xl sm:shadow-xl border-gray-600 transition-all">
             <!-- Encabezado con foto y datos -->
-            <div class="flex flex-row items-center justify-between gap-8">
+            <div class="flex flex-row items-center justify-between gap-8 bg-gradient-to-tr from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+                        p-6 rounded-2xl shadow-xl border border-gray-700">
               <div class="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto">
                 <!-- Foto de perfil -->
-                <div class="relative group">
-                  <img :src="usuario.profile_picture || defaultProfilePicture" alt="Foto de perfil"
-                    class="w-28 h-28 md:w-32 md:h-32 object-cover rounded-full shadow-lg ring-4 ring-blue-100 group-hover:ring-blue-300 transition-all cursor-pointer"
-                    @click="cambiarFoto" />
-                  <button @click="cambiarFoto"
-                    class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-md hover:bg-blue-700 transition"
-                    title="Cambiar foto">
-                    <font-awesome-icon icon="camera" />
-                  </button>
-                </div>
+                <img :src="usuario.profile_picture || defaultProfilePicture" alt="Foto de perfil"
+                  class="w-28 h-28 rounded-full object-cover shadow-lg border border-white/20" />
 
                 <!-- Datos del usuario -->
                 <div class="text-center sm:text-left">
                   <h2 class="text-2xl font-bold text-gray-200">
                     {{ usuario.name }} {{ usuario.last_name }}
                   </h2>
-                  <p class="text-gray-200 flex items-center justify-center sm:justify-start mt-1">
-                    <font-awesome-icon icon="envelope" class="mr-2 text-primary" />
+                  <p class="text-gray-400 text-sm flex items-center justify-center sm:justify-start mt-1">
+                    <font-awesome-icon icon="envelope" class="mr-2 text-newgreen" />
                     {{ usuario.email }}
-                  </p>
-                  <p v-if="usuario.dni" class="text-gray-200 flex items-center justify-center sm:justify-start mt-1">
-                    <font-awesome-icon icon="id-card" class="mr-2 text-primary" />
-                    DNI: {{ usuario.dni }}
                   </p>
                   <p v-if="isAdmin"
                     class="text-xs mt-2 inline-flex items-center gap-1 text-green-700 justify-center sm:justify-start">
@@ -66,65 +57,68 @@
                   </p>
                 </div>
               </div>
-
-              <!-- Botón de cerrar sesión (solo móvil) -->
-              <button @click="verifyToken('/quit')"
-                class="md:hidden bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-800 transition flex items-center gap-2">
-                Cerrar sesión
-              </button>
             </div>
 
-            <!-- Formulario -->
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField v-model="usuario.name" label="NOMBRE" type="text" required />
-              <FormField v-model="usuario.last_name" label="APELLIDO" type="text" required />
-              <FormField v-model="usuario.email" label="EMAIL" type="text" required />
-              <FormField v-model="usuario.dni" label="DOCUMENTO" type="text" required />
-              <FormFieldAutocomplete v-model="usuario.address" label="DIRECCIÓN" class="md:col-span-2" />
-            </div>
+            <ul class="w-full flex-1 sm:grid grid-cols-2 mt-8 border-b border-gray-600 pb-8 space-y-1 px-2">
 
-            <!-- Botón Guardar -->
-            <div class="mt-8">
-              <button @click="guardarTodo"
-                class="w-full bg-primary text-gray-200 py-4 rounded-xl text-lg font-semibold shadow-md hover:shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
-                <font-awesome-icon icon="save" class="text-lg" />
-                Guardar Cambios
-              </button>
-            </div>
+              <!-- Admin -->
+              <div v-if="isAdmin" class="mb-4">
+                <SettingsItem icon="fa-solid fa-wrench" label="Administración" :isAdmin="isAdmin"
+                    @click="router.push('/admin-page')" />
+              </div>
+
+              <div>
+                <SettingsItem icon="fa-solid fa-user" label="Perfil personal"
+                  @click="router.push('/personal-profile-user')" />
+
+                <SettingsItem icon="fa-solid fa-calendar-check" label="Perfil anfitrión"
+                  @click="router.push('/personal-profile-owner')" />
+
+                <SettingsItem icon="fa-solid fa-car" label="Mis vehículos"
+                  @click="router.push('/vehicles/user-vehicles')" />
+
+                <SettingsItem icon="fa-solid fa-wallet" label="Billetera" @click="router.push('/personal-wallet-user')" />
+              </div>
+              <div>
+                <SettingsItem icon="fa-solid fa-bank" label="Cuentas de pago"
+                  @click="router.push('/personal-accounts-user')" />
+
+                <SettingsItem icon="fa-solid fa-question-circle" label="Centro de ayuda"
+                  @click="router.push('/help')" />
+
+                <SettingsItem icon="fa-solid fa-file-contract" label="Términos y condiciones"
+                  @click="router.push('/termsConditions')" />
+
+                <SettingsItem icon="fa-solid fa-shield-halved" label="Privacidad y seguridad"
+                  @click="router.push('/PrivacyPolicy')" />
+              </div>
+
+            </ul>
+
+            <button class="w-full flex-1 my-2 p-2 text-newgreen hover:bg-white/10 rounded-xl">
+              Cerrar sesión
+            </button>
           </section>
 
-          <VehicleSection v-else-if="activeSection === 'vehicles'" key="vehicles" />
+          <ReservationHistory v-else-if="activeSection === 'reservas-anteriores'" key="reservas"
+            :reservations="reservas" />
 
-          <ReservationIncomingHistory v-else-if="activeSection === 'reservas-entrantes'" key="reservas-entrantes"
-            :reservations="reservasEntrantes" />
-
-          <ReservationHistory v-else-if="activeSection === 'reservas'" key="reservas" :reservations="reservas" />
-
-          <PublicationHistory v-else-if="activeSection === 'publicaciones'" key="publicaciones"
+          <PublicationHistory v-else-if="activeSection === 'publicaciones-anteriores'" key="publicaciones"
             :publications="publicaciones" />
-
-          <Favorites v-else-if="activeSection === 'favoritos'" key="favorites" :reservations="favoritos" />
-
-          <UserReviews v-else-if="activeSection === 'calificaciones'" key="reviews" />
-
-          <PayoutAccounts v-else-if="activeSection === 'cuentas'" key="cuentas" :payout="cuentas" />
-
-          <walletProfile v-else-if="activeSection === 'walletP'" key="walletP" />
 
           <!-- Solo admin -->
           <AdminWithdrawals v-else-if="activeSection === 'pagos' && isAdmin" key="pagos" :payout="pagos" />
 
-        </KeepAlive>
-      </transition>
-
+        </transition>
+      </KeepAlive>
     </div>
 
-    <!-- Modales -->
+    <!-- Modals -->
     <StatusModal :visible="showSuccessModal" type="success" title="¡Éxito!"
-      message="Los cambios se han guardado correctamente." icon="/src/assets/logo.png" @confirm="closeSuccessModal" />
+      message="Los cambios se han guardado correctamente." :icon="logo" @confirm="closeSuccessModal" />
 
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+      :icon="logo" @confirm="showErrorModal = false" />
 
   </div>
 
@@ -134,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ReservationHistory from '../components/pages/profilePage/ReservationHistory.vue';
 import PublicationHistory from '../components/pages/profilePage/PublicationHistory.vue';
@@ -144,26 +138,16 @@ import defaultProfilePicture from '../assets/user_icon_primary.png';
 import loadIcon from "../assets/load-icon_primary.svg";
 import BackButton from '../components/common/BackButton.vue';
 import MainHeader from '../components/layout/header/MainHeader.vue';
-import FormField from '../components/forms/FormField.vue';
-import FormFieldAutocomplete from '../components/forms/FormFieldAutocomplete.vue';
-import { useVerifyToken } from '../logic/useVerifyToken';
-import VehicleSection from '../components/pages/profilePage/VehicleSection.vue';
 import SectionMenu from '../components/pages/profilePage/UI/SectionMenu.vue';
-import ReservationIncomingHistory from '../components/pages/profilePage/ReservationIncomingHistory.vue';
-import PayoutAccounts from './PayoutAccounts.vue';
 import AdminWithdrawals from './AdminWithdrawals.vue';
-import walletProfile from './wallet.vue';
-import UserReviews from '../components/pages/profilePage/UserReviews.vue';
-import Favorites from '../components/pages/profilePage/Favorites.vue';
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
+import SettingsItem from '../components/pages/profilePage/UI/SettingsItem.vue';
+import logo from "../assets/logo.png";
 
 const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
-const inputFoto = ref<HTMLInputElement | null>(null);
-
-const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 const usuario = computed(() => userStore.user || {
   id: "",
@@ -174,37 +158,33 @@ const usuario = computed(() => userStore.user || {
   dni: "",
   address: "",
   phone: "",
-  walletEmail: ""
+  role: "",
+  owner_rating: 0,
+  renter_rating: 0,
+  created_at: null,
+  updated_at: null,
 });
 
 // *** ADMIN: por ahora ID=6 o role='admin' ***
 const isAdmin = computed(() => {
   const u = userStore.user;
-  return !!(u && (u.role === 'admin' || u.id === 6));
+  return !!(u && (u.role === 'admin' || u.id === import.meta.env.VITE_ADMIN_USER_ID));
 });
 
 const reservas = ref([]);
-const favoritos = ref([]);
-const reservasEntrantes = ref([]);
 const publicaciones = ref([]);
-const cuentas = ref([]);
 const pagos = ref([]);
 const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
 const errorMessage = ref('');
-const activeSection = ref<'datos' | 'vehicles' | 'reservas' | 'reservas-entrantes' | 'publicaciones' | 'favoritos' | 'calificaciones' | 'walletP' | 'cuentas' | 'pagos'>('datos');
+const activeSection = ref('resume') as Ref<string>;
+
 
 // Menú base
 const baseMenuSections = [
-  { value: 'datos', label: 'Datos personales' },
-  { value: 'vehicles', label: 'Mis Vehículos' },
-  { value: 'reservas', label: 'Mis Reservas' },
-  { value: 'reservas-entrantes', label: 'Reservas entrantes' },
-  { value: 'publicaciones', label: 'Publicaciones' },
-  { value: 'favoritos', label: 'Favoritos' },
-  { value: 'calificaciones', label: 'Calificaciones' },
-  { value: 'walletP', label: 'Ganancias' },
-  { value: 'cuentas', label: 'Cuentas' },
+  { value: 'resume', label: 'Sobre mí' },
+  { value: 'reservas-anteriores', label: 'Mis Reservas' },
+  { value: 'publicaciones-anteriores', label: 'Mis Publicaciones' },
 ];
 
 // Menú computado (agrega pagos sólo si admin)
@@ -221,13 +201,14 @@ const menuSectionsComputed = computed(() => {
 function normalizeSection(s?: string | null): typeof activeSection.value {
   const available = menuSectionsComputed.value.map(s => s.value);
   const wanted = (s || '').toString();
-  if (wanted === 'pagos' && !isAdmin.value) return 'datos';
+  if (wanted === 'pagos' && !isAdmin.value) return 'resume';
   if (available.includes(wanted)) return wanted as any;
-  return 'datos';
+  return 'resume';
 }
 
 // Arranque: leer query y normalizar
 onMounted(() => {
+  console.log(usuario.value);
   const sectionFromUrl = route.query.section as string | undefined;
   const normalized = normalizeSection(sectionFromUrl);
   if (normalized !== sectionFromUrl) {
@@ -266,58 +247,20 @@ const handleSectionChange = (val: string) => {
 watch(
   () => activeSection.value,
   async (sec) => {
-    if (sec === 'reservas-entrantes') {
+    if (sec === 'reservas-anteriores') {
       const userId = userStore.user?.id;
       if (userId) {
-        const response = await api.get(`/reservations/incoming/${userId}`, { withCredentials: true });
-        reservasEntrantes.value = response.data;
+        const response = await api.get(`/reservations/history/${userId}`, { withCredentials: true });
+        reservas.value = response.data;
       }
     }
   },
   { immediate: false }
 );
 
-const cambiarFoto = (): void => {
-  // inputFoto.value?.click();
-};
-
-const guardarTodo = async (): Promise<void> => {
-
-  const payload = {
-    name: usuario.value.name,
-    last_name: usuario.value.last_name,
-    email: usuario.value.email,
-    dni: usuario.value.dni,
-    address: usuario.value.address,
-    profile_picture: typeof usuario.value.profile_picture === "string"
-      ? usuario.value.profile_picture
-      : userStore.user.profile_picture
-  };
-
-  console.log(payload)
-  try {
-    const response = await api.put(
-      `/users/update/${usuario.value.id}`,
-      payload,
-      { withCredentials: true }
-    );
-
-    userStore.setUser(response.data);
-    showSuccessModal.value = true;
-  } catch (error) {
-    console.error("Error al guardar los cambios", error);
-    errorMessage.value = "Hubo un error al guardar los cambios. Por favor, inténtalo nuevamente.";
-    showErrorModal.value = true;
-  }
-};
-
 const closeSuccessModal = () => {
   router.push('/dashboard');
   showSuccessModal.value = false;
-};
-
-const closeErrorModal = () => {
-  showErrorModal.value = false;
 };
 </script>
 

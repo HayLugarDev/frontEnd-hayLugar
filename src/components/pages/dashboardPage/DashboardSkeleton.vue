@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col h-full bg-secondary animate-pulse text-transparent">
+  <div class="flex flex-col h-full bg-gray-700 animate-pulse text-transparent">
     <!-- Simulación del MainHeader en modo skeleton -->
     <div
-      class="hidden md:flex justify-between items-center border-b-2 px-4 pt-16 md:pt-2 xl:px-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
+      class="hidden md:flex justify-between items-center border-b-2 px-4 pt-16 md:pt-2 xl:px-16 h-20 bg-gray-500 rounded mb-4 animate-pulse">
       <!-- Logo placeholder -->
       <div class="w-16 h-10 bg-gray-400 rounded"></div>
 
@@ -13,7 +13,6 @@
       </div>
     </div>
 
-
     <!-- Floating button -->
     <div class="hidden md:fixed md:left-1/2 md:-translate-x-1/2 md:bottom-16 w-24 h-10 bg-gray-300 rounded-full"></div>
 
@@ -21,7 +20,7 @@
     <div class="flex md:hidden items-center justify-center bg-gray-300 mx-6 rounded-full my-4 h-12"></div>
 
     <!-- Zona de búsqueda -->
-    <div class="hidden md:grid grid-cols-11 gap-2 px-8 py-4 bg-gray-300 rounded-md mb-4 h-20"></div>
+    <!-- <div class="hidden md:grid grid-cols-11 gap-2 px-8 py-4 bg-gray-300 rounded-md mb-4 h-20"></div>
 
     <div class="flex flex-row justify-start items-center gap-4 pl-4">
       <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
@@ -35,7 +34,7 @@
         <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
         <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Cards o mapa -->
     <div class="flex flex-1 p-6">

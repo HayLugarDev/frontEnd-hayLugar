@@ -25,7 +25,7 @@
               <span>{{ formatType(space?.subcategory) }}</span>
             </div>
             <div class="bg-white/5 rounded-xl p-3 flex items-center justify-between">
-              <i class="fa-solid fa-ruler-combined text-[#06D6A0]"></i>
+              <i class="fa-solid fa-ruler-combined text-newgreen"></i>
               <span>{{ space?.capacity_m2 ?? '—' }} m²</span>
             </div>
             <div class="bg-white/5 rounded-xl p-3 flex items-center justify-between">
@@ -33,7 +33,7 @@
               <span>{{ space?.height_m ?? '—' }} m</span>
             </div>
             <div class="bg-white/5 rounded-xl p-3 flex items-center justify-between">
-              <i class="fa-solid fa-bolt text-[#06D6A0]"></i>
+              <i class="fa-solid fa-bolt text-newgreen"></i>
               <span>Trifásica {{ space?.energy_3phase ? '✔' : '—' }}</span>
             </div>
           </div>
@@ -84,7 +84,7 @@
           <h3 class="text-lg font-semibold mb-3">Disponibilidad</h3>
           <div class="grid grid-cols-7 gap-2 text-xs">
             <div v-for="d in demoDays" :key="d.label" class="rounded-lg px-2 py-3 text-center border"
-                 :class="d.available ? 'bg-[#06D6A0]/15 border-[#06D6A0]/30' : 'bg-white/5 border-white/10 text-[#B0BEC5]'">
+                 :class="d.available ? 'bg-newgreen/15 border-newgreen/30' : 'bg-white/5 border-white/10 text-[#B0BEC5]'">
               <div class="font-semibold">{{ d.label }}</div>
               <div class="opacity-80">{{ d.range }}</div>
             </div>
@@ -115,7 +115,7 @@
         <button
           :disabled="!canConfirm"
           @click="openConfirm = true"
-          class="w-full mt-5 bg-gradient-to-r from-[#00B4D8] to-[#06D6A0] hover:opacity-90 text-[#0D1B2A] font-semibold py-3 rounded-xl transition-all disabled:opacity-50"
+          class="w-full mt-5 bg-gradient-to-r from-[#00B4D8] to-newgreen hover:opacity-90 text-[#0D1B2A] font-semibold py-3 rounded-xl transition-all disabled:opacity-50"
         >
           Continuar
         </button>

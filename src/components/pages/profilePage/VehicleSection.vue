@@ -1,5 +1,6 @@
 <template>
-  <section class="bg-white/10 border border-white/10 text-white p-4 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3">
+  <section
+    class="pt-20 sm:p-8 sm:bg-white/10 text-white sm:rounded-2xl sm:shadow-xl mb-8 w-full md:w-2/3">
 
     <div class="flex items-center justify-between mb-4">
       <div>
@@ -7,7 +8,7 @@
           <font-awesome-icon :icon="['fas', 'car']" />
           Vehículos
         </h2>
-        <p class="text-sm text-gray-400 px-4">Gestioná tus vehículos para poder realizar reseras en HayLugar</p>
+        <p class="text-md text-gray-200 px-6">Gestioná tus vehículos para poder realizar reseras en HayLugar</p>
       </div>
     </div>
 
@@ -20,13 +21,13 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
       <div class="flex flex-wrap gap-2 md:gap-3 justify-end">
-        <button @click="router.push('/add-vehicle')"
+        <button v-if="vehiculos.length" @click="router.push('/add-vehicle')"
           class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-xl shadow hover:bg-primary/90 transition-all">
           <font-awesome-icon :icon="['fas', 'circle-plus']" />
           Agregar
         </button>
         <button v-if="!modoEdicion && vehiculos.length" @click="editVehicles"
-          class="flex items-center gap-2 bg-[#06D6A0]/30 hover:bg-[#06D6A0]/40 text-white px-4 py-2 rounded-xl shadow transition-all">
+          class="flex items-center gap-2 bg-newgreen/30 hover:bg-newgreen/40 text-white px-4 py-2 rounded-xl shadow transition-all">
           <font-awesome-icon :icon="['fas', 'pen-to-square']" />
           Editar
         </button>
@@ -49,10 +50,9 @@
             { icon: 'rectangle-list', label: 'Modelo', value: vehiculo.model || 'No especificado' },
             { icon: 'palette', label: 'Color', value: vehiculo.color || 'No especificado' },
             { icon: 'id-card', label: 'Patente', value: vehiculo.license_plate || 'No aplica' }
-          ]" :key="i"
-            class="flex items-center gap-3 p-3 bg-white/10 border-white/10 rounded-xl border transition-all">
+          ]" :key="i" class="flex items-center gap-3 p-3 bg-white/10 border-white/10 rounded-xl border transition-all">
             <div class="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-full">
-              <font-awesome-icon :icon="item.icon" class="text-[#06D6A0] text-md" />
+              <font-awesome-icon :icon="item.icon" class="text-newgreen text-md" />
             </div>
             <div class="flex flex-col ">
               <span class="text-sm text-gray-200 font-medium">{{ item.label }}</span>
@@ -86,7 +86,11 @@
         <font-awesome-icon icon="car" class="text-primary text-3xl" />
       </div>
       <p class="text-lg font-medium">No tienes ningún vehículo registrado aún.</p>
-      <span class="text-primary font-semibold mt-1">¡Agregá tu primer vehículo!</span>
+      <button v-if="!vehiculos.length" @click="router.push('/add-vehicle')"
+        class="flex items-center gap-2 text-primary font-semibold bg-white/10 px-4 py-2 rounded-xl shadow hover:bg-white/20 transition-all mt-4">
+        <font-awesome-icon :icon="['fas', 'circle-plus']" />
+        ¡Agregá tu primer vehículo!
+      </button>
     </div>
 
 
@@ -215,11 +219,13 @@ const closeErrorModal = () => {
 section {
   animation: fadeIn 0.4s ease-in-out;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

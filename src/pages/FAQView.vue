@@ -1,12 +1,17 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
+
+    <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+      <BackButton />
+    </div>
+
     <MainHeader />
 
     <!-- Hero -->
     <section class="py-16 px-6 text-center max-w-4xl mx-auto">
       <h1 class="text-3xl md:text-4xl font-bold mb-4">Preguntas Frecuentes (FAQ)</h1>
       <p class="text-gray-300 text-base md:text-lg">
-        Todo lo que necesitás saber sobre <span class="font-semibold">HayLugar</span> — 
+        Todo lo que necesitás saber sobre <span class="font-semibold">HayLugar</span> —
         cómo funciona, cómo ganar dinero con tu espacio y cómo moverte mejor por la ciudad.
       </p>
     </section>
@@ -21,35 +26,21 @@
           </h2>
 
           <div class="space-y-4">
-            <div
-              v-for="(item, j) in category.items"
-              :key="j"
-              class="border border-gray-200 rounded-xl shadow-sm bg-gray-50 overflow-hidden"
-            >
-              <button
-                @click="toggle(category.title + j)"
-                class="w-full flex justify-between items-center p-4 text-left focus:outline-none"
-              >
+            <div v-for="(item, j) in category.items" :key="j"
+              class="border border-gray-200 rounded-xl shadow-sm bg-gray-50 overflow-hidden">
+              <button @click="toggle(category.title + j)"
+                class="w-full flex justify-between items-center p-4 text-left focus:outline-none">
                 <span class="font-medium">{{ item.q }}</span>
-                <svg
-                  :class="[
-                    'w-5 h-5 transform transition-transform duration-300',
-                    opened === category.title + j ? 'rotate-180 text-accent' : 'rotate-0 text-gray-400'
-                  ]"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
+                <svg :class="[
+                  'w-5 h-5 transform transition-transform duration-300',
+                  opened === category.title + j ? 'rotate-180 text-accent' : 'rotate-0 text-gray-400'
+                ]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
               <transition name="fade">
-                <div
-                  v-if="opened === category.title + j"
-                  class="px-5 pb-4 text-gray-700 text-sm leading-relaxed"
-                >
+                <div v-if="opened === category.title + j" class="px-5 pb-4 text-gray-700 text-sm leading-relaxed">
                   <p v-html="item.a"></p>
                 </div>
               </transition>
@@ -64,6 +55,7 @@
 <script setup>
 import { ref } from 'vue'
 import MainHeader from '../components/layout/header/MainHeader.vue'
+import BackButton from '../components/common/BackButton.vue'
 
 const opened = ref(null)
 const toggle = (key) => (opened.value = opened.value === key ? null : key)
@@ -147,6 +139,7 @@ const faqs = [
 .fade-leave-active {
   transition: all 0.3s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;

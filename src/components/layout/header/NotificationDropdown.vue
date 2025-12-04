@@ -2,7 +2,7 @@
   <div v-if="userStore.user" class="relative">
     <!-- Botón de campana -->
     <button @click="toggleMenu"
-            class="relative w-12 h-12 flex items-center justify-center rounded-full transition duration-200 hover:shadow-xl">
+            class="hidden relative w-12 h-12 sm:flex items-center justify-center rounded-full transition duration-200 hover:shadow-xl">
       <font-awesome-icon icon="fa-regular fa-bell" class="text-xl text-gray-400 " />
       <!-- Punto rojo si hay notificaciones sin leer -->
       <span v-if="hasUnreadNotifications && !viewNotification"
@@ -17,7 +17,7 @@
         No hay notificaciones nuevas.
       </li>
       <li v-for="notification in pendingNotifications" :key="notification.id"
-          class="border border-gray-300 bg-gray-200 rounded-xl p-3 flex justify-between items-start cursor-pointer"
+          class="text-gray-200 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] border-2 rounded-xl p-3 flex justify-between items-start cursor-pointer"
           @click="openNotification(notification.id)">
         <div class="flex-1">
           <p class="text-gray-800">{{ truncate(notification.message, 65) }}</p>

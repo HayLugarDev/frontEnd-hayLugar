@@ -11,7 +11,7 @@
         <!-- PRICE BADGE -->
         <div class="absolute bottom-4 right-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl
                     flex items-baseline gap-1 border border-white/10">
-          <span class="text-[#06D6A0] font-bold text-sm">${{ getMinPrice() }}</span>
+          <span class="text-newgreen font-bold text-sm">${{ getMinPrice() }}</span>
           <span class="text-gray-300 text-[10px]">/h</span>
         </div>
       </div>

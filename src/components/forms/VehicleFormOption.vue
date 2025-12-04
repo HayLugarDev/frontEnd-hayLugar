@@ -9,7 +9,7 @@
         <p class="text-gray-400 text-sm">{{ text }}</p>
 
         <transition name="fade">
-          <p v-if="configured" class="text-[#06D6A0] mt-1 text-sm font-medium">
+          <p v-if="configured" class="text-newgreen mt-1 text-sm font-medium">
             ✅ Configurado: capacidad {{ configuration.capacity }},
             ${{ configuration.price_per_hour }}/hora
           </p>
@@ -46,7 +46,7 @@
 
         <div class="flex justify-end gap-2 pt-2">
           <button
-            class="px-4 py-2 bg-[#06D6A0]/20 text-white rounded-lg text-sm font-medium hover:bg-gray-300 active:scale-95 transition-all"
+            class="px-4 py-2 bg-newgreen/20 text-white rounded-lg text-sm font-medium hover:bg-gray-300 active:scale-95 transition-all"
             @click="cancel">
             Cancelar
           </button>
@@ -65,13 +65,14 @@
     </transition>
   </div>
 
-  <StatusModal :visible="showErrorModal" title="¡Atención!" :message="errorMessage" icon="/src/assets/logo.png"
+  <StatusModal :visible="showErrorModal" title="¡Atención!" :message="errorMessage" :icon="logo"
     @confirm="showErrorModal = false" />
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
 import StatusModal from '../pages/addSpacePage/StatusModal.vue';
+import logo from "../../assets/logo.png";
 
 const props = defineProps(['value', 'title', 'text', 'configured', 'configuration'])
 const emit = defineEmits(['save', 'remove'])

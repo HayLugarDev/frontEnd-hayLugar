@@ -3,7 +3,7 @@
     v-if="space"
     class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white flex flex-col"
   >
-   <MainHeader class="hidden md:block" />
+   <MainHeader />
     <!-- ===== HEADER ===== -->
     <header
       class="flex items-center justify-between px-6 md:px-12 py-6 border-b border-white/10 bg-[#0D1B2A]/70 backdrop-blur-lg shadow-lg"
@@ -28,7 +28,7 @@
         </button>
         <button
           @click="router.back()"
-          class="text-sm bg-[#06D6A0]/20 hover:bg-[#06D6A0]/40 px-4 py-2 rounded-xl transition-all duration-300"
+          class="text-sm bg-newgreen/20 hover:bg-newgreen/40 px-4 py-2 rounded-xl transition-all duration-300"
         >
           ← Volver
         </button>
@@ -58,7 +58,7 @@
       <div
         class="absolute bottom-6 left-6 bg-[#1B263B]/70 backdrop-blur-md px-4 py-2 rounded-xl text-sm flex items-center gap-2 border border-white/10"
       >
-        <i class="fa-solid fa-map-marker-alt text-[#06D6A0]"></i>
+        <i class="fa-solid fa-map-marker-alt text-newgreen"></i>
         <span>{{ space.location }}</span>
       </div>
     </section>
@@ -89,7 +89,7 @@
             class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-[#B0BEC5] mb-6"
           >
             <div class="bg-white/10 rounded-xl p-4 flex items-center justify-between">
-              <i class="fa-solid fa-ruler-combined text-[#06D6A0]"></i>
+              <i class="fa-solid fa-ruler-combined text-newgreen"></i>
               <span>{{ space.capacity_m2 ?? '—' }} m²</span>
             </div>
             <div class="bg-white/10 rounded-xl p-4 flex items-center justify-between">
@@ -108,24 +108,24 @@
           </p>
 
           <!-- 🔹 Especificaciones técnicas -->
-          <h3 class="text-lg font-semibold mb-4 border-l-4 border-[#06D6A0] pl-3">
+          <h3 class="text-lg font-semibold mb-4 border-l-4 border-newgreen pl-3">
             Especificaciones Técnicas
           </h3>
           <ul class="grid md:grid-cols-2 gap-3 text-sm text-[#B0BEC5] bg-white/5 rounded-2xl p-4 border border-white/10">
             <li>
-              <i :class="space.has_security ? 'fa-solid fa-shield-halved text-[#06D6A0]' : 'fa-solid fa-xmark text-red-400'"></i>
+              <i :class="space.has_security ? 'fa-solid fa-shield-halved text-newgreen' : 'fa-solid fa-xmark text-red-400'"></i>
               <span class="ml-2">Seguridad 24 hs</span>
             </li>
             <li>
-              <i :class="space.has_loading_dock ? 'fa-solid fa-truck-ramp-box text-[#06D6A0]' : 'fa-solid fa-xmark text-red-400'"></i>
+              <i :class="space.has_loading_dock ? 'fa-solid fa-truck-ramp-box text-newgreen' : 'fa-solid fa-xmark text-red-400'"></i>
               <span class="ml-2">Muelle de carga</span>
             </li>
             <li>
-              <i :class="space.has_cold_chain ? 'fa-solid fa-snowflake text-[#06D6A0]' : 'fa-solid fa-xmark text-red-400'"></i>
+              <i :class="space.has_cold_chain ? 'fa-solid fa-snowflake text-newgreen' : 'fa-solid fa-xmark text-red-400'"></i>
               <span class="ml-2">Cadena de frío</span>
             </li>
             <li>
-              <i :class="space.energy_3phase ? 'fa-solid fa-bolt text-[#06D6A0]' : 'fa-solid fa-xmark text-red-400'"></i>
+              <i :class="space.energy_3phase ? 'fa-solid fa-bolt text-newgreen' : 'fa-solid fa-xmark text-red-400'"></i>
               <span class="ml-2">Energía trifásica</span>
             </li>
           </ul>
@@ -154,13 +154,13 @@
 
           <button
             @click="goToReservation(space.slug)"
-            class="w-full mt-5 bg-gradient-to-r from-[#00B4D8] to-[#06D6A0] hover:opacity-90 text-[#0D1B2A] font-semibold py-3 rounded-xl transition-all shadow-md hover:shadow-lg"
+            class="w-full mt-5 bg-gradient-to-r from-[#00B4D8] to-newgreen hover:opacity-90 text-[#0D1B2A] font-semibold py-3 rounded-xl transition-all shadow-md hover:shadow-lg"
           >
             Reservar ahora
           </button>
 
           <p class="text-xs text-[#B0BEC5]/80 mt-4 text-center border-t border-white/10 pt-3">
-            <i class="fa-solid fa-lock text-[#06D6A0]"></i> Pago seguro con HayLugar
+            <i class="fa-solid fa-lock text-newgreen"></i> Pago seguro con HayLugar
           </p>
         </div>
       </div>
@@ -168,7 +168,7 @@
 
     <!-- ===== MAPA ===== -->
     <section class="px-6 md:px-12 pb-16">
-      <h3 class="text-lg font-semibold mb-4 border-l-4 border-[#06D6A0] pl-3">Ubicación</h3>
+      <h3 class="text-lg font-semibold mb-4 border-l-4 border-newgreen pl-3">Ubicación</h3>
       <div class="rounded-2xl overflow-hidden shadow-lg border border-white/10 h-[340px]">
         <CustomGoogleMap
           :center="{ lat: Number(space.latitude), lng: Number(space.longitude) }"
@@ -217,7 +217,7 @@
 
     <!-- CTA sticky en mobile -->
     <div
-      class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-[#00B4D8] to-[#06D6A0] text-[#0D1B2A] font-semibold text-center py-3 md:hidden"
+      class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-[#00B4D8] to-newgreen text-[#0D1B2A] font-semibold text-center py-3 md:hidden"
       @click="goToReservation(space.slug)"
     >
       Reservar ahora

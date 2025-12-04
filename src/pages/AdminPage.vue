@@ -1,5 +1,13 @@
 <template>
-  <div class="flex flex-col max-w-7xl mx-auto p-8 gap-8">
+
+  <MainHeader class="hidden sm:block" />
+
+  <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-24 md:px-6 md:py-14 text-white">
+
     <h1 class="text-3xl font-bold text-primary text-center mb-4">Panel de Administración</h1>
 
     <!-- Tabs -->
@@ -28,12 +36,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import api from "../services/apiService";
 import AdminUsers from "../components/pages/adminPage/AdminUsers.vue";
 import AdminSpaces from "../components/pages/adminPage/AdminSpaces.vue";
 import AdminReservations from "../components/pages/adminPage/AdminReservations.vue";
 import AdminPayments from "../components/pages/adminPage/AdminPayments.vue";
+import BackButton from "../components/common/BackButton.vue";
+import MainHeader from "../components/layout/header/MainHeader.vue";
 
 const activeTab = ref("users");
 const loading = ref(false);
@@ -48,11 +58,6 @@ const tabs = [
   { key: "reservations", label: "Reservas" },
   { key: "payments", label: "Pagos" },
 ];
-
-const formatDate = (value: string) => {
-  const date = new Date(value);
-  return date.toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" });
-};
 
 onMounted(async () => {
   loading.value = true;
@@ -87,30 +92,57 @@ onMounted(async () => {
   }
 });
 
-function deepMerge(target: any, source: any) {
-  for (const key of Object.keys(source)) {
-    if (
-      source[key] instanceof Object &&
-      !(source[key] instanceof Array) &&
-      key in target
-    ) {
-      Object.assign(source[key], deepMerge(target[key], source[key]));
-    }
+watch(activeTab, async (newTab) => {
+  if (newTab === "spaces" && spaces.value.length === 0) loadSpaces();
+});
+
+const loadSpaces = async () => {
+  loading.value = true;
+  try {
+    const spacesRes = await api.get("/spaces/getAll", { withCredentials: true });
+    spaces.value = spacesRes.data.spaces || spacesRes.data;
+  } catch (error) {
+    console.error("Error cargando espacios:", error);
+  } finally {
+    loading.value = false;
   }
-  return { ...target, ...source };
-}
+};
 
 const handleUpdateSpaces = (action: string, payload?: any) => {
-  if (action === 'edit' && payload) {
-    const index = spaces.value.findIndex(space => space.id === payload.id);
-    if (index !== -1) {
-      spaces.value[index] = deepMerge(spaces.value[index], payload);
+  if (!payload) return;
+
+  if (action === "edit") {
+    const idx = spaces.value.findIndex(s => s.id === payload.id);
+
+    if (idx !== -1) {
+      // reemplazar por objeto completo (mucho más seguro)
+      spaces.value[idx] = { ...spaces.value[idx], ...payload };
     } else {
       spaces.value.push(payload);
     }
-  } else if (action === 'delete' && payload) {
-    spaces.value = spaces.value.filter(space => space.id !== payload.id);
+
+    // actualizar reservas relacionadas
+    reservations.value = reservations.value.map(r =>
+      r.space_id === payload.id
+        ? {
+          ...r,
+          space: { id: payload.id, name: payload.name }
+        }
+        : r
+    );
+  }
+
+  if (action === "delete") {
+    spaces.value = spaces.value.filter(s => s.id !== payload.id);
+
+    // marcar reservas como eliminadas (opcional)
+    reservations.value = reservations.value.map(r =>
+      r.space_id === payload.id
+        ? { ...r, space: { name: "Eliminado" } }
+        : r
+    );
   }
 };
+
 
 </script>

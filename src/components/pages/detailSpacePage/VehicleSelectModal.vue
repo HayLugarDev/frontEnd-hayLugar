@@ -6,7 +6,7 @@
         <div
           v-for="vehiculo in filteredVehicles"
           :key="vehiculo.id"
-          class="border rounded-lg p-4 cursor-pointer bg-[#06D6A0]/20 hover:bg-[#06D6A0]/30 text-gray-200"
+          class="border rounded-lg p-4 cursor-pointer bg-newgreen/20 hover:bg-newgreen/30 text-gray-200"
           @click="seleccionarVehiculo(vehiculo)"
         >
           <p><strong>Tipo:</strong> {{ vehicleLabel(vehiculo.type) }}</p>

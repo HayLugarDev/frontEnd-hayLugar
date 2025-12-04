@@ -1,7 +1,16 @@
 <template>
-  <MainHeader class="hidden md:block" />
-  <BackButton class="absolute top-2 right-6 md:top-8 md:left-8 z-50 md:hidden" />
-  <div class="relative w-full h-full mx-auto py-8 sm:py-4 md:py-6">
+
+  <div class="w-full fixed flex justify-end p-4 sm:hidden top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  <MainHeader />
+
+  <!-- MENÚ INFERIOR MOBILE -->
+  <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
+    :showMap="showMap" />
+
+  <div class="relative w-full min-h-screen mx-auto pt-20 py-4 md:py-6">
     <!-- Instrucciones iniciales -->
     <transition name="fade-step" mode="out-in">
       <div :key="currentStep">
@@ -128,6 +137,7 @@ import BackButton from '../components/common/BackButton.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import logo from "../assets/logo.png";
 import { useSpaceStore } from "../store/spaceStore";
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
 
 const router = useRouter();
 const showSuccessModal = ref(false);

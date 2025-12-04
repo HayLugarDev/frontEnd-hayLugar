@@ -77,7 +77,7 @@
             <div class="flex items-center justify-between mt-4">
               <!-- Precio estimado -->
               <div>
-                <p class="text-sm font-semibold text-[#06D6A0]">
+                <p class="text-sm font-semibold text-newgreen">
                   ${{ f.space.vehicle_capacities?.[0]?.price_per_hour?.toLocaleString() }}/h
                 </p>
                 <p class="text-xs text-gray-400 mt-1">

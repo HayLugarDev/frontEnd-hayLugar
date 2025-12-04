@@ -3,8 +3,8 @@
         <div class="w-full max-w-md mx-auto bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-3xl shadow-2xl p-6 animate-fadeIn">
             <!-- Header -->
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
-                    <font-awesome-icon icon="search-location" class="text-primary text-2xl" />
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <font-awesome-icon icon="search-location" class="text-white text-2xl" />
                     Búsqueda avanzada
                 </h2>
                 <button @click="$emit('close')" class="text-gray-400 hover:text-white text-2xl">
@@ -13,12 +13,12 @@
             </div>
 
             <!-- Formulario -->
-            <form @submit.prevent="handleSearch" class="space-y-6">
+            <form @submit.prevent="handleSearch" class="space-y-6 text-gray-200">
                 <!-- Lugar -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-400 mb-1">Zona o dirección</label>
+                    <label class="block text-sm font-semibold text-gray-300 mb-1">Zona o dirección</label>
                     <input v-model="localSearchQuery" type="text" placeholder="Ej: Palermo, Av. Corrientes..."
-                        class="w-full rounded-full border border-gray-300 px-4 py-3 text-lg focus:ring-2 focus:ring-primary focus:outline-none transition" />
+                        class="bg-gray-900 w-full rounded-full border border-gray-500 px-4 py-3 text-lg focus:ring-2 focus:outline-none transition" />
                 </div>
 
                 <!-- Fechas -->
@@ -49,14 +49,14 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-400 mb-1">Precio máximo por hora</label>
                     <input v-model="localMaxPrice" type="number" min="0" placeholder="Ej: 500"
-                        class="w-full rounded-full border border-gray-300 px-4 py-3 text-lg focus:ring-2 focus:ring-primary focus:outline-none transition" />
+                        class="bg-gray-900 w-full rounded-full border border-gray-500 px-4 py-3 text-lg focus:ring-2 focus:ring-primary focus:outline-none transition" />
                 </div>
 
                 <!-- Ordenar por -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-400 mb-1">Ordenar por</label>
                     <select v-model="localSortBy"
-                        class="w-full rounded-full border border-gray-300 px-4 py-3 text-lg focus:ring-2 focus:ring-primary focus:outline-none transition">
+                        class="bg-gray-900 w-full rounded-full border border-gray-500 px-4 py-3 text-lg focus:ring-2 focus:ring-primary focus:outline-none transition">
                         <option value="nearest">Más cercanas</option>
                         <option value="price">Precio</option>
                         <option value="published">Fecha de publicación</option>
@@ -65,7 +65,7 @@
 
                 <!-- Botón de búsqueda -->
                 <button type="submit"
-                    class="w-full py-3 rounded-full bg-[#06D6A0]/30 hover:bg-[#06D6A0]/40 text-white font-bold text-lg shadow-lg transition-all flex items-center justify-center gap-2">
+                    class="w-full py-3 rounded-full bg-newgreen/30 hover:bg-newgreen/40 text-white font-bold text-lg shadow-lg transition-all flex items-center justify-center gap-2">
                     <font-awesome-icon icon="search" />
                     Buscar espacios
                 </button>

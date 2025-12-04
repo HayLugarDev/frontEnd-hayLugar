@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
+  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-0">
+
+    <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+      <BackButton />
+    </div>
+
     <MainHeader />
 
     <!-- Hero -->
@@ -9,8 +14,10 @@
         Última actualización: <span class="font-semibold">10/10/2025</span>
       </p>
       <p class="text-gray-400 mt-2 text-sm">
-        Esta Política complementa los <RouterLink to="/termsConditions" class="text-accent underline">Términos y Condiciones</RouterLink>
-        y la <RouterLink to="/PrivacyPolicy" class="text-accent underline">Política de Privacidad</RouterLink> de HayLugar.
+        Esta Política complementa los <RouterLink to="/termsConditions" class="text-accent underline">Términos y
+          Condiciones</RouterLink>
+        y la <RouterLink to="/PrivacyPolicy" class="text-accent underline">Política de Privacidad</RouterLink> de
+        HayLugar.
       </p>
     </section>
 
@@ -29,9 +36,8 @@
           <h2 class="text-xl font-bold text-primary mb-2">1. Uso de cookies</h2>
           <p>
             El sitio
-            <a href="https://haylugar.com.ar" target="_blank" class="text-accent font-semibold underline"
-              >https://haylugar.com.ar</a
-            >
+            <a href="https://haylugar.com.ar" target="_blank"
+              class="text-accent font-semibold underline">https://haylugar.com.ar</a>
             utiliza cookies y tecnologías similares para garantizar su correcto funcionamiento, mejorar la seguridad,
             optimizar la navegación y ofrecer una mejor experiencia al usuario.
           </p>
@@ -48,15 +54,18 @@
           <ul class="list-disc ml-6 space-y-2">
             <li><strong>Cookies necesarias:</strong> permiten el funcionamiento básico y seguro del sitio.</li>
             <li>
-              <strong>Cookies de personalización:</strong> recuerdan ciertas preferencias del usuario (por ejemplo, idioma
+              <strong>Cookies de personalización:</strong> recuerdan ciertas preferencias del usuario (por ejemplo,
+              idioma
               o región).
             </li>
             <li>
               <strong>Cookies de terceros:</strong> algunos servicios integrados, como Google Maps o Cloudflare, pueden
-              instalar sus propias cookies para brindar funcionalidades o mejorar la seguridad y el rendimiento del sitio.
+              instalar sus propias cookies para brindar funcionalidades o mejorar la seguridad y el rendimiento del
+              sitio.
             </li>
             <li>
-              <strong>Cookies de análisis (futuras):</strong> se utilizarán exclusivamente para mejorar los servicios, previa
+              <strong>Cookies de análisis (futuras):</strong> se utilizarán exclusivamente para mejorar los servicios,
+              previa
               obtención de consentimiento.
             </li>
           </ul>
@@ -89,28 +98,16 @@
           </p>
           <ul class="list-disc ml-6 mt-2 space-y-1">
             <li>
-              <a
-                href="https://policies.google.com/privacy"
-                target="_blank"
-                class="text-primary underline font-semibold"
-                >Política de privacidad de Google</a
-              >
+              <a href="https://policies.google.com/privacy" target="_blank"
+                class="text-primary underline font-semibold">Política de privacidad de Google</a>
             </li>
             <li>
-              <a
-                href="https://www.cloudflare.com/privacypolicy/"
-                target="_blank"
-                class="text-primary underline font-semibold"
-                >Política de privacidad de Cloudflare</a
-              >
+              <a href="https://www.cloudflare.com/privacypolicy/" target="_blank"
+                class="text-primary underline font-semibold">Política de privacidad de Cloudflare</a>
             </li>
             <li>
-              <a
-                href="https://www.mercadopago.com.ar/privacidad"
-                target="_blank"
-                class="text-primary underline font-semibold"
-                >Política de privacidad de Mercado Pago</a
-              >
+              <a href="https://www.mercadopago.com.ar/privacidad" target="_blank"
+                class="text-primary underline font-semibold">Política de privacidad de Mercado Pago</a>
             </li>
           </ul>
         </div>
@@ -120,15 +117,13 @@
           <h2 class="text-xl font-bold text-primary mb-2">5. Derechos del usuario</h2>
           <p>
             Podés ejercer tus derechos de acceso, rectificación, actualización o supresión de tus datos escribiendo a
-            <a href="mailto:apphaylugar@gmail.com" class="text-primary font-semibold underline"
-              >apphaylugar@gmail.com</a
-            >.
+            <a href="mailto:apphaylugar@gmail.com"
+              class="text-primary font-semibold underline">apphaylugar@gmail.com</a>.
           </p>
           <p class="mt-2">
             La autoridad de aplicación es la
-            <a href="https://www.argentina.gob.ar/aaip" target="_blank" class="text-primary underline font-semibold"
-              >Agencia de Acceso a la Información Pública (AAIP)</a
-            >.
+            <a href="https://www.argentina.gob.ar/aaip" target="_blank"
+              class="text-primary underline font-semibold">Agencia de Acceso a la Información Pública (AAIP)</a>.
           </p>
         </div>
 
@@ -137,7 +132,8 @@
           <h2 class="text-xl font-bold text-primary mb-2">6. Actualizaciones de esta Política</h2>
           <p>
             HayLugar podrá modificar esta Política de Cookies cuando se incorporen nuevas herramientas o servicios que
-            impliquen el uso de cookies. La versión vigente estará siempre disponible en esta sección, indicando la fecha
+            impliquen el uso de cookies. La versión vigente estará siempre disponible en esta sección, indicando la
+            fecha
             de su última actualización.
           </p>
         </div>
@@ -152,13 +148,16 @@
 <script setup>
 import MainHeader from '../components/layout/header/MainHeader.vue'
 import CookieBanner from '../components/common/CookieBanner.vue'
+import BackButton from '../components/common/BackButton.vue';
 </script>
 
 <style scoped>
 a {
   transition: color 0.3s ease;
 }
+
 a:hover {
-  color: #0ea5e9; /* tono más claro del accent */
+  color: #0ea5e9;
+  /* tono más claro del accent */
 }
 </style>

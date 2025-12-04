@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col max-w-xl mx-auto bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] h-screen rounded-2xl shadow-lg p-8 gap-6 md:min-h-[80vh] animate-fade-in">
+    class="flex flex-col max-w-xl mx-auto rounded-2xl shadow-lg p-8 gap-6 md:min-h-[80vh] animate-fade-in">
 
     <!-- Título -->
     <h1 class="text-primary text-2xl sm:text-4xl font-bold text-center mb-4">
@@ -33,7 +33,7 @@
 
     <!-- Modal de error -->
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-      message="Por favor, seleccioná una opción antes de continuar." icon="/src/assets/logo.png"
+      message="Por favor, seleccioná una opción antes de continuar." :icon="logo"
       @confirm="showErrorModal = false" />
   </div>
 
@@ -43,6 +43,7 @@
 import { ref, computed } from 'vue';
 import FormOption from '../../forms/FormOption.vue';
 import StatusModal from "../addSpacePage/StatusModal.vue";
+import logo from "../../../assets/logo.png";
 
 const showErrorModal = ref(false);
 const props = defineProps(['modelValue']);
