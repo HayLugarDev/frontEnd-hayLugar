@@ -5,7 +5,7 @@
 
 <!-- ============================ HERO ============================ -->
 <section
-  class="relative overflow-hidden pt-16 pb-36 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#020617]"
+  class="relative overflow-hidden pt-28 md:pt-16 pb-36 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#020617]"
 >
   <!-- Halos -->
   <div class="pointer-events-none absolute inset-0 -z-10">
