@@ -15,9 +15,9 @@
   <SpaceDetailsSkeleton v-if="spaceStore.loading" />
 
   <div v-else-if="space"
-    class="flex flex-col bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] xl:w-11/12 mx-auto pt-20 md:gap-4">
+    class="flex flex-col bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] xl:w-11/12 mx-auto pt-20 md:pt-28 md:gap-4">
 
-    <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
+    <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto space-y-4">
 
       <!-- Carrusel en móviles -->
       <Carousel :images="carouselImages" class="lg:hidden w-full h-full rounded-lg" :controls="false" />

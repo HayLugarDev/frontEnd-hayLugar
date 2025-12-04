@@ -16,8 +16,7 @@
            text-white p-6 md:p-10"
   >
     <section
-      class="pt-10 max-w-4xl mx-auto sm:bg-white/5 backdrop-blur-md sm:border border-white/10
-             rounded-2xl p-6 md:p-10 shadow-xl"
+      class="pt-10 md:pt-16 max-w-4xl mx-auto p-6 md:p-10"
     >
       <!-- HEADER -->
       <header class="mb-8">

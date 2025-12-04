@@ -4,16 +4,15 @@
         <BackButton />
     </div>
 
-    
     <MainHeader />
 
     <!-- MENÚ INFERIOR MOBILE -->
     <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
-    <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-20 md:px-6 md:py-10 text-white">
+    <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-20 md:pt-24 md:px-6 md:py-10 text-white">
 
         <section
-            class="sm:bg-white/5 backdrop-blur-md sm:border border-white/10 rounded-2xl sm:shadow-xl p-6 md:p-10 max-w-3xl mx-auto">
+            class="p-6 md:p-10 max-w-3xl mx-auto">
             <!-- Título -->
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-3xl font-bold text-white flex items-center gap-3 drop-shadow">

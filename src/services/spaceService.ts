@@ -141,7 +141,7 @@ export const getSpaceById = async (id: number) => {
 
 export const getSpaceBySlug = async (slug: string) => {
   try {
-    const response = await api.get(`/spaces/slug/${slug}`);
+    const response = await api.get(`/spaces/getbyslug/${slug}`);
     const item = response.data as any;
 
     let paymentMethods: string[] = [];

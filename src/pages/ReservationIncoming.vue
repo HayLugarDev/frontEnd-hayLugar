@@ -12,8 +12,7 @@
 
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] 
               text-white p-6 md:p-10">
-    <section class="pt-10 max-w-4xl mx-auto sm:bg-white/5 backdrop-blur-md sm:border border-white/10
-             rounded-2xl p-6 md:p-10 shadow-xl">
+    <section class="pt-20 max-w-4xl mx-auto p-6">
       <!-- HEADER -->
       <header class="mb-8">
         <h2 class="text-3xl font-bold text-primary flex items-center gap-2">

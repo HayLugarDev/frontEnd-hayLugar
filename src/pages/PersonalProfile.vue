@@ -12,8 +12,7 @@
     <div
         class="min-h-screen bg-gradient-to-br py-10 sm:p-8 from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-16 md:px-6 md:py-10 text-white">
         
-        <section class="pt-10 max-w-4xl mx-auto sm:bg-white/5 backdrop-blur-md sm:border border-white/10
-             rounded-2xl p-6 md:p-10 shadow-xl">
+        <section class="pt-10 md:pt-16 max-w-4xl mx-auto p-6">
 
             <!-- Título -->
             <h1 class="text-3xl md:text-4xl font-bold text-white mb-6 flex items-center gap-3">

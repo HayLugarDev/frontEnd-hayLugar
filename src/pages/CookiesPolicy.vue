@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-0">
+  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-16">
 
     <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
       <BackButton />

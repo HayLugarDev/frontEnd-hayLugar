@@ -2,7 +2,7 @@
   <div class="flex flex-col h-full bg-gray-700 animate-pulse text-transparent">
     <!-- Simulación del MainHeader en modo skeleton -->
     <div
-      class="hidden md:flex justify-between items-center border-b-2 px-4 pt-16 md:pt-2 xl:px-16 h-20 bg-gray-500 rounded mb-4 animate-pulse">
+      class="flex justify-between items-center border-b-2 px-4 pt-2 xl:px-16 h-20 bg-gray-500 rounded mb-4 animate-pulse">
       <!-- Logo placeholder -->
       <div class="w-16 h-10 bg-gray-400 rounded"></div>
 
@@ -17,7 +17,7 @@
     <div class="hidden md:fixed md:left-1/2 md:-translate-x-1/2 md:bottom-16 w-24 h-10 bg-gray-300 rounded-full"></div>
 
     <!-- Botón móvil de búsqueda -->
-    <div class="flex md:hidden items-center justify-center bg-gray-300 mx-6 rounded-full my-4 h-12"></div>
+    <div class="flex items-center justify-center bg-gray-300 mx-6 rounded-full my-4 h-12"></div>
 
     <!-- Zona de búsqueda -->
     <!-- <div class="hidden md:grid grid-cols-11 gap-2 px-8 py-4 bg-gray-300 rounded-md mb-4 h-20"></div>

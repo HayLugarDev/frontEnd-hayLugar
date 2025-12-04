@@ -4,13 +4,13 @@
     <BackButton />
   </div>
 
-  
+
   <MainHeader />
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
-  <div class="min-h-screen md:p-10 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] 
+  <div class="min-h-screen md:pt-32 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] 
       text-white overflow-hidden border-b border-white/10 pt-8" v-if="!userStore.loading">
     <div class="flex flex-col md:pt-0 md:flex-row w-full items-start">
 
@@ -57,14 +57,19 @@
                   </p>
                 </div>
               </div>
+              <!-- Admin -->
+                <div v-if="isAdmin" class="mb-4 hidden md:block ">
+                  <SettingsItem class="gap-2" icon="fa-solid fa-wrench" label="Administración" :isAdmin="isAdmin"
+                    @click="router.push('/admin-page')" />
+                </div>
             </div>
 
             <ul class="w-full flex-1 sm:grid grid-cols-2 mt-8 border-b border-gray-600 pb-8 space-y-1 px-2">
 
               <!-- Admin -->
-              <div v-if="isAdmin" class="mb-4">
+              <div v-if="isAdmin" class="mb-4 md:hidden">
                 <SettingsItem icon="fa-solid fa-wrench" label="Administración" :isAdmin="isAdmin"
-                    @click="router.push('/admin-page')" />
+                  @click="router.push('/admin-page')" />
               </div>
 
               <div>
@@ -77,7 +82,8 @@
                 <SettingsItem icon="fa-solid fa-car" label="Mis vehículos"
                   @click="router.push('/vehicles/user-vehicles')" />
 
-                <SettingsItem icon="fa-solid fa-wallet" label="Billetera" @click="router.push('/personal-wallet-user')" />
+                <SettingsItem icon="fa-solid fa-wallet" label="Billetera"
+                  @click="router.push('/personal-wallet-user')" />
               </div>
               <div>
                 <SettingsItem icon="fa-solid fa-bank" label="Cuentas de pago"
@@ -117,8 +123,8 @@
     <StatusModal :visible="showSuccessModal" type="success" title="¡Éxito!"
       message="Los cambios se han guardado correctamente." :icon="logo" @confirm="closeSuccessModal" />
 
-    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-      :icon="logo" @confirm="showErrorModal = false" />
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage" :icon="logo"
+      @confirm="showErrorModal = false" />
 
   </div>
 

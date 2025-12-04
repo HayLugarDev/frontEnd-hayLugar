@@ -10,7 +10,7 @@
   <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
     :showMap="showMap" />
 
-  <div class="relative w-full min-h-screen mx-auto pt-20 py-4 md:py-6">
+  <div class="relative w-full min-h-screen mx-auto pt-20 md:pt-28 py-4 md:py-6">
     <!-- Instrucciones iniciales -->
     <transition name="fade-step" mode="out-in">
       <div :key="currentStep">

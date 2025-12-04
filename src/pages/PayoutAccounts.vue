@@ -11,7 +11,7 @@
   <MobileButtonNav @navigate="(path: string) => router.push(path)" class="md:hidden" :showMap="false" />
 
   <div v-if="!loadingUser"
-    class="flex flex-col space-y-6 min-h-screen pt-20 sm:p-8 sm:w-2/3 mx-auto md:px-6 md:py-10 text-white">
+    class="flex flex-col space-y-6 min-h-screen pt-20 md:pt-32 sm:p-8 sm:w-2/3 mx-auto md:px-6 md:py-10 text-white">
 
     <!-- Header -->
     <section class="sm:bg-white/10 sm:border border-white/10 p-6 md:p-8 rounded-2xl sm:shadow-lg">

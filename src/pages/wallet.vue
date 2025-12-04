@@ -14,7 +14,7 @@
     class="min-h-screen bg-gradient-to-br pt-16 sm:p-8 from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] md:px-6 md:py-10 text-white">
 
     <section
-      class="mx-auto sm:bg-white/10 border-white/10 p-10 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3 sm:border border-gray-200 flex flex-col gap-6">
+      class="mx-auto p-10 md:pt-20 md:p-8 w-full md:w-2/3 flex flex-col gap-6">
 
       <!-- Header y saldo -->
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

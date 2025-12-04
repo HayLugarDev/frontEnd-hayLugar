@@ -1,7 +1,7 @@
 <template>
   <MainHeader />
   <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] p-6 pt-10 lg:pt-0">
-    <div class="bg-white/10 border border-white/10 p-8 rounded-lg shadow-md w-full max-w-lg">
+    <div class="md:bg-white/10 md:border border-white/10 p-8 rounded-lg md:shadow-md w-full max-w-lg">
       <!-- Título principal -->
       <h1 class="text-3xl font-bold text-amber-500 flex items-center">
         <font-awesome-icon icon="clock" class="mr-2" />

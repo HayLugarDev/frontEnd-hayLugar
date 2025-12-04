@@ -11,7 +11,7 @@
     <MobileButtonNav @navigate="(p) => router.push(p)" class="md:hidden" :showMap="false" />
 
     <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] 
-              text-white pt-24 px-8 sm:p-6 sm:px-20">
+              text-white pt-24 md:pt-32 px-8 sm:p-6 max-w-4xl mx-auto">
         <div class="absolute -top-32 -righ t-32 h-64 w-64 blur-3xl rounded-full"></div>
         <div class="absolute -bottom-40 -left-40 h-56 w-56 blur-3xl rounded-full"></div>
 

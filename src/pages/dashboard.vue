@@ -3,17 +3,19 @@
     class="relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-x-hidden">
 
     <!-- LOADING -->
-    <DashboardSkeleton v-if="loading || !spaces" />
+     <div v-if="loading || !spaces">
+       <DashboardSkeleton />
+   
+       <!-- BUSCADOR MOBILE AVANZADO -->
+       <div v-if="showSearchMenu"
+         class="p-4 w-11/12 mx-auto bg-[#1B263B]/90 rounded-2xl shadow-2xl border border-white/10">
+         <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
+           v-model:publishedDate="publishedDate" v-model:maxPrice="maxPrice" v-model:sortBy="sortBy" @search="buscar"
+           @close="showSearchMenu = false" />
+       </div>
+     </div>
 
-    <!-- BUSCADOR MOBILE AVANZADO -->
-    <div v-if="showSearchMenu"
-      class="p-4 w-11/12 mx-auto bg-[#1B263B]/90 rounded-2xl shadow-2xl border border-white/10">
-      <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
-        v-model:publishedDate="publishedDate" v-model:maxPrice="maxPrice" v-model:sortBy="sortBy" @search="buscar"
-        @close="showSearchMenu = false" />
-    </div>
-
-    <div v-else class="flex flex-col h-full pt-20 md:pt-0">
+    <div v-else class="flex flex-col h-full pt-24 md:pt-20">
 
       
       <MainHeader />
