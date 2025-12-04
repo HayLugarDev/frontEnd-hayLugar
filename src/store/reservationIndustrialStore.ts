@@ -12,6 +12,7 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
       owner_id: null as number | null,
       space_id: null as number | null,
       slug: null as string | null,
+      space_name: null as string | null,  // ✅ NUEVO
       start_time: '' as string,
       end_time: '' as string,
       pricing_unit: 'day' as 'hour' | 'day' | 'week' | 'month',
@@ -36,27 +37,32 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
 
   actions: {
     /**
-     * Inicializa o actualiza parcialmente la reserva industrial.
+     * Inicializa o actualiza la reserva industrial
      */
     setReservationData(data: Partial<typeof this.reservation>) {
       const userStore = useUserStore()
       const spaceStore = useSpaceStore()
 
-      // asigna usuario si está logueado
+      // usuario logueado
       if (!data.user_id && userStore.user) {
         data.user_id = userStore.user.id
       }
 
-      // asigna owner_id desde espacio seleccionado
+      // owner
       if (!data.owner_id && spaceStore.selectedSpace?.owner_id) {
         data.owner_id = spaceStore.selectedSpace.owner_id
+      }
+
+      // nombre del espacio para el success screen
+      if (!data.space_name && spaceStore.selectedSpace?.name) {
+        (data as any).space_name = spaceStore.selectedSpace.name
       }
 
       this.reservation = { ...this.reservation, ...data }
     },
 
     /**
-     * Calcula monto estimado (solo UI)
+     * Calcula el monto estimado
      */
     estimateTotal(startISO: string, endISO: string, pricingUnit: string, pricePerUnit: number) {
       const start = new Date(startISO)
@@ -84,32 +90,33 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
     },
 
     /**
-     * Envía la reserva al backend (POST /industrial-reservations)
+     * Envía la reserva al backend
      */
     async submitIndustrialReservation() {
       this.loading = true
       this.error = null
 
       try {
-        // Determina endpoint según método
         const endpoint = '/industrial-reservations/create'
 
-        // Si el método es "manual_contract", enviamos estado inicial especial
-        if (this.reservation.method === 'manual_contract') {
-          this.reservation.status = 'contract_required'
-        } else {
-          this.reservation.status = 'pending'
-        }
+        // estado inicial según método de reserva
+        this.reservation.status =
+          this.reservation.method === 'manual_contract'
+            ? 'contract_required'
+            : 'pending'
 
         const response = await api.post(endpoint, this.reservation)
-        this.reservation.id = response.data?.id || response.data?.reservation?.id || null
 
-        // Estado actualizado localmente
-        if (this.reservation.method === 'manual_contract') {
-          this.reservation.status = 'contract_required'
-        } else {
-          this.reservation.status = 'confirmed'
-        }
+        this.reservation.id =
+          response.data?.id ||
+          response.data?.reservation?.id ||
+          null
+
+        // estado final
+        this.reservation.status =
+          this.reservation.method === 'manual_contract'
+            ? 'contract_required'
+            : 'confirmed'
 
         return response.data
       } catch (err: any) {
@@ -122,7 +129,7 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
     },
 
     /**
-     * Limpia el estado (reset completo)
+     * Resetea todo
      */
     clearReservation() {
       this.reservation = {
@@ -131,6 +138,7 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
         owner_id: null,
         space_id: null,
         slug: null,
+        space_name: null,
         start_time: '',
         end_time: '',
         pricing_unit: 'day',

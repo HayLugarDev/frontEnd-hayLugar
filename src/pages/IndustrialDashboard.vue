@@ -11,6 +11,7 @@
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
   <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden">
+
     <!-- ===== HEADER ===== -->
     <header class="relative z-10 px-6 pt-16 py-4 md:py-8 md:px-12 flex items-center justify-between md:hidden">
       <div class="flex items-center gap-3">
@@ -30,7 +31,8 @@
       <video autoplay muted loop playsinline poster="/assets/industry.png"
         class="absolute inset-0 w-full h-full object-cover brightness-75"></video>
       <div class="absolute inset-0 bg-gradient-to-t from-[#0D1B2A]/90 via-transparent"></div>
-      <div class="relative z-10 text-center">
+
+      <div class="relative z-10 text-center px-4">
         <h2 class="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">Espacios Logísticos en Red</h2>
         <p class="text-3xl md:text-3xl font-bold mb-2 drop-shadow-lg">
           Almacená, transportá y optimizá tus operaciones con inteligencia urbana HayLugar.
@@ -85,22 +87,27 @@
       </div>
     </section>
 
-    <!-- ===== LISTA DE ESPACIOS ===== -->
-    <section v-if="viewMode === 'list' && spaces.length"
-      class="container mx-auto px-6 md:px-12 py-12 grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      <transition-group name="fade-up" tag="div">
-        <div v-for="space in spaces" :key="space.id"
-          class="group bg-[#1B263B]/70 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-white/5">
-          <div class="relative h-52 overflow-hidden">
-            <img :src="'/assets/industrial_cover.jpg'" :alt="space.name"
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-            <div class="absolute inset-0 bg-gradient-to-t from-[#0D1B2A]/80 via-transparent"></div>
-            <div class="absolute bottom-3 left-3">
-              <span class="bg-newgreen/20 px-3 py-1 rounded-full font-medium uppercase text-xs tracking-wider">
-                {{ formatType(space.subcategory) }}
-              </span>
+    <!-- ===== LISTA DE ESPACIOS (CARDS EN FILA) ===== -->
+    <section v-if="viewMode === 'list' && spaces.length" class="container mx-auto px-6 md:px-12 py-12">
+      <div class="flex flex-wrap gap-6 justify-center md:justify-start">
+
+        <transition-group name="fade-up" tag="div" class="contents">
+          <div v-for="space in spaces" :key="space.id"
+            class="w-full sm:w-[48%] md:w-[31%] lg:w-[30%] xl:w-[23%]
+                   bg-[#1B263B]/70 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg
+                   hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2
+                   border border-white/5">
+
+            <div class="relative h-52 overflow-hidden">
+              <img :src="(Array.isArray(space.images) ? space.images[0] : null) || '/assets/industrial_cover.jpg'"
+                :alt="space.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0D1B2A]/80 via-transparent"></div>
+              <div class="absolute bottom-3 left-3">
+                <span class="bg-[#06D6A0]/20 px-3 py-1 rounded-full font-medium uppercase text-xs tracking-wider">
+                  {{ formatType(space.subcategory) }}
+                </span>
+              </div>
             </div>
-          </div>
 
           <div class="p-6 flex flex-col gap-2">
             <h3 class="text-xl font-semibold leading-tight">{{ space.name }}</h3>
@@ -120,7 +127,7 @@
       </transition-group>
     </section>
 
-    <!-- ===== MAPA INTERACTIVO ===== -->
+    <!-- ===== MAPA ===== -->
     <section v-else-if="viewMode === 'map'" class="container mx-auto px-6 md:px-12 py-12">
       <div class="rounded-2xl overflow-hidden shadow-lg border border-white/10 h-[600px]">
         <CustomGoogleMap :center="mapCenter" :zoom="13" :options="{ disableDefaultUI: true, zoomControl: true }">
@@ -175,7 +182,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useSpaceStore } from '../store/spaceStore'
+import { useIndustrialStore } from '../store/industrialStore'
 import { storeToRefs } from 'pinia'
 import logo from '../assets/logo.png'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
@@ -184,25 +191,23 @@ import MainHeader from '../components/layout/header/MainHeader.vue'
 import BackButton from '../components/common/BackButton.vue'
 
 const router = useRouter()
-const spaceStore = useSpaceStore()
-const { spaces } = storeToRefs(spaceStore)
+const industrialStore = useIndustrialStore()
+const { spaces } = storeToRefs(industrialStore)
 
 const filters = ref({
   search: '',
   subcategory: '',
   minCapacity: null,
-  maxPrice: null,
-  security: false,
-  loadingDock: false
+  maxPrice: null
 })
 
 const viewMode = ref<'list' | 'map'>('list')
 
-const mapCenter = { lat: -26.8109807, lng: -65.1686014 } // Parque Industrial Tucumán
+const mapCenter = { lat: -26.8109807, lng: -65.1686014 }
 
 const fetchSpaces = async () => {
-  await spaceStore.fetchIndustrialSpaces({
-    searchQuery: filters.value.search,
+  await industrialStore.loadSpacesByFilters({
+    search: filters.value.search,
     subcategory: filters.value.subcategory
   })
 }
