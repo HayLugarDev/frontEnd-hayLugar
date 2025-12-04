@@ -3,7 +3,7 @@
     <MainHeader />
 
     <!-- BOTÓN ATRÁS MOBILE -->
-    <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+    <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
         <BackButton />
     </div>
 

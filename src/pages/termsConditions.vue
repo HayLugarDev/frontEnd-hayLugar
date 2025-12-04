@@ -1,6 +1,6 @@
 <template>
 
-  <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
     <BackButton />
   </div>
 
@@ -126,7 +126,7 @@
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">15. Autoridades y Contacto</h2>
-          <ul class="list-disc ml-6 space-y-1">
+          <ul class="list-disc space-y-1 flex-wrap">
             <li>Soporte: <a href="mailto:apphaylugar@gmail.com" class="text-primary underline font-semibold">soportehaylugar@gmail.com</a></li>
             <li>Defensa del Consumidor: <a href="https://www.argentina.gob.ar/defensadelconsumidor" target="_blank" class="text-primary underline font-semibold">https://www.argentina.gob.ar/defensadelconsumidor</a></li>
           </ul>

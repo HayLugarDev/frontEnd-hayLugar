@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
 
-    <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+    <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
       <BackButton />
     </div>
 
