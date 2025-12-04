@@ -1,6 +1,5 @@
 <template>
-  <header
-    class="w-full z-20 fixed md:static top-0 left-0
+  <header class="w-full z-20 fixed md:static top-0 left-0
            bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
            text-white border-b border-white/10 shadow-lg md:shadow-none
            px-6 py-4 xl:px-16 flex items-center justify-between gap-6">
@@ -14,11 +13,10 @@
         <h1 class="md:hidden font-bold tracking-tight sm:text-lg text-white">
           Estacionamiento inteligente
         </h1>
-      </span> 
+      </span>
 
       <!-- Texto principal desktop-->
-      <span
-        class="hidden md:block font-bold tracking-tight text-xl 
+      <span class="hidden md:block font-bold tracking-tight text-xl 
                text-white hover:text-accent transition-colors duration-200">
         Encontrá tu próximo estacionamiento
       </span>
@@ -36,26 +34,24 @@
       </button> -->
 
       <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
-            <button
-    @click="router.push('/add-space')"
-    class="bg-[#06D6A0] hover:bg-[#00B4D8] text-[#0D1B2A] font-semibold px-4 py-2 rounded-xl shadow-lg text-sm transition-all"
-  >
-    + Publica tu espacio
-  </button>
+      <button @click="router.push('/add-space')"
+        class="hidden md:block bg-[#06D6A0] hover:bg-[#00B4D8] text-[#0D1B2A] font-semibold px-4 py-2 rounded-xl shadow-lg text-sm transition-all">
+        + Publica tu espacio
+      </button>
 
-        <!-- <button
+      <!-- <button
     @click="router.push('/industrial/new-space')"
     class="bg-[#06D6A0] hover:bg-[#00B4D8] text-[#0D1B2A] font-semibold px-4 py-2 rounded-xl shadow-lg text-sm transition-all"
   >
     + Crear Espacio
   </button> -->
-  <!-- <button
+      <!-- <button
     @click="router.push('/industrial/new-park')"
     class="bg-white/10 hover:bg-white/20 text-sm px-4 py-2 rounded-xl border border-white/20 transition-all"
   >
     + Crear Parque
   </button> -->
-  
+
       <!-- Botón ayuda -->
       <!-- <font-awesome-icon 
         icon="fa-regular fa-circle-question"
@@ -67,19 +63,10 @@
       <NotificationDropdown v-if="routeConfig.showNotificationButton" />
 
       <!-- Botón mapa (mobile only) -->
-      <MapButton 
-        :text="buttonText"
-        color="white" 
-        background="primary"
-        @click="toggleMap"
-        class="md:hidden"
-      />
+      <MapButton :text="buttonText" color="white" background="primary" @click="toggleMap" class="md:hidden" />
 
       <!-- Menú usuario -->
-      <UserMenu 
-        v-if="routeConfig.showUserMenuButton"
-        @navigate="handleNavigate"
-      />
+      <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
 
     </div>
 
