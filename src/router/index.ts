@@ -26,6 +26,13 @@ import ImpactDashboard from '../pages/ImpactDashboard.vue'
 import IndustrialDashboard from '../pages/IndustrialDashboard.vue'
 import AdminPage from '../pages/AdminPage.vue'
 import PlayaDashboard from '../pages/PlayaDashboard.vue'
+import PersonalProfile from '../pages/PersonalProfile.vue'
+import OwnerProfile from '../pages/OwnerProfile.vue'
+import ReservationIncoming from '../pages/ReservationIncoming.vue'
+import OwnerPublications from '../pages/OwnerPublications.vue'
+import UserVehicles from '../pages/UserVehicles.vue'
+import Wallet from '../pages/wallet.vue'
+import PayoutAccounts from '../pages/PayoutAccounts.vue'
 import IndustrialDetail from '../pages/IndustrialDetail.vue'
 import IndustrialSpaceCreate from '../pages/IndustrialSpaceCreate.vue'
 import IndustrialParkCreate from '../pages/IndustrialParkCreate.vue'
@@ -56,10 +63,18 @@ const routes: RouteRecordRaw[] = [
   { path: '/pago', component: payment, meta: { requiresAuth: true } },
   { path: '/confirmacion', component: confirmaReserva, meta: { requiresAuth: true } },
   { path: '/profile', component: profile, meta: { requiresAuth: true } },
+  { path: '/personal-profile-user', component: PersonalProfile, meta: { requiresAuth: true } },
+  { path: '/personal-profile-owner', component: OwnerProfile, meta: { requiresAuth: true } },
+  { path: '/personal-wallet-user', component: Wallet, meta: { requiresAuth: true } },
+  { path: '/personal-accounts-user', component: PayoutAccounts, meta: { requiresAuth: true } },
   { path: '/notifications', component: Notifications, meta: { requiresAuth: true } },
   { path: '/add-vehicle', component: AddVehicle, meta: { requiresAuth: true } },
   { path: '/help', component: Help, meta: { requiresAuth: false } },
-
+  { path: '/owner/mypublications', name: 'publications', component: OwnerPublications, meta: { requiresAuth: true } },
+  { path: '/owner/reservation-incoming', name: 'reservation-incoming', component: ReservationIncoming, meta: { requiresAuth: true } },
+  { path: '/vehicles/user-vehicles', name: 'user-vehicles', component: UserVehicles,  meta: { requiresAuth: true } },
+  
+  
   {
     path: '/universidades',
     name: 'Universities',

@@ -57,7 +57,7 @@ onMounted(() => {
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
           scale: 8,
-          fillColor: '#06D6A0',
+          fillColor: 'newgreen',
           fillOpacity: 0.9,
           strokeWeight: 0,
         },

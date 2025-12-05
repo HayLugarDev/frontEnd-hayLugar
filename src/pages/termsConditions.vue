@@ -1,6 +1,12 @@
 <template>
-  <MainHeader class="hidden md:block" />
-  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
+
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  <MainHeader />
+  
+  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-16">
     <!-- Header -->
     <section class="py-16 px-6 text-center max-w-4xl mx-auto">
       <h1 class="text-3xl md:text-4xl font-bold mb-2">Términos y Condiciones de Uso</h1>
@@ -120,7 +126,7 @@
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">15. Autoridades y Contacto</h2>
-          <ul class="list-disc ml-6 space-y-1">
+          <ul class="list-disc space-y-1 flex-wrap">
             <li>Soporte: <a href="mailto:apphaylugar@gmail.com" class="text-primary underline font-semibold">soportehaylugar@gmail.com</a></li>
             <li>Defensa del Consumidor: <a href="https://www.argentina.gob.ar/defensadelconsumidor" target="_blank" class="text-primary underline font-semibold">https://www.argentina.gob.ar/defensadelconsumidor</a></li>
           </ul>
@@ -138,6 +144,7 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import MainHeader from '../components/layout/header/MainHeader.vue';
+import BackButton from '../components/common/BackButton.vue';
 const currentYear = computed(() => new Date().getFullYear())
 </script>
 

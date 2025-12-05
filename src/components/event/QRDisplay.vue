@@ -16,12 +16,12 @@
     <!-- Copiar -->
     <button 
       @click="copy" 
-      class="mt-4 bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 transition"
+      class="mt-4 bg-[#00B4D8] hover:bg-newgreen text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 transition"
     >
       Copiar Token
     </button>
 
-    <p v-if="copied" class="mt-2 text-[#06D6A0] text-sm">Copiado ✔</p>
+    <p v-if="copied" class="mt-2 text-newgreen text-sm">Copiado ✔</p>
   </div>
 </template>
 

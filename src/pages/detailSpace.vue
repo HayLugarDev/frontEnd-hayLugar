@@ -1,7 +1,11 @@
 <template>
-  <!-- HEADER SOLO EN DESKTOP -->
-  <MainHeader class="hidden md:block" />
-  <BackButton class="absolute top-2 right-6 md:top-8 md:left-8 z-50 md:hidden" />
+
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  
+  <MainHeader />
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
@@ -11,9 +15,9 @@
   <SpaceDetailsSkeleton v-if="spaceStore.loading" />
 
   <div v-else-if="space"
-    class="flex flex-col bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] xl:w-11/12 mx-auto md:gap-4">
+    class="flex flex-col bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] xl:w-11/12 mx-auto pt-20 md:pt-28 md:gap-4">
 
-    <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto">
+    <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto space-y-4">
 
       <!-- Carrusel en móviles -->
       <Carousel :images="carouselImages" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
@@ -145,7 +149,7 @@
           <!-- Disponibilidad -->
           <div class="mt-10">
             <p class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
-              <font-awesome-icon icon="calendar-days" class="text-[#06D6A0] text-xl" />
+              <font-awesome-icon icon="calendar-days" class="text-newgreen text-xl" />
               Disponibilidad:
             </p>
 
@@ -155,7 +159,7 @@
               <!-- Días particulares -->
               <template v-if="disponibilidad?.days?.length">
                 <span v-for="(day, i) in disponibilidad.days" :key="i"
-                  class="px-3 py-1 text-sm rounded-full bg-[#06D6A0]/20 border border-[#06D6A0]/30 text-[#06D6A0] font-medium">
+                  class="px-3 py-1 text-sm rounded-full bg-newgreen/20 border border-newgreen/30 text-newgreen font-medium">
                   {{ capitalizeDay(day) }}
                 </span>
               </template>
@@ -163,7 +167,7 @@
               <!-- Disponible todos los días -->
               <template v-else>
                 <span
-                  class="inline-flex items-center gap-2 bg-[#06D6A0]/20 text-[#06D6A0] px-4 py-2 rounded-full font-medium shadow">
+                  class="inline-flex items-center gap-2 bg-newgreen/20 text-newgreen px-4 py-2 rounded-full font-medium shadow">
                   <font-awesome-icon icon="check-circle" />
                   Disponible todos los días
                 </span>
@@ -202,7 +206,7 @@
          text-center order-5 lg:order-3 text-white">
           <font-awesome-icon icon="user-lock" class="text-5xl text-[#00B4D8] mb-4" />
 
-          <h2 class="text-2xl font-bold text-[#06D6A0] mb-2">
+          <h2 class="text-2xl font-bold text-newgreen mb-2">
             ¡Inicia sesión para reservar!
           </h2>
 
@@ -210,12 +214,12 @@
             Debes estar autenticado para seleccionar un vehículo y completar tu reserva.
           </p>
 
-          <router-link to="/login" class="px-6 py-3 bg-gradient-to-r from-[#00B4D8] to-[#06D6A0] text-[#0D1B2A] 
+          <router-link to="/login" class="px-6 py-3 bg-gradient-to-r from-[#00B4D8] to-newgreen text-[#0D1B2A] 
            rounded-xl shadow-lg hover:shadow-2xl hover:scale-[1.03] transition-all font-semibold">
             Iniciar sesión
           </router-link>
 
-          <router-link to="/login" class="mt-3 text-[#00B4D8] underline hover:text-[#06D6A0]">
+          <router-link to="/login" class="mt-3 text-[#00B4D8] underline hover:text-newgreen">
             ¿No tienes cuenta? Regístrate aquí
           </router-link>
         </div>
@@ -223,7 +227,7 @@
         <!-- Descripción -->
         <section class="col-span-10 p-6 rounded-xl text-xl order-6 bg-[#1B263B]/60 backdrop-blur-xl 
          border border-white/10 shadow-xl text-white">
-          <p class="font-semibold flex items-center gap-2 text-[#06D6A0]">
+          <p class="font-semibold flex items-center gap-2 text-newgreen">
             <font-awesome-icon icon="info-circle" class="text-[#00B4D8]" />
             Descripción:
           </p>
@@ -256,7 +260,7 @@
     @close="showReviewsModal = false" />
 
   <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-    icon="/src/assets/logo.png" :isHtml="modalIsHtml" :buttonText="requiresTerms ? 'Aceptar términos' : 'Cerrar'"
+    :icon="logo" :isHtml="modalIsHtml" :buttonText="requiresTerms ? 'Aceptar términos' : 'Cerrar'"
     @close="showErrorModal = false" @confirm="requiresTerms ? redirigirATerminos() : showErrorModal = false" />
 
   <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario" :vehicleType="getVehicleKey(tipoVehiculo)"
@@ -326,6 +330,7 @@ import someImg from '../assets/img-haylugar.jpeg';
 import defaultProfile from '../assets/user_icon_primary.png';
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
 import BackButton from '../components/common/BackButton.vue';
+import logo from "../assets/logo.png";
 
 const spaceStore = useSpaceStore()
 const { selectedSpace: space, favorites } = storeToRefs(spaceStore)

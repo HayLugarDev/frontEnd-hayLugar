@@ -8,11 +8,11 @@
         @click="selectZone(z.id)"
         :class="[
           'flex items-center justify-between bg-white/5 rounded-xl px-4 py-2 cursor-pointer transition',
-          selectedZone === z.id ? 'border border-[#06D6A0]/50 bg-[#06D6A0]/10' : 'hover:bg-white/10'
+          selectedZone === z.id ? 'border border-newgreen/50 bg-newgreen/10' : 'hover:bg-white/10'
         ]"
       >
         <div class="flex items-center gap-2">
-          <span class="inline-flex h-6 w-6 rounded-lg bg-[#06D6A0]/20 text-[#06D6A0] items-center justify-center text-sm font-bold">
+          <span class="inline-flex h-6 w-6 rounded-lg bg-newgreen/20 text-newgreen items-center justify-center text-sm font-bold">
             {{ z.code }}
           </span>
           <span>{{ z.name || 'Zona ' + z.code }}</span>

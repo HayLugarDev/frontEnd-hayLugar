@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-[#0D1B2A] to-[#1B263B] text-white relative">
     <!-- Header -->
-      <MainHeader class="hidden md:block" />
+      <MainHeader />
     <header
       class="sticky top-0 z-30 flex items-center justify-between px-6 md:px-12 py-4 border-b border-white/10 backdrop-blur-md bg-[#0D1B2A]/80"
     >
@@ -14,7 +14,7 @@
         </button>
         <button
           @click="router.push('/impact-dashboard')"
-          class="px-5 py-2 rounded-xl bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold transition shadow-md hover:shadow-lg"
+          class="px-5 py-2 rounded-xl bg-[#00B4D8] hover:bg-newgreen text-[#0D1B2A] font-semibold transition shadow-md hover:shadow-lg"
         >
           Impacto Global
         </button>
@@ -27,7 +27,7 @@
 
       <div class="flex items-center gap-2">
         <span class="hidden md:inline text-xs text-[#B0BEC5]">Powered by HayLugar</span>
-        <span class="inline-flex h-2 w-2 rounded-full bg-[#06D6A0] animate-pulse"></span>
+        <span class="inline-flex h-2 w-2 rounded-full bg-newgreen animate-pulse"></span>
       </div>
     </header>
 
@@ -44,7 +44,7 @@
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
             <span
-              class="px-3 py-1 rounded-full bg-[#06D6A0]/20 text-[#06D6A0] text-xs uppercase tracking-wider"
+              class="px-3 py-1 rounded-full bg-newgreen/20 text-newgreen text-xs uppercase tracking-wider"
             >
               {{ event ? formatType(event.type) : '—' }}
             </span>
@@ -121,7 +121,7 @@
             >
               <div class="flex items-center gap-2">
                 <span
-                  class="inline-flex h-6 w-6 rounded-lg bg-[#06D6A0]/20 text-[#06D6A0] items-center justify-center text-sm font-bold"
+                  class="inline-flex h-6 w-6 rounded-lg bg-newgreen/20 text-newgreen items-center justify-center text-sm font-bold"
                   >{{ z.code }}</span
                 >
                 <span class="text-sm">{{ z.name || ('Zona ' + z.code) }}</span>
@@ -130,7 +130,7 @@
             </li>
           </ul>
           <button
-            class="mt-5 w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-4 py-2 transition shadow"
+            class="mt-5 w-full bg-[#00B4D8] hover:bg-newgreen text-[#0D1B2A] font-semibold rounded-xl px-4 py-2 transition shadow"
             @click="currentTab='reserve'"
           >
             Reservar ahora
@@ -222,7 +222,7 @@
               <button
                 type="submit"
                 :disabled="reserving"
-                class="bg-[#00B4D8] hover:bg-[#06D6A0] disabled:opacity-60 text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 transition"
+                class="bg-[#00B4D8] hover:bg-newgreen disabled:opacity-60 text-[#0D1B2A] font-semibold rounded-xl px-5 py-2 transition"
               >
                 {{ reserving ? 'Generando…' : 'Generar QR' }}
               </button>
@@ -300,7 +300,7 @@
           </button>
         </div>
 
-        <p v-if="copied" class="mt-3 text-[#06D6A0] text-sm">Token copiado ✔</p>
+        <p v-if="copied" class="mt-3 text-newgreen text-sm">Token copiado ✔</p>
       </div>
     </div>
   </div>

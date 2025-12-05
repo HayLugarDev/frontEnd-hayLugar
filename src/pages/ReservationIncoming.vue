@@ -1,187 +1,214 @@
 <template>
-  <section class="sm:bg-white/10 p-8 rounded-lg sm:shadow-lg mb-8 w-full md:w-2/3">
-    <div class="flex items-center justify-between mb-4">
-      <div>
-        <h2 class="text-2xl font-bold text-primary">🧾 Reservas entrantes</h2>
-        <p class="text-md text-gray-400 px-4">Gestioná tus reservas recibidas de forma clara y rápida</p>
+  
+  <MainHeader />
+
+  <!-- BOTÓN ATRÁS MOBILE -->
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  <!-- MENÚ INFERIOR MOBILE -->
+  <MobileButtonNav @navigate="(p) => router.push(p)" class="md:hidden" :showMap="false" />
+
+  <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] 
+              text-white p-6 md:p-10">
+    <section class="pt-20 max-w-4xl mx-auto p-6">
+      <!-- HEADER -->
+      <header class="mb-8">
+        <h2 class="text-3xl font-bold text-primary flex items-center gap-2">
+          🧾 Reservas entrantes
+        </h2>
+        <p class="text-sm text-gray-400 mt-1">
+          Gestioná tus reservas recibidas de forma clara y rápida
+        </p>
+      </header>
+
+      <!-- LOADING -->
+      <div v-if="loading" class="space-y-4">
+        <ItemSkeleton />
+        <ItemSkeleton />
       </div>
-    </div>
 
-    <div v-if="loading" class="space-y-4">
-      <ItemSkeleton />
-      <ItemSkeleton />
-    </div>
+      <!-- LISTA -->
+      <div v-else-if="reservations.length">
+        <div v-for="reservation in reservations" :key="reservation.id"
+          class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all backdrop-blur-xl mb-6">
+          <!-- HEADER DEL CARD -->
+          <div class="flex justify-between items-center p-4 bg-white/10 border-b border-white/10">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+                <font-awesome-icon icon="calendar-check" class="text-primary" />
+                Reserva #{{ reservation.id }}
+              </h3>
+              <p class="text-xs text-gray-400">
+                {{ formatDate(reservation.created_at) }}
+              </p>
+            </div>
 
-    <div v-else-if="reservations.length">
-      <div v-for="(reservation, index) in reservations" :key="index"
-        class="border border-gray-200 rounded-2xl bg-white/10 border-white/10 shadow-md hover:shadow-lg transition-all overflow-hidden mb-4">
-        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-white/10 border-white/10">
-          <div>
-            <h3 class="text-lg font-bold text-gray-200 flex items-center gap-2">
-              <font-awesome-icon icon="calendar-check" class="text-primary" />
-              Reserva #{{ reservation.id }}
-            </h3>
-            <p class="text-xs text-gray-400">{{ formatDate(reservation.created_at) }}</p>
+            <!-- STATUS TAG -->
+            <span :class="[
+              'px-3 py-1 rounded-full text-xs font-semibold shadow-sm',
+              statusColors[reservation.status] || 'bg-gray-100 text-gray-600'
+            ]">
+              {{ getStatusInfo(reservation.status).label }}
+            </span>
           </div>
 
-          <span :class="[
-            'px-3 py-1 rounded-full text-xs font-semibold',
-            statusColors[reservation.status] ||
-            'bg-gray-100 text-gray-600'
-          ]">
-            {{ getStatusInfo(reservation.status).label }}
-          </span>
-        </div>
+          <!-- CUERPO -->
+          <div class="p-5 space-y-4 text-gray-300">
+            <!-- DATOS GRID -->
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+              <p>
+                <span class="font-semibold">📍 Espacio:</span>
+                {{ reservation.space?.name ?? '—' }}
+              </p>
+              <p>
+                <span class="font-semibold">🗺 Dirección:</span>
+                {{ (reservation.space?.location || '—').split(',')[0] }}
+              </p>
+              <p>
+                <span class="font-semibold">👤 Usuario:</span>
+                {{ reservation.client?.name ?? '—' }}
+              </p>
+              <p>
+                <span class="font-semibold">🚘 Vehículo:</span>
+                <template v-if="reservation.vehicle">
+                  {{ getVehicleType(reservation.vehicle.type) }}
+                  <span class="text-gray-400">
+                    ({{ reservation.vehicle.brand }} {{ reservation.vehicle.model }})
+                  </span>
+                </template>
+                <template v-else>—</template>
+              </p>
+            </div>
 
-        <div class="p-5 space-y-3 text-sm text-gray-200">
-          <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
-            <p><span class="font-semibold">📍 Espacio:</span> {{ reservation.space?.name ?? '—' }}</p>
-            <p><span class="font-semibold">🗺️ Dirección:</span> {{ (reservation.space?.location || '—').split(',')[0]
-            }}</p>
-            <p><span class="font-semibold">👤 Usuario:</span> {{ reservation.client?.name ?? '—' }}</p>
-            <p>
-              <span class="font-semibold">🚘 Vehículo:</span>
-              {{ reservation.vehicle ? getVehicleType(reservation.vehicle.type) : '—' }}
-              <span v-if="reservation.vehicle" class="text-gray-400">
-                ({{ reservation.vehicle.brand }} {{ reservation.vehicle.model }})
-              </span>
+            <!-- MENSAJE / ESTADO -->
+            <p class="text-xs text-gray-400 italic">
+              {{ getStatusInfo(reservation.status).message }}
             </p>
-          </div>
 
-          <p class="text-sm text-gray-400 italic pt-2">
-            {{ getStatusInfo(reservation.status).message }}
-          </p>
-
-          <!-- Badges auxiliares -->
-          <div class="flex flex-wrap items-center gap-2 pt-2">
-            <span v-if="hasHold(reservation)"
-              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
-              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              Retención OK
-            </span>
-
-            <span v-else-if="reservation.payment_id && !hasHold(reservation)"
-              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm">
-              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-              Pago inmediato
-            </span>
-
-            <span v-else-if="isApprovedLike(reservation.status)"
-              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
-              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-              Esperando retención
-            </span>
-
-            <span v-if="reservation.status === 'completed'"
-              class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
-              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-              Pago Acreditado
-            </span>
-          </div>
-
-          <!-- Countdown -->
-          <div v-if="reservation.status === 'in_progress'" class="mt-2">
-            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold">
-              ⏱ {{ countdowns[reservation.id] || 'Cargando...' }}
-            </span>
-          </div>
-        </div>
-
-
-        <!-- Acciones -->
-        <div class="flex flex-wrap items-center justify-end gap-2 border-t border-gray-200 p-4 bg-white/10 border-white/10">
-          <!-- PENDING -->
-          <template v-if="isPending(reservation.status)">
-            <button @click="confirmApprovedReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-primary text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
-              <font-awesome-icon :icon="['fas', 'check']" /> Aprobar
-            </button>
-            <button @click="confirmRejectReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
-              <font-awesome-icon :icon="['fas', 'xmark']" /> Rechazar
-            </button>
-          </template>
-
-          <!-- VERIFICAR -->
-          <template v-else-if="reservation.status === 'verified'">
-            <button @click="confirmCheckinReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
-              <font-awesome-icon :icon="['fas', 'check']" /> Checkin realizado
-            </button>
-            <button @click="confirmRejectReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
-              <font-awesome-icon :icon="['fas', 'xmark']" /> Rechazar
-            </button>
-          </template>
-
-          <!-- FINALIZAR -->
-          <template v-else-if="canFinalize(reservation)">
-            <button @click="confirmFinalizeReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-primary to-blue-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all"
-              :disabled="quoteLoading && selectedReservation?.id === reservation.id">
-              <font-awesome-icon :icon="['fas', 'money-bill']" />
-              {{ (quoteLoading && selectedReservation?.id === reservation.id) ? 'Calculando…' : 'Finalizar y cobrar' }}
-            </button>
-
-            <span v-if="quote && selectedReservation?.id === reservation.id" class="text-sm text-gray-600 mt-2 sm:mt-0">
-              Total: {{ formatCents(quote.final_cents) }}
-              <span v-if="quote.penalty_cents > 0">• Penalidad: {{ formatCents(quote.penalty_cents) }}</span>
-              <span v-if="quote.remainder_cents > 0" class="text-amber-600">
-                • Resto vs hold:
-                {{ formatCents(quote.remainder_cents) }}
+            <!-- BADGES -->
+            <div class="flex flex-wrap gap-2 pt-1">
+              <span v-if="hasHold(reservation)" class="badge-success">
+                <span class="dot bg-emerald-500"></span> Retención OK
               </span>
-            </span>
-          </template>
 
-          <!-- Aviso -->
-          <div v-else class="mt-3 text-sm text-gray-500">
-            <span v-if="isApprovedLike(reservation.status)">
-              A la espera de la retención de pago para poder finalizar.
-            </span>
+              <span v-else-if="reservation.payment_id && !hasHold(reservation)" class="badge-info">
+                <span class="dot bg-indigo-500"></span> Pago inmediato
+              </span>
+
+              <span v-else-if="isApprovedLike(reservation.status)" class="badge-warn">
+                <span class="dot bg-amber-500"></span> Esperando retención
+              </span>
+
+              <span v-if="reservation.status === 'completed'" class="badge-blue">
+                <span class="dot bg-blue-500"></span> Pago acreditado
+              </span>
+            </div>
+
+            <!-- COUNTDOWN -->
+            <div v-if="reservation.status === 'in_progress'" class="mt-2">
+              <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold shadow">
+                ⏱ {{ countdowns[reservation.id] || 'Cargando...' }}
+              </span>
+            </div>
           </div>
 
-          <!-- CANCELAR -->
-          <button v-if="!['pending', 'cancelled', 'completed', 'failed', 'verified'].includes(reservation.status)"
-            @click="confirmCancelation(reservation)"
-            class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
-            Cancelar
-          </button>
+          <!-- ACCIONES -->
+          <div class="flex flex-wrap items-center justify-end gap-3 border-t border-white/10 p-4 bg-white/5">
+            <!-- PENDING -->
+            <template v-if="isPending(reservation.status)">
+              <button @click="confirmApprovedReservation(reservation)" class="btn-primary">
+                <font-awesome-icon :icon="['fas', 'check']" /> Aprobar
+              </button>
+              <button @click="confirmRejectReservation(reservation)" class="btn-danger">
+                <font-awesome-icon :icon="['fas', 'xmark']" /> Rechazar
+              </button>
+            </template>
+
+            <!-- VERIFICAR -->
+            <template v-else-if="reservation.status === 'verified'">
+              <button @click="confirmCheckinReservation(reservation)" class="btn-green">
+                <font-awesome-icon :icon="['fas', 'check']" /> Check-in realizado
+              </button>
+              <button @click="confirmRejectReservation(reservation)" class="btn-danger">
+                <font-awesome-icon :icon="['fas', 'xmark']" /> Rechazar
+              </button>
+            </template>
+
+            <!-- FINALIZAR -->
+            <template v-else-if="canFinalize(reservation)">
+              <button @click="confirmFinalizeReservation(reservation)" class="btn-primary-gradient"
+                :disabled="quoteLoading && selectedReservation?.id === reservation.id">
+                <font-awesome-icon :icon="['fas', 'money-bill']" />
+                {{ (quoteLoading && selectedReservation?.id === reservation.id) ? 'Calculando…' : 'Finalizar y cobrar'
+                }}
+              </button>
+
+              <span v-if="quote && selectedReservation?.id === reservation.id" class="text-sm text-gray-300">
+                Total: {{ formatCents(quote.final_cents) }}
+                <span v-if="quote.penalty_cents > 0"> • Penalidad: {{ formatCents(quote.penalty_cents) }}</span>
+                <span v-if="quote.remainder_cents > 0" class="text-amber-400">
+                  • Resto vs hold: {{ formatCents(quote.remainder_cents) }}
+                </span>
+              </span>
+            </template>
+
+            <!-- AVISO -->
+            <div v-else class="text-sm text-gray-500 italic">
+              <span v-if="isApprovedLike(reservation.status)">
+                A la espera de la retención para finalizar.
+              </span>
+            </div>
+
+            <!-- CANCELAR -->
+            <button v-if="!['pending', 'cancelled', 'completed', 'failed', 'verified'].includes(reservation.status)"
+              @click="confirmCancelation(reservation)" class="btn-danger">
+              Cancelar
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Sin reservas -->
-    <p v-else class="text-gray-500 text-center py-10 text-sm">
-      No tienes reservas entrantes aún.
-    </p>
+      <!-- SIN RESERVAS -->
+      <p v-else class="text-gray-400 text-center py-12 italic">
+        No tienes reservas entrantes aún.
+      </p>
 
-    <!-- Modales -->
-    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage || 'Ocurrió un error'"
-      :icon="logo" @confirm="showErrorModal = !showErrorModal" />
+    </section>
+  </div>
 
-    <StatusModal :visible="showSuccessModal" title="¡Éxito!" :message="'Verificación exitosa.'"
-      :icon="logo" @confirm="goToReservation" />
+  <!-- MODALES -->
+  <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage || 'Ocurrió un error'"
+    icon="/src/assets/logo.png" @confirm="showErrorModal = !showErrorModal" />
 
-    <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
-      @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
+  <StatusModal :visible="showSuccessModal" title="¡Éxito!" :message="'Verificación exitosa.'"
+    icon="/src/assets/logo.png" @confirm="goToReservation" />
 
-    <RatingModal :visible="showRatingModal" :reservationId="selectedReservation?.id" @close="showRatingModal = false"
-      @submit="handleRatingSubmit" />
-  </section>
+  <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
+    @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
+
+  <RatingModal :visible="showRatingModal" :reservationId="selectedReservation?.id" @close="showRatingModal = false"
+    @submit="handleRatingSubmit" />
+
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useUserStore } from '../../../store/userStore';
-import api from '../../../services/apiService';
-import { getVehicleType } from '../../../utils/vehicleTypeIconTraslation';
-import { reservationMessages, ReservationMessageStatus, statusColors } from '../../../logic/useReservationMessages';
-import StatusModal from '../addSpacePage/StatusModal.vue';
+import { useUserStore } from '../store/userStore';
+import api from '../services/apiService';
+import { getVehicleType } from '../utils/vehicleTypeIconTraslation';
+import { reservationMessages, ReservationMessageStatus, statusColors } from '../logic/useReservationMessages';
+import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import { useRouter } from 'vue-router';
-import ConfirmModal from '../../common/ConfirmModal.vue';
-import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
-import RatingModal from '../../common/RatingModal.vue';
-import logo from "../../../assets/logo.png";
+import ConfirmModal from '../components/common/ConfirmModal.vue';
+import ItemSkeleton from '../components/layout/skeletons/ItemSkeleton.vue';
+import RatingModal from '../components/common/RatingModal.vue';
+import MainHeader from '../components/layout/header/MainHeader.vue';
+import BackButton from '../components/common/BackButton.vue';
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
+import { showToast } from '../utils/toast';
+import { formatDate } from '../utils/FormatDate';
 
 const reservations = ref<any[]>([]);
 const userStore = useUserStore();
@@ -205,22 +232,7 @@ const modalConfig = ref({
   onConfirm: () => { }
 });
 
-/** Mini toast */
-const toast = ref<{ show: boolean; type: 'success' | 'error'; text: string }>({
-  show: false,
-  type: 'success',
-  text: ''
-});
-function showToast(text: string, type: 'success' | 'error' = 'success') {
-  toast.value = { show: true, type, text };
-  setTimeout(() => (toast.value.show = false), 2500);
-}
-
 // ===== formateadores =====
-const formatDate = (value: string): string => {
-  const date = new Date(value);
-  return date.toLocaleString();
-};
 const formatCents = (c: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format((Math.round(c) / 100) || 0);
 
@@ -310,12 +322,14 @@ const cancelReservation = async () => {
       r.id === selectedReservation.value.id ? { ...r, status: 'cancelled' } : r
     );
 
+    showToast('Reserva cancelada', 'success');
     selectedReservation.value = null;
     showErrorModal.value = false;
     showSuccessModal.value = false;
     showCheckInModal.value = false;
     showConfirmModal.value = false;
   } catch (error: any) {
+    showToast('No se pudo cancelar la reserva', 'error');
     showErrorModal.value = true;
     errorMessage.value = error.response?.data?.message || "Error al cancelar la reserva";
   }
@@ -535,14 +549,52 @@ function updateCountdowns() {
 section {
   animation: fadeIn 0.4s ease-in-out;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.badge-success {
+  @apply inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm;
+}
+
+.badge-info {
+  @apply inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm;
+}
+
+.badge-warn {
+  @apply inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 shadow-sm;
+}
+
+.badge-blue {
+  @apply inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 shadow-sm;
+}
+
+.dot {
+  @apply w-2 h-2 rounded-full;
+}
+
+.btn-primary {
+  @apply flex items-center justify-center gap-2 text-sm font-semibold bg-primary text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all;
+}
+
+.btn-primary-gradient {
+  @apply flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-primary to-blue-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all;
+}
+
+.btn-danger {
+  @apply flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all;
+}
+
+.btn-green {
+  @apply flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all;
 }
 </style>

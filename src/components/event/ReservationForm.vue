@@ -28,7 +28,7 @@
     <button
       type="submit"
       :disabled="loading"
-      class="w-full bg-[#00B4D8] hover:bg-[#06D6A0] text-[#0D1B2A] font-semibold rounded-xl px-5 py-3 transition disabled:opacity-60"
+      class="w-full bg-[#00B4D8] hover:bg-newgreen text-[#0D1B2A] font-semibold rounded-xl px-5 py-3 transition disabled:opacity-60"
     >
       {{ loading ? 'Generando QR...' : 'Generar Pase Inteligente' }}
     </button>

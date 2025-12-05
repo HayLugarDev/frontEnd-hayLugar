@@ -38,7 +38,7 @@
           </button>
 
           <button @click="submit" :disabled="rating === 0" class="px-5 py-2 bg-[#00B4D8] text-white rounded-lg font-semibold
-                   shadow hover:bg-[#06D6A0] transition active:scale-95 
+                   shadow hover:bg-newgreen transition active:scale-95 
                    disabled:opacity-40">
             Enviar
           </button>

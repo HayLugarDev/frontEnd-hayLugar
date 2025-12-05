@@ -51,7 +51,7 @@
             <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-1">
               <span class="text-[10px] text-[#78909C] uppercase">Superficie</span>
               <div class="flex items-center gap-2">
-                <i class="fa-solid fa-ruler-combined text-[#06D6A0]"></i>
+                <i class="fa-solid fa-ruler-combined text-newgreen"></i>
                 <span class="font-medium">{{ space?.capacity_m2 }} m²</span>
               </div>
             </div>

@@ -55,7 +55,7 @@ const closeModal = () => {
           <button
             @click="closeModal"
             class="px-6 py-3 bg-[#00B4D8] text-white rounded-lg font-semibold 
-                   shadow hover:bg-[#06D6A0] transition active:scale-95"
+                   shadow hover:bg-newgreen transition active:scale-95"
           >
             Iniciar Sesión
           </button>
