@@ -52,13 +52,23 @@
       <form @submit.prevent="handleSearch" class="grid sm:grid-cols-3 gap-4">
 
         <!-- Campo Ciudad -->
-        <input
-          v-model="filters.city"
-          type="text"
-          placeholder="Ciudad"
-          class="w-full px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/60
-                 border border-white/20 focus:outline-none focus:ring-2 focus:ring-accent/50"
-        />
+      <!-- Campo Provincia -->
+<select
+  v-model="filters.province"
+  class="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20
+         focus:outline-none focus:ring-2 focus:ring-accent/50"
+>
+  <option class="text-black" value="">Provincia</option>
+  <option
+    v-for="prov in argentinaProvinces"
+    :key="prov"
+    :value="prov"
+    class="text-black"
+  >
+    {{ prov }}
+  </option>
+</select>
+
 
         <!-- Campo Vertical -->
         <select
@@ -298,6 +308,38 @@ const filters = ref({
   vertical: '',
   date: ''
 })
+const argentinaProvinces = [
+  "Ciudad Autónoma de Buenos Aires",
+  "Buenos Aires",
+  "Catamarca",
+  "Chaco",
+  "Chubut",
+  "Córdoba",
+  "Corrientes",
+  "Entre Ríos",
+  "Formosa",
+  "Jujuy",
+  "La Pampa",
+  "La Rioja",
+  "Mendoza",
+  "Misiones",
+  "Neuquén",
+  "Río Negro",
+  "Salta",
+  "San Juan",
+  "San Luis",
+  "Santa Cruz",
+  "Santa Fe",
+  "Santiago del Estero",
+  "Tierra del Fuego, Antártida e Islas del Atlántico Sur",
+  "Tucumán"
+];
+
+filters.value = {
+  province: "",
+  vertical: "",
+  date: ""
+};
 
 const handleSearch = () => {
   router.push({
