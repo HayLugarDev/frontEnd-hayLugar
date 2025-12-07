@@ -37,13 +37,14 @@ import IndustrialDetail from '../pages/IndustrialDetail.vue'
 import IndustrialSpaceCreate from '../pages/IndustrialSpaceCreate.vue'
 import IndustrialParkCreate from '../pages/IndustrialParkCreate.vue'
 import IndustrialReservation from '../pages/IndustrialReservation.vue'
-
+import LandingB2B from '../pages/LandingB2B.vue'
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
 const AcceptTerms = () => import('../pages/AcceptTerms.vue')
 
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'landing', component: landingHayLugar },
+  { path: '/corporativo', component: LandingB2B },
   { path: '/login', name: 'login', component: login },
   { path: '/register', component: register },
   { path: '/google-success', name: 'GoogleSuccess', component: GoogleSuccess },

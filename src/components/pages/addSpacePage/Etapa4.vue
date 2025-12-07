@@ -293,8 +293,8 @@ const handleNext = () => {
     return;
   }
 
-  if (selectedFiles.value.length < 5) {
-    errorMessage.value = "Debes cargar al menos 5 imágenes de tu espacio antes de continuar.";
+  if (selectedFiles.value.length < 2) {
+    errorMessage.value = "Debes cargar al menos 2 imágenes de tu espacio antes de continuar.";
     showErrorModal.value = true;
     return;
   }
