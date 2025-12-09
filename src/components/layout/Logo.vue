@@ -1,6 +1,6 @@
 <template>
     <div class="items-center space-x-4">
-        <img src="/src/assets/logo.png" alt="HayLugAR Logo" :class="`w-${width}`" />
+        <img src="/src/assets/logo.png" alt="HayLugar Logo" :class="`w-${width}`" />
     </div>
 </template>
 <script setup>

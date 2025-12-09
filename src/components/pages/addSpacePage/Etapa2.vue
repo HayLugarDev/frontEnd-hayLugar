@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex flex-col max-w-xl mx-auto h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-lg p-8 gap-6 md:min-h-[80vh] animate-fade-in">
+        class="flex flex-col max-w-xl mx-auto p-8 gap-6 md:min-h-[80vh] animate-fade-in">
         <!-- Título -->
         <div class="text-center">
             <h1 class="text-primary text-3xl sm:text-4xl font-bold mb-2">
@@ -65,7 +65,7 @@
 
         <!-- Modal de error -->
         <StatusModal :visible="showErrorModal" type="error" title="Dirección faltante"
-            message="Por favor, seleccioná una dirección antes de continuar." icon="/src/assets/logo.png"
+            message="Por favor, seleccioná una dirección antes de continuar." :icon="logo"
             @confirm="showErrorModal = false" />
 
         <!-- Modal con mapa manual -->
@@ -77,6 +77,7 @@
 import { computed, ref, watch, onMounted } from 'vue'
 import StatusModal from '../addSpacePage/StatusModal.vue'
 import SelectLocationMap from '../addSpacePage/SelectLocationMap.vue'
+import logo from '../../../assets/logo.png'
 
 const props = defineProps(['modelValue']);
 const emit = defineEmits(['update:modelValue', 'next', 'prev']);

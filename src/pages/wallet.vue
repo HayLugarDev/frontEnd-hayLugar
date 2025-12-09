@@ -1,179 +1,198 @@
 <template>
-  <section class="bg-white/10 border-white/10 p-4 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3 border border-gray-200 flex flex-col gap-6">
 
-    <!-- Header y saldo -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div>
-        <h2 class="hidden text-2xl font-bold text-primary md:flex items-center gap-2">
-          <font-awesome-icon icon="wallet" />
-          Mi Billetera
-        </h2>
-        <p class="text-gray-400 mt-1">Resumen y movimientos de tu cuenta</p>
-      </div>
-      <div class="md:text-right">
-        <span class="block text-white text-sm">Saldo actual</span>
-        <span class="text-4xl font-extrabold text-[#06D6A0] tracking-tight">{{ formatARS(balance) }}</span>
-      </div>
-    </div>
+  
+  <MainHeader />
 
-    <!-- Loader -->
-    <div v-if="loading" class="flex flex-col gap-4">
-      <div v-for="i in 3" :key="i" class="h-28 w-full bg-gray-100 animate-pulse rounded-2xl"></div>
-    </div>
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+    <BackButton />
+  </div>
 
-    <!-- KPIs rápidos -->
-    <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="rounded-2xl border border-gray-200 p-4 bg-white/10 border-white/10 shadow-sm hover:shadow-md transition">
-        <div class="text-sm text-gray-400">Ingresos (período)</div>
-        <div class="text-xl font-semibold text-[#06D6A0]">{{ formatARS(sumIn) }}</div>
-      </div>
-      <div class="rounded-2xl border border-gray-200 p-4 bg-white/10 border-white/10 shadow-sm hover:shadow-md transition">
-        <div class="text-sm text-gray-400">Egresos (período)</div>
-        <div class="text-xl font-semibold text-red-600">{{ formatARS(Math.abs(sumOut)) }}</div>
-      </div>
-      <div class="rounded-2xl border border-gray-200 p-4 bg-white/10 border-white/10 shadow-sm hover:shadow-md transition">
-        <div class="text-sm text-gray-400">Neto (período)</div>
-        <div class="text-xl font-semibold" :class="netPeriod >= 0 ? 'text-[#06D6A0]' : 'text-red-700'">
-          {{ formatARS(netPeriod) }}
+  <!-- MENÚ INFERIOR MOBILE -->
+  <MobileButtonNav @navigate="(path: string) => router.push(path)" class="md:hidden" :showMap="false" />
+
+  <div
+    class="min-h-screen bg-gradient-to-br pt-16 sm:p-8 from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] md:px-6 md:py-10 text-white">
+
+    <section
+      class="mx-auto p-10 md:pt-20 md:p-8 w-full md:w-2/3 flex flex-col gap-6">
+
+      <!-- Header y saldo -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white md:flex items-center gap-2">
+            <font-awesome-icon icon="wallet" />
+            Mi Billetera
+          </h2>
+          <p class="text-gray-400 mt-1 text-lg">Resumen y movimientos de tu cuenta</p>
+        </div>
+        <div class="md:text-right">
+          <span class="block text-white text-sm">Saldo actual</span>
+          <span class="text-4xl font-extrabold text-newgreen tracking-tight">{{ formatARS(balance) }}</span>
         </div>
       </div>
-    </div>
 
-    <!-- Controles y filtros -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-4">
-      <div class="flex flex-wrap gap-2">
-        <button v-for="f in filters" :key="f.value" @click="activeFilter = f.value"
-          class="px-3 py-1.5 rounded-full text-sm font-medium transition border"
-          :class="activeFilter === f.value
-            ? 'bg-primary text-white border-transparent'
-            : 'bg-white/10 border-white/10 text-gray-200 border-gray-300 hover:bg-gray-500'">
-          {{ f.label }}
-        </button>
-      </div>
-      <div class="flex items-center gap-2 flex-wrap">
-        <label class="text-sm text-gray-200">Período:</label>
-        <select v-model="days" class="px-3 py-2 rounded-lg border border-gray-300 bg-white/10 border-white/10 text-gray-400 text-sm focus:outline-none">
-          <option :value="7">Últimos 7 días</option>
-          <option :value="30">Últimos 30 días</option>
-          <option :value="90">Últimos 90 días</option>
-        </select>
-        <label class="text-sm text-gray-200">Mostrar:</label>
-        <select v-model="limit" class="px-3 py-2 rounded-lg border border-gray-300 bg-white/10 border-white/10 text-gray-400 text-sm focus:outline-none">
-          <option :value="10">10</option>
-          <option :value="25">25</option>
-          <option :value="50">50</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Movimientos -->
-    <div class="mt-6 space-y-2">
-      <h3 class="text-xl font-semibold text-primary mb-2">Movimientos</h3>
-      <div v-if="filteredTx.length === 0" class="p-6 text-center text-gray-400 rounded-2xl border bg-white/10 border-white/10">
-        Sin movimientos para los filtros seleccionados
+      <!-- Loader -->
+      <div v-if="loading" class="flex flex-col gap-4">
+        <div v-for="i in 3" :key="i" class="h-28 w-full bg-gray-100 animate-pulse rounded-2xl"></div>
       </div>
 
-      <!-- Desktop table -->
-      <div class="hidden md:block overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-white/10 border-white/10">
-              <th class="p-3 text-sm font-semibold text-gray-400">Fecha</th>
-              <th class="p-3 text-sm font-semibold text-gray-400">Tipo</th>
-              <th class="p-3 text-sm font-semibold text-gray-400">Descripción</th>
-              <!-- <th class="p-3 text-sm font-semibold text-gray-400">Ref</th> -->
-              <th class="p-3 text-sm font-semibold text-gray-400 text-right">Monto</th>
-              <th class="p-3 text-sm font-semibold text-gray-400">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="tx in filteredTx" :key="tx.id || tx.reference_id || tx.created_at" class="border-b hover:bg-gray-50 transition">
-              <td class="p-3 whitespace-nowrap text-sm">{{ formatDate(txDate(tx)) }}</td>
-              <td class="p-3">
-                <span class="px-2.5 py-1 rounded-full text-xs font-semibold" :class="badgeClass(tx.transaction_type)">
-                  {{ typeLabel(tx.transaction_type) }}
-                </span>
-              </td>
-              <td class="p-3 text-gray-700">{{ tx.description || '—' }}</td>
-              <!-- <td class="p-3 text-gray-500">{{ tx.reference_id || '—' }}</td> -->
-              <td class="p-3 text-right font-semibold" :class="tx.amount >= 0 ? 'text-[#06D6A0]' : 'text-red-600'">
-                {{ signedARS(tx.amount) }}
-              </td>
-              <td class="p-3 capitalize">
-                <span class="px-2 py-0.5 rounded text-xs font-medium" :class="statusClass(tx.status)">
-                  {{ tx.status }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Mobile cards -->
-      <div class="md:hidden space-y-3">
-        <div v-for="tx in filteredTx" :key="tx.id || tx.reference_id || tx.created_at"
-          class="border border-gray-200 rounded-2xl p-4 bg-gradient-to-b from-gray-50 to-white shadow-sm hover:shadow-md transition">
-          <div class="flex items-start justify-between">
-            <div class="space-y-1">
-              <div class="text-sm text-gray-500">{{ formatDate(txDate(tx)) }}</div>
-              <div>
-                <span class="px-2 py-0.5 rounded-full text-xs font-semibold" :class="badgeClass(tx.transaction_type)">
-                  {{ typeLabel(tx.transaction_type) }}
-                </span>
-              </div>
-              <div class="text-sm text-gray-700">{{ tx.description || '—' }}</div>
-              <!-- <div class="text-xs text-gray-400 font-mono">{{ tx.reference_id || '' }}</div> -->
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-semibold" :class="tx.amount >= 0 ? 'text-[#06D6A0]' : 'text-red-600'">
-                {{ signedARS(tx.amount) }}
-              </div>
-              <div class="mt-1">
-                <span class="px-2 py-0.5 rounded text-xs font-medium capitalize" :class="statusClass(tx.status)">
-                  {{ tx.status }}
-                </span>
-              </div>
-            </div>
+      <!-- KPIs rápidos -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div
+          class="rounded-2xl border border-gray-200 p-4 bg-white/10 border-white/10 shadow-sm hover:shadow-md transition">
+          <div class="text-sm text-gray-400">Ingresos (período)</div>
+          <div class="text-xl font-semibold text-newgreen">{{ formatARS(sumIn) }}</div>
+        </div>
+        <div
+          class="rounded-2xl border border-gray-200 p-4 bg-white/10 border-white/10 shadow-sm hover:shadow-md transition">
+          <div class="text-sm text-gray-400">Egresos (período)</div>
+          <div class="text-xl font-semibold text-red-600">{{ formatARS(Math.abs(sumOut)) }}</div>
+        </div>
+        <div
+          class="rounded-2xl border border-gray-200 p-4 bg-white/10 border-white/10 shadow-sm hover:shadow-md transition">
+          <div class="text-sm text-gray-400">Neto (período)</div>
+          <div class="text-xl font-semibold" :class="netPeriod >= 0 ? 'text-newgreen' : 'text-red-700'">
+            {{ formatARS(netPeriod) }}
           </div>
         </div>
       </div>
 
-      <!-- Retiro de fondos -->
-      <button @click="withdrawFunds"
-        class="w-full md:w-auto mt-4 flex items-center justify-center bg-[#06D6A0]/20 text-white px-4 py-2 rounded-2xl shadow hover:shadow-lg transition">
-        <font-awesome-icon icon="arrow-down" class="mr-2" /> Retirar fondos
-      </button>
+      <!-- Controles y filtros -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-4">
+        <div class="flex flex-wrap gap-2">
+          <button v-for="f in filters" :key="f.value" @click="activeFilter = f.value"
+            class="px-3 py-1.5 rounded-full text-sm font-medium transition border" :class="activeFilter === f.value
+              ? 'bg-primary text-white border-transparent'
+              : 'bg-white/10 border-white/10 text-gray-200 border-gray-300 hover:bg-gray-500'">
+            {{ f.label }}
+          </button>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <label class="text-sm text-gray-200">Período:</label>
+          <select v-model="days"
+            class="px-3 py-2 rounded-lg border border-gray-300 bg-white/10 border-white/10 text-gray-400 text-sm focus:outline-none">
+            <option :value="7">Últimos 7 días</option>
+            <option :value="30">Últimos 30 días</option>
+            <option :value="90">Últimos 90 días</option>
+          </select>
+          <label class="text-sm text-gray-200">Mostrar:</label>
+          <select v-model="limit"
+            class="px-3 py-2 rounded-lg border border-gray-300 bg-white/10 border-white/10 text-gray-400 text-sm focus:outline-none">
+            <option :value="10">10</option>
+            <option :value="25">25</option>
+            <option :value="50">50</option>
+          </select>
+        </div>
+      </div>
 
-      <!-- Leyenda -->
-      <p class="mt-4 text-xs text-gray-500">
-        * “Pago de reserva” acredita el neto recibido (descontadas tarifas del procesador).<br>
-        “Comisión plataforma” refleja el cargo de servicio cuando aplica.<br>
-        Los importes positivos suman a tu saldo; los negativos lo descuentan.
-      </p>
-    </div>
+      <!-- Movimientos -->
+      <div class="mt-6 space-y-2">
+        <h3 class="text-xl font-semibold text-primary mb-2">Movimientos</h3>
+        <div v-if="filteredTx.length === 0"
+          class="p-6 text-center text-gray-400 rounded-2xl border bg-white/10 border-white/10">
+          Sin movimientos para los filtros seleccionados
+        </div>
 
-    <!-- Modal de retiro -->
-    <WithdrawModal
-      ref="modalRef"
-      v-model="showWithdraw"
-      :summary="summary"
-      :accounts="payoutAccounts"
-      :min-withdraw="1000"
-      @submitted="onModalSubmitted"
-      @open-accounts="$router.push({ name: 'payout-accounts' })"
-    />
-  </section>
+        <!-- Desktop table -->
+        <div class="hidden md:block overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-white/10 border-white/10">
+                <th class="p-3 text-sm font-semibold text-gray-400">Fecha</th>
+                <th class="p-3 text-sm font-semibold text-gray-400">Tipo</th>
+                <th class="p-3 text-sm font-semibold text-gray-400">Descripción</th>
+                <!-- <th class="p-3 text-sm font-semibold text-gray-400">Ref</th> -->
+                <th class="p-3 text-sm font-semibold text-gray-400 text-right">Monto</th>
+                <th class="p-3 text-sm font-semibold text-gray-400">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="tx in filteredTx" :key="tx.id || tx.reference_id || tx.created_at"
+                class="border-b hover:bg-gray-50 transition">
+                <td class="p-3 whitespace-nowrap text-sm">{{ formatDate(txDate(tx)) }}</td>
+                <td class="p-3">
+                  <span class="px-2.5 py-1 rounded-full text-xs font-semibold" :class="badgeClass(tx.transaction_type)">
+                    {{ typeLabel(tx.transaction_type) }}
+                  </span>
+                </td>
+                <td class="p-3 text-gray-700">{{ tx.description || '—' }}</td>
+                <!-- <td class="p-3 text-gray-500">{{ tx.reference_id || '—' }}</td> -->
+                <td class="p-3 text-right font-semibold" :class="tx.amount >= 0 ? 'text-newgreen' : 'text-red-600'">
+                  {{ signedARS(tx.amount) }}
+                </td>
+                <td class="p-3 capitalize">
+                  <span class="px-2 py-0.5 rounded text-xs font-medium" :class="statusClass(tx.status)">
+                    {{ tx.status }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile cards -->
+        <div class="md:hidden space-y-3">
+          <div v-for="tx in filteredTx" :key="tx.id || tx.reference_id || tx.created_at"
+            class="border border-gray-200 rounded-2xl p-4 bg-gradient-to-b from-gray-50 to-white shadow-sm hover:shadow-md transition">
+            <div class="flex items-start justify-between">
+              <div class="space-y-1">
+                <div class="text-sm text-gray-500">{{ formatDate(txDate(tx)) }}</div>
+                <div>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-semibold" :class="badgeClass(tx.transaction_type)">
+                    {{ typeLabel(tx.transaction_type) }}
+                  </span>
+                </div>
+                <div class="text-sm text-gray-700">{{ tx.description || '—' }}</div>
+                <!-- <div class="text-xs text-gray-400 font-mono">{{ tx.reference_id || '' }}</div> -->
+              </div>
+              <div class="text-right">
+                <div class="text-lg font-semibold" :class="tx.amount >= 0 ? 'text-newgreen' : 'text-red-600'">
+                  {{ signedARS(tx.amount) }}
+                </div>
+                <div class="mt-1">
+                  <span class="px-2 py-0.5 rounded text-xs font-medium capitalize" :class="statusClass(tx.status)">
+                    {{ tx.status }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Retiro de fondos -->
+        <button @click="withdrawFunds"
+          class="w-full md:w-auto mt-4 flex items-center justify-center bg-newgreen/50 text-white px-4 py-2 rounded-2xl shadow hover:shadow-lg transition">
+          <font-awesome-icon icon="arrow-down" class="mr-2" /> Retirar fondos
+        </button>
+
+        <!-- Leyenda -->
+        <p class="mt-4 text-xs text-gray-500">
+          * “Pago de reserva” acredita el neto recibido (descontadas tarifas del procesador).<br>
+          “Comisión plataforma” refleja el cargo de servicio cuando aplica.<br>
+          Los importes positivos suman a tu saldo; los negativos lo descuentan.
+        </p>
+      </div>
+
+      <!-- Modal de retiro -->
+      <WithdrawModal ref="modalRef" v-model="showWithdraw" :summary="summary" :accounts="payoutAccounts"
+        :min-withdraw="1000" @submitted="onModalSubmitted" @open-accounts="$router.push({ name: 'payout-accounts' })" />
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { useUserStore } from '../store/userStore'
 import api from '../services/apiService'
-import loadIcon from '../assets/load-icon_primary.svg'
 import WithdrawModal from '../components/WithdrawModal.vue'
 import { showToast } from '../utils/toast'
+import BackButton from '../components/common/BackButton.vue'
+import { useRouter } from 'vue-router'
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue'
+import MainHeader from '../components/layout/header/MainHeader.vue'
 
 const userStore = useUserStore()
+const router = useRouter();
 
 /* ===== estado principal ===== */
 const balance = ref<number>(0)
@@ -422,11 +441,13 @@ async function onModalSubmitted() {
 section {
   animation: fadeIn 0.4s ease-in-out;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

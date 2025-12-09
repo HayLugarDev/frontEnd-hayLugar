@@ -1,180 +1,204 @@
 <template>
-  <section class="bg-white/10 border-white/10 p-2 md:p-8 rounded-lg w-full md:w-2/3">
-    <div class="p-4 flex flex-col gap-4" v-if="!loadingUser">
-      <!-- Header -->
-      <section class="bg-white/10 border-white/10 p-6 md:p-8 rounded-2xl shadow-lg">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
-            <h2 class="text-2xl font-semibold text-primary flex items-center gap-2">
-              <font-awesome-icon icon="university" />
-              Cuentas de cobro
-            </h2>
-            <p class="text-gray-200 mt-1">
-              Administra tus cuentas para recibir retiros de tu billetera.
-            </p>
-          </div>
 
-          <button @click="openCreate()"
-            class="inline-flex items-center bg-[#06D6A0]/20 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition">
-            <font-awesome-icon icon="plus" class="mr-2" />
-            Nueva cuenta
-          </button>
-        </div>
-      </section>
+  
+  <MainHeader />
 
-      <!-- Listado -->
-      <section class="bg-white/10 border-white/10 p-6 md:p-8 rounded-2xl shadow-lg">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-semibold text-primary">Mis cuentas</h3>
-          <div v-if="isLoading" class="text-sm text-gray-400">Cargando…</div>
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  <!-- MENÚ INFERIOR MOBILE -->
+  <MobileButtonNav @navigate="(path: string) => router.push(path)" class="md:hidden" :showMap="false" />
+
+  <div v-if="!loadingUser"
+    class="flex flex-col space-y-6 min-h-screen pt-20 md:pt-32 sm:p-8 sm:w-2/3 mx-auto md:px-6 md:py-10 text-white">
+
+    <!-- Header -->
+    <section class="sm:bg-white/10 sm:border border-white/10 p-6 md:p-8 rounded-2xl sm:shadow-lg">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div>
+          <h2 class="text-2xl font-semibold text-primary flex items-center gap-2">
+            <font-awesome-icon icon="university" />
+            Cuentas de cobro
+          </h2>
+          <p class="text-gray-200 mt-1">
+            Administra tus cuentas para recibir retiros de tu billetera.
+          </p>
         </div>
 
-        <div v-if="accounts.length === 0 && !isLoading" class="text-center py-10 text-gray-400">
-          Aún no cargaste cuentas de cobro.
-          <button class="ml-2 text-[#06D6A0] underline" @click="openCreate()">Crear ahora</button>
-        </div>
+        <button @click="openCreate()"
+          class="inline-flex items-center bg-newgreen/20 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition">
+          <font-awesome-icon icon="plus" class="mr-2" />
+          Nueva cuenta
+        </button>
+      </div>
+    </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" v-if="accounts.length">
-          <div v-for="acc in accounts" :key="acc.id" class="border rounded-xl p-4 bg-gray-50">
-            <div class="flex items-start justify-between gap-4">
-              <div class="min-w-0">
-                <div class="text-sm text-gray-500">Banco</div>
-                <div class="font-semibold text-gray-900 truncate">{{ acc.bank_name || '—' }}</div>
+    <!-- Listado -->
+    <section class="sm:bg-white/10 sm:border sm:border-white/10 p-6 md:p-8 rounded-2xl sm:shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-semibold text-primary">Mis cuentas</h3>
+        <div v-if="isLoading" class="text-sm text-gray-400">Cargando…</div>
+      </div>
 
-                <div class="mt-2 text-sm text-gray-500">Titular</div>
-                <div class="text-gray-900 truncate">{{ acc.account_holder || '—' }}</div>
+      <div v-if="accounts.length === 0 && !isLoading" class="text-center py-10 text-gray-400">
+        Aún no cargaste cuentas de cobro.
+        <button class="ml-2 text-newgreen underline" @click="openCreate()">Crear ahora</button>
+      </div>
 
-                <div class="mt-2 text-sm text-gray-500">Alias/CBU/CVU</div>
-                <div class="font-mono text-gray-900 break-all">
-                  {{ showAliasOrMasked(acc.alias_cbu) }}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" v-if="accounts.length">
+        <div v-for="acc in accounts" :key="acc.id" class="border rounded-xl p-4 bg-gray-900">
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <div class="text-sm text-gray-500">Banco</div>
+              <div class="font-semibold text-gray-900 truncate">{{ acc.bank_name || '—' }}</div>
+
+              <div class="mt-2 text-sm text-gray-500">Titular</div>
+              <div class="text-gray-900 truncate">{{ acc.account_holder || '—' }}</div>
+
+              <div class="mt-2 text-sm text-gray-500">Alias/CBU/CVU</div>
+              <div class="font-mono text-gray-900 break-all">
+                {{ showAliasOrMasked(acc.alias_cbu) }}
+              </div>
+
+              <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <div class="text-sm text-gray-500">CUIT/CUIL</div>
+                  <div class="text-gray-900 break-all">{{ acc.tax_id || '—' }}</div>
                 </div>
-
-                <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <div class="text-sm text-gray-500">CUIT/CUIL</div>
-                    <div class="text-gray-900 break-all">{{ acc.tax_id || '—' }}</div>
+                <div>
+                  <div class="text-sm text-gray-500">Verificada</div>
+                  <div class="text-gray-900">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                      :class="acc.verified_at ? 'bg-emerald-100 text-newgreen' : 'bg-gray-200 text-gray-600'">
+                      {{ acc.verified_at ? 'Sí' : 'No' }}
+                    </span>
                   </div>
-                  <div>
-                    <div class="text-sm text-gray-500">Verificada</div>
-                    <div class="text-gray-900">
-                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
-                        :class="acc.verified_at ? 'bg-emerald-100 text-[#06D6A0]' : 'bg-gray-200 text-gray-600'">
-                        {{ acc.verified_at ? 'Sí' : 'No' }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-3">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
-                    :class="acc.is_default ? 'bg-green-100 text-[#06D6A0]' : 'bg-gray-200 text-gray-600'">
-                    {{ acc.is_default ? 'Principal' : 'Secundaria' }}
-                  </span>
-                </div>
-
-                <div class="mt-2 text-xs text-gray-400">
-                  <span>Creada: {{ formatDate(acc.created_at) }}</span>
-                  <span v-if="acc.updated_at"> · Actualizada: {{ formatDate(acc.updated_at) }}</span>
                 </div>
               </div>
 
-              <div class="flex flex-col items-end gap-2 shrink-0">
-                <button class="px-3 py-1.5 rounded-lg border text-sm" :class="acc.is_default
-                  ? 'border-gray-300 text-gray-400 cursor-not-allowed'
-                  : 'border-primary text-primary hover:bg-primary hover:text-white transition'"
-                  :disabled="acc.is_default || busyId === acc.id" @click="makeDefault(acc)"
-                  title="Marcar como principal">
-                  {{ acc.is_default ? 'Predeterminada' : 'Hacer principal' }}
+              <div class="mt-3">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                  :class="acc.is_default ? 'bg-green-100 text-newgreen' : 'bg-gray-200 text-gray-600'">
+                  {{ acc.is_default ? 'Principal' : 'Secundaria' }}
+                </span>
+              </div>
+
+              <div class="mt-2 text-xs text-gray-400">
+                <span>Creada: {{ formatDate(acc.created_at) }}</span>
+                <span v-if="acc.updated_at"> · Actualizada: {{ formatDate(acc.updated_at) }}</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col items-end gap-2 shrink-0">
+              <button class="px-3 py-1.5 rounded-lg border text-sm" :class="acc.is_default
+                ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+                : 'border-primary text-primary hover:bg-primary hover:text-white transition'"
+                :disabled="acc.is_default || busyId === acc.id" @click="makeDefault(acc)" title="Marcar como principal">
+                {{ acc.is_default ? 'Predeterminada' : 'Hacer principal' }}
+              </button>
+
+              <div class="flex gap-2">
+                <button
+                  class="px-3 py-1.5 rounded-lg border text-sm border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                  :disabled="busyId === acc.id" @click="openEdit(acc)" title="Editar cuenta">
+                  Editar
                 </button>
 
-                <div class="flex gap-2">
-                  <button
-                    class="px-3 py-1.5 rounded-lg border text-sm border-gray-300 text-gray-700 hover:bg-gray-100 transition"
-                    :disabled="busyId === acc.id" @click="openEdit(acc)" title="Editar cuenta">
-                    Editar
-                  </button>
-
-                  <button
-                    class="px-3 py-1.5 rounded-lg border text-sm border-rose-300 text-rose-600 hover:bg-rose-50 transition"
-                    :disabled="busyId === acc.id" @click="remove(acc)" title="Eliminar cuenta">
-                    Eliminar
-                  </button>
-                </div>
+                <button
+                  class="px-3 py-1.5 rounded-lg border text-sm border-rose-300 text-rose-600 hover:bg-rose-50 transition"
+                  :disabled="busyId === acc.id" @click="remove(acc)" title="Eliminar cuenta">
+                  Eliminar
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
+  </div>
 
-    <!-- Modal crear/editar -->
-    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
-      <div class="absolute inset-0 bg-black/40" @click="closeModal()"></div>
+  <!-- Modal crear/editar -->
+  <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/40" @click="closeModal()"></div>
 
-      <div class="relative w-full max-w-2xl bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-xl p-6 md:p-8">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-semibold text-primary">
-            {{ editingId ? 'Editar cuenta' : 'Nueva cuenta' }}
-          </h3>
-          <button class="text-gray-500 hover:text-gray-700" @click="closeModal()">
-            <font-awesome-icon icon="times" />
-          </button>
+    <div
+      class="relative w-full max-w-2xl bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-xl p-6 md:p-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-semibold text-primary">
+          {{ editingId ? 'Editar cuenta' : 'Nueva cuenta' }}
+        </h3>
+        <button class="text-gray-500 hover:text-gray-700" @click="closeModal()">
+          <font-awesome-icon icon="times" />
+        </button>
+      </div>
+
+      <form @submit.prevent="submitForm" class="space-y-6">
+
+        <!-- Alias / CBU -->
+        <div class="space-y-2 text-gray-400">
+          <label class="block text-sm text-gray-200">Alias o CBU/CVU</label>
+
+          <input v-model.trim="form.alias_cbu" type="text" placeholder="mi.alias.banco ó 2850XXXXXXXXXXXXXXX" class="w-full bg-white/10 border border-white/10 px-3 py-2 rounded-xl
+             focus:outline-none focus:ring-2 focus:ring-primary/60 transition" />
+
+          <p v-if="errors.alias_cbu" class="text-xs text-rose-500">
+            {{ errors.alias_cbu }}
+          </p>
+
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Podés ingresar un <strong>alias</strong> (ej: <em>mi.alias.banco</em>) o un
+            <strong>CBU/CVU</strong> (22 dígitos).
+          </p>
         </div>
 
-        <form @submit.prevent="submitForm" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="md:col-span-2">
-              <label class="block text-sm text-gray-200 mb-1">Alias o CBU/CVU</label>
-              <input v-model.trim="form.alias_cbu" type="text"
-                class="bg-white/10 border-white/10 selection:w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none font-mono"
-                placeholder="mi.alias.banco ó 2850XXXXXXXXXXXXXXX" />
-              <p v-if="errors.alias_cbu" class="text-xs text-rose-600 mt-1">{{ errors.alias_cbu }}</p>
-              <p class="text-xs text-gray-400 mt-1">
-                Podés ingresar un <strong>alias</strong> (ej: <em>mi.alias.banco</em>) o un <strong>CBU/CVU</strong> (22
-                dígitos).
-              </p>
-            </div>
+        <!-- Grid general -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-400">
 
-            <div>
-              <label class="block text-sm text-gray-200 mb-1">Banco (opcional)</label>
-              <input v-model.trim="form.bank_name" type="text"
-                class="bg-white/10 border-white/10 w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none"
-                placeholder="Banco Ejemplo" />
-            </div>
-
-            <div>
-              <label class="block text-sm text-gray-200 mb-1">Titular (opcional)</label>
-              <input v-model.trim="form.account_holder" type="text"
-                class="bg-white/10 border-white/10 w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none"
-                placeholder="Nombre y apellido" />
-            </div> 
-
-            <div>
-              <label class="block text-sm text-gray-200 mb-1">CUIT/CUIL (opcional)</label>
-              <input v-model.trim="form.tax_id" type="text"
-                class="bg-white/10 border-white/10 w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none"
-                placeholder="20-12345678-9" />
-            </div>
+          <!-- Banco -->
+          <div class="flex flex-col space-y-2">
+            <label class="text-sm text-gray-200">Banco (opcional)</label>
+            <input v-model.trim="form.bank_name" type="text" placeholder="Banco Ejemplo" class="w-full bg-white/10 border border-white/10 px-3 py-2 rounded-xl
+               focus:outline-none focus:ring-2 focus:ring-primary/60 transition" />
           </div>
 
-          <div class="flex items-center justify-end gap-3 pt-2">
-            <button type="button" class="bg-[#06D6A0]/20 px-4 py-2 rounded-lg border border-gray-300" @click="closeModal()">
-              Cancelar
-            </button>
-            <button type="submit"
-              class="px-4 py-2 rounded-lg bg-primary text-white shadow hover:shadow-md transition disabled:opacity-60"
-              :disabled="submitting">
-              {{ submitting ? 'Guardando…' : (editingId ? 'Guardar cambios' : 'Crear cuenta') }}
-            </button>
+          <!-- Titular -->
+          <div class="flex flex-col space-y-2">
+            <label class="text-sm text-gray-200">Titular (opcional)</label>
+            <input v-model.trim="form.account_holder" type="text" placeholder="Nombre y apellido" class="w-full bg-white/10 border border-white/10 px-3 py-2 rounded-xl
+               focus:outline-none focus:ring-2 focus:ring-primary/60 transition" />
           </div>
-        </form>
-      </div>
+
+          <!-- CUIT/CUIL -->
+          <div class="flex flex-col space-y-2">
+            <label class="text-sm text-gray-200">CUIT/CUIL (opcional)</label>
+            <input v-model.trim="form.tax_id" type="text" placeholder="20-12345678-9" class="w-full bg-white/10 border border-white/10 px-3 py-2 rounded-xl
+               focus:outline-none focus:ring-2 focus:ring-primary/60 transition" />
+          </div>
+
+        </div>
+
+        <!-- Botones -->
+        <div class="flex items-center justify-end gap-3 pt-4">
+
+          <button type="button" @click="closeModal()" class="px-4 py-2 rounded-xl border border-white/20 bg-white/5 
+             text-gray-200 hover:bg-white/10 transition">
+            Cancelar
+          </button>
+
+          <button type="submit" :disabled="submitting" class="px-4 py-2 rounded-xl bg-primary text-white shadow
+             hover:shadow-lg transition disabled:opacity-50">
+            {{ submitting ? 'Guardando…' : (editingId ? 'Guardar cambios' : 'Crear cuenta') }}
+          </button>
+        </div>
+      </form>
+
     </div>
-    <!-- Loader global usuario (si lo querés mostrar)
+  </div>
+  <!-- Loader global usuario (si lo querés mostrar)
   <div v-else class="min-h-screen flex items-center justify-center">
     <img :src="loadIcon" alt="Cargando..." class="w-16 h-16 animate-spin" />
   </div> -->
-  </section>
 </template>
 
 <script setup lang="ts">
@@ -183,9 +207,13 @@ import api from '../services/apiService'
 import { useUserStore } from '../store/userStore'
 import MainHeader from '../components/layout/header/MainHeader.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import BackButton from '../components/common/BackButton.vue'
+import { useRouter } from 'vue-router'
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue'
 
 /** ==== Estado usuario ==== */
 const userStore = useUserStore()
+const router = useRouter();
 const loadingUser = computed(() => userStore.loading)
 
 /** ==== Tipos (alineados a tu tabla) ==== */
@@ -366,11 +394,13 @@ onMounted(async () => {
 section {
   animation: fadeIn 0.4s ease-in-out;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

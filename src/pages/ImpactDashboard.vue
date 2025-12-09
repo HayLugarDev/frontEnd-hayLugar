@@ -1,13 +1,20 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden relative">
+  <div
+    class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-hidden relative">
     <!-- Fondo decorativo animado -->
     <div class="absolute inset-0 -z-10 opacity-30">
-      <div class="absolute top-0 left-0 w-96 h-96 bg-[#06D6A0]/20 blur-[180px] animate-pulse-slow"></div>
-      <div class="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-[#00B4D8]/20 blur-[180px] animate-pulse-slow delay-500"></div>
+      <div class="absolute top-0 left-0 w-96 h-96 bg-newgreen/20 blur-[180px] animate-pulse-slow"></div>
+      <div
+        class="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-[#00B4D8]/20 blur-[180px] animate-pulse-slow delay-500">
+      </div>
+    </div>
+
+    <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+      <BackButton />
     </div>
 
     <!-- HEADER -->
- <MainHeader class="hidden md:block" />
+    <MainHeader />
 
     <!-- KPIs PRINCIPALES -->
     <section class="container mx-auto px-6 md:px-12 py-10 grid gap-6 md:grid-cols-3">
@@ -30,11 +37,12 @@
 
     <!-- INFO SOCIOAMBIENTAL -->
     <section class="container mx-auto px-6 md:px-12 py-12">
-      <div class="bg-[#1B263B]/70 border border-white/10 rounded-2xl p-8 text-[#B0BEC5] leading-relaxed shadow-xl backdrop-blur-md">
+      <div
+        class="bg-[#1B263B]/70 border border-white/10 rounded-2xl p-8 text-[#B0BEC5] leading-relaxed shadow-xl backdrop-blur-md">
         <h3 class="text-xl font-semibold text-white mb-3">Análisis del Impacto</h3>
         <p>
           El sistema HayLugar está reduciendo los tiempos de espera en un promedio de
-          <span class="text-[#06D6A0] font-semibold">{{ impact?.avg_wait_seconds }}</span> segundos por vehículo,
+          <span class="text-newgreen font-semibold">{{ impact?.avg_wait_seconds }}</span> segundos por vehículo,
           optimizando el uso de espacio urbano y promoviendo prácticas sustentables.
         </p>
         <p class="mt-3">
@@ -43,42 +51,45 @@
           para los anfitriones y comercios asociados.
         </p>
         <div class="mt-6 flex flex-wrap gap-4 text-sm">
-          <span class="px-4 py-2 rounded-xl bg-[#00B4D8]/20 border border-[#00B4D8]/30 text-[#00B4D8]">Sustentabilidad urbana</span>
-          <span class="px-4 py-2 rounded-xl bg-[#06D6A0]/20 border border-[#06D6A0]/30 text-[#06D6A0]">Economía circular</span>
-          <span class="px-4 py-2 rounded-xl bg-[#FFD166]/20 border border-[#FFD166]/30 text-[#FFD166]">Cultura verde</span>
+          <span class="px-4 py-2 rounded-xl bg-[#00B4D8]/20 border border-[#00B4D8]/30 text-[#00B4D8]">Sustentabilidad
+            urbana</span>
+          <span class="px-4 py-2 rounded-xl bg-newgreen/20 border border-newgreen/30 text-newgreen">Economía
+            circular</span>
+          <span class="px-4 py-2 rounded-xl bg-[#FFD166]/20 border border-[#FFD166]/30 text-[#FFD166]">Cultura
+            verde</span>
         </div>
       </div>
     </section>
 
     <!-- ===== FOOTER ===== -->
-      <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+    <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
               gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
 
-          <!-- Branding -->
-          <div class="flex items-center gap-2">
-            <span class="text-white font-semibold tracking-wide">HayLugar</span>
-            <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
-          </div>
-
-          <!-- Links -->
-          <div class="flex gap-6">
-            <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
-              Política de Privacidad
-            </router-link>
-
-            <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
-              Términos y Condiciones
-            </router-link>
-          </div>
-
-          <!-- Extra -->
-          <div class="text-xs text-[#78909C]">
-            Movilidad inteligente
-          </div>
+        <!-- Branding -->
+        <div class="flex items-center gap-2">
+          <span class="text-white font-semibold tracking-wide">HayLugar</span>
+          <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
         </div>
-      </footer>
-      
+
+        <!-- Links -->
+        <div class="flex gap-6">
+          <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+            Política de Privacidad
+          </router-link>
+
+          <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+            Términos y Condiciones
+          </router-link>
+        </div>
+
+        <!-- Extra -->
+        <div class="text-xs text-[#78909C]">
+          Movilidad inteligente
+        </div>
+      </div>
+    </footer>
+
   </div>
 </template>
 
@@ -88,6 +99,7 @@ import { getImpact, getImpactSeries, type ImpactSnapshot } from '../services/eve
 import Chart from 'chart.js/auto'
 import logo from '../assets/logo.png'
 import MainHeader from '../components/layout/header/MainHeader.vue'
+import BackButton from '../components/common/BackButton.vue'
 const impact = ref<ImpactSnapshot | null>(null)
 const impactSeries = ref<ImpactSnapshot[]>([])
 
@@ -186,9 +198,19 @@ export default {
 
 <style scoped>
 @keyframes pulse-slow {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.05); }
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
 }
+
 .animate-pulse-slow {
   animation: pulse-slow 6s ease-in-out infinite;
 }

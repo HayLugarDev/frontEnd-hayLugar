@@ -1,5 +1,10 @@
 <template>
-   <MainHeader class="hidden md:block" />
+
+  <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  <MainHeader />
   <div class="px-4 sm:px-8 py-6 bg-secondary min-h-screen">
     <template v-if="loading">
       <div class="text-center py-10 text-gray-500">Cargando datos...</div>
@@ -24,36 +29,35 @@
 
         <!-- Leyenda -->
         <div class="flex items-center gap-4 flex-wrap mb-8 text-sm">
-          <div class="flex items-center gap-2"><div class="w-4 h-4 bg-green-400 rounded"></div> Libre</div>
-          <div class="flex items-center gap-2"><div class="w-4 h-4 bg-yellow-300 rounded"></div> Reservado</div>
-          <div class="flex items-center gap-2"><div class="w-4 h-4 bg-red-500 rounded"></div> Ocupado</div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-green-400 rounded"></div> Libre
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-yellow-300 rounded"></div> Reservado
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-red-500 rounded"></div> Ocupado
+          </div>
         </div>
       </div>
 
       <!-- Sectores -->
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <div
-          v-for="sector in sectores"
-          :key="sector.nombre"
-          class="rounded-2xl bg-white shadow-xl border border-gray-200 transition hover:shadow-2xl"
-        >
+        <div v-for="sector in sectores" :key="sector.nombre"
+          class="rounded-2xl bg-white shadow-xl border border-gray-200 transition hover:shadow-2xl">
           <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
             <h3 class="text-xl font-semibold text-accent">Sector {{ sector.nombre }}</h3>
             <span class="text-sm text-gray-500">{{ sector.spots.length }} lugares</span>
           </div>
 
           <div class="grid grid-cols-5 sm:grid-cols-6 gap-3 p-4">
-            <div
-              v-for="spot in sector.spots"
-              :key="spot.id"
+            <div v-for="spot in sector.spots" :key="spot.id"
               class="aspect-square rounded-lg flex items-center justify-center text-sm font-bold border shadow-inner transition-transform transform hover:scale-105 cursor-pointer"
               :class="{
                 'bg-green-400 text-white border-green-600': spot.estado === 'libre',
                 'bg-red-500 text-white border-red-600 animate-pulse': spot.estado === 'ocupado',
                 'bg-yellow-300 text-black border-yellow-500': spot.estado === 'reservado',
-              }"
-              @click="seleccionarSpot(spot)"
-            >
+              }" @click="seleccionarSpot(spot)">
               {{ spot.spot_number }}
             </div>
           </div>
@@ -64,8 +68,7 @@
       <div v-if="hayDisponibles" class="mt-10 text-center">
         <button
           class="bg-accent hover:bg-accent-dark text-white text-lg font-semibold px-8 py-3 rounded-full shadow-lg transition"
-          @click="mostrarModal = true"
-        >
+          @click="mostrarModal = true">
           Reservar un lugar ahora
         </button>
       </div>
@@ -108,6 +111,8 @@ import { getAllVehicles } from '../services/vehicleService.ts';
 import GoogleMap from '../components/layout/GoogleMap.vue';
 import { useUserStore } from '../store/userStore';
 import MainHeader from '../components/layout/header/MainHeader.vue';
+import MainHeader from '../components/layout/header/MainHeader.vue';
+import BackButton from '../components/common/BackButton.vue';
 
 const route = useRoute();
 const router = useRouter();

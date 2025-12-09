@@ -36,7 +36,7 @@
             <!-- Modal de error -->
             <StatusModal :visible="showErrorModal" title="¡Atención!"
                 message="Selecciona al menos un tipo de vehículo y configura su capacidad y precio."
-                icon="/src/assets/logo.png" @close="showErrorModal = false" />
+                :icon="logo" @close="showErrorModal = false" />
         </div>
     </div>
 </template>
@@ -46,6 +46,7 @@ import { ref, computed } from 'vue'
 import VehicleModal from '../../addSpacePage/VehicleModal.vue';
 import VehicleFormOption from '../../../forms/VehicleFormOption.vue';
 import StatusModal from '../../addSpacePage/StatusModal.vue';
+import logo from "../../../../assets/logo.png";
 
 const props = defineProps<{
     visible: boolean

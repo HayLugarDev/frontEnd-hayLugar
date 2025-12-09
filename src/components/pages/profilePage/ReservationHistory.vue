@@ -1,9 +1,9 @@
 <template>
-  <section class="bg-white/10 border-white/10 p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+  <section class="sm:bg-white/10 p-8 rounded-lg sm:shadow-lg mb-8 w-full md:w-2/3">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h2 class="hidden md:block text-2xl font-bold text-white">📅 Tus reservas</h2>
-        <p class="text-sm text-gray-400 px-4">Revisá el estado y detalles de tus reservas activas o pasadas</p>
+        <h2 class="text-2xl font-bold text-white">📅 Tus reservas</h2>
+        <p class="text-md text-gray-400 px-4">Revisá el estado y detalles de tus reservas activas o pasadas</p>
       </div>
     </div>
 
@@ -96,9 +96,15 @@
       </div>
     </div>
 
-    <p v-else class="text-gray-200 text-center py-10 text-sm">
-      No tienes reservas realizadas aún.
-    </p>
+    <!-- Sin reservas -->
+    <div v-else class="text-center text-gray-500 mt-10 flex flex-col items-center justify-center">
+      <p class="text-lg font-medium">No tienes ninguna reserva activa.</p>
+      <button v-if="!reservations.length" @click="router.push('/dashboard')"
+        class="flex items-center gap-2 text-newgreen font-semibold bg-white/10 px-4 py-2 rounded-xl shadow hover:bg-white/20 transition-all mt-4">
+        <font-awesome-icon :icon="['fas', 'circle-plus']" />
+        ¡Hacé tu primera reserva!
+      </button>
+    </div>
 
     <!-- Modal CheckIn -->
     <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-white/10 border border-white/10 z-50">
@@ -116,7 +122,7 @@
           <button @click="showCheckInModal = false" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300">
             Cancelar
           </button>
-          <button @click="confirmCheckIn" class="px-4 py-2 rounded-lg bg-[#06D6A0]/20 hover:bg-[#06D6A0]/30 text-white">
+          <button @click="confirmCheckIn" class="px-4 py-2 rounded-lg bg-newgreen/20 hover:bg-newgreen/30 text-white">
             Confirmar
           </button>
         </div>
@@ -132,7 +138,7 @@
       @submit="handleRatingSubmit" />
 
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-      message="Ocurrió un error al procesar la acción" icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+      message="Ocurrió un error al procesar la acción" :icon="logo" @confirm="showErrorModal = false" />
   </section>
 </template>
 
@@ -149,6 +155,7 @@ import ConfirmModal from '../../common/ConfirmModal.vue';
 import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 import RatingModal from '../../common/RatingModal.vue';
 import { showToast } from '../../../utils/toast';
+import logo from "../../../assets/logo.png";
 
 const reservations = ref([]);
 const userStore = useUserStore();

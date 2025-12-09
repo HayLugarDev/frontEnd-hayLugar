@@ -1,9 +1,9 @@
 <template>
-  <section class="bg-white/10 border-white/10 p-2 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3 border border-gray-200">
+  <section class="p-2 md:p-8 rounded-2xl shadow-xl mb-8">
     <!-- Título -->
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h2 class="hidden md:flex text-2xl font-bold text-primary">⭐ Mis Calificaciones</h2>
+        <h2 class="hidden md:flex text-2xl font-bold text-primary">Últimas calificaciones</h2>
         <p class="text-sm text-gray-400 px-4">Leé lo que otros opinan sobre tus espacios y tu atención</p>
       </div>
     </div>
@@ -24,12 +24,12 @@
       <div
         v-for="r in reviews"
         :key="r.id"
-        class="border border-gray-200 rounded-2xl bg-white/10 border-white/30 shadow-md hover:shadow-lg transition-all overflow-hidden p-5"
+        class="rounded-2xl bg-white/10 shadow-md hover:shadow-lg transition-all overflow-hidden p-5"
       >
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-3">
           <div class="flex items-center gap-3">
             <!-- Avatar del revisor -->
-            <div class="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center text-gray-200 text-lg font-semibold shadow-sm">
+            <div class="w-12 h-12 rounded-full bg-primary/50 flex items-center justify-center text-gray-200 text-lg font-semibold shadow-sm">
               {{ getInitials(r.reviewer?.name, r.reviewer?.last_name) }}
             </div>
             <div>

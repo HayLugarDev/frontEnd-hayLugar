@@ -3,20 +3,22 @@
     class="relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-x-hidden">
 
     <!-- LOADING -->
-    <DashboardSkeleton v-if="loading || !spaces" />
+     <div v-if="loading || !spaces">
+       <DashboardSkeleton />
+   
+       <!-- BUSCADOR MOBILE AVANZADO -->
+       <div v-if="showSearchMenu"
+         class="p-4 w-11/12 mx-auto bg-[#1B263B]/90 rounded-2xl shadow-2xl border border-white/10">
+         <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
+           v-model:publishedDate="publishedDate" v-model:maxPrice="maxPrice" v-model:sortBy="sortBy" @search="buscar"
+           @close="showSearchMenu = false" />
+       </div>
+     </div>
 
-    <!-- BUSCADOR MOBILE AVANZADO -->
-    <div v-if="showSearchMenu"
-      class="p-4 w-11/12 mx-auto bg-[#1B263B]/90 rounded-2xl shadow-2xl border border-white/10">
-      <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
-        v-model:publishedDate="publishedDate" v-model:maxPrice="maxPrice" v-model:sortBy="sortBy" @search="buscar"
-        @close="showSearchMenu = false" />
-    </div>
+    <div v-else class="flex flex-col h-full pt-24 md:pt-20">
 
-    <div v-else class="flex flex-col h-full">
-
-      <!-- HEADER SOLO EN DESKTOP -->
-      <MainHeader class="hidden md:block" />
+      
+      <MainHeader />
 
       <!-- MENÚ INFERIOR MOBILE -->
       <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
@@ -24,8 +26,8 @@
 
       <!-- BUSCADOR MOBILE -->
       <button v-if="!showSearchMenu" @click="toggleSearchMenu" class="flex md:hidden items-center justify-center 
-               bg-white/10 text-white border border-white/20
-               shadow-lg backdrop-blur-md p-4 mx-6 rounded-full my-4 gap-2 
+               bg-white/10 text-white border-b border-white/20
+               shadow-xl backdrop-blur-md p-4 mx-6 rounded-full my-4 gap-2 
                hover:bg-white/20 transition">
         <font-awesome-icon icon="search" class="text-sm" />
         <span>Comenzar busqueda</span>
@@ -40,74 +42,35 @@
       </div>
 
       <!-- NAVBAR -->
-      <div class="flex overflow-x-auto px-4 py-4">
-        <div class="flex gap-4 w-full">
-
-          <!-- Universidades -->
-          <button :disabled="!features.universidades" @click="features.universidades && router.push('/universidades')"
-            :class="[
-              'flex flex-col items-center justify-center p-2 min-w-[150px] bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300',
-              features.universidades
-                ? 'hover:bg-white/20 hover:border-[#06D6A0] hover:shadow-[0_0_20px_#06D6A055]'
-                : 'opacity-40 pointer-events-none'
-            ]">
-            <School class="w-7 h-7 text-[#06D6A0]" />
-            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Universidades</span>
-            <span class="text-gray-300 text-[8px] md:text-[9px]">Campus Inteligentes</span>
-          </button>
-
-          <!-- Medido -->
-          <button :disabled="!features.medido" @click="features.medido && router.push('/meteredParkingDashboard')"
-            :class="[
-              'flex flex-col items-center justify-center p-2 min-w-[150px] bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300',
-              features.medido
-                ? 'hover:bg-white/20 hover:border-[#00B4D8] hover:shadow-[0_0_20px_#00B4D855]'
-                : 'opacity-40 pointer-events-none'
-            ]">
-            <ParkingSquare class="w-7 h-7 text-[#00B4D8]" />
-            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Medido</span>
-            <span class="text-gray-300 text-[8px] md:text-[9px]">Calles en tiempo real</span>
-          </button>
-
-          <!-- Eventos -->
-          <button :disabled="!features.eventos" @click="features.eventos && router.push('/events')" :class="[
-            'flex flex-col items-center justify-center p-2 min-w-[150px] bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300',
-            features.eventos
-              ? 'hover:bg-white/20 hover:border-[#FFD166] hover:shadow-[0_0_20px_#FFD16655]'
-              : 'opacity-40 pointer-events-none'
-          ]">
-            <Ticket class="w-7 h-7 text-[#FFD166]" />
-            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Eventos</span>
-            <span class="text-gray-300 text-[8px] md:text-[9px]">Festivales & shows</span>
-          </button>
-
-          <!-- Industrial -->
-          <button :disabled="!features.industrial" @click="features.industrial && router.push('/industrial-dashboard')"
-            :class="[
-              'flex flex-col items-center justify-center p-2 min-w-[150px] bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300',
-              features.industrial
-                ? 'hover:bg-white/20 hover:border-[#8ECAE6] hover:shadow-[0_0_20px_#8ECAE655]'
-                : 'opacity-40 pointer-events-none'
-            ]">
-            <Factory class="w-7 h-7 text-[#8ECAE6]" />
-            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Industrial</span>
-            <span class="text-gray-300 text-[8px] md:text-[9px]">Operaciones en tiempo real</span>
-          </button>
-
-          <!-- Playas de Estacionamientos -->
-          <button :disabled="!features.playas" @click="features.playas && router.push('/playa-dashboard')" :class="[
-            'flex flex-col items-center justify-center p-2 min-w-[150px] bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300',
-            features.playas
-              ? 'hover:bg-white/20 hover:border-[#90BE6D] hover:shadow-[0_0_20px_#90BE6D55]'
-              : 'opacity-40 pointer-events-none'
-          ]">
-            <ParkingSquare class="w-7 h-7 text-[#90BE6D]" />
-            <span class="text-white font-semibold text-[11px] md:text-xs mt-1">Playas</span>
-            <span class="text-gray-300 text-[8px] md:text-[9px]">Estacionamientos en tiempo real</span>
-          </button>
-
+      <!-- <div class="relative py-4">
+        <div
+          class="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-[#0D1B2A] to-transparent">
         </div>
-      </div>
+        <div
+          class="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#0D1B2A] to-transparent">
+        </div>
+
+        <div class="flex gap-4 px-4 overflow-x-auto hide-scrollbar">
+          <FeatureButton :icon="School" color="#06D6A0" title="Universidades" subtitle="Campus Inteligentes"
+            :enabled="features.universidades" :onClick="() => router.push('/universidades')" />
+
+          <FeatureButton :icon="ParkingSquare" color="#00B4D8" title="Medido" subtitle="Calles en tiempo real"
+            :enabled="features.medido" :onClick="() => router.push('/meteredParkingDashboard')" />
+
+          <FeatureButton :icon="Ticket" color="#FFD166" title="Eventos" subtitle="Festivales & shows"
+            :enabled="features.eventos" :onClick="() => router.push('/events')" />
+
+          <FeatureButton :icon="Factory" color="#8ECAE6" title="Industrial" subtitle="Operaciones en tiempo real"
+            :enabled="features.industrial" :onClick="() => router.push('/industrial-dashboard')" />
+
+          <FeatureButton :icon="ParkingSquare" color="#90BE6D" title="Playas" subtitle="Estacioná en tiempo real"
+            :enabled="features.playas" :onClick="() => router.push('/playa-dashboard')" />
+        </div>
+      </div> -->
+
+      <span class="w-full rounded-t-xl font-bold tracking-tight text-xl md:text-2xl text-gray-200 pl-6 md:pl-10 pt-4">
+        Cerca de ti...
+      </span>
 
       <!-- RESULTADOS -->
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-4 md:py-0 md:px-8">
@@ -201,6 +164,7 @@ import { useSpaceStore } from '../store/spaceStore';
 import { storeToRefs } from 'pinia'
 import { School, ParkingSquare, Ticket, Factory, ParkingCircleIcon, HouseIcon } from 'lucide-vue-next'
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
+import FeatureButton from '../components/pages/dashboardPage/FeatureButton.vue';
 
 const features = {
   playas: import.meta.env.VITE_FEATURE_PLAYAS === "true",
