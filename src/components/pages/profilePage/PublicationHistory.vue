@@ -1,10 +1,10 @@
 <template>
-  <section class="bg-white/10 border-white/10 p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
-    <!-- Título -->
-    <div class="flex items-center justify-between">            
+  <section class="sm:bg-white/10 p-8 rounded-lg sm:shadow-lg mb-8 w-full md:w-2/3">
+
+    <div class="flex items-center justify-between mb-4">
       <div>
-        <h2 class="hidden md:block text-2xl font-bold text-primary">📦 Tus publicaciones</h2>
-        <p class="text-sm text-gray-400 px-4">Gestioná tus espacios publicados de forma simple y visual</p>
+        <h2 class="text-2xl font-bold text-white">📦 Tus publicaciones</h2>
+        <p class="text-md text-gray-400 p-3">Gestioná tus espacios publicados de forma simple y visual</p>
       </div>
     </div>
 
@@ -19,7 +19,7 @@
         <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-white/10 border-white/10">
           <div>
             <h3 class="text-lg font-bold text-gray-200 flex items-center gap-2">
-              <font-awesome-icon icon="warehouse" class="text-primary" />
+              <font-awesome-icon icon="warehouse" class="text-newgreen" />
               {{ publication.name }}
             </h3>
             <p class="text-xs text-gray-400">{{ publication.location.split(',')[0] }}</p>
@@ -51,7 +51,7 @@
                 class="flex flex-col items-center p-2 border rounded-xl bg-white/10 border-white/10 shadow-sm hover:shadow-md transition-all w-24">
                 <font-awesome-icon :icon="['fas', getVehicleIcon(v.type)]" class="text-gray-200 text-lg mb-1" />
                 <span class="text-xs capitalize text-gray-200">{{ getVehicleType(v.type) }}</span>
-                <span v-if="v.price_per_hour" class="text-xs font-semibold text-primary">
+                <span v-if="v.price_per_hour" class="text-xs font-semibold text-newgreen">
                   ${{ v.price_per_hour.toLocaleString() }}/h
                 </span>
               </div>
@@ -62,7 +62,7 @@
         <!-- Acciones -->
         <div class="flex items-center justify-end gap-2 border-t border-gray-200 p-4 bg-white/10 border-white/10">
           <button @click="editPublication(publication)"
-            class="flex items-center justify-center gap-2 text-sm font-semibold bg-[#06D6A0]/20 hover:bg-[#06D6A0]/30 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
+            class="flex items-center justify-center gap-2 text-sm font-semibold bg-newgreen/50 hover:bg-newgreen/30 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
             <font-awesome-icon :icon="['fas', 'pen-to-square']" /> Editar
           </button>
           <button @click="openConfirm(publication)"
@@ -78,7 +78,7 @@
     </p>
 
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+      :icon="logo" @confirm="showErrorModal = false" />
 
     <EditPublications :visible="openModal" :spaceId="space?.id" @close="openModal = false"
       @updated="fetchPublications" />
@@ -101,6 +101,7 @@ import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 import { useSpaceStore } from '../../../store/spaceStore';
 import { deleteSpaceById } from '../../../services/spaceService';
 import StatusModal from '../addSpacePage/StatusModal.vue';
+import logo from "../../../assets/logo.png";
 
 export interface VehicleCapacity {
   type: 'car' | 'motorcycle' | 'van' | 'bicycle';
@@ -190,7 +191,7 @@ const deletePublication = async (id: number) => {
     spaceStore.removeSpaceFromStore(id);
   } catch (error) {
     console.error('Error al eliminar publicación', error);
-  } 
+  }
 };
 </script>
 

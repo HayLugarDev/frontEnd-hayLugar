@@ -1,303 +1,358 @@
 <template>
-  <div class="min-h-screen bg-[#0F172A] text-white selection:bg-accent/30 selection:text-white">
+  <div class="min-h-screen bg-[#0A0F1C] text-white selection:bg-accent/30 selection:text-white">
 
-    <!-- ============================ HERO B2B ============================ -->
-    <section class="relative overflow-hidden pt-32 pb-28 bg-gradient-to-br from-[#0D1B2A] via-[#1B2535] to-[#0A1220]">
-      <!-- Decoración -->
-      <div class="absolute inset-0 -z-10 opacity-40">
+    <!-- HEADER -->
+    <MainHeader />
+
+    <!-- ====================================================================== -->
+    <!--                                HERO B2B                                -->
+    <!-- ====================================================================== -->
+    <section class="relative overflow-hidden pt-32 pb-32 bg-gradient-to-br from-[#0D1B2A] via-[#142135] to-[#0A0F1C]">
+      
+      <!-- Halos -->
+      <div class="absolute inset-0 -z-10 opacity-70">
         <div class="halo halo--lg"></div>
         <div class="halo halo--sm"></div>
       </div>
 
-      <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+      <div class="container mx-auto px-6 max-w-5xl">
         
-        <!-- IZQUIERDA -->
-        <div>
-          <div class="flex items-center gap-4 mb-5">
-            <img :src="logo" class="h-20 w-20 drop-shadow-xl" alt="HayLugar" />
-            <h1 class="text-5xl md:text-6xl font-extrabold leading-[0.9]">
-              HayLugar for Business
-            </h1>
+        <div class="max-w-3xl">
+          <!-- Badge -->
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 
+                   text-xs font-medium text-white/70 mb-5"
+          >
+            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Plataforma Enterprise
           </div>
 
-          <p class="text-white/85 text-xl max-w-2xl leading-relaxed">
-            La plataforma argentina que moderniza la movilidad urbana, la gestión de estacionamientos
-            y el acceso vehicular en entornos complejos: 
-            <span class="text-accent font-semibold">municipios, universidades, parques industriales, eventos y empresas.</span>
+          <!-- TITULO -->
+          <h1 class="text-5xl md:text-7xl font-extrabold leading-[1.05] tracking-tight">
+            La infraestructura digital<br />
+            para la movilidad urbana.
+          </h1>
+
+          <!-- DESCRIPCIÓN -->
+          <p class="mt-6 text-xl text-white/70 leading-relaxed max-w-2xl">
+            Gestioná estacionamiento, accesos, flotas y movilidad en tiempo real.
+            Una solución unificada para municipios, universidades, industrias y empresas.
           </p>
 
           <!-- CTA -->
-          <div class="mt-8 flex flex-col sm:flex-row gap-3 max-w-md">
-            <button
-              @click="contact"
-              class="px-6 py-3 rounded-full bg-accent text-white font-semibold shadow-xl hover:bg-accent/90 transition-all"
-            >
-              Solicitar una demo
+          <div class="flex flex-col sm:flex-row gap-4 mt-10">
+            <button 
+              @click="openCalendar"
+              class="px-8 py-3 rounded-xl bg-accent text-[#0D1B2A] font-semibold shadow-xl hover:bg-accent/90 transition">
+              Agendar reunión
             </button>
 
-            <button
+            <button 
               @click="goTo('/dashboard')"
-              class="px-6 py-3 rounded-full bg-white/10 border border-white/30 text-white font-semibold hover:bg-white/15 transition-all"
-            >
+              class="px-8 py-3 rounded-xl border border-white/20 bg-white/5 hover:bg-white/15 font-semibold transition">
               Ver plataforma
             </button>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- DERECHA: GRÁFICO -->
-        <div
-          class="rounded-2xl bg-white/5 backdrop-blur-xl p-6 shadow-xl border border-white/10 hover:-translate-y-1 transition"
-        >
-          <h3 class="text-lg font-semibold mb-2">Solución integral multivertical</h3>
-          <p class="text-white/70 text-sm">
-            Un ecosistema único: movilidad, acceso y estacionamiento en tiempo real.
-          </p>
+    <!-- ====================================================================== -->
+    <!--                        SECCIÓN: PROPUESTA DE VALOR                      -->
+    <!-- ====================================================================== -->
+    <section class="py-24 bg-[#0A0F1C]">
+      <div class="container mx-auto px-6 max-w-6xl text-center">
 
-          <div class="mt-5 rounded-2xl overflow-hidden bg-black/30 shadow-lg ring-1 ring-white/15">
-            <img :src="mapaVisual" class="w-full h-full object-cover" alt="Mapa verticales HayLugar" />
+        <h2 class="text-3xl md:text-5xl font-extrabold mb-6">Conectamos infraestructura, movilidad y datos.</h2>
+
+        <p class="text-white/50 max-w-3xl mx-auto text-lg leading-relaxed">
+          HayLugar for Business unifica estacionamiento, accesos, permisos, sensores y analítica 
+          en un ecosistema integral que se adapta a cualquier escala: desde ciudades hasta campus o industrias.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-10 mt-14">
+
+          <!-- CARD 1 -->
+          <div
+            class="bg-white/5 border border-white/10 rounded-2xl p-8 text-center 
+                   hover:bg-white/10 transition shadow-lg shadow-black/20"
+          >
+            <div class="text-4xl mb-4 text-accent">
+              <i class="fa-solid fa-building-city"></i>
+            </div>
+            <h3 class="text-lg font-bold">Gobiernos & Smart Cities</h3>
+            <p class="text-white/60 text-sm mt-2 leading-relaxed">
+              Ordenamiento urbano, estacionamiento inteligente y datos estratégicos.
+            </p>
           </div>
+
+          <!-- CARD 2 -->
+          <div
+            class="bg-white/5 border border-white/10 rounded-2xl p-8 text-center 
+                   hover:bg-white/10 transition shadow-lg shadow-black/20"
+          >
+            <div class="text-4xl mb-4 text-accent">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <h3 class="text-lg font-bold">Universidades & Campus</h3>
+            <p class="text-white/60 text-sm mt-2 leading-relaxed">
+              Accesos por legajo, zonas dinámicas y control total del tránsito interno.
+            </p>
+          </div>
+
+          <!-- CARD 3 -->
+          <div
+            class="bg-white/5 border border-white/10 rounded-2xl p-8 text-center 
+                   hover:bg-white/10 transition shadow-lg shadow-black/20"
+          >
+            <div class="text-4xl mb-4 text-accent">
+              <i class="fa-solid fa-industry"></i>
+            </div>
+            <h3 class="text-lg font-bold">Industria & Logística</h3>
+            <p class="text-white/60 text-sm mt-2 leading-relaxed">
+              Dársenas, flotas, turnos y patios logísticos centralizados.
+            </p>
+          </div>
+
         </div>
       </div>
     </section>
 
-    <!-- ============================ PROPUESTA DE VALOR ============================ -->
-    <section class="py-20 md:py-24 bg-white text-[#0F172A]">
-      <div class="container mx-auto px-6">
+    <!-- ====================================================================== -->
+    <!--                     SECTION: MÓDULOS READY-TO-USE                       -->
+    <!-- ====================================================================== -->
+    <section class="py-24 bg-[#0D1B2A] border-t border-white/10">
+      <div class="container mx-auto px-6 max-w-6xl">
 
-        <h2 class="text-center text-3xl md:text-4xl font-bold">
-          Una infraestructura digital para tu ciudad, campus o industria.
+        <h2 class="text-center text-3xl md:text-5xl font-extrabold">
+          Módulos hechos para escalar
         </h2>
 
-        <p class="text-center text-[#64748B] max-w-3xl mx-auto mt-3">
-          HayLugar es más que estacionamiento. Es una capa de inteligencia urbana que conecta espacios,
-          regula accesos y optimiza la movilidad en tiempo real.
+        <p class="text-center text-white/60 max-w-3xl mx-auto mt-3">
+          Elegí qué módulos activar y ponelos en marcha en cuestión de días.
         </p>
 
-        <div class="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-14">
 
-          <!-- MUNICIPIOS -->
-          <div class="b2bCard">
-            <img :src="imgMunicipios" class="b2bImg" alt="Municipios" />
-            <h3 class="b2bTitle">Municipios</h3>
-            <p class="b2bDesc">
-              Estacionamiento medido inteligente, control de infracciones,
-              analítica urbana, integraciones QR y ordenamiento vial en tiempo real.
-            </p>
+          <!-- MODULE -->
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-accent transition">
+            <h4 class="font-bold text-lg mb-1">Accesos inteligentes</h4>
+            <p class="text-white/60 text-sm">QR · Patente · Legajo · Roles avanzados.</p>
           </div>
 
-          <!-- UNIVERSIDADES -->
-          <div class="b2bCard">
-            <img :src="imgUniversidades" class="b2bImg" alt="Universidades" />
-            <h3 class="b2bTitle">Universidades</h3>
-            <p class="b2bDesc">
-              Acceso por legajo, zonas diferenciadas, panel de control,
-              capacidad dinámica y visualización de sectores.
-            </p>
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-accent transition">
+            <h4 class="font-bold text-lg mb-1">Estacionamiento medido</h4>
+            <p class="text-white/60 text-sm">Pago digital, sensores, disponibilidad en vivo.</p>
           </div>
 
-          <!-- INDUSTRIA -->
-          <div class="b2bCard">
-            <img :src="imgIndustrial" class="b2bImg" alt="Parques industriales" />
-            <h3 class="b2bTitle">Parques Industriales</h3>
-            <p class="b2bDesc">
-              Turnos de camiones, dársenas, patios logísticos,
-              accesos y seguridad perimetral desde un solo tablero.
-            </p>
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-accent transition">
+            <h4 class="font-bold text-lg mb-1">Playas & Cocheras privadas</h4>
+            <p class="text-white/60 text-sm">Cuadrantes, reservas y capacidad en tiempo real.</p>
           </div>
 
-          <!-- EVENTOS -->
-          <div class="b2bCard">
-            <img :src="imgEventos" class="b2bImg" alt="Eventos" />
-            <h3 class="b2bTitle">Eventos Masivos</h3>
-            <p class="b2bDesc">
-              Recitales, festivales y estadios: precios claros,
-              accesos guiados, reducción de caos vehicular y control total.
-            </p>
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-accent transition">
+            <h4 class="font-bold text-lg mb-1">Logística industrial</h4>
+            <p class="text-white/60 text-sm">Turnos, muelles, flotas y dársenas.</p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-accent transition">
+            <h4 class="font-bold text-lg mb-1">Eventos masivos</h4>
+            <p class="text-white/60 text-sm">Accesos guiados, QR, control perimetral.</p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-accent transition">
+            <h4 class="font-bold text-lg mb-1">Analytics + Insights</h4>
+            <p class="text-white/60 text-sm">Métricas avanzadas y dashboards ejecutivos.</p>
           </div>
 
         </div>
       </div>
     </section>
 
-    <!-- ============================ MÓDULOS ENTERPRISE ============================ -->
-    <section class="py-20 md:py-24 bg-[#F8FAFC] text-[#0F172A]">
-      <div class="container mx-auto px-6">
+    <!-- ====================================================================== -->
+    <!--                             CTA FINAL                                   -->
+    <!-- ====================================================================== -->
+    <section class="py-28 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0A0F1C] text-center">
+      <h3 class="text-4xl md:text-6xl font-bold max-w-3xl mx-auto leading-tight">
+        Tu ciudad, campus o industria<br />con movilidad inteligente.
+      </h3>
 
-        <h2 class="text-center text-3xl md:text-4xl font-bold">
-          Módulos listos para implementar
-        </h2>
-        <p class="text-center text-[#64748B] max-w-3xl mx-auto mt-2">
-          Cada organización elige qué módulos necesita.
-        </p>
+      <p class="text-white/70 max-w-3xl mx-auto mt-4 text-lg">
+        Tecnología argentina pensada para operar a escala nacional con estándares globales.
+      </p>
 
-        <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div class="flex flex-col sm:flex-row justify-center gap-4 mt-12">
+        <button 
+          @click="openCalendar"
+          class="px-10 py-3 rounded-xl bg-accent text-[#0D1B2A] font-semibold hover:bg-accent/90 transition">
+          Solicitar demo corporativa
+        </button>
 
-          <div class="moduleCard">
-            <h4 class="moduleTitle">• Gestión de accesos</h4>
-            <p class="moduleDesc">Flujos por QR, patentes, legajo o permisos especiales.</p>
-          </div>
-
-          <div class="moduleCard">
-            <h4 class="moduleTitle">• Estacionamiento medido</h4>
-            <p class="moduleDesc">Calles inteligentes con disponibilidad visible y pagos digitales.</p>
-          </div>
-
-          <div class="moduleCard">
-            <h4 class="moduleTitle">• Analytics + Dashboard</h4>
-            <p class="moduleDesc">Ocupación, ingresos, accesos, flujos y predicciones.</p>
-          </div>
-
-          <div class="moduleCard">
-            <h4 class="moduleTitle">• Playas & sectores</h4>
-            <p class="moduleDesc">Visualización por cuadrantes, real time, conteo automático.</p>
-          </div>
-
-          <div class="moduleCard">
-            <h4 class="moduleTitle">• Integración con flotas</h4>
-            <p class="moduleDesc">Empresas pueden gestionar vehículos, roles y accesos internos.</p>
-          </div>
-
-          <div class="moduleCard">
-            <h4 class="moduleTitle">• Turnos logísticos</h4>
-            <p class="moduleDesc">Puntos de carga/descarga con reserva a demanda.</p>
-          </div>
-
-        </div>
+        <button 
+          @click="goTo('/dashboard')"
+          class="px-10 py-3 rounded-xl border border-white/20 bg-white/10 hover:bg-white/15 transition font-semibold">
+          Ver plataforma en vivo
+        </button>
       </div>
     </section>
 
-    <!-- ============================ CTA FINAL ============================ -->
-    <section class="py-20 bg-gradient-to-br from-[#0D1B2A] via-[#1B2535] to-[#0A1220] text-white">
-      <div class="container mx-auto px-6 text-center max-w-3xl">
+    <!-- FOOTER -->
+    <footer
+      class="max-w-6xl mx-auto bg-white text-[#0F172A] rounded-[32px] shadow-[0_-10px_40px_rgba(15,23,42,0.25)]
+            px-6 md:px-10 py-10 mb-10"
+    >
 
-        <h3 class="text-4xl md:text-5xl font-bold">
-          Llevá tu ciudad, campus o industria al siguiente nivel.
-        </h3>
-
-        <p class="mt-4 text-white/80">
-          Implementación rápida, soporte local y tecnología argentina pensada para escalar.
-        </p>
-
-        <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
-          <button
-            @click="contact"
-            class="px-6 py-3 rounded-full bg-accent text-white font-semibold shadow-xl hover:bg-accent/90 transition"
-          >
-            Solicitar demo
-          </button>
-
-          <button
-            @click="goTo('/dashboard')"
-            class="px-6 py-3 rounded-full bg-white/10 border border-white/20 hover:bg-white/15 transition font-semibold"
-          >
-            Ver plataforma en vivo
-          </button>
+      <!-- Logo + divider -->
+      <div class="flex flex-col gap-4 mb-8">
+        <div class="flex items-center gap-3">
+          <Logo width="32" class="drop-shadow-lg cursor-pointer" />
+          <span class="text-2xl font-bold tracking-tight">HayLugar</span>
         </div>
+        <div class="h-px bg-[#E2E8F0]" />
       </div>
-    </section>
 
-    <!-- ===== FOOTER ===== -->
-      <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
-              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+      <!-- GRID PRINCIPAL -->
+      <div class="grid gap-10 md:grid-cols-[2fr,2fr,2fr,2fr]">
 
-          <!-- Branding -->
-          <div class="flex items-center gap-2">
-            <span class="text-white font-semibold tracking-wide">HayLugar</span>
-            <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
-          </div>
+        <!-- Sobre Nosotros -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4 text-[#0F172A]">Sobre HayLugar</h4>
+          <ul class="space-y-2 text-sm text-[#475569]">
+            <li><router-link to="/help" class="hover:text-accent">Cómo funciona</router-link></li>
+            <li><router-link to="/FAQView" class="hover:text-accent">Preguntas frecuentes</router-link></li>
+            <li><router-link to="/add-space" class="hover:text-accent">Ser anfitrión</router-link></li>
+            <li><router-link to="/" class="hover:text-accent">HayLugar</router-link></li>
+          </ul>
+        </div>
 
-          <!-- Links -->
-          <div class="flex gap-6">
-            <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
-              Política de Privacidad
-            </router-link>
+        <!-- Localidades -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4 text-[#0F172A]">Localidades</h4>
+          <ul class="space-y-2 text-sm text-[#475569]">
+            <li class="flex items-center justify-between cursor-default hover:text-accent">
+              Argentina <span class="text-xs text-[#94A3B8]">▾</span>
+            </li>
+            <li class="flex items-center justify-between cursor-default hover:text-accent">
+              Chile <span class="text-xs text-[#94A3B8]">▾</span>
+            </li>
+            <li class="flex items-center justify-between cursor-default hover:text-accent">
+              México <span class="text-xs text-[#94A3B8]">▾</span>
+            </li>
+            <li class="flex items-center justify-between cursor-default hover:text-accent">
+              Perú <span class="text-xs text-[#94A3B8]">▾</span>
+            </li>
+          </ul>
+        </div>
 
-            <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
-              Términos y Condiciones
-            </router-link>
-          </div>
+        <!-- Empresa -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4 text-[#0F172A]">Empresa</h4>
+          <ul class="space-y-2 text-sm text-[#475569]">
+            <li><router-link to="/termsConditions" class="hover:text-accent">Términos y condiciones</router-link></li>
+            <li><router-link to="/PrivacyPolicy" class="hover:text-accent">Política de privacidad</router-link></li>
+            <li><router-link to="/contacto" class="hover:text-accent">Contacto</router-link></li>
+          </ul>
+        </div>
 
-          <!-- Extra -->
-          <div class="text-xs text-[#78909C]">
-            HayLugar for Business — Tecnología argentina para movilidad urbana
+        <!-- Apps y comunidad -->
+        <div class="flex flex-col items-start gap-3 mt-[-8px]">
+
+          <!-- Google Play -->
+          <a href="#" class="w-[150px] hover:opacity-90 transition">
+            <img :src="googlePlayBadge" alt="Google Play" class="w-full h-auto object-contain" />
+          </a>
+
+          <!-- App Store -->
+          <a href="#" class="w-[150px] hover:opacity-90 transition">
+            <img :src="appStoreBadge" alt="App Store" class="w-full h-auto object-contain" />
+          </a>
+
+          <!-- Redes Sociales -->
+          <div class="flex items-center gap-3 mt-4">
+            <a
+              href="https://www.linkedin.com/company/hay-lugar/"
+              target="_blank"
+            >
+              <img src="../../assets/linkedin.png" alt="LinkedIn" class="w-20 h-15" />
+            </a>
+            <a
+              href="https://www.instagram.com/haylugarok?igsh=MXh2bm43cTY3NjJscQ%3D%3D&utm_source=qr"
+              target="_blank"
+            >
+              <img src="../../assets/instagram.png" alt="Instagram" class="w-20 h-15" />
+            </a>
+            <a
+              href="https://www.tiktok.com/@apphaylugar?_r=1&_t=ZM-91v2JMPkRJI"
+              target="_blank"
+            >
+              <img src="../../assets/tiktok.png" alt="TikTok" class="w-20 h-15" />
+            </a>
           </div>
         </div>
-      </footer>
 
+      </div>
+
+      <!-- Divider inferior -->
+      <div class="h-px bg-[#E2E8F0] mt-10 mb-4" />
+
+      <!-- COPYRIGHT -->
+      <div class="text-center text-xs text-[#94A3B8]">
+        © {{ currentYear }} · HayLugar · Todos los derechos reservados.
+      </div>
+
+    </footer>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useRouter } from "vue-router";
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import MainHeader from '../components/layout/header/MainHeader.vue'
+import Logo from '../components/layout/Logo.vue'
+import googlePlayBadge from '../../assets/GooglePlay.png'
+import appStoreBadge from '../../assets/appstore.png'
 
-import logo from "../assets/logo.png";
-import mapaVisual from "../assets/mapa-visual.png";
+const router = useRouter()
+const goTo = (path) => router.push(path)
 
-import imgEventos from "../assets/events.png";
-import imgMunicipios from "../assets/medido.png";
-import imgIndustrial from "../assets/industry.png";
-import imgUniversidades from "../assets/universidad.png";
+// URL del calendar corporativo (CONFIGURAR EN .env)
+const B2B_CALENDAR_URL =
+  import.meta.env.VITE_B2B_CALENDAR_URL ||
+  'https://calendar.google.com/calendar/u/0/r?cid=apphaylugar@gmail.com' // reemplazá por tu link público de agenda
 
-const router = useRouter();
-const goTo = (p) => router.push(p);
-const contact = () => router.push("/contacto");
+const openCalendar = () => {
+  window.open(B2B_CALENDAR_URL, '_blank')
+}
 
-const currentYear = computed(() => new Date().getFullYear());
+const currentYear = computed(() => new Date().getFullYear())
 </script>
 
 <style scoped>
-/* Tarjetas B2B */
-.b2bCard {
-  @apply bg-white rounded-2xl p-5 shadow-[0_12px_40px_rgba(15,23,42,0.08)]
-         border border-[#E2E8F0] hover:shadow-[0_18px_55px_rgba(15,23,42,0.12)]
-         transition-all duration-200;
-}
-.b2bImg {
-  @apply w-full h-40 object-cover rounded-xl mb-4;
-}
-.b2bTitle {
-  @apply text-lg font-bold mb-1;
-}
-.b2bDesc {
-  @apply text-sm text-[#475569];
-}
-
-/* Módulos */
-.moduleCard {
-  @apply bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-sm hover:shadow-lg transition duration-200;
-}
-.moduleTitle {
-  @apply text-base font-bold text-[#0F172A] mb-1;
-}
-.moduleDesc {
-  @apply text-sm text-[#64748B];
-}
-
-/* Halos */
+/* ---------------- HALOS ---------------- */
 .halo {
   position: absolute;
   border-radius: 9999px;
   filter: blur(48px);
+  opacity: 0.7;
   animation: float 14s ease-in-out infinite;
 }
 .halo--lg {
   right: -10rem;
-  top: -10rem;
-  width: 28rem;
-  height: 28rem;
-  background: rgba(59, 130, 246, 0.4);
+  top: -8rem;
+  width: 26rem;
+  height: 26rem;
+  background: rgba(59,130,246,0.35);
 }
 .halo--sm {
-  left: -6rem;
-  bottom: -12rem;
-  width: 24rem;
-  height: 24rem;
-  background: rgba(45, 212, 191, 0.4);
+  left: -8rem;
+  bottom: -10rem;
+  width: 22rem;
+  height: 22rem;
+  background: rgba(45,212,191,0.45);
 }
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(12px); }
+  50% { transform: translateY(14px); }
 }
 </style>

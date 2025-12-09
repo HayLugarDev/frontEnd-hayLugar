@@ -1,10 +1,14 @@
 <template>
+
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
   <div
     class="flex flex-col min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white font-lexend w-full max-w-7xl mx-auto px-4">
     <MainHeader />
 
     <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full py-6">
-      <BackButton class="md:hidden mb-2 text-end" />
 
       <!-- Usamos grid-cols-1 por defecto y md:grid-cols-9 en desktop -->
       <section class="grid grid-cols-1 md:grid-cols-9 gap-6">

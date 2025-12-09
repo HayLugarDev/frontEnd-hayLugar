@@ -1,9 +1,9 @@
 <template>
-  <section class="bg-white/10 border-white/10 p-2 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3">
+  <section class="sm:bg-white/10 p-8 rounded-lg sm:shadow-lg mb-8 w-full md:w-2/3">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h2 class="hidden md:block text-2xl font-bold text-primary">🧾 Reservas entrantes</h2>
-        <p class="text-sm text-gray-400 px-4">Gestioná tus reservas recibidas de forma clara y rápida</p>
+        <h2 class="text-2xl font-bold text-primary">🧾 Reservas entrantes</h2>
+        <p class="text-md text-gray-400 px-4">Gestioná tus reservas recibidas de forma clara y rápida</p>
       </div>
     </div>
 
@@ -93,7 +93,7 @@
           <!-- PENDING -->
           <template v-if="isPending(reservation.status)">
             <button @click="confirmApprovedReservation(reservation)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
+              class="flex items-center justify-center gap-2 text-sm font-semibold bg-primary text-white px-4 py-2 rounded-xl shadow hover:shadow-lg transition-all">
               <font-awesome-icon :icon="['fas', 'check']" /> Aprobar
             </button>
             <button @click="confirmRejectReservation(reservation)"
@@ -157,10 +157,10 @@
 
     <!-- Modales -->
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage || 'Ocurrió un error'"
-      icon="/src/assets/logo.png" @confirm="showErrorModal = !showErrorModal" />
+      :icon="logo" @confirm="showErrorModal = !showErrorModal" />
 
     <StatusModal :visible="showSuccessModal" title="¡Éxito!" :message="'Verificación exitosa.'"
-      icon="/src/assets/logo.png" @confirm="goToReservation" />
+      :icon="logo" @confirm="goToReservation" />
 
     <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
       @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
@@ -181,6 +181,7 @@ import { useRouter } from 'vue-router';
 import ConfirmModal from '../../common/ConfirmModal.vue';
 import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 import RatingModal from '../../common/RatingModal.vue';
+import logo from "../../../assets/logo.png";
 
 const reservations = ref<any[]>([]);
 const userStore = useUserStore();

@@ -1,6 +1,6 @@
 <template>
   <!-- Modo desktop -->
-  <div class="hidden md:flex flex-col w-11/12 px-4 space-y-2">
+  <div class="hidden sm:flex flex-col w-11/12 px-4 space-y-2">
     <button
       v-for="section in sections"
       :key="section.value"
@@ -8,7 +8,7 @@
       :class="[
         'w-full flex items-center justify-start gap-3 py-3 px-4 rounded-2xl font-semibold text-base transition-all duration-300',
         activeSection === section.value
-          ? 'bg-primary text-white shadow-md scale-[1.02]'
+          ? 'bg-newgreen/60 text-white shadow-md scale-[1.02]'
           : 'bg-white/10 text-gray-200 hover:bg-white/20 hover:scale-[1.01]'
       ]"
     >
@@ -17,7 +17,7 @@
   </div>
 
   <!-- Modo mobile: dropdown -->
-  <div class="block md:hidden w-full bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-primary">
+  <div class="sm:hidden w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white">
     <MobileMenuDropdown
       :modelValue="activeSection"
       @update:modelValue="$emit('update:activeSection', $event)"

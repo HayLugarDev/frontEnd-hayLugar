@@ -1,4 +1,9 @@
 <template>
+
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
   <div class="min-h-screen bg-secondary">
     <MainHeader />
 
@@ -227,6 +232,7 @@ import { useUserStore } from '../store/userStore'
 import MeteredAccessDialog from '../components/meteredAccessDialog.vue'
 import CurbBandsLayer from '../components/curb/CurbBandsLayer.vue'
 import { streetTechStyle } from '../mapStyles/streetTech'
+import BackButton from '../components/common/BackButton.vue'
 
 const { center, zoom, mapOptions, setCenterToLocation } = useUniversityMap()
 center.value = { lat: -26.8309, lng: -65.2033 }

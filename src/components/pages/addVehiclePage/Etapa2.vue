@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex flex-col max-w-xl mx-auto h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-lg p-8 gap-6 md:min-h-[80vh] animate-fade-in">
+        class="flex flex-col max-w-xl mx-auto p-8 gap-6 md:min-h-[80vh] animate-fade-in">
         <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-4">
             Completá los detalles de tu vehículo
         </h1>
@@ -46,13 +46,14 @@
 
         <!-- Modal de error -->
         <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-            message="Por favor, completá todos los campos antes de continuar." icon="/src/assets/logo.png"
+            message="Por favor, completá todos los campos antes de continuar." :icon="logo"
             @confirm="showErrorModal = false" />
     </div>
 </template>
 
 <script setup>
 import StatusModal from "../addSpacePage/StatusModal.vue";
+import logo from "../../../assets/logo.png";
 import { computed, ref } from 'vue';
 
 const showErrorModal = ref(false);

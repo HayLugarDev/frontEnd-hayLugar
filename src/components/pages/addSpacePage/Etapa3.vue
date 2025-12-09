@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col max-w-xl mx-auto bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-lg p-8 gap-6 min-h-[80vh] animate-fade-in">
+    class="flex flex-col max-w-xl mx-auto p-8 gap-6 min-h-[80vh] animate-fade-in">
 
     <!-- Título -->
     <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-2">
@@ -36,7 +36,7 @@
     <!-- Modal de error -->
     <StatusModal :visible="showErrorModal" title="¡Atención!"
       message="Por favor, selecciona al menos un tipo de vehículo y configura su capacidad y precio."
-      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+     :icon="logo" @confirm="showErrorModal = false" />
   </div>
 
 </template>
@@ -46,6 +46,7 @@ import { computed, ref } from 'vue';
 import VehicleFormOption from '../../forms/VehicleFormOption.vue';
 import VehicleModal from '../addSpacePage/VehicleModal.vue';
 import StatusModal from '../addSpacePage/StatusModal.vue';
+import logo from "../../../assets/logo.png";
 
 const props = defineProps(['modelValue']);
 const emit = defineEmits(['update:modelValue', 'next', 'prev']);

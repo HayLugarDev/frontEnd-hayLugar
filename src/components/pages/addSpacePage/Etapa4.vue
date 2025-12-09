@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col max-w-3xl mx-auto bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] rounded-2xl shadow-lg p-8 gap-6 md:min-h-[80vh] animate-fade-in">
+    class="flex flex-col max-w-3xl mx-auto p-8 gap-6 md:min-h-[80vh] animate-fade-in">
     <!-- Título -->
     <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-4">
       Completá los detalles de tu espacio
@@ -162,7 +162,7 @@
 
     <!-- Modal de error -->
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+      :icon="logo" @confirm="showErrorModal = false" />
   </div>
 
 </template>
@@ -174,6 +174,7 @@ import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import { getAllDays, WeekDay } from "../../../utils/daysTraslation";
 import { formatDate } from "../../../utils/FormatDate";
+import logo from "../../../assets/logo.png";
 
 const errorMessage = ref("");
 const showErrorModal = ref(false);
@@ -292,8 +293,8 @@ const handleNext = () => {
     return;
   }
 
-  if (selectedFiles.value.length < 5) {
-    errorMessage.value = "Debes cargar al menos 5 imágenes de tu espacio antes de continuar.";
+  if (selectedFiles.value.length < 2) {
+    errorMessage.value = "Debes cargar al menos 2 imágenes de tu espacio antes de continuar.";
     showErrorModal.value = true;
     return;
   }

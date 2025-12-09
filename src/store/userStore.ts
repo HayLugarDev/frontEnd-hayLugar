@@ -15,8 +15,10 @@ export const useUserStore = defineStore('user', {
       address?: string;
       role?: string;
       profile_picture?: string;
-      termsAccepted: boolean  
+      termsAccepted: boolean
       acceptedTermsVersion: string | null
+      created_at: Date
+      updated_at: Date
     },
     loading: false,
     error: null as string | null,
@@ -100,19 +102,11 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    setUser(user: {
-      id: number;
-      name: string;
-      email: string;
-      last_name?: string;
-      dni?: string;
-      phone?: string;
-      address?: string;
-      role?: string;
-      profile_picture?: string;
-    }) {
-      this.user = user;
-      this.sessionExpired = false;
+    setUser(partialUser: Partial<typeof this.user>) {
+      this.user = {
+        ...this.user,
+        ...partialUser
+      };
     },
 
     clearUser() {
@@ -160,23 +154,5 @@ export const useUserStore = defineStore('user', {
     setReservations(reservas: any[]) {
       this.reservations = reservas;
     },
-
-    // checkReservationsForUpcoming() {
-    //   const ahora = Date.now();
-    //   this.reservations.forEach((reserva: any) => {
-    //     const inicio = new Date(reserva.start_time).getTime();
-    //     const diffMinutos = (inicio - ahora) / (1000 * 60);
-
-    //     if (diffMinutos > 0 && diffMinutos <= 10) {
-    //       this.addNotification({
-    //         id: Date.now(),
-    //         message: `Tu reserva comienza en ${Math.round(diffMinutos)} minutos`,
-    //         status: "pending",
-    //         changed_at: new Date(),
-    //         type: "reminder",
-    //       });
-    //     }
-    //   });
-    // },
   },
 });

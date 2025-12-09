@@ -34,7 +34,7 @@
 
             <!-- Aceptar -->
             <button @click="$emit('acept')" class="px-5 py-2 bg-[#00B4D8] text-white rounded-lg
-                     font-semibold shadow hover:bg-[#06D6A0] 
+                     font-semibold shadow hover:bg-newgreen 
                      transition active:scale-95">
               {{ buttonText }}
             </button>
