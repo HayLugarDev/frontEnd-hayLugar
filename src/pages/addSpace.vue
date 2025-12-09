@@ -15,64 +15,100 @@
     <transition name="fade-step" mode="out-in">
       <div :key="currentStep">
         <!-- Paso 0: Instrucciones para publicar un espacio -->
-        <div v-if="currentStep === 0" class="rounded-lg border-gray-300">
-          <header>
-            <h1 class="text-2xl md:text-3xl font-bold text-center text-primary mb-8 mt-4 md:mt-0 py-2">
-              Publicá tu espacio en HayLugar
+        <div v-if="currentStep === 0" class="w-full flex flex-col items-center text-white">
+
+          <!-- HERO -->
+          <div class="w-full text-center px-6 pt-6 pb-10 md:pb-16 bg-gradient-to-b
+           from-[#0D1B2A] via-[#112331] to-transparent">
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
+              Publicá tu espacio en <span class="text-primary">HayLugar</span>
             </h1>
-          </header>
 
-          <div class="grid xl:grid-cols-2 gap-6 items-center w-11/12 mx-auto">
-            <!-- Tarjetas de instrucciones -->
-            <div class="flex flex-col gap-6 px-4 xl:px-12">
-              <!-- Tarjeta 1 -->
-              <div
-                class="flex items-start gap-4 p-4 bg-white/10 border border-white/10 rounded-lg shadow-sm hover:shadow-md transition">
-                <div class="text-primary text-3xl">📍</div>
+            <p class="text-gray-300 max-w-xl mx-auto text-base md:text-lg leading-relaxed">
+              Conectá tu espacio disponible con miles de automovilistas.
+              Publicar es simple, rápido y completamente gratis.
+            </p>
+          </div>
+
+          <!-- CONTENIDO PRINCIPAL -->
+          <div class="max-w-6xl w-full grid xl:grid-cols-2 gap-8 px-6 md:px-10">
+
+            <!-- Ilustración + Glow -->
+            <div class="hidden xl:flex justify-center items-center relative">
+              <div class="absolute w-72 h-72 bg-blue-500/20 blur-3xl rounded-full"></div>
+
+              <img src="../assets/add-space_etapa-1.png"
+                class="relative w-4/5 rounded-2xl shadow-[0_0_25px_rgba(0,0,0,0.45)] border border-white/10"
+                alt="Ilustración del espacio de estacionamiento">
+            </div>
+
+            <!-- Tarjetas -->
+            <div class="flex flex-col gap-6">
+
+              <!-- CARD 1 -->
+              <div class="flex items-start gap-5 bg-white/5 backdrop-blur-xl 
+               p-5 rounded-2xl border border-white/10 shadow-md 
+               hover:bg-white/10 hover:shadow-xl transition">
+                <div class="bg-primary/20 text-primary p-3 rounded-xl text-3xl">
+                  <font-awesome-icon icon="map-marker-alt" />
+                </div>
                 <div>
-                  <h2 class="font-semibold text-xl text-white mb-1">Contanos sobre tu espacio</h2>
-                  <p class="text-gray-300">Ingresá la dirección, tipo de espacio, tipo de superficie, y qué vehículos
-                    pueden estacionar.</p>
+                  <h2 class="font-semibold text-xl mb-1">
+                    Contanos sobre tu espacio
+                  </h2>
+                  <p class="text-gray-300 text-sm">
+                    Ingresá dirección, tipo de superficie y qué vehículos pueden estacionar.
+                  </p>
                 </div>
               </div>
 
-              <!-- Tarjeta 2 -->
-              <div
-                class="flex items-start gap-4 p-4 border bg-white/10 ber border-white/10 rounded-lg shadow-sm hover:shadow-md transition">
-                <div class="text-primary text-3xl">🖼️</div>
+              <!-- CARD 2 -->
+              <div class="flex items-start gap-5 bg-white/5 backdrop-blur-xl
+               p-5 rounded-2xl border border-white/10 shadow-md
+               hover:bg-white/10 hover:shadow-xl transition">
+                <div class="bg-primary/20 text-primary p-3 rounded-xl text-3xl">
+                  <font-awesome-icon icon="info-circle" />
+                </div>
                 <div>
-                  <h2 class="font-semibold text-xl text-white mb-1">Agregá información útil</h2>
-                  <p class="text-gray-300">Subí fotos, croquis, detalles de disponibilidad y formas de pago para que los
-                    usuarios elijan con confianza.</p>
+                  <h2 class="font-semibold text-xl mb-1">
+                    Agregá información útil
+                  </h2>
+                  <p class="text-gray-300 text-sm">
+                    Subí fotos, horarios disponibles, croquis, tarifas y formas de pago.
+                  </p>
                 </div>
               </div>
 
-              <!-- Tarjeta 3 -->
-              <div
-                class="flex items-start gap-4 p-4 border bg-white/10 border-white/10 rounded-lg shadow-sm hover:shadow-md transition">
-                <div class="text-primary text-3xl">✅</div>
+              <!-- CARD 3 -->
+              <div class="flex items-start gap-5 bg-white/5 backdrop-blur-xl
+               p-5 rounded-2xl border border-white/10 shadow-md
+               hover:bg-white/10 hover:shadow-xl transition">
+                <div class="bg-primary/20 text-primary p-3 rounded-xl text-3xl">
+                  <font-awesome-icon icon="check-circle" />
+                </div>
                 <div>
-                  <h2 class="font-semibold text-xl text-white mb-1">Revisá y publicá</h2>
-                  <p class="text-gray-300">Confirmá el precio, revisá los datos ingresados y ¡listo! Tu espacio estará
-                    disponible para miles de usuarios.</p>
+                  <h2 class="font-semibold text-xl mb-1">
+                    Revisá y publicá
+                  </h2>
+                  <p class="text-gray-300 text-sm">
+                    Confirmá los datos y tu espacio estará disponible al instante.
+                  </p>
                 </div>
               </div>
 
-              <!-- Botón -->
-              <div class="flex justify-end mt-6">
-                <button @click="nextFirstStep"
-                  class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all w-full md:w-auto">
+              <!-- BOTÓN -->
+              <div class="flex justify-start mt-4">
+                <button @click="nextFirstStep" class="px-8 py-3 rounded-xl font-semibold text-white 
+                 bg-primary shadow-lg shadow-primary/30
+                 hover:bg-primary/90 hover:shadow-primary/50
+                 transition-all w-full md:w-auto">
                   Comenzar
                 </button>
               </div>
             </div>
-
-            <!-- Imagen ilustrativa -->
-            <img src="../assets/add-space_etapa-1.png"
-              class="w-5/6 hidden xl:block mx-auto rounded-xl shadow-2xl shadow-gray-400/60"
-              alt="Ilustración del espacio de estacionamiento">
           </div>
         </div>
+
         <!-- Formulario por pasos -->
         <div v-else-if="currentStep === 1" class="">
           <transition name="fade-step" mode="out-in">
