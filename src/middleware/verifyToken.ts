@@ -9,7 +9,6 @@ export const verifyActiveSession = async (): Promise<boolean> => {
     if (error.response?.status === 401) {
       return false; // Token inválido o expirado
     }
-    console.error('Error al verificar sesión:', error);
     return false;
   }
 };
