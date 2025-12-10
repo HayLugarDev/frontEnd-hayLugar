@@ -79,10 +79,6 @@
     <!-- GALERÍA + RESUMEN HERO -->
     <section class="relative w-full h-[260px] md:h-[440px] overflow-hidden">
       <Swiper
-        :modules="[Navigation, Pagination, Autoplay]"
-        :navigation="true"
-        :pagination="{ clickable: true }"
-        :autoplay="{ delay: 6000, disableOnInteraction: false }"
         class="w-full h-full"
       >
         <SwiperSlide
@@ -469,8 +465,8 @@ import logo from '../assets/logo.png';
 import CustomGoogleMap from '../components/layout/GoogleMap.vue';
 import MainHeader from '../components/layout/header/MainHeader.vue';
 
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+//import { Swiper, SwiperSlide } from 'swiper/vue';
+//import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
 import { useIndustrialStore } from '../store/industrialStore';
 
