@@ -34,7 +34,7 @@
       </button> -->
 
       <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
-      <button @click="router.push('/add-space')"
+      <button @click="verifyToken('/add-space')"
         class="hidden md:block bg-[#06D6A0] hover:bg-[#00B4D8] text-[#0D1B2A] font-semibold px-4 py-2 rounded-xl shadow-lg text-sm transition-all">
         + Publica tu espacio
       </button>
