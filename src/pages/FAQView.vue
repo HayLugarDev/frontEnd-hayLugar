@@ -8,7 +8,7 @@
     <MainHeader />
 
     <!-- Hero -->
-    <section class="py-16 px-6 text-center max-w-4xl mx-auto">
+    <section class="py-16 px-6 text-center max-w-4xl mx-auto pt-28">
       <h1 class="text-3xl md:text-4xl font-bold mb-4">Preguntas Frecuentes (FAQ)</h1>
       <p class="text-gray-300 text-base md:text-lg">
         Todo lo que necesitás saber sobre <span class="font-semibold">HayLugar</span> —

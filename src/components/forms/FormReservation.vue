@@ -53,13 +53,15 @@
       <div class="flex flex-col rounded-xl p-4 bg-white/5 border border-white/10 shadow-md">
         <label class="font-semibold text-gray-200 mb-2">Check-out</label>
 
-        <FuturisticDatepicker :modelValue="tiempoFinal" @update:modelValue="$emit('update:tiempoFinal', $event)"
-          :minDate="tipoPlazoReserva === 'Por hora' && tiempoInicial
+        <FuturisticDatepicker :key="tiempoInicial" :modelValue="tiempoFinal"
+          @update:modelValue="$emit('update:tiempoFinal', $event)" :minDate="tipoPlazoReserva === 'Por hora' && tiempoInicial
             ? new Date(tiempoInicial)
             : availability.dateRange?.[0]" :maxDate="availability.dateRange?.[1]" :minTime="tipoPlazoReserva === 'Por hora' && tiempoInicial
               ? parseTimeString(formatHour(new Date(tiempoInicial)))
               : parseTimeString(availability.start)" :maxTime="parseTimeString(availability.end)"
-          :showTime="tipoPlazoReserva === 'Por hora'" label="Seleccionar salida" :plazo="tipoPlazoReserva" :plazoInicial="tiempoInicial" />
+          :showTime="tipoPlazoReserva === 'Por hora'" label="Seleccionar salida" :plazo="tipoPlazoReserva"
+          :plazoInicial="tiempoInicial" />
+
       </div>
     </div>
 

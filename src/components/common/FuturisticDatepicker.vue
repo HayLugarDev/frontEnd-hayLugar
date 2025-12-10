@@ -3,7 +3,7 @@
         <!-- Trigger -->
         <button @click="open = true"
             class="px-4 py-2 rounded-xl bg-[#0DAD83] text-white font-semibold shadow-md hover:opacity-90 transition">
-                {{ formattedPreview ?? buttonLabel }} 
+            {{ formattedPreview ?? buttonLabel }}
         </button>
 
         <!-- Modal -->
@@ -138,8 +138,8 @@
         </transition>
     </div>
 
-    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-    :icon="logo" @close="showErrorModal = false" @confirm="showErrorModal = false" />
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage" :icon="logo"
+        @close="showErrorModal = false" @confirm="showErrorModal = false" />
 
 </template>
 
@@ -155,7 +155,7 @@ interface Props {
     disablePast?: boolean; // bloquear fechas pasadas
     minDateTime: Date,
     plazo: 'Por hora' | 'Por dia' | 'Por semana' | 'Por mes';
-    plazoInicial: Date
+    plazoInicial?: Date | string | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -171,6 +171,7 @@ const open = ref(false);
 const selectedDate = ref<Date | null>(props.modelValue ? new Date(props.modelValue) : null);
 const selectedHour = ref<number>(selectedDate.value ? selectedDate.value.getHours() : 12);
 const selectedMinute = ref<number>(selectedDate.value ? selectedDate.value.getMinutes() : 0);
+const selectedSecond = ref<number>(selectedDate.value ? selectedDate.value.getSeconds() : 0);
 const amPm = ref<string>(selectedHour.value >= 12 ? 'PM' : 'AM');
 
 // Calendar helpers
@@ -444,35 +445,137 @@ const formattedPreview = computed(() => {
 });
 
 // Actions
+
 function confirm() {
-    const hour = new Date();
-    if (!selectedHour.value && !selectedMinute.value) {
+    // =============================
+    // 1) DETERMINAR FECHA BASE (CHECK-IN vs CHECK-OUT)
+    // =============================
+    let baseDate: Date;
+
+    // ✔ Checkout → siempre usar la fecha del check-in (plazoInicial)
+    if (props.plazoInicial) {
+        baseDate =
+            props.plazoInicial instanceof Date
+                ? props.plazoInicial
+                : new Date(props.plazoInicial);
+    }
+
+    // ✔ Check-in → usar la fecha seleccionada en el calendario
+    else {
+        if (selectedDate.value) {
+            baseDate = new Date(selectedDate.value);
+        } else {
+            // fallback (no debería pasar)
+            baseDate = new Date();
+        }
+    }
+
+    // =============================
+    // 2) ARMAR FECHA COMPLETA (fecha + hora)
+    // =============================
+    const fechaSeleccionada = new Date(
+        baseDate.getFullYear(),
+        baseDate.getMonth(),
+        baseDate.getDate(),
+        selectedHour.value,
+        selectedMinute.value ?? 0,
+        selectedSecond.value ?? 0,
+        0
+    );
+
+    // =============================
+    // 3) DEFINIR FECHA MÍNIMA PERMITIDA
+    // =============================
+    let fechaMinima: Date;
+
+    // ✔ Si hay check-in (checkout): no puede ser menor que esa fecha
+    if (props.plazoInicial) {
+        fechaMinima = new Date(
+            baseDate.getFullYear(),
+            baseDate.getMonth(),
+            baseDate.getDate(),
+            baseDate.getHours(),
+            baseDate.getMinutes(),
+            baseDate.getSeconds(),
+            0
+        );
+    }
+
+    // ✔ Si es check-in → usar minDateTime
+    else {
+        fechaMinima =
+            props.minDateTime instanceof Date
+                ? props.minDateTime
+                : new Date(props.minDateTime);
+    }
+
+    // =============================
+    // 4) VALIDACIONES
+    // =============================
+    const soloFechaSel = new Date(
+        fechaSeleccionada.getFullYear(),
+        fechaSeleccionada.getMonth(),
+        fechaSeleccionada.getDate()
+    );
+
+    const soloFechaMin = new Date(
+        fechaMinima.getFullYear(),
+        fechaMinima.getMonth(),
+        fechaMinima.getDate()
+    );
+
+    // A) Día no anterior
+    if (soloFechaSel < soloFechaMin) {
         showErrorModal.value = true;
-        errorMessage.value = 'Por favor, seleccioná una hora válida.';
-        selectedDate.value = null;
+        errorMessage.value =
+            "La fecha seleccionada no puede ser anterior al día permitido.";
         return;
     }
-    if (selectedHour.value < props.plazoInicial.getHours() && isSameDay(selectedDate.value, props.plazoInicial)) {
+
+    // B) Si es el mismo día → validar hora
+    const mismoDia = soloFechaSel.getTime() === soloFechaMin.getTime();
+
+    if (mismoDia && fechaSeleccionada.getTime() < fechaMinima.getTime()) {
         showErrorModal.value = true;
-        errorMessage.value = 'La hora de salida no puede ser inferior a la hora de entrada.';
-        selectedDate.value = null;
+
+        const minTxt = fechaMinima.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        });
+
+        errorMessage.value = `La hora seleccionada no puede ser inferior a ${minTxt}.`;
         return;
     }
-    if (selectedHour.value < hour.getHours() && isSameDay(selectedDate.value, today)) {
+
+    // C) Evitar horas pasadas si es hoy
+    const ahora = new Date();
+    const hoy = new Date(
+        ahora.getFullYear(),
+        ahora.getMonth(),
+        ahora.getDate()
+    );
+
+    const diaSeleccionado = new Date(
+        baseDate.getFullYear(),
+        baseDate.getMonth(),
+        baseDate.getDate()
+    );
+
+    if (
+        diaSeleccionado.getTime() === hoy.getTime() &&
+        fechaSeleccionada.getTime() < ahora.getTime()
+    ) {
         showErrorModal.value = true;
-        errorMessage.value = 'La hora seleccionada ya pasó. Por favor, elegí una hora futura.';
+        errorMessage.value = "La hora seleccionada ya pasó.";
         return;
     }
-    if (!selectedDate.value) {
-        // if not chosen, pick today
-        const t = new Date();
-        selectedDate.value = new Date(t.getFullYear(), t.getMonth(), t.getDate(), selectedHour.value, selectedMinute.value);
-    } else {
-        selectedDate.value.setHours(selectedHour.value, selectedMinute.value, 0, 0);
-    }
-    const iso = selectedDate.value.toISOString();
-    emit('update:modelValue', iso);
-    emit('confirm', iso);
+
+    // =============================
+    // 5) TODO OK → EMITIR FECHA
+    // =============================
+    emit("update:modelValue", fechaSeleccionada.toISOString());
+    emit("confirm", fechaSeleccionada.toISOString());
     open.value = false;
 }
 
