@@ -18,7 +18,7 @@
     </div>
 
     <!-- Contenedor central -->
-    <div class="flex-grow flex items-center justify-center px-6 pt-16">
+    <div class="flex-grow flex items-center justify-center px-6 pt-10 sm:pt-16">
       <div
         class="bg-gray-800 text-gray-200 rounded-2xl shadow-2xl w-full max-w-md p-10 text-center">
         <!-- Logo -->

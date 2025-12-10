@@ -17,7 +17,7 @@
 
 const props = defineProps({
   modelValue: { type: [String, Number], required: true },
-  label: { type: String, required: true },
+  label: { type: String },
   type: { type: String, default: 'text' },
   placeholder: { type: String },
   required: { type: Boolean, default: false }
