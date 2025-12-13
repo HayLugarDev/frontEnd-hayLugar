@@ -22,10 +22,11 @@
 
 
       <!-- PUBLICAR - FAB -->
-      <li @click="$emit('navigate', '/add-space')" class="relative -mt-6 bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center 
+      <li @click="userStore.user ? $emit('navigate', '/add-space') : verifyToken('/add-space');" class="relative -mt-6 bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center 
                  shadow-lg shadow-primary/40 border-2 border-white/20 cursor-pointer">
         <font-awesome-icon icon="plus" class="text-2xl" />
-        <img :src="decoPublica" alt="Publicar ahora" class="absolute -bottom-10 -right-2 h-24 rotate-12 pointer-events-none select-none" />
+        <img :src="decoPublica" alt="Publicar ahora"
+          class="absolute -bottom-10 -right-2 h-24 rotate-12 pointer-events-none select-none" />
       </li>
 
       <!-- NOTIFICACIONES -->
@@ -46,13 +47,15 @@
       <li @click="userStore.user ? $emit('navigate', '/profile') : $emit('navigate', '/login')"
         class="flex flex-col items-center text-xs cursor-pointer" :class="isActive('/profile')">
         <font-awesome-icon v-if="!userStore.user" icon="user" class="text-2xl mb-1" />
-        <img v-else :src="userStore.user.profile_picture" alt="Perfil"
-          class="w-7 h-7 rounded-full object-cover mb-1" />
+        <img v-else :src="userStore.user.profile_picture" alt="Perfil" class="w-7 h-7 rounded-full object-cover mb-1" />
         <h1>Menu</h1>
       </li>
 
     </ul>
   </nav>
+
+  <session-expired :sessionExpired="isSessionInvalid" />
+
 </template>
 
 <script setup lang="ts">
@@ -60,8 +63,11 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useUserStore } from "../../store/userStore";
 import decoPublica from "../../assets/deco-publica.png";
+import { useVerifyToken } from "../../logic/useVerifyToken";
+import SessionExpired from "../common/SessionExpired.vue";
 
 const userStore = useUserStore();
+const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 // Recibo desde el padre si el mapa está activado
 const props = defineProps<{ showMap: boolean }>();
