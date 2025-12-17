@@ -3,7 +3,7 @@
     <!-- Botón de campana -->
     <button @click="toggleMenu"
             class="hidden relative w-12 h-12 sm:flex items-center justify-center rounded-full transition duration-200 hover:shadow-xl">
-      <font-awesome-icon icon="fa-regular fa-bell" class="text-xl text-gray-400 " />
+      <font-awesome-icon icon="fa-regular fa-bell" class="text-xl text-gray-300 " />
       <!-- Punto rojo si hay notificaciones sin leer -->
       <span v-if="hasUnreadNotifications && !viewNotification"
             class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping">
@@ -12,16 +12,16 @@
 
     <!-- Dropdown de notificaciones -->
     <ul v-if="openMenu"
-        class="absolute right-0 mt-2 text-md text-gray-200 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] border-2 rounded-xl z-50 w-60 max-h-64 overflow-y-auto animate-fade-in">
-      <li v-if="pendingNotifications.length === 0" class="p-4 text-center">
+        class="absolute right-0 mt-2 text-md text-gray-200 rounded-xl z-50 w-60 max-h-64 overflow-y-auto animate-fade-in">
+      <li v-if="pendingNotifications.length === 0" class="p-4 text-center bg-gray-900/90 border rounded-xl">
         No hay notificaciones nuevas.
       </li>
       <li v-for="notification in pendingNotifications" :key="notification.id"
-          class="text-gray-200 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] border-2 rounded-xl p-3 flex justify-between items-start cursor-pointer"
+          class="text-gray-200 bg-gray-900/90 border-2 rounded-xl p-3 flex justify-between items-start cursor-pointer"
           @click="openNotification(notification.id)">
         <div class="flex-1">
-          <p class="text-gray-800">{{ truncate(notification.message, 65) }}</p>
-          <small class="text-gray-500">
+          <p class="text-gray-300">{{ truncate(notification.message, 65) }}</p>
+          <small class="text-gray-400">
             {{ formatDate(notification.changed_at) }}
           </small>
         </div>

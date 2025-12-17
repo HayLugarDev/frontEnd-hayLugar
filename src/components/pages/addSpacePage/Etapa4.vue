@@ -1,170 +1,255 @@
 <template>
   <div
-    class="flex flex-col max-w-3xl mx-auto p-8 gap-6 md:min-h-[80vh] animate-fade-in">
+    class="flex flex-col max-w-3xl mx-auto p-6 sm:p-10 gap-10 md:min-h-[80vh] animate-fade-in"
+  >
     <!-- Título -->
-    <h1 class="text-primary text-3xl sm:text-4xl font-bold text-center mb-4">
-      Completá los detalles de tu espacio
-    </h1>
+    <div class="text-center space-y-2">
+      <h1 class="text-primary text-3xl sm:text-4xl font-bold">
+        Completá los detalles de tu espacio
+      </h1>
+      <p class="text-gray-300 max-w-lg mx-auto">
+        Ingresá toda la información para que tus clientes conozcan tu espacio antes de reservar.
+      </p>
+    </div>
 
-    <p class="text-gray-300 text-center mb-6">
-      Ingresá toda la información para que tus clientes tengan claro tu espacio.
-    </p>
+    <!-- FORM -->
+    <div class="space-y-10">
 
-    <div class="space-y-6 font-normal">
+      <!-- 📌 Información Básica -->
+      <section class="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-5 shadow-lg">
+        <h2 class="text-lg font-semibold text-primary flex items-center gap-2">
+          <i class="i-lucide-info text-primary"></i> Información básica
+        </h2>
 
-      <!-- Nombre del espacio -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-200 mb-2">Nombre del espacio</label>
-        <input type="text" v-model="name" placeholder="Ej: Estacionamiento privado en Palermo"
-          class="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition" />
-      </div>
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">
+            Nombre del espacio
+          </label>
+          <input
+            v-model="name"
+            type="text"
+            placeholder="Ej: Estacionamiento privado en Palermo"
+            class="input-primary"
+          />
+        </div>
 
-      <!-- Tipo de parking -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-200 mb-2">Tipo de estacionamiento</label>
-        <select v-model="parking_type"
-          class="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition">
-          <option value="">Selecciona una opción</option>
-          <option value="cubierto">Cubierto</option>
-          <option value="descubierto">Descubierto</option>
-        </select>
-      </div>
+        <!-- Tipo de espacio -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">
+            Tipo de espacio
+          </label>
+          <select v-model="parking_type" class="input-primary bg-gray-900 text-gray-600">
+            <option value="">Selecciona una opción</option>
+            <option value="cubierto">Cubierto</option>
+            <option value="descubierto">Descubierto</option>
+          </select>
+        </div>
 
-      <!-- Descripción -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-200 mb-2">Descripción</label>
-        <textarea v-model="description" rows="4" placeholder="Escribe una descripción detallada del espacio..."
-          class="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition"></textarea>
-      </div>
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">
+            Descripción
+          </label>
+          <textarea
+            v-model="description"
+            rows="4"
+            placeholder="Escribe una descripción detallada del espacio..."
+            class="input-primary"
+          ></textarea>
+        </div>
+      </section>
 
-      <!-- Tipo de plazo -->
-      <div>
-        <label class="block text-sm font-semibold text-gray-200 mb-2">
-          Tipo de plazo ofrecido
-        </label>
+      <!-- 💰 Tipo de plazo -->
+      <section class="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4 shadow-lg">
+        <h2 class="text-lg font-semibold text-primary flex items-center gap-2">
+          <i class="i-lucide-calendar-range"></i> Tipo de plazo ofrecido
+        </h2>
 
         <div
-          class="flex items-center justify-between gap-2 bg-white/10 border-white/10 rounded-2xl p-1 border border-gray-200 shadow-sm">
-          <label v-for="unit in priceUnits" :key="unit.value" class="flex-1 cursor-pointer">
-            <input type="radio" name="reservation_period" class="hidden peer" :value="unit.value"
-              v-model="reservation_period" @change="updateAvailabilityFields" />
+          class="flex items-center justify-between gap-2 bg-white/10 rounded-2xl p-1 border border-white/10 text-gray-200"
+        >
+          <label
+            v-for="unit in priceUnits"
+            :key="unit.value"
+            class="flex-1 cursor-pointer"
+          >
+            <input
+              type="radio"
+              name="reservation_period"
+              class="hidden peer"
+              :value="unit.value"
+              v-model="reservation_period"
+              @change="updateAvailabilityFields"
+            />
 
-            <div class="text-center px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 
-               peer-checked:bg-primary peer-checked:text-white 
-               peer-checked:shadow-md text-gray-200 hover:bg-primary/20">
+            <div
+              class="text-center px-4 py-2 rounded-xl font-semibold text-sm transition-all 
+                peer-checked:bg-primary peer-checked:text-white hover:bg-primary/20"
+            >
               {{ unit.label }}
             </div>
           </label>
         </div>
-      </div>
+      </section>
 
+      <!-- ⏰ Disponibilidad por hora -->
+      <section
+        v-if="price_unit === 'hour'"
+        class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-lg space-y-4"
+      >
+        <h2 class="text-lg font-semibold text-primary flex items-center gap-2">
+          <i class="i-lucide-clock"></i> Horario de disponibilidad
+        </h2>
 
-      <!-- Horario de disponibilidad -->
-      <fieldset v-if="price_unit === 'hour'" class="border border-gray-200 p-4 rounded-2xl">
-        <legend class="text-lg font-semibold text-gray-200">Horario de Disponibilidad</legend>
-        <div class="grid grid-cols-2 gap-4 mt-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm mb-1 text-white">Desde:</label>
-            <DatePicker v-model:value="availabilityStartRaw" type="time" format="HH:mm" placeholder="Hora inicio"
-              class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
+            <label class="block text-sm text-gray-200 mb-1">Desde:</label>
+            <DatePicker
+              v-model:value="availabilityStartRaw"
+              type="time"
+              format="HH:mm"
+              class="datepicker-primary"
+            />
           </div>
           <div>
-            <label class="block text-sm mb-1 text-white">Hasta:</label>
-            <DatePicker v-model:value="availabilityEndRaw" type="time" format="HH:mm" placeholder="Hora fin"
-              class="w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-primary transition" />
+            <label class="block text-sm text-gray-200 mb-1">Hasta:</label>
+            <DatePicker
+              v-model:value="availabilityEndRaw"
+              type="time"
+              format="HH:mm"
+              class="datepicker-primary"
+            />
           </div>
         </div>
-      </fieldset>
+      </section>
 
-      <!-- Días disponibles -->
-      <div class="mt-4">
-        <fieldset class="border border-gray-200 p-4 rounded-2xl text-gray-200">
-          <legend class="text-lg font-semibold text-gray-200">Días disponibles</legend>
-          <p class="text-xs text-gray-300 mb-2">
-            Seleccioná los días disponibles o marcá <b>Todos los días</b>.
-          </p>
-          <div class="mb-2">
-            <label class="flex items-center gap-2">
-              <input type="checkbox" v-model="allDaysSelected" @change="handleAllDaysChange"
-                :disabled="price_unit !== 'hour'" class="h-4 w-4 text-primary" />
-              <span><b>Todos los días</b></span>
-            </label>
-          </div>
-          <div v-if="price_unit === 'hour'" class="grid grid-cols-2 gap-2 md:grid-cols-3">
-            <label v-for="day in daysOfWeek" :key="day.value" class="flex items-center gap-2">
-              <input type="checkbox" :value="day.value" v-model="availabilityDays" @change="handleSpecificDaysChange"
-                class="h-4 w-4 text-primary" />
-              <span>{{ day.label }}</span>
-            </label>
-          </div>
-        </fieldset>
-      </div>
+      <!-- 📅 Días disponibles -->
+      <section class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-lg space-y-4">
+        <h2 class="text-lg font-semibold text-primary flex items-center gap-2">
+          <i class="i-lucide-calendar-days"></i> Días disponibles
+        </h2>
 
-      <div v-if="price_unit" :class="[
-        'p-4 rounded-xl text-sm',
-        price_unit === 'hour' ? 'bg-white/10 border border-white/10 text-blue-300' : 'bg-white/10 border border-white/10 text-yellow-200'
-      ]">
-        <p v-html="currentMessage"></p>
-      </div>
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            v-model="allDaysSelected"
+            @change="handleAllDaysChange"
+            class="accent-primary"
+            :disabled="price_unit !== 'hour'"
+          />
+          <span class="text-gray-200 font-medium">Todos los días</span>
+        </label>
 
-      <!-- Resumen -->
-      <div v-if="price_unit" class="mt-6 p-5 bg-white/10 border-white/10 rounded-2xl shadow-sm border border-gray-200">
+        <div
+          v-if="price_unit === 'hour'"
+          class="grid grid-cols-2 sm:grid-cols-3 gap-2"
+        >
+          <label
+            v-for="day in daysOfWeek"
+            :key="day.value"
+            class="flex items-center gap-2"
+          >
+            <input
+              type="checkbox"
+              class="accent-primary"
+              :value="day.value"
+              v-model="availabilityDays"
+              @change="handleSpecificDaysChange"
+            />
+            <span class="text-gray-300">{{ day.label }}</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- 📌 Resumen -->
+      <section
+        v-if="price_unit"
+        class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-lg"
+      >
         <h3 class="text-lg font-semibold text-gray-200 mb-3 flex items-center gap-2">
-          <span class="inline-block w-2 h-2 bg-primary rounded-full"></span>
-          Resumen de disponibilidad
+          <i class="i-lucide-list-checks text-primary"></i> Resumen de disponibilidad
         </h3>
 
-        <div class="space-y-1 text-gray-400 text-sm leading-relaxed">
-          <div v-if="reservation_period === 'hour' && availabilityStartRaw && availabilityEndRaw">
-            <p><span class="font-medium">Días disponible para reservar:</span> {{ selectedDaysLabels ?
-              selectedDaysLabels : 'Todos los días' }}</p>
+        <div class="text-gray-300 space-y-1 text-sm leading-relaxed">
+          <div
+            v-if="reservation_period === 'hour' && availabilityStartRaw && availabilityEndRaw"
+          >
             <p>
-              <span class="font-medium">Franja horaria disponible:</span>
-              {{ formatDate(availabilityStartRaw, 'time') }} – {{ formatDate(availabilityEndRaw, 'time') }}
+              <span class="font-medium text-white">Días disponibles:</span>
+              {{ selectedDaysLabels || "Todos los días" }}
+            </p>
+            <p>
+              <span class="font-medium text-white">Horario:</span>
+              {{ formatDate(availabilityStartRaw, "time") }} –
+              {{ formatDate(availabilityEndRaw, "time") }}
             </p>
           </div>
 
-          <div v-else-if="reservation_period === 'day' || reservation_period === 'week' || reservation_period === 'month'">
-            <p><span class="font-medium">Días disponible para reservar:</span> Todos los días</p>
+          <div
+            v-else-if="
+              reservation_period === 'day' ||
+              reservation_period === 'week' ||
+              reservation_period === 'month'
+            "
+          >
+            <p>
+              <span class="font-medium text-white">Días disponibles:</span> Todos
+              los días
+            </p>
           </div>
 
-          <div v-else class="text-red-400 font-medium">
-            Aún no has seleccionado días u horarios de disponibilidad.
-          </div>
+          <p v-else class="text-red-400 font-medium">
+            Aún no has seleccionado horarios o días.
+          </p>
         </div>
-      </div>
+      </section>
 
-      <!-- Imágenes -->
-      <div>
-        <p class="text-gray-300 mb-4 text-sm">
-          <strong>Atención:</strong> Debes subir al menos 5 imágenes de tu espacio.
+      <!-- 🖼️ Imágenes -->
+      <section class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-lg space-y-3">
+        <h2 class="text-lg font-semibold text-primary flex items-center gap-2">
+          <i class="i-lucide-images"></i> Imágenes del espacio
+        </h2>
+
+        <p class="text-gray-300 text-sm">
+          Debes subir al menos <strong>2 imágenes</strong> del espacio.
         </p>
-        <input type="file" multiple accept="image/*" @change="handleFileUpload"
-          class="w-full border border-gray-300 rounded-xl p-4 text-gray-200 focus:ring-2 focus:ring-primary transition" />
+
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          @change="handleFileUpload"
+          class="input-primary cursor-pointer"
+        />
+
         <div class="mt-3 flex flex-wrap gap-3">
-          <img v-for="(img, index) in previewImages" :key="index" :src="img"
-            class="w-24 h-24 object-cover rounded-xl shadow-md ring-1 ring-gray-200" />
+          <img
+            v-for="(img, index) in previewImages"
+            :key="index"
+            :src="img"
+            class="w-24 h-24 object-cover rounded-xl shadow-md ring-1 ring-gray-200"
+          />
         </div>
-      </div>
+      </section>
     </div>
 
     <!-- Botones -->
-    <div class="flex justify-between mt-6 space-x-4">
-      <button @click="emit('prev')"
-        class="px-6 py-2 border-2 border-primary text-primary rounded-full font-semibold hover:bg-primary hover:text-white transition">
-        Anterior
-      </button>
-      <button @click="handleNext"
-        class="px-8 py-2 bg-primary text-white rounded-full font-bold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
-        Siguiente ➜
-      </button>
+    <div class="flex justify-between mt-4">
+      <button class="btn-secondary" @click="emit('prev')">Anterior</button>
+      <button class="btn-primary" @click="handleNext">Siguiente ➜</button>
     </div>
 
-    <!-- Modal de error -->
-    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-      :icon="logo" @confirm="showErrorModal = false" />
+    <!-- Modal error -->
+    <StatusModal
+      :visible="showErrorModal"
+      type="error"
+      :message="errorMessage"
+      title="¡Atención!"
+      :icon="logo"
+      @confirm="showErrorModal = false"
+    />
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -293,8 +378,8 @@ const handleNext = () => {
     return;
   }
 
-  if (selectedFiles.value.length < 5) {
-    errorMessage.value = "Debes cargar al menos 5 imágenes de tu espacio antes de continuar.";
+  if (selectedFiles.value.length < 2) {
+    errorMessage.value = "Debes cargar al menos 2 imágenes de tu espacio antes de continuar.";
     showErrorModal.value = true;
     return;
   }
@@ -494,4 +579,27 @@ const availabilityTimeRange = computed({
 .alert-warning {
   @apply border-yellow-500 text-yellow-800 bg-yellow-50;
 }
+
+/* INPUTS */
+.input-primary {
+  @apply w-full bg-white/10 border border-white/10 rounded-xl p-4 
+         text-gray-200 focus:ring-2 focus:ring-primary focus:outline-none transition;
+}
+
+/* DATE PICKER BASE */
+.datepicker-primary {
+  @apply w-full rounded-xl border border-white/10 text-gray-200 p-2 
+         focus:ring-2 focus:ring-primary bg-white/10;
+}
+
+/* BUTTONS */
+.btn-primary {
+  @apply px-8 py-3 bg-primary text-white rounded-full font-bold 
+         shadow-md hover:bg-primary/90 active:scale-95 transition-all;
+}
+.btn-secondary {
+  @apply px-6 py-3 border-2 border-primary text-primary rounded-full font-semibold
+         hover:bg-primary hover:text-white transition;
+}
+
 </style>

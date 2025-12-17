@@ -101,7 +101,8 @@
 
             </ul>
 
-            <button class="w-full flex-1 my-2 p-2 text-newgreen hover:bg-white/10 rounded-xl">
+            <button @click="verifyToken('/quit')" 
+              class="w-full flex-1 my-2 p-2 text-newgreen hover:bg-white/10 rounded-xl">
               Cerrar sesión
             </button>
           </section>
@@ -150,10 +151,13 @@ import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import SettingsItem from '../components/pages/profilePage/UI/SettingsItem.vue';
 import logo from "../assets/logo.png";
+import { useVerifyToken } from '../logic/useVerifyToken';
 
 const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
+
+const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 const usuario = computed(() => userStore.user || {
   id: "",

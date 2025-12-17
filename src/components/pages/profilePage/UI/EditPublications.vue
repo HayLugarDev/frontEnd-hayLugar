@@ -295,7 +295,7 @@ const guardarCambios = async () => {
     errorMessage.value = "Por favor, completá todos los campos requeridos.";
     showErrorModal.value = true; return;
   }
-  if (formData.value.images.length < 5) { errorMessage.value = "Debes tener al menos 5 imágenes."; showErrorModal.value = true; return; }
+  if (formData.value.images.length < 2) { errorMessage.value = "Debes tener al menos 2 imágenes."; showErrorModal.value = true; return; }
   if (formData.value.reservation_period === 'hour') {
     if (!formData.value.availability.start || !formData.value.availability.end) {
       errorMessage.value = "Debes definir horario de disponibilidad (inicio y fin)."; showErrorModal.value = true; return;

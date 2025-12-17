@@ -2,7 +2,7 @@
   <header class="w-full z-20 fixed top-0 left-0
            bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
            text-white border-b border-white/10 shadow-lg md:shadow-none
-           px-6 py-4 xl:px-16 flex items-center justify-between gap-6">
+           px-6 py-3 sm:py-4 xl:px-16 flex items-center justify-between gap-6">
 
     <!-- LEFT: LOGO + TITULO -->
     <div class="flex items-center gap-4 cursor-pointer" @click="router.push('/dashboard')">
@@ -34,7 +34,7 @@
       </button> -->
 
       <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
-      <button @click="router.push('/add-space')"
+      <button @click="verifyToken('/add-space')"
         class="hidden md:block bg-[#06D6A0] hover:bg-[#00B4D8] text-[#0D1B2A] font-semibold px-4 py-2 rounded-xl shadow-lg text-sm transition-all">
         + Publica tu espacio
       </button>

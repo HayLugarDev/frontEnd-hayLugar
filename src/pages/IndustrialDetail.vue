@@ -85,8 +85,6 @@
     <!-- HERO + GALERÍA -->
     <section class="relative w-full h-[260px] md:h-[440px] overflow-hidden">
       <Swiper
-        :modules="[Navigation, Pagination, Autoplay]"
-
         class="w-full h-full"
       >
         <SwiperSlide v-for="(img, i) in galleryImages" :key="i">
@@ -251,8 +249,8 @@ import logo from '../assets/logo.png'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
 import MainHeader from '../components/layout/header/MainHeader.vue'
 
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+//import { Swiper, SwiperSlide } from 'swiper/vue';
+//import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
 import { useIndustrialStore } from '../store/industrialStore'
 import { useIndustrialAvailabilityStore } from '../store/industrialAvailability'

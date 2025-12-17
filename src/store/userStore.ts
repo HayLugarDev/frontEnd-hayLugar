@@ -59,7 +59,6 @@ export const useUserStore = defineStore('user', {
         // Esperamos a que el user esté seteado antes de pedir notificaciones
         await this.fetchNotifications(user.id, { initialLoad: true });
       } catch (error: any) {
-        console.error('fetchUser error:', error.response?.data ?? error.message ?? error);
         if (error.response?.status === 401) {
           this.expireSession();
         }
@@ -136,6 +135,13 @@ export const useUserStore = defineStore('user', {
       if (notification.status === 'pending') {
         showToast?.('¡Tienes una nueva notificación!', 'success');
       }
+    },
+
+    markAllAsRead() {
+      this.notifications = this.notifications.map((n: any) => ({
+        ...n,
+        status: 'read'
+      }));
     },
 
     markAsRead(id: number) {

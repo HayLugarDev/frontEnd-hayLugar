@@ -92,7 +92,7 @@
           <!-- Inputs -->
           <div class="flex flex-col gap-2">
             <h2 class="text-lg font-semibold mb-1">Datos de Facturación</h2>
-            <FormField v-model="nombre" placeholder="Nombre completo" />
+            <FormField v-model="nombre" placeholder="Nombre completo"/>
             <FormField v-model="dni" placeholder="Número de documento" />
             <FormField v-model="direccion" placeholder="Domicilio" />
             <FormField v-model="email" placeholder="Correo electrónico" />
@@ -145,8 +145,8 @@
       </transition>
     </main>
 
-    <StatusModal :visible="showErrorModal" type="error" title="Faltan datos" :message="errorMessage"
-      icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+    <StatusModal :visible="showErrorModal" type="error" title="Error" :message="errorMessage"
+      :icon="Logo" @confirm="showErrorModal = false" />
   </div>
 
   <!-- ===== FOOTER ===== -->
@@ -193,6 +193,7 @@ import MainHeader from "../components/layout/header/MainHeader.vue";
 import { getVehicleById } from '../services/vehicleService';
 import FormField from '../components/forms/FormField.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
+import Logo from '../assets/logo.png'
 
 const router = useRouter();
 const reservationStore = useReservationStore();
@@ -328,7 +329,7 @@ const initWalletBrick = async (reservationId: number) => {
       description: "Reserva de espacio",
       email: email.value,
       userId: reserva.value.user_id,
-    });
+    }, { withCredentials: true });
 
     const preferenceId = res.data.preference_id;
     console.log("🟢 Preferencia creada:", preferenceId);

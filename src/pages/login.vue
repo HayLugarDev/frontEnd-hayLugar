@@ -18,7 +18,7 @@
     </div>
 
     <!-- Contenedor central -->
-    <div class="flex-grow flex items-center justify-center px-6 py-16">
+    <div class="flex-grow flex items-center justify-center px-6 sm:pt-16">
       <div
         class="bg-gray-800 text-gray-200 rounded-2xl shadow-2xl w-full max-w-md p-10 text-center">
         <!-- Logo -->
@@ -53,6 +53,9 @@ import GoogleLogin from '../components/layout/GoogleLogin.vue'
 import logo from '../assets/logo.png'
 import BackButton from '../components/common/BackButton.vue';
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 </script>
 
 <style scoped>
