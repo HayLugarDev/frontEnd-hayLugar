@@ -32,10 +32,10 @@ export async function getAuthenticatedUser(): Promise<User | null> {
 /** Actualiza la foto de perfil del usuario */
 export async function updateUserPhoto(id: number, file: File): Promise<User | null> {
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("profile_picture", file);
 
     try {
-        const { data } = await api.put<User>(`/users/update/${id}/photo`, formData, {
+        const { data } = await api.put(`/users/update/${id}/profile_picture`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
             withCredentials: true
         });
@@ -46,7 +46,6 @@ export async function updateUserPhoto(id: number, file: File): Promise<User | nu
         return null;
     }
 }
-
 
 /** Actualiza los datos del usuario autenticado */
 export async function updateAuthenticatedUser(payload: {

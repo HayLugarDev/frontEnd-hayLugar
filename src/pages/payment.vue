@@ -20,7 +20,8 @@
         <!-- 📋 Resumen -->
         <div class="md:col-span-4 flex flex-col gap-5">
           <!-- Espacio -->
-          <div class="bg-white/10 border border-white/10 p-5 rounded-2xl shadow-md flex items-start gap-5 hover:shadow-lg transition">
+          <div
+            class="bg-white/10 border border-white/10 p-5 rounded-2xl shadow-md flex items-start gap-5 hover:shadow-lg transition">
             <!-- Imagen responsiva: tamaños relativos a breakpoint -->
             <img v-if="espacio?.images?.[0]" :src="espacio.images[0]"
               class="w-20 h-20 md:w-28 md:h-28 object-cover rounded-lg shadow-sm" />
@@ -51,7 +52,8 @@
           </div>
 
           <!-- Total -->
-          <div class="bg-white/10 border border-white/10 p-6 rounded-2xl shadow-md border-t-2 grid grid-cols-2 items-center">
+          <div
+            class="bg-white/10 border border-white/10 p-6 rounded-2xl shadow-md border-t-2 grid grid-cols-2 items-center">
             <p class="text-lg font-semibold">Total a pagar</p>
             <p class="text-2xl font-bold text-end text-primary">
               {{ formatARS(totalGuestPays) }}
@@ -75,7 +77,8 @@
         <!-- 🧍 Datos de facturación -->
         <div class="bg-white/10 border border-white/10 p-6 rounded-2xl shadow-md md:col-span-5 flex flex-col gap-4">
           <!-- Vehículo -->
-          <div v-if="reserva.vehicle_type" class="bg-white/10 border-white/10 p-4 rounded-lg border border-gray-200 shadow-sm">
+          <div v-if="reserva.vehicle_type"
+            class="bg-white/10 border-white/10 p-4 rounded-lg border border-gray-200 shadow-sm">
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-md font-semibold text-white">Vehículo Seleccionado</h3>
               <font-awesome-icon
@@ -92,7 +95,7 @@
           <!-- Inputs -->
           <div class="flex flex-col gap-2">
             <h2 class="text-lg font-semibold mb-1">Datos de Facturación</h2>
-            <FormField v-model="nombre" placeholder="Nombre completo"/>
+            <FormField v-model="nombre" placeholder="Nombre completo" />
             <FormField v-model="dni" placeholder="Número de documento" />
             <FormField v-model="direccion" placeholder="Domicilio" />
             <FormField v-model="email" placeholder="Correo electrónico" />
@@ -122,6 +125,11 @@
           ]">
             <font-awesome-icon icon="credit-card" class="text-xl" />
             <span>Tarjeta de crédito / débito</span>
+            <span v-if="metodoPago === 'tarjeta'"
+              class="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+              Seleccionado
+            </span>
+
           </button>
 
           <button @click="verifyPaymentMethod('cuenta_mp')" :class="[
@@ -132,21 +140,45 @@
           ]">
             <img src="../assets/logo-mercadopago.png" alt="Mercado Pago" class="h-8 w-auto" />
             <span>Cuenta Mercado Pago</span>
+
+            <span v-if="metodoPago === 'cuenta_mp'"
+              class="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+              Seleccionado
+            </span>
           </button>
         </div>
       </div>
 
-      <!-- 🔹 Brick dinámico -->
+      <!-- 💸 Zona de pago -->
       <transition name="fade">
-        <div v-if="datosCompletos" :key="metodoPago" class="mt-4 w-full flex justify-center">
-          <div v-show="metodoPago === 'cuenta_mp'" id="walletBrick_container" class="w-full max-w-md"></div>
-          <div v-show="metodoPago === 'tarjeta'" id="cardPaymentBrick_container" class="w-full max-w-md"></div>
+        <div v-if="datosCompletos && metodoPago" class="mt-8 w-full max-w-xl mx-auto 
+           bg-white/10 border border-white/10 
+           rounded-2xl p-6 shadow-xl">
+
+          <h3 class="text-lg font-semibold mb-4 text-center text-gray-100">
+            {{
+              metodoPago === 'cuenta_mp'
+                ? 'Vas a pagar con tu cuenta de Mercado Pago'
+                : 'Ingresá los datos de tu tarjeta'
+            }}
+          </h3>
+
+          <div class="flex justify-center">
+            <div v-show="metodoPago === 'cuenta_mp'" id="walletBrick_container" class="w-full"></div>
+
+            <div v-show="metodoPago === 'tarjeta'" id="cardPaymentBrick_container" class="w-full"></div>
+          </div>
+
+          <p v-if="metodoPago === 'cuenta_mp'" class="text-xs text-gray-400 text-center mt-4">
+            Serás redirigido a Mercado Pago para finalizar el pago de forma segura.
+          </p>
         </div>
       </transition>
+
     </main>
 
-    <StatusModal :visible="showErrorModal" type="error" title="Error" :message="errorMessage"
-      :icon="Logo" @confirm="showErrorModal = false" />
+    <StatusModal :visible="showErrorModal" type="error" title="Error" :message="errorMessage" :icon="Logo"
+      @confirm="showErrorModal = false" />
   </div>
 
   <!-- ===== FOOTER ===== -->
@@ -282,7 +314,7 @@ const verifyPaymentMethod = (method: PaymentMethod) => {
   if (method === 'tarjeta') {
     initCardBrick();
   } else if (method === 'cuenta_mp') {
-    initWalletBrick(Number(reserva.value.id));
+    initWalletBrick();
   }
 };
 
@@ -306,7 +338,7 @@ const serviceFeeAmount = computed(() => Math.round(baseAmount.value * SERVICE_FE
 const totalGuestPays = computed(() => Math.round((baseAmount.value + serviceFeeAmount.value) * 100) / 100);
 
 // Inicia Brick MercadoPago Wallet
-const initWalletBrick = async (reservationId: number) => {
+const initWalletBrick = async () => {
   await loadMercadoPago();
 
   if (total.value <= 0) {
@@ -321,7 +353,27 @@ const initWalletBrick = async (reservationId: number) => {
   const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'es-AR' });
   const bricksBuilder = mp.bricks();
 
-  // Primero pedimos la preference al backend
+  // Persistir datos de facturación
+  reservationStore.setReservationData({
+    payment_method: metodoPago.value,
+    payment_data: {
+      invoice_name: nombre.value,
+      invoice_dni: dni.value,
+      invoice_address: direccion.value,
+      invoice_email: email.value
+    }
+  });
+
+  // 1️⃣ asegurarse de que la reserva existe
+  const reservationResponse = await reservationStore.submitReservation();
+
+  const reservationId =
+    reservationResponse?.reservation?.id ||
+    reservationResponse?.data?.reservation?.id;
+
+  if (!reservationId) throw new Error("No se pudo crear la reserva");
+
+  // 2️⃣ crear preference ya con ID real
   try {
     const res = await api.post("/payments/create-preference", {
       reservation_id: reservationId,
@@ -352,9 +404,9 @@ const initWalletBrick = async (reservationId: number) => {
           showErrorModal.value = true;
           errorMessage.value = "Ocurrió un error al inicializar el pago.";
         },
-        onSubmit: () => {
-          console.log("💳 Iniciando pago con Wallet...");
-          confirmarPagoConCuentaMP(preferenceId);
+        onSubmit: async () => {
+          console.log("🕒 Pago enviado a Mercado Pago, esperando webhook...");
+          await checkPaymentStatus(reservationId);
         },
       },
     });
@@ -444,60 +496,15 @@ const checkPaymentStatus = async (reservationId: number) => {
 
     if (status === "approved") {
       clearInterval(interval);
-      router.push({ path: '/confirmacion', query: { id: espacio.value.id } });
+      router.push({ path: '/confirmacion', query: { id: reserva.value.id } });
     }
+
 
     if (attempts >= maxAttempts) {
       clearInterval(interval);
       console.warn("⏰ Tiempo de espera agotado. No se confirmó el pago.");
     }
   }, 5000); // cada 5 segundos
-};
-
-// Función para confirmar el pago con cuenta MP
-const confirmarPagoConCuentaMP = async (preferenceId: string) => {
-  // Persistir datos de facturación
-  reservationStore.setReservationData({
-    payment_method: metodoPago.value,
-    payment_data: {
-      invoice_name: nombre.value,
-      invoice_dni: dni.value,
-      invoice_address: direccion.value,
-      invoice_email: email.value
-    }
-  });
-
-  // Crear reserva pendiente si no existe
-  let reservationResponse: any;
-  try {
-    reservationResponse = await reservationStore.submitReservation();
-  } catch (err) {
-    console.error("Error al crear la reserva:", err);
-    alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
-    return;
-  }
-
-  const reservationId =
-    reservationResponse?.reservation?.id ||
-    reservationResponse?.data?.reservation?.id;
-
-  if (!reservationId) {
-    console.error("reservationId no encontrado:", reservationResponse);
-    alert("Error interno: no se pudo obtener el ID de la reserva.");
-    return;
-  }
-
-  try {
-    await api.post('/payments/confirm-wallet-payment', {
-      reservation_id: reservationId,
-      preference_id: preferenceId,
-    });
-
-    return await checkPaymentStatus(reservationId);
-  } catch (error) {
-    console.error("Error al procesar el pago:", error);
-    alert("Ocurrió un error al procesar el pago. Intenta nuevamente.");
-  }
 };
 
 // Función para confirmar el pago utilizando el Checkout API
