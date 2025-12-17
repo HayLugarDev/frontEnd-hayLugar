@@ -193,7 +193,7 @@ const onFileSelected = async (event) => {
     if (!file) return;
 
     try {
-        const updatedUser = await updateUserPhoto(user.id, file);
+        const updatedUser = await updateUserPhoto(user.value.id, file);
         userStore.setUser(updatedUser);
         showToast("Foto de perfil actualizada con éxito.", "success");
     } catch (error) {
