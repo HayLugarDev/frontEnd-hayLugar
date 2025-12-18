@@ -42,18 +42,18 @@
         <li class="flex justify-between border-b border-white/10 pb-2">
           <span class="text-[#B0BEC5]">Espacio</span>
           <span class="font-semibold text-right">
-            {{ reservation.space_name || reservation.slug }}
+            {{ reservation.space_name || reservation.slug || 'Espacio industrial' }}
           </span>
         </li>
 
         <li class="flex justify-between border-b border-white/10 pb-2">
           <span class="text-[#B0BEC5]">Desde</span>
-          <span class="text-right">{{ reservation.start_time }}</span>
+          <span class="text-right">{{ formatDate(reservation.start_time) }}</span>
         </li>
 
         <li class="flex justify-between border-b border-white/10 pb-2">
           <span class="text-[#B0BEC5]">Hasta</span>
-          <span class="text-right">{{ reservation.end_time }}</span>
+          <span class="text-right">{{ formatDate(reservation.end_time) }}</span>
         </li>
 
         <li class="flex justify-between border-b border-white/10 pb-2">
@@ -72,6 +72,8 @@
 
     <!-- BOTONES -->
     <div class="flex flex-col md:flex-row flex-wrap gap-4 mt-12 justify-center animate-fadeInUp">
+
+      <!-- VOLVER -->
       <button
         @click="goToSpace"
         class="bg-gradient-to-r from-[#00B4D8] to-[#06D6A0] text-[#0D1B2A] font-semibold px-6 py-3 rounded-xl shadow-lg hover:opacity-90 transition-all"
@@ -79,6 +81,7 @@
         Volver al espacio
       </button>
 
+      <!-- DASHBOARD -->
       <button
         @click="goToDashboard"
         class="bg-white/10 border border-white/10 px-6 py-3 rounded-xl text-white hover:bg-white/20 transition-all"
@@ -86,6 +89,7 @@
         Ir a mis reservas
       </button>
 
+      <!-- PDF -->
       <button
         @click="downloadPdf"
         :disabled="downloadingPdf || !reservation?.id"
@@ -97,6 +101,7 @@
         </span>
       </button>
 
+      <!-- WHATSAPP -->
       <button
         @click="contactByWhatsApp"
         class="bg-[#25D366]/90 hover:bg-[#25D366] px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-lg transition-all"
@@ -114,23 +119,30 @@ import { useRoute, useRouter } from 'vue-router'
 import { useReservationIndustrialStore } from '../store/reservationIndustrialStore'
 import api from '../services/apiService'
 
+// Router + store
 const route = useRoute()
 const router = useRouter()
 const reservationStore = useReservationIndustrialStore()
 
-// ✅ Reserva actual guardada en el store al confirmar
+// Reserva actual
 const reservation = computed(() => reservationStore.reservation)
 
-// Texto del método de pago
+// Método de pago formateado
 const methodLabel = computed(() => {
-  if (!reservation.value) return ''
-  const m = reservation.value.method
-  return m === 'wallet'
-    ? 'Billetera HayLugar'
-    : m === 'mercadopago'
-    ? 'Mercado Pago'
-    : 'Contrato (sin pago)'
+  const m = reservation.value?.method
+  if (m === 'wallet') return 'Billetera HayLugar'
+  if (m === 'mercadopago') return 'Mercado Pago'
+  return 'Contrato (sin pago)'
 })
+
+// === FORMATEO DE FECHAS ===
+function formatDate(iso: string) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleString('es-AR', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+}
 
 // === NAVEGACIÓN ===
 function goToSpace() {
@@ -182,11 +194,12 @@ function contactByWhatsApp() {
   if (!reservation.value) return
 
   const phone = WHATSAPP_NUMBER.replace(/[^0-9]/g, '')
+
   const text = encodeURIComponent(
     `Hola, soy usuario de HayLugar y acabo de enviar una solicitud de reserva industrial.\n\n` +
-      `Espacio: ${reservation.value.space_name || reservation.value.slug}\n` +
-      `Período: ${reservation.value.start_time} → ${reservation.value.end_time}\n` +
-      `Total estimado: $${reservation.value.estimated_total}\n\n` +
+      `📍 Espacio: ${reservation.value.space_name || reservation.value.slug}\n` +
+      `📅 Período: ${formatDate(reservation.value.start_time)} → ${formatDate(reservation.value.end_time)}\n` +
+      `💰 Total estimado: $${reservation.value.estimated_total}\n\n` +
       `Me gustaría coordinar los próximos pasos.`
   )
 
@@ -210,15 +223,7 @@ function contactByWhatsApp() {
   100% { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fadeInSlow {
-  animation: fadeInSlow 0.9s ease forwards;
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.8s ease forwards;
-}
-
-.animate-fadeInUp {
-  animation: fadeInUp 1s ease forwards;
-}
+.animate-fadeInSlow { animation: fadeInSlow 0.9s ease forwards; }
+.animate-fadeIn { animation: fadeIn 0.8s ease forwards; }
+.animate-fadeInUp { animation: fadeInUp 1s ease forwards; }
 </style>
