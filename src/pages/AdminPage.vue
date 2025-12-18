@@ -11,11 +11,11 @@
     <h1 class="text-3xl font-bold text-primary text-center mb-4">Panel de Administración</h1>
 
     <!-- Tabs -->
-    <div class="flex justify-center gap-4 border-b border-gray-200 pb-2">
+    <div class="flex justify-center gap-2 sm:gap-4 pb-2">
       <button v-for="tab in tabs" :key="tab.key" :class="[
-        'px-4 py-2 rounded-lg font-semibold transition-colors',
+        'px-2 sm:px-4 py-2 font-semibold transition-colors w-11/12',
         activeTab === tab.key
-          ? 'bg-primary text-white shadow-md'
+          ? 'border-b-2 border-primary text-white shadow-md'
           : 'text-gray-600 hover:bg-gray-100'
       ]" @click="activeTab = tab.key">
         {{ tab.label }}

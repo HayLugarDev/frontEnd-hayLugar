@@ -1,7 +1,8 @@
 <template>
   <transition name="fade">
     <div v-if="visible" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div class="bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] w-full max-w-3xl rounded-2xl shadow-xl p-8 relative overflow-y-auto max-h-[90vh]">
+      <div
+        class="bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] w-full max-w-3xl rounded-2xl shadow-xl p-8 relative overflow-y-auto max-h-[90vh]">
 
         <!-- Botón cerrar -->
         <button @click="close" class="absolute top-4 right-4 text-gray-400 hover:text-white">✖</button>
@@ -74,8 +75,8 @@
         </div>
 
         <!-- Mensaje informativo -->
-        <div v-if="formData.reservation_period" class="mt-4 p-4 rounded-xl text-sm bg-white/10 border-white/10 text-newgreen"
-          v-html="currentMessage">
+        <div v-if="formData.reservation_period"
+          class="mt-4 p-4 rounded-xl text-sm bg-white/10 border-white/10 text-newgreen" v-html="currentMessage">
         </div>
 
         <!-- Vehículos aceptados -->
@@ -95,8 +96,15 @@
           <h3 class="text-xl font-semibold text-primary mb-2">Modificar imágenes actuales</h3>
           <input type="file" multiple @change="onFileChange" class="border-2 shadow-xl rounded-full p-2" />
           <div class="flex gap-2 mt-2 flex-wrap">
-            <img v-for="(img, i) in previewImages" :key="i" :src="img"
-              class="w-24 h-24 object-cover rounded-lg shadow" />
+            <div v-for="(img, i) in previewImages" :key="i" class="relative">
+              <img :src="img.src" class="w-24 h-24 rounded-lg object-cover" />
+
+              <button @click="removeImage(i)"
+                class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">
+                ✖
+              </button>
+            </div>
+
           </div>
         </div>
 
@@ -112,14 +120,14 @@
   </transition>
 
   <!-- Modales -->
-  <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-    :icon="logo" @confirm="showErrorModal = false" />
-  <StatusModal :visible="showSuccessModal" title="¡Éxito!" :message="successMessage"
-    :icon="logo" @confirm="closeSuccess" />
+  <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage" :icon="logo"
+    @confirm="showErrorModal = false" />
+  <StatusModal :visible="showSuccessModal" title="¡Éxito!" :message="successMessage" :icon="logo"
+    @confirm="closeSuccess" />
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import api from '../../../../services/apiService';
 import FormField from '../../../forms/FormField.vue';
 import FormFieldAutocomplete from '../../../forms/FormFieldAutocomplete.vue';
@@ -152,7 +160,11 @@ const formData = ref<any>({
   images: []
 });
 
-const previewImages = ref<string[]>([]);
+const existingImages = ref<string[]>([]);
+const newImages = ref<File[]>([]);
+const removedImages = ref<string[]>([]);
+const previewImages = ref<{ src: string; isNew: boolean }[]>([]);
+
 const selectedType = ref<string | null>(null);
 const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
@@ -199,6 +211,18 @@ const availabilityMessages: Record<string, string> = {
 };
 const currentMessage = computed(() => availabilityMessages[formData.value.reservation_period] || "");
 
+
+onMounted(() => {
+  existingImages.value = [...(formData.value.images || [])];
+  newImages.value = [];
+  removedImages.value = [];
+
+  previewImages.value = existingImages.value.map(url => ({
+    src: url,
+    isNew: false
+  }));
+
+})
 // Funciones vehículos
 function openConfig(type: string) { selectedType.value = type; }
 
@@ -239,9 +263,14 @@ watch(() => props.visible, async (val) => {
         vehicleMap.value[v.type] = v;
       });
 
-      previewImages.value = formData.value.images.map((img: any) =>
-        typeof img === 'string' ? img : URL.createObjectURL(img)
-      );
+      existingImages.value = [...(formData.value.images || [])];
+      newImages.value = [];
+
+      previewImages.value = existingImages.value.map(url => ({
+        src: url,
+        isNew: false
+      }));
+
 
       availabilityStartRaw.value = formData.value.availability?.start
         ? new Date(`1970-01-01T${formData.value.availability.start}:00`)
@@ -285,17 +314,76 @@ watch(availabilityDays, (val) => {
 const onFileChange = (e: Event) => {
   const files = (e.target as HTMLInputElement).files;
   if (!files) return;
-  formData.value.images = [...formData.value.images.filter((img: any) => typeof img === 'string'), ...Array.from(files)];
-  previewImages.value = formData.value.images.map((img: any) => typeof img === 'string' ? img : URL.createObjectURL(img));
+
+  const selected = Array.from(files);
+
+  selected.forEach(file => {
+    newImages.value.push(file);
+    previewImages.value.push({
+      src: URL.createObjectURL(file),
+      isNew: true
+    });
+  });
+};
+
+const removeImage = (index: number) => {
+  const img = previewImages.value[index];
+
+  // Imagen existente
+  if (!img.isNew) {
+    removedImages.value.push(img.src);
+    existingImages.value = existingImages.value.filter(i => i !== img.src);
+  }
+
+  // Imagen nueva
+  if (img.isNew) {
+    newImages.value.splice(
+      newImages.value.findIndex(f => URL.createObjectURL(f) === img.src),
+      1
+    );
+  }
+
+  previewImages.value.splice(index, 1);
 };
 
 // Guardar cambios con validaciones
 const guardarCambios = async () => {
+
+  const total = existingImages.value.length + newImages.value.length;
+  if (total < 2) {
+    errorMessage.value = 'Debes tener al menos 2 imágenes.';
+    showErrorModal.value = true;
+    return;
+  }
+
+  const form = new FormData();
+
+  // datos normales
+  Object.entries(formData.value).forEach(([key, value]) => {
+    if (key !== 'images') {
+      form.append(
+        key,
+        typeof value === 'object' ? JSON.stringify(value) : String(value)
+      );
+    }
+  });
+
+  // imágenes
+  form.append('existingImages', JSON.stringify(existingImages.value));
+  form.append('removedImages', JSON.stringify(removedImages.value));
+
+  // orden final
+  const ordered = previewImages.value.map(i => i.src);
+  form.append('orderedImages', JSON.stringify(ordered));
+
+  // nuevas
+  newImages.value.forEach(img => form.append('images', img));
+
   if (!formData.value.name || !formData.value.parking_type || !formData.value.description) {
     errorMessage.value = "Por favor, completá todos los campos requeridos.";
     showErrorModal.value = true; return;
   }
-  if (formData.value.images.length < 2) { errorMessage.value = "Debes tener al menos 2 imágenes."; showErrorModal.value = true; return; }
+
   if (formData.value.reservation_period === 'hour') {
     if (!formData.value.availability.start || !formData.value.availability.end) {
       errorMessage.value = "Debes definir horario de disponibilidad (inicio y fin)."; showErrorModal.value = true; return;
@@ -306,10 +394,19 @@ const guardarCambios = async () => {
   }
   console.log(formData.value);
   try {
-    const response = await api.put(`/spaces/update/${props.spaceId}`, formData.value)
+    const response = await api.put(
+      `/spaces/update/${props.spaceId}`,
+      form,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+
     successMessage.value = response.data.message || "Cambios guardados con éxito.";
     showSuccessModal.value = true;
-  } catch (err) { errorMessage.value = "Ocurrió un error al guardar."; showErrorModal.value = true; console.error(err); }
+  } catch (err) {
+    errorMessage.value = "Ocurrió un error al guardar.";
+    showErrorModal.value = true;
+    console.error(err);
+  }
 };
 
 const close = () => emit('close');

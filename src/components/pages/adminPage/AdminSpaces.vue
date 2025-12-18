@@ -120,7 +120,7 @@
           <div v-if="selectedSpace.availability" class="mb-8">
             <h4 class="font-semibold text-lg mb-2 text-primary">Disponibilidad</h4>
             <pre class="bg-white/5 p-3 rounded-xl border border-white/10 text-sm text-gray-200 overflow-auto">
-              {{ JSON.stringify(selectedSpace.availability, null, 2) }}
+              {{ selectedSpace.availability }}
             </pre>
           </div>
 
