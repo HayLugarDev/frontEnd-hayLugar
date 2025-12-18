@@ -12,7 +12,7 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
       owner_id: null as number | null,
       space_id: null as number | null,
       slug: null as string | null,
-      space_name: null as string | null,  // ✅ NUEVO
+      space_name: null as string | null,
       start_time: '' as string,
       end_time: '' as string,
       pricing_unit: 'day' as 'hour' | 'day' | 'week' | 'month',
@@ -23,6 +23,14 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
       status: 'draft' as 'draft' | 'pending' | 'confirmed' | 'contract_required' | 'cancelled',
       payment_data: null as Record<string, any> | null,
     },
+
+    // nuevas propiedades
+    availability: {
+      checked: false,
+      available: null as boolean | null,
+      conflicts: [] as any[],
+    },
+
     loading: false,
     error: null as string | null,
   }),
@@ -36,24 +44,21 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
   },
 
   actions: {
-    /**
-     * Inicializa o actualiza la reserva industrial
-     */
+    /* ============================================
+     * Inicializa / Actualiza la reserva
+     * ============================================ */
     setReservationData(data: Partial<typeof this.reservation>) {
       const userStore = useUserStore()
       const spaceStore = useSpaceStore()
 
-      // usuario logueado
       if (!data.user_id && userStore.user) {
         data.user_id = userStore.user.id
       }
 
-      // owner
       if (!data.owner_id && spaceStore.selectedSpace?.owner_id) {
         data.owner_id = spaceStore.selectedSpace.owner_id
       }
 
-      // nombre del espacio para el success screen
       if (!data.space_name && spaceStore.selectedSpace?.name) {
         (data as any).space_name = spaceStore.selectedSpace.name
       }
@@ -61,9 +66,9 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
       this.reservation = { ...this.reservation, ...data }
     },
 
-    /**
-     * Calcula el monto estimado
-     */
+    /* ============================================
+     * Calcular monto estimado
+     * ============================================ */
     estimateTotal(startISO: string, endISO: string, pricingUnit: string, pricePerUnit: number) {
       const start = new Date(startISO)
       const end = new Date(endISO)
@@ -89,17 +94,64 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
       return total
     },
 
-    /**
-     * Envía la reserva al backend
-     */
+    /* ============================================
+     * NUEVO: Check Availability real
+     * ============================================ */
+    async checkAvailability() {
+      this.loading = true
+      this.error = null
+
+      try {
+        if (!this.reservation.space_id) throw new Error("SPACE_ID_REQUIRED")
+
+        const params = {
+          space_id: this.reservation.space_id,
+          start_time: this.reservation.start_time,
+          end_time: this.reservation.end_time,
+        }
+
+        const res = await api.get('/industrial-reservations/check-availability', { params })
+
+        this.availability = {
+          checked: true,
+          available: res.data.available,
+          conflicts: res.data.conflicts,
+        }
+
+        return res.data
+      } catch (err: any) {
+        console.error('Availability error:', err)
+        this.error = 'Error verificando disponibilidad'
+        throw err
+      } finally {
+        this.loading = false
+      }
+    },
+
+    /* ============================================
+     * NUEVO: Validación antes de crear la reserva
+     * ============================================ */
+    async validateBeforeSubmit() {
+      const result = await this.checkAvailability()
+      if (!result.available) {
+        throw new Error('NO_AVAILABLE')
+      }
+      return true
+    },
+
+    /* ============================================
+     * Enviar la reserva al backend
+     * ============================================ */
     async submitIndustrialReservation() {
       this.loading = true
       this.error = null
 
       try {
+        // validar disponibilidad real antes
+        await this.validateBeforeSubmit()
+
         const endpoint = '/industrial-reservations/create'
 
-        // estado inicial según método de reserva
         this.reservation.status =
           this.reservation.method === 'manual_contract'
             ? 'contract_required'
@@ -112,7 +164,6 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
           response.data?.reservation?.id ||
           null
 
-        // estado final
         this.reservation.status =
           this.reservation.method === 'manual_contract'
             ? 'contract_required'
@@ -121,16 +172,16 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
         return response.data
       } catch (err: any) {
         console.error('Error creando reserva industrial:', err)
-        this.error = 'Error al crear la reserva industrial'
+        this.error = err.message || 'Error al crear la reserva industrial'
         throw err
       } finally {
         this.loading = false
       }
     },
 
-    /**
-     * Resetea todo
-     */
+    /* ============================================
+     * Limpiar el store
+     * ============================================ */
     clearReservation() {
       this.reservation = {
         id: null,
@@ -148,6 +199,12 @@ export const useReservationIndustrialStore = defineStore('reservationIndustrial'
         notes: '',
         status: 'draft',
         payment_data: null,
+      }
+
+      this.availability = {
+        checked: false,
+        available: null,
+        conflicts: [],
       }
     },
   },
