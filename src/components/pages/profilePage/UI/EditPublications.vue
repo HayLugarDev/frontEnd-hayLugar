@@ -360,13 +360,19 @@ const guardarCambios = async () => {
 
   // datos normales
   Object.entries(formData.value).forEach(([key, value]) => {
-    if (key !== 'images') {
-      form.append(
-        key,
-        typeof value === 'object' ? JSON.stringify(value) : String(value)
-      );
+    if (key === 'images') return;
+
+    if (value === null || value === undefined || value === '') {
+      return;
+    }
+
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      form.append(key, JSON.stringify(value));
+    } else {
+      form.append(key, String(value));
     }
   });
+
 
   // imágenes
   form.append('existingImages', JSON.stringify(existingImages.value));
