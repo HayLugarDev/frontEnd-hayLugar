@@ -71,7 +71,9 @@
                   class="fa-solid fa-bolt"
                   :class="space?.energy_3phase ? 'text-[#FFD166]' : 'text-[#607D8B]'"
                 ></i>
-                <span class="font-medium">{{ space?.energy_3phase ? 'Trifásica' : 'No trifásica' }}</span>
+                <span class="font-medium">
+                  {{ space?.energy_3phase ? 'Trifásica' : 'No trifásica' }}
+                </span>
               </div>
             </div>
           </div>
@@ -103,8 +105,64 @@
             </div>
           </div>
 
+          <!-- AVAILABILITY UI REAL -->
+          <div class="mt-1 space-y-2">
+            <p v-if="errors.availability" class="text-xs text-red-400">
+              {{ errors.availability }}
+            </p>
+
+            <div v-if="availability.checked">
+              <!-- DISPONIBLE -->
+              <div
+                v-if="availability.available"
+                class="flex items-center gap-3 bg-[#06D6A0]/20 border border-[#06D6A0]/40 text-[#06D6A0] px-4 py-3 rounded-xl"
+              >
+                <i class="fa-solid fa-circle-check text-xl"></i>
+                <div>
+                  <p class="font-semibold">Disponible</p>
+                  <p class="text-xs opacity-80">
+                    Este espacio se encuentra libre en el horario seleccionado.
+                  </p>
+                </div>
+              </div>
+
+              <!-- NO DISPONIBLE -->
+              <div
+                v-else
+                class="flex flex-col gap-3 bg-red-500/20 border border-red-500/40 text-red-300 px-4 py-3 rounded-xl"
+              >
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-circle-xmark text-xl"></i>
+                  <div>
+                    <p class="font-semibold">No disponible</p>
+                    <p class="text-xs opacity-80">
+                      El horario seleccionado se superpone con una reserva existente.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Conflictos -->
+                <div
+                  v-for="c in availability.conflicts"
+                  :key="c.id"
+                  class="text-xs bg-white/5 border border-white/10 rounded-xl px-3 py-2"
+                >
+                  <p>
+                    <span class="font-medium text-white">Reserva #{{ c.id }}</span>
+                  </p>
+                  <p class="opacity-80">
+                    {{ c.start_time }} → {{ c.end_time }}
+                  </p>
+                  <p class="opacity-60 capitalize">
+                    Estado: {{ c.status }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- PRECIOS + MÉTODO -->
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid md:grid-cols-2 gap-4 mt-4">
             <div>
               <label class="block text-xs uppercase tracking-wider text-[#B0BEC5] mb-1">Unidad de precio</label>
               <select
@@ -142,7 +200,9 @@
               class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#00B4D8] outline-none resize-none placeholder-gray-400"
               placeholder="Ej: 45 pallets semanal, carga seca, ingreso de flota 3 unidades..."
             ></textarea>
-            <p v-if="errors.operationDetails" class="text-xs text-red-400 mt-1">{{ errors.operationDetails }}</p>
+            <p v-if="errors.operationDetails" class="text-xs text-red-400 mt-1">
+              {{ errors.operationDetails }}
+            </p>
           </div>
 
           <!-- RESPONSABLE -->
@@ -155,7 +215,9 @@
                 class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#00B4D8]"
                 placeholder="Nombre y apellido"
               />
-              <p v-if="errors.contactName" class="text-xs text-red-400 mt-1">{{ errors.contactName }}</p>
+              <p v-if="errors.contactName" class="text-xs text-red-400 mt-1">
+                {{ errors.contactName }}
+              </p>
             </div>
 
             <div>
@@ -166,12 +228,14 @@
                 class="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#00B4D8]"
                 placeholder="+54 9 ..."
               />
-              <p v-if="errors.contactPhone" class="text-xs text-red-400 mt-1">{{ errors.contactPhone }}</p>
+              <p v-if="errors.contactPhone" class="text-xs text-red-400 mt-1">
+                {{ errors.contactPhone }}
+              </p>
             </div>
           </div>
         </div>
 
-        <!-- === VENTANA OPERATIVA === -->
+        <!-- === VENTANA OPERATIVA (DEMO) === -->
         <div class="bg-[#1B263B]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
           <h3 class="text-lg font-semibold mb-3">Ventana operativa</h3>
 
@@ -199,13 +263,39 @@
       >
         <h4 class="text-lg font-semibold mb-4">Resumen</h4>
 
+        <!-- ALERTA DISPONIBILIDAD -->
+        <div
+          v-if="availability.checked && availability.available === false"
+          class="bg-red-500/20 border border-red-500/40 text-red-300 px-3 py-2 rounded-xl text-xs mb-3"
+        >
+          El espacio no está disponible en el horario seleccionado.
+        </div>
+
         <ul class="space-y-2 text-sm text-[#B0BEC5]">
-          <li class="flex justify-between"><span>Espacio</span><span class="text-white">{{ space?.name }}</span></li>
-          <li class="flex justify-between"><span>Desde</span><span class="text-white">{{ startDate || '—' }}</span></li>
-          <li class="flex justify-between"><span>Hasta</span><span class="text-white">{{ endDate || '—' }}</span></li>
-          <li class="flex justify-between"><span>Unidad</span><span class="text-white capitalize">{{ pricingUnit }}</span></li>
-          <li class="flex justify-between"><span>Precio unidad</span><span class="text-white">${{ pricePerUnit }}</span></li>
-          <li class="flex justify-between"><span>Método</span><span class="text-white">{{ methodLabel }}</span></li>
+          <li class="flex justify-between">
+            <span>Espacio</span>
+            <span class="text-white">{{ space?.name }}</span>
+          </li>
+          <li class="flex justify-between">
+            <span>Desde</span>
+            <span class="text-white">{{ startDate || '—' }}</span>
+          </li>
+          <li class="flex justify-between">
+            <span>Hasta</span>
+            <span class="text-white">{{ endDate || '—' }}</span>
+          </li>
+          <li class="flex justify-between">
+            <span>Unidad</span>
+            <span class="text-white capitalize">{{ pricingUnit }}</span>
+          </li>
+          <li class="flex justify-between">
+            <span>Precio unidad</span>
+            <span class="text-white">${{ pricePerUnit }}</span>
+          </li>
+          <li class="flex justify-between">
+            <span>Método</span>
+            <span class="text-white">{{ methodLabel }}</span>
+          </li>
         </ul>
 
         <div class="my-4 border-t border-white/10"></div>
@@ -239,12 +329,18 @@
         <p class="text-[#B0BEC5] text-sm mt-1">Revisá los datos antes de continuar.</p>
 
         <div class="bg-[#1B263B] p-4 rounded-xl mt-4 text-sm space-y-2 border border-white/10">
-          <div class="flex justify-between"><span>Espacio</span><span class="text-white">{{ space?.name }}</span></div>
+          <div class="flex justify-between">
+            <span>Espacio</span>
+            <span class="text-white">{{ space?.name }}</span>
+          </div>
           <div class="flex justify-between">
             <span>Período</span>
             <span class="text-white">{{ startDate }} → {{ endDate }}</span>
           </div>
-          <div class="flex justify-between"><span>Método</span><span class="text-white">{{ methodLabel }}</span></div>
+          <div class="flex justify-between">
+            <span>Método</span>
+            <span class="text-white">{{ methodLabel }}</span>
+          </div>
           <div class="flex justify-between">
             <span>Total</span>
             <span class="text-[#00B4D8] font-semibold">${{ estimation }}</span>
@@ -302,7 +398,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import logo from "../assets/logo.png";
@@ -335,7 +431,10 @@ const contactPhone = ref("");
 const notes = ref("");
 const openConfirm = ref(false);
 
-const errors = ref<any>({});
+const errors = ref<Record<string, string>>({});
+
+// Availability from store
+const availability = computed(() => reservationStore.availability);
 
 // Computed
 const pricePerUnit = computed(() => Number(space.value?.price_per_unit || 0));
@@ -357,9 +456,14 @@ const estimation = computed(() =>
   )
 );
 
-const canConfirm = computed(
-  () => !!space.value && !!startDate.value && !!endDate.value
-);
+const canConfirm = computed(() => {
+  return (
+    !!space.value &&
+    !!startDate.value &&
+    !!endDate.value &&
+    availability.value.available !== false
+  );
+});
 
 const demoDays = computed(() => {
   const base = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
@@ -399,16 +503,62 @@ onMounted(async () => {
   endDate.value = end.toISOString().slice(0, 16);
 });
 
+// Watch fechas -> availability real
+watch([startDate, endDate], async () => {
+  // reset error de disponibilidad
+  delete errors.value.availability;
+
+  if (!startDate.value || !endDate.value || !space.value?.id) return;
+
+  reservationStore.setReservationData({
+    space_id: space.value.id,
+    slug: route.params.slug as string,
+    start_time: new Date(startDate.value).toISOString(),
+    end_time: new Date(endDate.value).toISOString(),
+    pricing_unit: pricingUnit.value,
+    price_per_unit: pricePerUnit.value,
+  });
+
+  try {
+    await reservationStore.checkAvailability();
+  } catch (err) {
+    console.warn("Availability check failed:", err);
+  }
+});
+
 // Validate
 function validateForm() {
   errors.value = {};
 
-  if (!startDate.value) errors.value.startDate = "Ingresá la fecha de inicio.";
-  if (!endDate.value) errors.value.endDate = "Ingresá la fecha de fin.";
-  if (!operationDetails.value || operationDetails.value.length < 10)
+  if (!startDate.value) {
+    errors.value.startDate = "Ingresá la fecha de inicio.";
+  }
+  if (!endDate.value) {
+    errors.value.endDate = "Ingresá la fecha de fin.";
+  }
+
+  // Validar rango lógico
+  if (startDate.value && endDate.value) {
+    const start = new Date(startDate.value);
+    const end = new Date(endDate.value);
+    if (end <= start) {
+      errors.value.endDate = "La fecha de fin debe ser posterior a la de inicio.";
+    }
+  }
+
+  if (!operationDetails.value || operationDetails.value.length < 10) {
     errors.value.operationDetails = "Describí brevemente tu operación.";
-  if (!contactName.value) errors.value.contactName = "Ingresá un responsable.";
-  if (!contactPhone.value) errors.value.contactPhone = "Ingresá teléfono de contacto.";
+  }
+  if (!contactName.value) {
+    errors.value.contactName = "Ingresá un responsable.";
+  }
+  if (!contactPhone.value) {
+    errors.value.contactPhone = "Ingresá teléfono de contacto.";
+  }
+
+  if (availability.value.available === false) {
+    errors.value.availability = "El horario seleccionado no está disponible.";
+  }
 
   return Object.keys(errors.value).length === 0;
 }
