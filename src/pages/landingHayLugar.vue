@@ -167,6 +167,90 @@
       </div>
     </section>
 
+    <!-- ============================ MAPA DE TRÁFICO URBANO ============================ -->
+<section class="py-24 bg-gradient-to-b from-[#020617] to-[#0B1220] border-b border-white/10">
+  <div class="container mx-auto px-6 max-w-6xl">
+
+    <!-- Header -->
+    <div class="max-w-3xl mx-auto text-center mb-14">
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full 
+               bg-white/5 border border-white/10 text-xs text-white/70 mb-6"
+      >
+        <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+        Tráfico urbano en tiempo real
+      </div>
+
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">
+        Donde hay tráfico, hay demanda de estacionamiento.
+      </h2>
+
+      <p class="text-white/70 text-lg leading-relaxed">
+        HayLugar analiza el flujo urbano en tiempo real para mostrar
+        dónde la ciudad genera mayor presión de estacionamiento.
+        <br class="hidden md:block" />
+        Si tenés un espacio cerca de estas zonas, hay una oportunidad real.
+      </p>
+    </div>
+
+    <!-- Content -->
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+
+      <!-- Visual -->
+      <div
+        class="relative rounded-2xl overflow-hidden border border-white/10
+               bg-white/5 shadow-2xl"
+      >
+        <!-- Reemplazar por imagen / gif / video -->
+        <img
+          src="../../assets/traffic-preview.png"
+          alt="Mapa de tráfico urbano HayLugar"
+          class="w-full h-full object-cover opacity-90"
+        />
+
+        <!-- Overlay caption -->
+        <div
+          class="absolute bottom-4 left-4 right-4
+                 bg-[#020617]/80 backdrop-blur
+                 border border-white/10 rounded-xl p-3 text-sm"
+        >
+          🔴 Zonas calientes detectadas · Horario pico activo
+        </div>
+      </div>
+
+      <!-- Text + CTA -->
+      <div class="flex flex-col gap-6">
+        <p class="text-white/70 leading-relaxed">
+          Horarios pico, zonas calientes y ciudades con alta circulación
+          explican por qué estacionar se vuelve un problema…
+          y por qué tu espacio puede ser parte de la solución.
+        </p>
+
+        <div class="flex gap-4">
+          <a
+            href="/traffic"
+            class="inline-flex items-center justify-center
+                   px-6 py-3 rounded-full font-semibold
+                   text-[#0D1B2A]
+                   bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
+                   shadow-lg shadow-cyan-900/30
+                   hover:from-[#06D6A0] hover:to-[#00B4D8]
+                   transition-all duration-300"
+          >
+            Explorar mapa de tráfico
+          </a>
+
+          <span class="text-xs text-white/50 self-center">
+            Vista informativa · datos en vivo
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
     <!-- ============================ PARA QUIÉN ES ============================ -->
     <section class="py-20 bg-[#020617] border-b border-white/10">
       <div class="container mx-auto px-6 max-w-5xl text-center">

@@ -271,3 +271,9 @@
   filter: drop-shadow(0 0 6px #facc15aa);
 }
 
+.hotzone-label {
+  background: rgba(0, 0, 0, 0.55);
+  padding: 4px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
+}
