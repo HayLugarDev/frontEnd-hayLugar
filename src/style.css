@@ -86,3 +86,9 @@ button:focus-visible {
   -ms-overflow-style: none;  /* Internet Explorer y Edge */
   scrollbar-width: none;     /* Firefox */
 }
+.hotzone-label {
+  background: rgba(0, 0, 0, 0.55);
+  padding: 4px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
+}

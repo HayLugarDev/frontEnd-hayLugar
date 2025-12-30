@@ -56,7 +56,7 @@ const toggleMenu = () => {
 
 // Abrir notificación completa
 const openNotification = (id: number) => {
-  userStore.markAsRead(id); // Marcamos como leída en el store
+  userStore.markAllAsRead(); // Marcamos como leídas en el store
   router.push('/notifications');
 };
 

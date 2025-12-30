@@ -38,6 +38,7 @@ import IndustrialSpaceCreate from '../pages/IndustrialSpaceCreate.vue'
 import IndustrialParkCreate from '../pages/IndustrialParkCreate.vue'
 import IndustrialReservation from '../pages/IndustrialReservation.vue'
 import LandingB2B from '../pages/LandingB2B.vue'
+import TrafficNationalView from '../pages/TrafficNationalView.vue'
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
 const AcceptTerms = () => import('../pages/AcceptTerms.vue')
@@ -118,7 +119,7 @@ const routes: RouteRecordRaw[] = [
 { path: '/industrial-dashboard', name: 'IndustrialDashboard', component:IndustrialDashboard },
 
 { path: '/playa-dashboard', name: 'PlayaDashboard', component:PlayaDashboard },
-
+{ path: '/traffic', name: 'TrafficNationalView', component:TrafficNationalView },
 // Admin Page
 { path: '/admin-page', name: 'adminPage', component: AdminPage, meta: { requiresAuth: true } },
 

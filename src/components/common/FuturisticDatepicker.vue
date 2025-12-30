@@ -16,7 +16,9 @@
                         <!-- Header -->
                         <div class="flex items-start justify-between gap-4">
                             <div>
-                                <h3 class="text-lg font-semibold text-teal-300">Seleccioná fecha y hora</h3>
+                                <h3 class="text-lg font-semibold text-teal-300">
+                                    Seleccioná un horario de {{ plazoInicial ? 'salida' : 'entrada' }}
+                                </h3>
                                 <p class="text-sm text-gray-400 mt-1">{{ formattedPreview }}</p>
                             </div>
                             <button @click="close" class="text-gray-400 hover:text-white">✕</button>
