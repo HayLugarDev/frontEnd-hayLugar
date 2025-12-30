@@ -111,7 +111,7 @@
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">12. Privacidad y Cookies</h2>
-          <p>El tratamiento de datos personales se rige por la <RouterLink to="/privacidad" class="text-primary underline">Política de Privacidad</RouterLink> y la <RouterLink to="/cookies" class="text-primary underline">Política de Cookies</RouterLink>.</p>
+          <p>El tratamiento de datos personales se rige por la <RouterLink to="/PrivacyPolicy" class="text-primary underline">Política de Privacidad</RouterLink> y la <RouterLink to="/cookies" class="text-primary underline">Política de Cookies</RouterLink>.</p>
         </div>
 
         <div>

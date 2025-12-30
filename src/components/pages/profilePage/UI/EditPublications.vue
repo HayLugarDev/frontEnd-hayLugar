@@ -249,7 +249,7 @@ const updateAvailabilityFields = () => { formData.value.availability.start = '';
 watch(() => props.visible, async (val) => {
   if (val && props.spaceId) {
     try {
-      const res = await api.get(`/spaces/getbyid/${props.spaceId}`);
+      const res = await api.get(`/spaces/getbyid/${props.spaceId}/edit`);
       formData.value = res.data;
 
       if (typeof formData.value.availability === 'string') {
@@ -359,20 +359,24 @@ const guardarCambios = async () => {
   const form = new FormData();
 
   // datos normales
+  const forbiddenKeys = [
+    'id',
+    'owner_id',
+    'created_at',
+    'host',
+    'space_reviews',
+    'average_rating'
+  ];
+
   Object.entries(formData.value).forEach(([key, value]) => {
-    if (key === 'images') return;
+    if (forbiddenKeys.includes(key)) return;
 
-    if (value === null || value === undefined || value === '') {
-      return;
-    }
-
-    if (typeof value === 'object' && !Array.isArray(value)) {
+    if (typeof value === 'object') {
       form.append(key, JSON.stringify(value));
     } else {
       form.append(key, String(value));
     }
   });
-
 
   // imágenes
   form.append('existingImages', JSON.stringify(existingImages.value));

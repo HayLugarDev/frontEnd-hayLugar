@@ -4,7 +4,7 @@
     <BackButton />
   </div>
 
-  
+
   <MainHeader />
 
   <!-- MENÚ INFERIOR MOBILE -->
@@ -184,12 +184,11 @@
         </div>
 
         <!-- Formulario reserva -->
-        <FormReservation v-if="!isOwner && isLogged" class="col-span-10 lg:col-span-4 order-5 lg:order-3"
+        <FormReservation v-if="space && isLogged && !isOwner" class="col-span-10 lg:col-span-4 order-5 lg:order-3"
           :tipoVehiculo="tipoVehiculo" :tipoPlazoReserva="tipoPlazoReserva" :tiempoInicial="tiempoInicial"
           :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
           @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
-          @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event" @reservar="reservar"
-          :availability="disponibilidad" />
+          @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event" @reservar="reservar" />
 
         <!-- Botón para dueño -->
         <div v-else-if="isOwner"
@@ -259,9 +258,9 @@
   <ReviewsModal :show="showReviewsModal" :reviews="reviews" :avgRating="avgRating" :totalReviews="totalReviews"
     @close="showReviewsModal = false" />
 
-  <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
-    :icon="logo" :isHtml="modalIsHtml" :buttonText="requiresTerms ? 'Aceptar términos' : 'Cerrar'"
-    @close="showErrorModal = false" @confirm="requiresTerms ? redirigirATerminos() : showErrorModal = false" />
+  <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage" :icon="logo"
+    :isHtml="modalIsHtml" :buttonText="requiresTerms ? 'Aceptar términos' : 'Cerrar'" @close="showErrorModal = false"
+    @confirm="requiresTerms ? redirigirATerminos() : showErrorModal = false" />
 
   <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario" :vehicleType="getVehicleKey(tipoVehiculo)"
     @selected="onSelectedVehicle" :isHtml="modalIsHtml" @close="showVehicleModal = false" />
@@ -331,6 +330,9 @@ import defaultProfile from '../assets/user_icon_primary.png';
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
 import BackButton from '../components/common/BackButton.vue';
 import logo from "../assets/logo.png";
+import { isWithinAvailability } from '../utils/availability';
+import { capitalizeDay } from '../utils/capitalizeDay';
+import { createReservation } from '../services/reservationService';
 
 const spaceStore = useSpaceStore()
 const { selectedSpace: space, favorites } = storeToRefs(spaceStore)
@@ -405,6 +407,8 @@ const disponibilidad = computed(() => {
 const obtenerEspacio = async () => {
   const slug = route.params.slug
   const space = await spaceStore.fetchSpaceBySlug(slug)
+  
+  console.log(space);
   if (!space) return
 
   avgRating.value = space.average_rating || 5
@@ -482,10 +486,22 @@ const reservar = async () => {
     return;
   }
 
+  const result = isWithinAvailability(
+    tiempoInicial.value,
+    tiempoFinal.value,
+    disponibilidad.value
+  );
+
+  if (!result.valid) {
+    errorMessage.value = result.message;
+    showErrorModal.value = true;
+    return;
+  }
+
   if (userStore.terms?.mustReaccept) {
     errorMessage.value = 'Todavía no aceptaste los Términos y Condiciones de HayLugar';
     modalIsHtml.value = false;
-    requiresTerms.value = true; // 👈 solo en este caso
+    requiresTerms.value = true;
     showErrorModal.value = true;
     return;
   }
@@ -499,7 +515,7 @@ const reservar = async () => {
 
     if (vehiculosUsuario.value.length === 0) {
       errorMessage.value = `No tenés vehículos registrados para este tipo.<br/>
-        <a href="/profile?section=vehicles" class="text-blue-600 underline hover:text-blue-800">Agrega tu vehículo aquí</a>.`;
+        <a href="/add-vehicle" class="text-blue-600 underline hover:text-blue-800">Agrega tu vehículo acá</a>.`;
       showErrorModal.value = true;
       modalIsHtml.value = true;
       return;
@@ -511,23 +527,41 @@ const reservar = async () => {
   }
 };
 
-const onSelectedVehicle = (vehicle) => {
-  vehiculoSeleccionado.value = vehicle;
-  const payload = {
-    owner_id: space.value.owner_id,
-    space_id: space.value.id,
-    vehicle_id: vehiculoSeleccionado.value.id,
-    vehicle_type: getVehicleKey(tipoVehiculo.value),
-    start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
-    end_time: formatLocalDateTime(new Date(tiempoFinal.value)),
-    dead_line: deadLine.value,
-    total: totalCalculado.value,
-    user_vehicle_id: vehicle.id
-  };
+const onSelectedVehicle = async (vehicle) => {
+  try {
+    vehiculoSeleccionado.value = vehicle;
 
-  reservationStore.setReservationData(payload);
-  router.push('/pago');
+    const payload = {
+      owner_id: space.value.owner_id,
+      space_id: space.value.id,
+      vehicle_id: vehiculoSeleccionado.value.id,
+      user_vehicle_id: vehicle.id,
+      vehicle_type: getVehicleKey(tipoVehiculo.value),
+      start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
+      end_time: formatLocalDateTime(new Date(tiempoFinal.value)),
+      total: totalCalculado.value,
+      // NO payment_data todavía
+    };
+
+    // 1. Crear reserva en backend (PENDING)
+    const reservation = await createReservation(payload);
+
+    // 2. Guardar reserva REAL en Pinia
+    reservationStore.setReservationData({
+      ...payload,
+      id: reservation.id,
+      status: reservation.status,
+    });
+
+    // 3. Ir a página de confirmación
+    router.push(`/reservation-request/confirmed`);
+
+  } catch (error) {
+    console.error(error);
+    router.push('/reservation-request/failed');
+  }
 };
+
 
 const totalCalculado = computed(() => {
   if (!tiempoInicial.value || !tiempoFinal.value || !space.value || !tipoVehiculo.value) return 0;
@@ -627,19 +661,6 @@ const toggleFavourite = async () => {
     console.error(err);
     showToast("Error al actualizar favorito", "error");
   }
-};
-
-const capitalizeDay = (day) => {
-  const map = {
-    monday: "Lunes",
-    tuesday: "Martes",
-    wednesday: "Miércoles",
-    thursday: "Jueves",
-    friday: "Viernes",
-    saturday: "Sábado",
-    sunday: "Domingo",
-  };
-  return map[day.toLowerCase()] || day;
 };
 
 </script>

@@ -90,9 +90,9 @@
           <div v-if="selectedSpace.paymentMethods?.length" class="mb-6">
             <h4 class="font-semibold text-lg mb-2 text-primary">Métodos de pago</h4>
             <div class="flex flex-wrap gap-2">
-              <span v-for="(method, idx) in selectedSpace.paymentMethods" :key="idx"
+              <span
                 class="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm">
-                {{ method }}
+                MercadoPago
               </span>
             </div>
           </div>

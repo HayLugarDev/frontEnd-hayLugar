@@ -31,9 +31,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useUserStore } from '../../../store/userStore';
 import { useRouter } from 'vue-router';
+import { showToast } from '../../../utils/toast';
 
 const openMenu = ref(false);
 const viewNotification = ref(false);
@@ -51,7 +52,14 @@ const hasUnreadNotifications = computed(() =>
 
 // Toggle del dropdown
 const toggleMenu = () => {
-  openMenu.value = !openMenu.value;
+  router.push('/notifications');
+
+  if (hasUnreadNotifications.value) {
+    userStore.markAllAsRead();
+  } else {
+    // flag para animar en la page
+    sessionStorage.setItem('blinkNotification', 'true');
+  }
 };
 
 // Abrir notificación completa

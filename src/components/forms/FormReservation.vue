@@ -1,10 +1,17 @@
 <template>
   <section
-    class="p-8 xl:p-10 rounded-2xl bg-[#1B263B]/60 backdrop-blur-xl border border-white/10 shadow-2xl space-y-6 text-white">
+    class="font-normal p-8 xl:p-10 rounded-2xl bg-[#1B263B]/60 backdrop-blur-xl border border-white/10 shadow-2xl space-y-6 text-white">
     <!-- Título -->
     <div>
       <h2 class="text-3xl font-bold text-[#00B4D8] tracking-wide">Reservá tu espacio</h2>
-      <p class="text-sm text-gray-300 mt-1">Completá los siguientes pasos para confirmar tu reserva</p>
+      <p class="text-sm text-gray-300 mt-1">Completá los campos para hacer la solicitud de reserva al
+        <span class="font-semibold">Anfitrión</span>
+      </p>
+      <p class="text-xs text-gray-500">Para más Información ingresá
+        <span class="text-primary">
+          <RouterLink to="/Help">acá</RouterLink>
+        </span>
+      </p>
     </div>
 
     <!-- Disponibilidad -->
@@ -45,7 +52,8 @@
         <FuturisticDatepicker :modelValue="tiempoInicial" @update:modelValue="$emit('update:tiempoInicial', $event)"
           :minDate="getMinDate()" :minDateTime="minDateTime" :maxDate="availability.dateRange?.[1]"
           :minTime="parseTimeString(availability.start)" :maxTime="parseTimeString(availability.end)"
-          :showTime="tipoPlazoReserva === 'Por hora'" label="Seleccionar entrada" :plazo="tipoPlazoReserva" />
+          :showTime="tipoPlazoReserva === 'Por hora'" :isDateDisabled="isDayDisabled" label="Seleccionar entrada"
+          :plazo="tipoPlazoReserva" />
 
       </div>
 
@@ -59,10 +67,11 @@
             : availability.dateRange?.[0]" :maxDate="availability.dateRange?.[1]" :minTime="tipoPlazoReserva === 'Por hora' && tiempoInicial
               ? parseTimeString(formatHour(new Date(tiempoInicial)))
               : parseTimeString(availability.start)" :maxTime="parseTimeString(availability.end)"
-          :showTime="tipoPlazoReserva === 'Por hora'" label="Seleccionar salida" :plazo="tipoPlazoReserva"
-          :plazoInicial="tiempoInicial" />
+          :showTime="tipoPlazoReserva === 'Por hora'" :isDateDisabled="isDayDisabled" label="Seleccionar salida"
+          :plazo="tipoPlazoReserva" :plazoInicial="tiempoInicial" />
 
       </div>
+
     </div>
 
     <!-- Tarifa -->
@@ -79,8 +88,11 @@
     <!-- Botón reservar -->
     <button @click="$emit('reservar')"
       class="w-full flex justify-center items-center gap-3 bg-gradient-to-r from-[#00B4D8] to-newgreen text-[#0D1B2A] px-6 py-3 rounded-xl text-xl font-bold shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all">
-      <font-awesome-icon icon="calendar-check" class="text-xl" />
-      Reservar Ahora
+      <img v-if="loading" :src="loadIcon" alt="Cargando" class="w-6 h-6" />
+      <div v-else>
+        <font-awesome-icon icon="calendar-check" class="text-xl" />
+        Solicitar reserva
+      </div>
     </button>
   </section>
 </template>
@@ -88,9 +100,9 @@
 
 <script setup>
 import MenuDropdown from "../layout/MenuDropdown.vue";
-import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { computed, watch } from "vue";
+import { computed, toRefs, watch } from "vue";
+import loadIcon from "../../assets/load-icon_secondary.svg";
 import FuturisticDatepicker from "../common/FuturisticDatepicker.vue";
 
 const props = defineProps({

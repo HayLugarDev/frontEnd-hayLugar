@@ -38,6 +38,8 @@ import IndustrialSpaceCreate from '../pages/IndustrialSpaceCreate.vue'
 import IndustrialParkCreate from '../pages/IndustrialParkCreate.vue'
 import IndustrialReservation from '../pages/IndustrialReservation.vue'
 import LandingB2B from '../pages/LandingB2B.vue'
+import ReservationRequest from '../pages/reservationRequest.vue'
+import ReservationRequestFailed from '../pages/reservationRequestFailed.vue'
 import TrafficNationalView from '../pages/TrafficNationalView.vue'
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
@@ -62,7 +64,9 @@ const routes: RouteRecordRaw[] = [
 
   { path: '/add-space', component: addSpace, meta: { requiresAuth: true } },
   { path: '/espacio/:slug', component: detailSpace },
-  { path: '/pago', component: payment, meta: { requiresAuth: true } },
+  { path: '/reservations/pago', component: payment, meta: { requiresAuth: true } },
+  { path: '/reservation-request/confirmed', component: ReservationRequest, meta: { requiresAuth: true } },
+  { path: '/reservation-request/failed', component: ReservationRequestFailed, meta: { requiresAuth: true } },
   { path: '/confirmacion', component: confirmaReserva, meta: { requiresAuth: true } },
   { path: '/profile', component: profile, meta: { requiresAuth: true } },
   { path: '/personal-profile-user', component: PersonalProfile, meta: { requiresAuth: true } },
