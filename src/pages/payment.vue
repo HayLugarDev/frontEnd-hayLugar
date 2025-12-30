@@ -229,6 +229,7 @@ import Logo from '../assets/logo.png'
 
 const router = useRouter();
 const reservationStore = useReservationStore();
+const reserva = computed(() => reservationStore.reservation);
 
 type PaymentMethod = 'tarjeta' | 'cuenta_mp';
 
@@ -267,6 +268,13 @@ const obtenerEspacio = async () => {
 
 onMounted(async () => {
   await obtenerEspacio();
+
+  if (!reserva.value) {
+    console.warn('Intento de acceso inválido a pago');
+    router.push('/dashboard');
+    return;
+  }
+
   if (!reservationStore.reservation.space_id || !reservationStore.reservation.start_time) {
     console.error('Error en envío de datos.');
     router.push('/dashboard');
@@ -317,8 +325,6 @@ const verifyPaymentMethod = (method: PaymentMethod) => {
     initWalletBrick();
   }
 };
-
-const reserva = computed(() => reservationStore.reservation);
 
 const ratingLabel = computed(() => {
   const rating = espacio.value?.average_rating || 0;

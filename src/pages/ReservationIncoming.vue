@@ -1,5 +1,5 @@
 <template>
-  
+
   <MainHeader />
 
   <!-- BOTÓN ATRÁS MOBILE -->
@@ -83,7 +83,7 @@
             </div>
 
             <!-- MENSAJE / ESTADO -->
-            <p class="text-xs text-gray-400 italic">
+            <p class="text-sm text-gray-400 italic">
               {{ getStatusInfo(reservation.status).message }}
             </p>
 
@@ -91,6 +91,10 @@
             <div class="flex flex-wrap gap-2 pt-1">
               <span v-if="hasHold(reservation)" class="badge-success">
                 <span class="dot bg-emerald-500"></span> Retención OK
+              </span>
+
+              <span v-else-if="reservation.status === 'approved' && reservation.payment_status === 'pending'" class="badge-info">
+                <span class="dot bg-amber-500"></span> Pago pendiente
               </span>
 
               <span v-else-if="reservation.payment_id && !hasHold(reservation)" class="badge-info">
@@ -191,6 +195,8 @@
   <RatingModal :visible="showRatingModal" :reservationId="selectedReservation?.id" @close="showRatingModal = false"
     @submit="handleRatingSubmit" />
 
+  <SessionExpired :sessionExpired="isSessionInvalid" />
+
 </template>
 
 <script setup lang="ts">
@@ -209,10 +215,14 @@ import BackButton from '../components/common/BackButton.vue';
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
 import { showToast } from '../utils/toast';
 import { formatDate } from '../utils/FormatDate';
+import SessionExpired from '../components/common/SessionExpired.vue';
+import { useVerifyToken } from '../logic/useVerifyToken';
 
 const reservations = ref<any[]>([]);
 const userStore = useUserStore();
 const router = useRouter();
+
+const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 const showCheckInModal = ref(false);
 const showErrorModal = ref(false);
@@ -281,7 +291,7 @@ function canFinalize(reservation: any) {
 function confirmApprovedReservation(reservation: any) {
   selectedReservation.value = reservation;
   modalConfig.value = {
-    message: '¿Aprobar esta reserva? Recuerda que te comprometes a recibir al usuario al momento de realizar el check-in.',
+    message: '¿Aprobar esta reserva? Una vez aprobada, el cliente podrá realizar el pago para confirmar la reserva.',
     buttonText: 'Confirmar',
     onConfirm: () => approveReservation()
   };
@@ -290,7 +300,7 @@ function confirmApprovedReservation(reservation: any) {
 
 async function approveReservation() {
   try {
-    await api.put(`/reservations/${selectedReservation.value.id}/status`, { status: 'approved' }, { withCredentials: true });
+    await api.put(`/reservations/${selectedReservation.value.id}/status`, { status: 'payment_pending' }, { withCredentials: true });
 
     showConfirmModal.value = false;
     selectedReservation.value = null;
@@ -512,6 +522,9 @@ async function handleRatingSubmit(formData: { rating: number; comment?: string }
 
 // ================== CICLO VIDA ==================
 onMounted(async () => {
+  await verifyToken();
+  if (isSessionInvalid.value) return;
+
   await fetchReservations();
   setInterval(updateCountdowns, 1000);
 });

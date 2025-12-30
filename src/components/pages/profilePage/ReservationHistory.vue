@@ -65,6 +65,13 @@
 
           <div class="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 bg-white/10 border-white/10">
 
+            <!-- Pagar reserva -->
+            <button v-if="reservation.status === 'payment_pending' && reservation.payment_status === 'pending'"
+              @click="paymentReservation(reservation)"
+              class="flex items-center gap-2 bg-newgreen text-white px-4 py-2 rounded-xl shadow hover:bg-green-600 transition-all">
+              <font-awesome-icon icon="credit-card" /> Pagar reserva
+            </button>
+
             <!-- Check-in -->
             <button v-if="reservation.status === 'approved'" @click="checkInInit(reservation)"
               :disabled="!checkInEnabled[reservation.id]"
@@ -79,7 +86,7 @@
             </button>
 
             <!-- Cancelar -->
-            <button v-if="reservation.status === 'pending'" @click="confirmCancelation(reservation)"
+            <button v-if="reservation.status === 'pending' && reservation.payment_status === 'pending'" @click="confirmCancelation(reservation)"
               class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition-all">
               <font-awesome-icon icon="ban" /> Cancelar
             </button>
@@ -107,7 +114,8 @@
     </div>
 
     <!-- Modal CheckIn -->
-    <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-white/10 border border-white/10 z-50">
+    <div v-if="showCheckInModal"
+      class="fixed inset-0 flex items-center justify-center bg-white/10 border border-white/10 z-50">
       <div class="bg-white rounded-lg shadow-lg p-6 w-96">
         <h2 class="text-lg font-bold mb-4">Verificar Check-In</h2>
 
@@ -139,6 +147,8 @@
 
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
       message="Ocurrió un error al procesar la acción" :icon="logo" @confirm="showErrorModal = false" />
+
+    <SessionExpired :sessionExpired="isSessionInvalid" />
   </section>
 </template>
 
@@ -156,6 +166,12 @@ import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 import RatingModal from '../../common/RatingModal.vue';
 import { showToast } from '../../../utils/toast';
 import logo from "../../../assets/logo.png";
+import { verifyActiveSession } from '../../../middleware/verifyToken';
+import SessionExpired from '../../common/SessionExpired.vue';
+import { useVerifyToken } from '../../../logic/useVerifyToken';
+import { useReservationStore } from '../../../store/reservationStore';
+
+const reservationStore = useReservationStore();
 
 const reservations = ref([]);
 const userStore = useUserStore();
@@ -167,6 +183,8 @@ const showErrorCheckinModal = ref(false);
 const showSuccessModal = ref(false);
 const showConfirmModal = ref(false);
 const loading = ref(true);
+
+const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 const checkInEnabled = ref<Record<number, boolean>>({});
 
@@ -203,27 +221,21 @@ const fetchReservations = async () => {
   loading.value = false;
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await verifyToken();
+  if (isSessionInvalid.value) return;
+
+  await fetchReservations();
   updateCheckInEnabled(); // inicial
+  setInterval(updateCountdowns, 1000);
   setInterval(updateCheckInEnabled, 1000); // actualización en tiempo real
 });
-
-onMounted(async () => {
-  await fetchReservations();
-  setInterval(updateCountdowns, 1000);
-});
-
-function openCheckInModal() {
-  showErrorModal.value = false;
-  showSuccessModal.value = false;
-  showCheckInModal.value = true;
-}
 
 async function confirmCheckIn() {
   if (!selectedReservation.value) return;
 
   try {
-    const response = await api.post(`/reservations/${selectedReservation.value.id}/verify-checkin`,
+    await api.post(`/reservations/${selectedReservation.value.id}/verify-checkin`,
       { code: checkInCode.value },
       { withCredentials: true }
     );
@@ -231,13 +243,28 @@ async function confirmCheckIn() {
     selectedReservation.value.status = "verified";
     showCheckInModal.value = false;
 
+    showToast('Check-In verificado con éxito. ¡Yá podés estacionar!', 'success');
+
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || "Error al verificar código";
   }
 }
 
-function goToReservation() {
-  router.push('/profile?section=reservas')
+function paymentReservation(reservation: any) {
+  // Seguridad extra
+  if (
+    reservation.status !== 'payment_pending' ||
+    reservation.payment_status !== 'pending'
+  ) {
+    showToast('Esta reserva no puede pagarse en este momento', 'error');
+    return;
+  }
+
+  // 👉 Cargar TODO en el store
+  reservationStore.setReservationData(reservation);
+
+  // 👉 Navegar
+  router.push('/reservations/pago');
 }
 
 function checkInInit(reservation: any) {
@@ -394,11 +421,13 @@ function updateCountdowns() {
 section {
   animation: fadeIn 0.4s ease-in-out;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

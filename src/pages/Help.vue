@@ -43,10 +43,13 @@
                             disponibles cerca tuyo.</li>
                         <li>Filtrá por tipo de vehículo, tarifa o disponibilidad horaria.</li>
                         <li>Seleccioná un espacio, elegí el tiempo (hora, día, semana o mes, según
-                            disponibilidad) y confirmá tu reserva.</li>
-                        <li>Pagá tus reservas a través de la plataforma MercadoPago.</li>
-                        <li>Recibirás una confirmación por correo electrónico con los detalles de tu reserva y
-                            los pasos para continuar con la misma.</li>
+                            disponibilidad) y hacé la solicitud de reserva.</li>
+                        <li>Un a vez que el Anfitrión apruebe tu reserva, recibirás un link para abonar la misma
+                            a través de la plataforma MercadoPago y ¡Listo! Tu reserva estará confirmada.
+                        </li>
+                        <li>Recibirás una confirmación por correo electrónico y en la app con los detalles de tu reserva y
+                            los pasos para hacer el ingreso en el horario seleccionado.</li>
+                        <li class="text-red-300">En caso de ser rechazada la solicitud por parte del Anfitrión, se te informará por los mismos medios.</li>
                     </ul>
                 </section>
 

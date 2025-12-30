@@ -10,3 +10,8 @@ export const getReservationById = async (reservation_id: number) => {
     return [];
   }
 }
+
+export async function createReservation(payload: any) {
+  const { data } = await api.post("/reservations/create", payload);
+  return data.reservation;
+}

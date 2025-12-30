@@ -58,10 +58,10 @@
                 </div>
               </div>
               <!-- Admin -->
-                <div v-if="isAdmin" class="mb-4 hidden md:block ">
-                  <SettingsItem class="gap-2" icon="fa-solid fa-wrench" label="Administración" :isAdmin="isAdmin"
-                    @click="router.push('/admin-page')" />
-                </div>
+              <div v-if="isAdmin" class="mb-4 hidden md:block ">
+                <SettingsItem class="gap-2" icon="fa-solid fa-wrench" label="Administración" :isAdmin="isAdmin"
+                  @click="router.push('/admin-page')" />
+              </div>
             </div>
 
             <ul class="w-full flex-1 sm:grid grid-cols-2 mt-8 border-b border-gray-600 pb-8 space-y-1 px-2">
@@ -101,7 +101,7 @@
 
             </ul>
 
-            <button @click="verifyToken('/quit')" 
+            <button @click="verifyToken('/quit')"
               class="w-full flex-1 my-2 p-2 text-newgreen hover:bg-white/10 rounded-xl">
               Cerrar sesión
             </button>
@@ -126,6 +126,8 @@
 
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage" :icon="logo"
       @confirm="showErrorModal = false" />
+
+    <SessionExpired :sessionExpired="isSessionInvalid" />
 
   </div>
 
@@ -152,6 +154,7 @@ import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import SettingsItem from '../components/pages/profilePage/UI/SettingsItem.vue';
 import logo from "../assets/logo.png";
 import { useVerifyToken } from '../logic/useVerifyToken';
+import SessionExpired from '../components/common/SessionExpired.vue';
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -217,7 +220,11 @@ function normalizeSection(s?: string | null): typeof activeSection.value {
 }
 
 // Arranque: leer query y normalizar
-onMounted(() => {
+onMounted(async () => {
+
+  await verifyToken();
+  if (isSessionInvalid.value) return;
+
   console.log(usuario.value);
   const sectionFromUrl = route.query.section as string | undefined;
   const normalized = normalizeSection(sectionFromUrl);

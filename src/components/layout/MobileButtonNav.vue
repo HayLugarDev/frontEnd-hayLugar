@@ -1,6 +1,6 @@
 <template>
   <nav class="bottom-safe fixed bottom-0 left-0 right-0 md:hidden z-50 
-         bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+         backdrop-blur-xl bg-black/70 border-t border-white/10 
          transition-transform duration-400" :class="isHidden ? 'translate-y-full' : 'translate-y-0'">
 
     <ul class="flex justify-around items-center py-4">
@@ -108,5 +108,10 @@ nav ul li {
 nav ul li:hover {
   transform: translateY(-2px);
   opacity: 0.9;
+}
+
+.bottom-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: constant(safe-area-inset-bottom);
 }
 </style>

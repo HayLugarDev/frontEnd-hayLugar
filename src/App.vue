@@ -19,5 +19,15 @@ onMounted(async ()=> userStore.fetchUser());
   </div>
 </template>
 
-<style scoped>
+<style>
+.safe-area-container {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+
+  /* fallback para algunos navegadores */
+  padding-top: constant(safe-area-inset-top);
+  padding-bottom: constant(safe-area-inset-bottom);
+}
 </style>

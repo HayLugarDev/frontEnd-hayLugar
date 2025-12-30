@@ -12,8 +12,13 @@ export default function vehicleLabel(type: string) {
   }
 }
 
-export function getVehicleKey(spanishLabel: string): VehicleType | null {
+export function getVehicleKey(
+  spanishLabel?: string | null
+): VehicleType | null {
+  if (!spanishLabel) return null;
+
   const entry = Object.entries(vehicleTypeTranslations)
     .find(([_, value]) => value === spanishLabel);
+
   return entry ? (entry[0] as VehicleType) : null;
 }
