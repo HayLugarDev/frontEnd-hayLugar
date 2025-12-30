@@ -1,6 +1,7 @@
 export type ReservationMessageStatus =
   | "pending"
-  | "approved"
+  | "payment_pending"
+  | "payment_approved"
   | "failed"
   | "verified"
   | "in_progress"
@@ -19,13 +20,18 @@ export const reservationMessages: Record<
 > = {
   pending: {
     label: "Pendiente",
-    client: "Debes aguardar a que el anfitrión apruebe tu reserva para poder utilizar el espacio en la fecha seleccionada.",
-    owner: "Tienes una nueva solicitud de reserva pendiente de aprobación.",
+    client: "Debes aguardar a que el anfitrión apruebe tu reserva para poder utilizar el espacio en la fecha y hora seleccionada.",
+    owner: "Tienes una nueva solicitud de reserva pendiente de aprobación.\n\nRevisa los detalles y aprueba o rechaza la solicitud.",
   },
-  approved: {
+  payment_pending: {
+    label: "Pago pendiente",
+    client: "Tu reserva ha sido aprobada por el anfitrión. Debes realizar el pago para confirmar tu reserva y recibir el código de check-in.",
+    owner: "El cliente debe realizar el pago para confirmar la reserva.\n\nUna vez que el pago sea aprobado, el usuario recibirá el código de check-in para ingresar a tu espacio.",
+  },
+  payment_approved: {
     label: "Confirmado",
-    client: "Todo está listo para que guardes tu vehículo en el horario seleccionado. Recuerda ser puntual para evitar penalidades. Podrás realizar el Checkin hasta 10 minutos antes del inicio de la resera",
-    owner: "Has aprobado la reserva. El cliente podrá utilizar el espacio en el horario seleccionado una vez que realice el Checkin.",
+    client: "Todo está listo para que guardes tu vehículo en el horario selecc",
+    owner: "Has aprobado la reserva. El cliente podrá utilizar el espacio en el horario seleccionado una vez que realice el check-in.",
   },
   cancelled: {
     label: "Rechazado",
@@ -56,7 +62,8 @@ export const reservationMessages: Record<
 
 export const statusColors: Record<ReservationMessageStatus, string> = {
   pending: "bg-yellow-100 text-yellow-800 border border-yellow-300",
-  approved: "bg-green-100 text-green-800 border border-green-300",
+  payment_pending: "bg-orange-100 text-orange-800 border border-orange-300",
+  payment_approved: "bg-green-100 text-green-800 border border-green-300",
   cancelled: "bg-red-100 text-red-800 border border-red-300",
   failed: "bg-gray-200 text-gray-700 border border-gray-300",
   verified: "bg-blue-100 text-blue-800 border border-blue-300",

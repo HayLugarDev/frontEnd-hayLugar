@@ -12,7 +12,7 @@
     <li v-if="!user" @click="$emit('navigate', '/login')" class="menu-item">
       <font-awesome-icon icon="right-to-bracket" /> <span>Iniciar sesión</span>
     </li>
-    <li v-if="user" @click="$emit('navigate', '/admin-page')" class="menu-item">
+    <li v-if="user?.role === 'admin'" @click="$emit('navigate', '/admin-page')" class="menu-item">
       <font-awesome-icon icon="wrench" /> <span>Administración</span>
     </li>
     <li v-if="user" @click="$emit('navigate', '/profile')" class="menu-item">

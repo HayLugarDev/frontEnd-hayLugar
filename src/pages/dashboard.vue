@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-x-hidden">
+    class="font-normal relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-x-hidden">
 
     <!-- LOADING -->
      <div v-if="loading || !spaces">

@@ -9,10 +9,10 @@
     <!-- MENÚ INFERIOR MOBILE -->
     <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
-    <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-20 md:pt-24 md:px-6 md:py-10 text-white">
+    <div
+        class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-20 md:pt-24 md:px-6 md:py-10 text-white">
 
-        <section
-            class="p-6 md:p-10 max-w-3xl mx-auto">
+        <section class="p-6 md:p-10 max-w-3xl mx-auto">
             <!-- Título -->
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-3xl font-bold text-white flex items-center gap-3 drop-shadow">
@@ -28,8 +28,13 @@
 
             <!-- Lista de Notificaciones -->
             <ul v-else-if="notifications.length" class="flex flex-col gap-4">
-                <li v-for="(notification, index) in notifications" :key="index" class="px-5 py-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg
-                 hover:bg-white/10 transition-all cursor-pointer flex flex-col gap-4">
+                <li v-for="(notification, index) in notifications" :key="index" :class="[
+                    'px-5 py-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg',
+                    'hover:bg-white/10 transition-all cursor-pointer flex flex-col gap-4',
+                    blink && index === 0
+                        ? 'animate-jump ring-2 ring-[#00B4D8]/60 bg-[#00B4D8]/10'
+                        : ''
+                ]">
 
                     <!-- Header -->
                     <div class="flex items-start justify-between">
@@ -101,6 +106,8 @@
 
         <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
             @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
+
+        <SessionExpired :sessionExpired="isSessionInvalid" />
     </div>
 </template>
 
@@ -117,12 +124,37 @@ import { statusColors } from '../logic/useReservationMessages';
 import loadIcon from "../assets/load-icon_secondary.svg";
 import ItemSkeleton from '../components/layout/skeletons/ItemSkeleton.vue';
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
+import { useVerifyToken } from '../logic/useVerifyToken';
+import SessionExpired from '../components/common/SessionExpired.vue';
 
 const router = useRouter();
 const notifications = ref([]);
 const userStore = useUserStore();
 const showConfirmModal = ref(false);
 const loading = ref(true);
+
+const { verifyToken, isSessionInvalid } = useVerifyToken();
+
+const blink = ref(false);
+
+onMounted(async () => {
+
+    await verifyToken();
+    if (isSessionInvalid.value) return;
+
+    await fetchNotifications();
+    const shouldBlink = sessionStorage.getItem('blinkNotification');
+
+    if (shouldBlink) {
+        blink.value = true;
+        sessionStorage.removeItem('blinkNotification');
+
+        setTimeout(() => {
+            blink.value = false;
+        }, 2000);
+    }
+});
+
 
 const modalConfig = ref({
     message: '',
@@ -189,11 +221,11 @@ const fetchNotifications = async () => {
 };
 
 const goToReservations = () => {
-    return router.push('/profile?section=reservas');
+    return router.push('/profile?section=reservas-anteriores');
 };
 
 const goToIncomingReservations = () => {
-    return router.push('/profile?section=reservas-entrantes');
+    return router.push('/owner/reservation-incoming');
 };
 
 
@@ -208,8 +240,6 @@ const markNotificationsAsRead = async (ids: number[]) => {
         console.error("Error al marcar como leídas", error);
     }
 };
-
-onMounted(fetchNotifications);
 
 const formatDate = (value: string): string => {
     const date = new Date(value);
