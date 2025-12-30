@@ -68,6 +68,30 @@
         </div>
       </div> -->
 
+           <!-- NAVBAR -->
+      <div class="relative py-4">
+        <div
+          class="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-[#0D1B2A] to-transparent">
+        </div>
+        <div
+          class="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#0D1B2A] to-transparent">
+        </div>
+
+        <div class="flex gap-4 px-4 overflow-x-auto hide-scrollbar">
+         
+
+            <FeatureButton
+     
+            :icon="ParkingCircleIcon"
+            color="#EF4444"
+            title="Tráfico"
+            subtitle="En tiempo real"
+            :enabled="true"
+            :onClick="() => router.push('/traffic')"
+    />
+        </div>
+      </div>
+
       <span class="w-full rounded-t-xl font-bold tracking-tight text-xl md:text-2xl text-gray-200 pl-6 md:pl-10 pt-4">
         Cerca de ti...
       </span>
