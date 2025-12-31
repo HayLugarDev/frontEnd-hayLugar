@@ -4,7 +4,16 @@
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-    <BackButton />
+
+    <!-- SAFE AREA -->
+    <div class="safe-top"></div>
+
+    <!-- CONTENIDO REAL -->
+    <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+      <BackButton />
+    </div>
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
@@ -93,7 +102,8 @@
                 <span class="dot bg-emerald-500"></span> Retención OK
               </span>
 
-              <span v-else-if="reservation.status === 'approved' && reservation.payment_status === 'pending'" class="badge-info">
+              <span v-else-if="reservation.status === 'approved' && reservation.payment_status === 'pending'"
+                class="badge-info">
                 <span class="dot bg-amber-500"></span> Pago pendiente
               </span>
 

@@ -1,11 +1,21 @@
 <template>
   <div class="min-h-screen flex flex-col bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
 
-    <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-      <BackButton />
-    </div>
-
     <MainHeader />
+
+    <!-- BOTÓN ATRÁS MOBILE -->
+    <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+
+      <!-- SAFE AREA -->
+      <div class="safe-top"></div>
+
+      <!-- CONTENIDO REAL -->
+      <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+        <BackButton />
+      </div>
+    </div>
 
     <!-- MENÚ INFERIOR MOBILE -->
     <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
@@ -19,8 +29,7 @@
 
     <!-- Contenedor central -->
     <div class="flex-grow flex items-center justify-center px-6 sm:pt-16">
-      <div
-        class="bg-gray-800 text-gray-200 rounded-2xl shadow-2xl w-full max-w-md p-10 text-center">
+      <div class="bg-gray-800 text-gray-200 rounded-2xl shadow-2xl w-full max-w-md p-10 text-center">
         <!-- Logo -->
         <img :src="logo" alt="HayLugar" class="mx-auto w-20 h-20 mb-4 drop-shadow-lg select-none" loading="eager" />
 

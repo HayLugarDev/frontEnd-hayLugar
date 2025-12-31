@@ -1,11 +1,21 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-16">
 
-    <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-      <BackButton />
-    </div>
-
     <MainHeader />
+
+    <!-- BOTÓN ATRÁS MOBILE -->
+    <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+
+      <!-- SAFE AREA -->
+      <div class="safe-top"></div>
+
+      <!-- CONTENIDO REAL -->
+      <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+        <BackButton />
+      </div>
+    </div>
 
     <!-- Hero -->
     <section class="py-16 px-6 text-center max-w-4xl mx-auto">

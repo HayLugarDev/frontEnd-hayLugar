@@ -1,10 +1,20 @@
 <template>
 
-  
+
   <MainHeader />
 
+  <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-    <BackButton />
+
+    <!-- SAFE AREA -->
+    <div class="safe-top"></div>
+
+    <!-- CONTENIDO REAL -->
+    <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+      <BackButton />
+    </div>
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
@@ -13,8 +23,7 @@
   <div
     class="min-h-screen bg-gradient-to-br pt-16 sm:p-8 from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] md:px-6 md:py-10 text-white">
 
-    <section
-      class="mx-auto p-10 md:pt-20 md:p-8 w-full md:w-2/3 flex flex-col gap-6">
+    <section class="mx-auto p-10 md:pt-20 md:p-8 w-full md:w-2/3 flex flex-col gap-6">
 
       <!-- Header y saldo -->
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

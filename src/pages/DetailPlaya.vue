@@ -1,10 +1,21 @@
 <template>
 
-  <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
-    <BackButton />
+  <MainHeader />
+
+  <!-- BOTÓN ATRÁS MOBILE -->
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+
+    <!-- SAFE AREA -->
+    <div class="safe-top"></div>
+
+    <!-- CONTENIDO REAL -->
+    <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+      <BackButton />
+    </div>
   </div>
 
-  <MainHeader />
   <div class="px-4 sm:px-8 py-6 bg-secondary min-h-screen">
     <template v-if="loading">
       <div class="text-center py-10 text-gray-500">Cargando datos...</div>
