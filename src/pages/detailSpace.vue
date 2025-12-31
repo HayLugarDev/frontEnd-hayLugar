@@ -1,11 +1,20 @@
 <template>
 
-  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-    <BackButton />
-  </div>
-
-
   <MainHeader />
+
+  <!-- BOTÓN ATRÁS MOBILE -->
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+
+    <!-- SAFE AREA -->
+    <div class="safe-top"></div>
+
+    <!-- CONTENIDO REAL -->
+    <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+      <BackButton />
+    </div>
+  </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
@@ -188,7 +197,8 @@
           :tipoVehiculo="tipoVehiculo" :tipoPlazoReserva="tipoPlazoReserva" :tiempoInicial="tiempoInicial"
           :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
           @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
-          @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event" @reservar="reservar" />
+          @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event"
+          @reservar="reservar" />
 
         <!-- Botón para dueño -->
         <div v-else-if="isOwner"
@@ -407,7 +417,7 @@ const disponibilidad = computed(() => {
 const obtenerEspacio = async () => {
   const slug = route.params.slug
   const space = await spaceStore.fetchSpaceBySlug(slug)
-  
+
   console.log(space);
   if (!space) return
 

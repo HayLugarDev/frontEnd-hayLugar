@@ -1,24 +1,29 @@
 <template>
 
-  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-    <BackButton />
-  </div>
-
-  
   <MainHeader />
+
+  <!-- BOTÓN ATRÁS MOBILE -->
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+
+    <!-- SAFE AREA -->
+    <div class="safe-top"></div>
+
+    <!-- CONTENIDO REAL -->
+    <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+      <BackButton />
+    </div>
+  </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
 
-  <div
-    class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
-           text-white overflow-hidden"
-  >
+  <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+           text-white overflow-hidden">
     <!-- ===== HEADER + TABS ===== -->
-    <header
-      class="relative z-10 px-6 pt-16 py-4 md:px-12 flex flex-col items-center
-             bg-gradient-to-b from-black/20 to-transparent md:hidden"
-    >
+    <header class="relative z-10 px-6 pt-16 py-4 md:px-12 flex flex-col items-center
+             bg-gradient-to-b from-black/20 to-transparent md:hidden">
       <div class="flex items-center gap-3">
         <img :src="logo" alt="HayLugar" class="h-10 w-10" />
         <h1 class="text-2xl font-semibold tracking-wide drop-shadow">
@@ -28,63 +33,43 @@
 
       <!-- Tabs en mobile -->
       <div class="flex items-center gap-2 ml-auto">
-        <button
-          class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
+        <button class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
                  backdrop-blur-md bg-white/10 hover:bg-white/20 shadow-md"
-          :class="showMap ? 'text-newgreen' : 'text-gray-300'"
-          @click="showMap = true"
-        >
+          :class="showMap ? 'text-newgreen' : 'text-gray-300'" @click="showMap = true">
           Mapa
         </button>
 
-        <button
-          class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
+        <button class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
                  backdrop-blur-md bg-white/10 hover:bg-white/20 shadow-md"
-          :class="!showMap ? 'text-newgreen' : 'text-gray-300'"
-          @click="showMap = false"
-        >
+          :class="!showMap ? 'text-newgreen' : 'text-gray-300'" @click="showMap = false">
           Lista
         </button>
       </div>
     </header>
 
     <!-- ===== FILTROS ===== -->
-    <section
-      class="mt-6 px-6 container mx-auto py-4 rounded-2xl bg-white/5 
-             backdrop-blur-xl border border-white/10 shadow-lg"
-    >
+    <section class="mt-6 px-6 container mx-auto py-4 rounded-2xl bg-white/5 
+             backdrop-blur-xl border border-white/10 shadow-lg">
       <div class="flex flex-wrap gap-3 items-center">
         <!-- Botones -->
-        <button
-          class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
-                 backdrop-blur-sm shadow-sm"
-          :class="filters.groups.students
-            ? 'bg-newgreen/30 text-newgreen'
-            : 'bg-white/5 text-gray-300 hover:bg-white/10'"
-          @click="toggleGroup('students')"
-        >
+        <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+                 backdrop-blur-sm shadow-sm" :class="filters.groups.students
+                  ? 'bg-newgreen/30 text-newgreen'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="toggleGroup('students')">
           🎓 Alumnos
         </button>
 
-        <button
-          class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
-                 backdrop-blur-sm shadow-sm"
-          :class="filters.groups.staff
-            ? 'bg-[#00B4D8]/30 text-[#00B4D8]'
-            : 'bg-white/5 text-gray-300 hover:bg-white/10'"
-          @click="toggleGroup('staff')"
-        >
+        <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+                 backdrop-blur-sm shadow-sm" :class="filters.groups.staff
+                  ? 'bg-[#00B4D8]/30 text-[#00B4D8]'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="toggleGroup('staff')">
           🧑‍🏫 Docentes
         </button>
 
-        <button
-          class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
-                 backdrop-blur-sm shadow-sm"
-          :class="filters.onlyAvailable
-            ? 'bg-amber-300/20 text-amber-300'
-            : 'bg-white/5 text-gray-300 hover:bg-white/10'"
-          @click="filters.onlyAvailable = !filters.onlyAvailable"
-        >
+        <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+                 backdrop-blur-sm shadow-sm" :class="filters.onlyAvailable
+                  ? 'bg-amber-300/20 text-amber-300'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="filters.onlyAvailable = !filters.onlyAvailable">
           ✅ Disponibles
         </button>
 
@@ -98,54 +83,32 @@
     <!-- ===== CONTENIDO MAPA / LISTA ===== -->
     <section class="p-6 container mx-auto">
       <!-- ===== MAPA ===== -->
-      <div
-        v-if="showMap"
-        class="w-full h-[68vh] relative rounded-2xl overflow-hidden shadow-2xl 
-               bg-[#0D1B2A]/60 border border-white/10 backdrop-blur-xl"
-      >
+      <div v-if="showMap" class="w-full h-[68vh] relative rounded-2xl overflow-hidden shadow-2xl 
+               bg-[#0D1B2A]/60 border border-white/10 backdrop-blur-xl">
         <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions" :locateUser="true">
-          <GMapPolygon
-            v-for="(zona, i) in zonasFiltradas"
-            :key="'zone-' + i"
-            :paths="zona.paths"
-            :options="{ ...zona.options, clickable: false, zIndex: 1 }"
-          />
+          <GMapPolygon v-for="(zona, i) in zonasFiltradas" :key="'zone-' + i" :paths="zona.paths"
+            :options="{ ...zona.options, clickable: false, zIndex: 1 }" />
 
-          <GMapMarker
-            :position="utnMarkerPosition"
-            :icon="universityIcon"
-            :options="{ zIndex: 3, clickable: false }"
-          />
+          <GMapMarker :position="utnMarkerPosition" :icon="universityIcon" :options="{ zIndex: 3, clickable: false }" />
 
-          <GMapMarker
-            v-for="(espacio, idx) in espaciosFiltrados"
-            :key="'mk-' + espacio.id + '-' + idx"
-            :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-            :icon="getMarkerIcon(espacio)"
-            :options="{ zIndex: 2 }"
-            @mouseover="setHovered(espacio)"
-            @mouseout="clearHovered"
-            @click="openAccessModal(espacio)"
-          />
+          <GMapMarker v-for="(espacio, idx) in espaciosFiltrados" :key="'mk-' + espacio.id + '-' + idx"
+            :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="getMarkerIcon(espacio)"
+            :options="{ zIndex: 2 }" @mouseover="setHovered(espacio)" @mouseout="clearHovered"
+            @click="openAccessModal(espacio)" />
         </CustomGoogleMap>
 
         <!-- ===== PANEL HOVER ===== -->
         <transition name="slide-fade">
-          <aside
-            v-if="hoveredSpace"
-            class="absolute right-4 top-4 w-[320px]
+          <aside v-if="hoveredSpace" class="absolute right-4 top-4 w-[320px]
                    bg-[#1B263B]/80 backdrop-blur-xl border border-white/10 
-                   rounded-2xl shadow-2xl p-5"
-          >
+                   rounded-2xl shadow-2xl p-5">
             <div class="flex items-start gap-3">
               <span class="px-3 py-1 rounded-lg text-xs font-semibold" :class="badgeClass(hoveredSpace)">
                 {{ groupLabel(hoveredSpace) }}
               </span>
 
-              <span
-                class="ml-auto text-xs font-semibold"
-                :class="hoveredSpace.capacity > 0 ? 'text-newgreen' : 'text-rose-400'"
-              >
+              <span class="ml-auto text-xs font-semibold"
+                :class="hoveredSpace.capacity > 0 ? 'text-newgreen' : 'text-rose-400'">
                 {{ hoveredSpace.capacity > 0 ? 'Disponible' : 'Completo' }}
               </span>
             </div>
@@ -169,21 +132,16 @@
               </div>
             </div>
 
-            <button
-              class="mt-4 w-full bg-[#00B4D8] hover:bg-newgreen text-dark font-semibold 
-                     rounded-xl py-2 transition-all shadow-md"
-              @click="openAccessModal(hoveredSpace)"
-            >
+            <button class="mt-4 w-full bg-[#00B4D8] hover:bg-newgreen text-dark font-semibold 
+                     rounded-xl py-2 transition-all shadow-md" @click="openAccessModal(hoveredSpace)">
               Confirmar acceso
             </button>
           </aside>
         </transition>
 
         <!-- ===== LEYENDA ===== -->
-        <div
-          class="absolute left-4 bottom-4 p-4 rounded-xl bg-[#1B263B]/80 backdrop-blur-xl
-                 border border-white/10 shadow-xl text-xs text-gray-200"
-        >
+        <div class="absolute left-4 bottom-4 p-4 rounded-xl bg-[#1B263B]/80 backdrop-blur-xl
+                 border border-white/10 shadow-xl text-xs text-gray-200">
           <div class="font-semibold text-white mb-2">Leyenda</div>
 
           <div class="flex items-center gap-2 mb-1">
@@ -218,14 +176,13 @@
       </div>
     </section>
 
-    <ConfirmAccessModal :open="modalOpen" :space="selectedSpace" @close="modalOpen = false" @success="onAccessSuccess" />
+    <ConfirmAccessModal :open="modalOpen" :space="selectedSpace" @close="modalOpen = false"
+      @success="onAccessSuccess" />
 
     <!-- ===== FOOTER ===== -->
     <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
-      <div
-        class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
-                gap-4 px-6 py-8 text-[#B0BEC5] text-sm"
-      >
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+                gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
         <div class="flex items-center gap-2">
           <span class="text-white font-semibold tracking-wide">HayLugar</span>
           <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>

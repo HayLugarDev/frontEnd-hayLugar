@@ -1,9 +1,19 @@
 <template>
-    
+
     <MainHeader />
 
+    <!-- BOTÓN ATRÁS MOBILE -->
     <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-        <BackButton />
+
+        <!-- SAFE AREA -->
+        <div class="safe-top"></div>
+
+        <!-- CONTENIDO REAL -->
+        <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+            <BackButton />
+        </div>
     </div>
 
     <!-- MENÚ INFERIOR MOBILE -->
@@ -11,7 +21,7 @@
 
     <div
         class="min-h-screen bg-gradient-to-br py-10 sm:p-8 from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-16 md:px-6 md:py-10 text-white">
-        
+
         <section class="pt-10 md:pt-16 max-w-4xl mx-auto p-6">
 
             <!-- Título -->
@@ -94,7 +104,7 @@
                 <div class="bg-white/5 p-4 rounded-xl border border-white/10 mt-6 text-sm text-gray-300">
                     <p>Usuario desde: <span class="font-medium text-white">{{ formatDate(user.created_at) }}</span></p>
                     <p>Última actualización: <span class="font-medium text-white">{{ formatDate(user.updated_at)
-                    }}</span></p>
+                            }}</span></p>
                 </div>
             </div>
         </section>

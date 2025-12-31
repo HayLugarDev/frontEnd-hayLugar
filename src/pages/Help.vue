@@ -4,7 +4,16 @@
 
     <!-- BOTÓN ATRÁS MOBILE -->
     <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-        <BackButton />
+
+        <!-- SAFE AREA -->
+        <div class="safe-top"></div>
+
+        <!-- CONTENIDO REAL -->
+        <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+            <BackButton />
+        </div>
     </div>
 
     <!-- MENÚ INFERIOR MOBILE -->
@@ -47,9 +56,11 @@
                         <li>Un a vez que el Anfitrión apruebe tu reserva, recibirás un link para abonar la misma
                             a través de la plataforma MercadoPago y ¡Listo! Tu reserva estará confirmada.
                         </li>
-                        <li>Recibirás una confirmación por correo electrónico y en la app con los detalles de tu reserva y
+                        <li>Recibirás una confirmación por correo electrónico y en la app con los detalles de tu reserva
+                            y
                             los pasos para hacer el ingreso en el horario seleccionado.</li>
-                        <li class="text-red-300">En caso de ser rechazada la solicitud por parte del Anfitrión, se te informará por los mismos medios.</li>
+                        <li class="text-red-300">En caso de ser rechazada la solicitud por parte del Anfitrión, se te
+                            informará por los mismos medios.</li>
                     </ul>
                 </section>
 
