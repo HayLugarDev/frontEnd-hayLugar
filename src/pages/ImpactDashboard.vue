@@ -9,12 +9,22 @@
       </div>
     </div>
 
-    <div class="w-full flex justify-end p-4 sm:hidden absolute top-0 left-0 z-50">
-      <BackButton />
-    </div>
-
     <!-- HEADER -->
     <MainHeader />
+
+    <!-- BOTÓN ATRÁS MOBILE -->
+    <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+
+      <!-- SAFE AREA -->
+      <div class="safe-top"></div>
+
+      <!-- CONTENIDO REAL -->
+      <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+        <BackButton />
+      </div>
+    </div>
 
     <!-- KPIs PRINCIPALES -->
     <section class="container mx-auto px-6 md:px-12 py-10 grid gap-6 md:grid-cols-3">

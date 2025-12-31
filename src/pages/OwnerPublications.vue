@@ -1,23 +1,28 @@
 <template>
-  
+
   <MainHeader />
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-    <BackButton />
+
+    <!-- SAFE AREA -->
+    <div class="safe-top"></div>
+
+    <!-- CONTENIDO REAL -->
+    <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+      <BackButton />
+    </div>
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @navigate="(p) => router.push(p)" class="md:hidden" :showMap="false" />
 
   <!-- FONDO -->
-  <div
-    class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
-           text-white p-6 md:p-10"
-  >
-    <section
-      class="pt-10 md:pt-16 max-w-4xl mx-auto p-6 md:p-10"
-    >
+  <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+           text-white p-6 md:p-10">
+    <section class="pt-10 md:pt-16 max-w-4xl mx-auto p-6 md:p-10">
       <!-- HEADER -->
       <header class="mb-8">
         <h2 class="text-3xl font-bold text-primary flex items-center gap-2">
@@ -36,12 +41,8 @@
 
       <!-- LISTA PUBLICACIONES -->
       <div v-else-if="publications.length" class="space-y-6">
-        <div
-          v-for="(publication, index) in publications"
-          :key="index"
-          class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden
-                 shadow-lg hover:shadow-xl transition-all backdrop-blur-xl"
-        >
+        <div v-for="(publication, index) in publications" :key="index" class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden
+                 shadow-lg hover:shadow-xl transition-all backdrop-blur-xl">
           <!-- CARD HEADER -->
           <div class="flex justify-between items-center p-4 bg-white/10 border-b border-white/10">
             <div>
@@ -54,14 +55,12 @@
               </p>
             </div>
 
-            <span
-              :class="[
-                'px-3 py-1 rounded-full text-xs font-semibold shadow-sm',
-                publication.status === 'active'
-                  ? 'bg-green-200/20 text-green-400'
-                  : 'bg-gray-200/20 text-gray-400'
-              ]"
-            >
+            <span :class="[
+              'px-3 py-1 rounded-full text-xs font-semibold shadow-sm',
+              publication.status === 'active'
+                ? 'bg-green-200/20 text-green-400'
+                : 'bg-gray-200/20 text-gray-400'
+            ]">
               {{ getSpanishState(publication.status) }}
             </span>
           </div>
@@ -95,16 +94,9 @@
               </p>
 
               <div class="flex flex-wrap gap-3">
-                <div
-                  v-for="v in publication.vehicle_capacities"
-                  :key="v.type"
-                  class="flex flex-col items-center p-3 border rounded-xl bg-white/10 border-white/10
-                         shadow-sm hover:shadow-md transition-all w-24"
-                >
-                  <font-awesome-icon
-                    :icon="['fas', getVehicleIcon(v.type)]"
-                    class="text-gray-200 text-lg mb-1"
-                  />
+                <div v-for="v in publication.vehicle_capacities" :key="v.type" class="flex flex-col items-center p-3 border rounded-xl bg-white/10 border-white/10
+                         shadow-sm hover:shadow-md transition-all w-24">
+                  <font-awesome-icon :icon="['fas', getVehicleIcon(v.type)]" class="text-gray-200 text-lg mb-1" />
                   <span class="text-xs capitalize text-gray-200">{{ getVehicleType(v.type) }}</span>
                   <span v-if="v.price_per_hour" class="text-xs font-semibold text-primary">
                     ${{ v.price_per_hour.toLocaleString() }}/h
@@ -116,21 +108,15 @@
 
           <!-- ACCIONES -->
           <div class="flex items-center justify-end gap-2 border-t border-white/10 p-4 bg-white/5">
-            <button
-              @click="editPublication(publication)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold
+            <button @click="editPublication(publication)" class="flex items-center justify-center gap-2 text-sm font-semibold
                      bg-newgreen/20 hover:bg-newgreen/30 text-white px-4 py-2
-                     rounded-xl shadow hover:shadow-lg transition-all"
-            >
+                     rounded-xl shadow hover:shadow-lg transition-all">
               <font-awesome-icon :icon="['fas', 'pen-to-square']" /> Editar
             </button>
 
-            <button
-              @click="openConfirm(publication)"
-              class="flex items-center justify-center gap-2 text-sm font-semibold
+            <button @click="openConfirm(publication)" class="flex items-center justify-center gap-2 text-sm font-semibold
                      bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2
-                     rounded-xl shadow hover:shadow-lg transition-all"
-            >
+                     rounded-xl shadow hover:shadow-lg transition-all">
               <font-awesome-icon :icon="['fas', 'trash']" /> Eliminar
             </button>
           </div>
@@ -145,29 +131,13 @@
   </div>
 
   <!-- MODALES -->
-  <StatusModal
-    :visible="showErrorModal"
-    type="error"
-    title="¡Atención!"
-    :message="errorMessage"
-    icon="/src/assets/logo.png"
-    @confirm="showErrorModal = false"
-  />
+  <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage"
+    icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
 
-  <EditPublications
-    :visible="openModal"
-    :spaceId="space?.id"
-    @close="openModal = false"
-    @updated="fetchPublications"
-  />
+  <EditPublications :visible="openModal" :spaceId="space?.id" @close="openModal = false" @updated="fetchPublications" />
 
-  <ConfirmModal
-    :visible="showConfirmModal"
-    :message="modalConfig.message"
-    :button-text="modalConfig.buttonText"
-    @close="showConfirmModal = false"
-    @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }"
-  />
+  <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
+    @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
 </template>
 
 <script setup lang="ts">
@@ -209,7 +179,7 @@ const errorMessage = ref("");
 const modalConfig = ref({
   message: "",
   buttonText: "Aceptar",
-  onConfirm: () => {},
+  onConfirm: () => { },
 });
 
 function openConfirm(publication) {
@@ -270,11 +240,13 @@ function editPublication(pub) {
 section {
   animation: fadeIn 0.3s ease-in-out;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

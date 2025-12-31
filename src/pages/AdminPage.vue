@@ -2,11 +2,22 @@
 
   <MainHeader class="hidden sm:block" />
 
+  <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-    <BackButton />
+
+    <!-- SAFE AREA -->
+    <div class="safe-top"></div>
+
+    <!-- CONTENIDO REAL -->
+    <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+      <BackButton />
+    </div>
   </div>
 
-  <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-24 md:px-6 md:py-14 text-white">
+  <div
+    class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-24 md:px-6 md:py-14 text-white">
 
     <h1 class="text-3xl font-bold text-primary text-center mb-4">Panel de Administración</h1>
 

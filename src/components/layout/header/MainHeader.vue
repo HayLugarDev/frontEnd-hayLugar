@@ -105,7 +105,6 @@ import NotificationDropdown from './NotificationDropdown.vue';
 import UserMenu from '../UserMenu.vue';
 import MobileUserMenu from './MobileUserMenu.vue';
 import MapButton from '../../pages/dashboardPage/MapButton.vue';
-import BackButton from '../../common/BackButton.vue';
 import HelpModal from '../HelpModal.vue';
 
 const userStore = useUserStore();
