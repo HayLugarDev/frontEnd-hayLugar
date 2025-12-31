@@ -3,21 +3,13 @@
     class="font-normal relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-x-hidden">
 
     <!-- LOADING -->
-     <div v-if="loading || !spaces">
-       <DashboardSkeleton />
-   
-       <!-- BUSCADOR MOBILE AVANZADO -->
-       <div v-if="showSearchMenu"
-         class="p-4 w-11/12 mx-auto bg-[#1B263B]/90 rounded-2xl shadow-2xl border border-white/10">
-         <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
-           v-model:publishedDate="publishedDate" v-model:maxPrice="maxPrice" v-model:sortBy="sortBy" @search="buscar"
-           @close="showSearchMenu = false" />
-       </div>
-     </div>
+    <div v-if="loading || !spaces">
+      <DashboardSkeleton />
+    </div>
 
     <div v-else class="flex flex-col h-full pt-24 md:pt-20">
 
-      
+
       <MainHeader />
 
       <!-- MENÚ INFERIOR MOBILE -->
@@ -65,33 +57,14 @@
 
           <FeatureButton :icon="ParkingSquare" color="#90BE6D" title="Playas" subtitle="Estacioná en tiempo real"
             :enabled="features.playas" :onClick="() => router.push('/playa-dashboard')" />
+
+          <FeatureButton :icon="ParkingCircleIcon" color="#EF4444" title="Tráfico" subtitle="En tiempo real"
+            :enabled="true" :onClick="() => router.push('/traffic')" />
+
         </div>
       </div> -->
 
-           <!-- NAVBAR -->
-      <div class="relative py-4">
-        <div
-          class="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-[#0D1B2A] to-transparent">
-        </div>
-        <div
-          class="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#0D1B2A] to-transparent">
-        </div>
-
-        <div class="flex gap-4 px-4 overflow-x-auto hide-scrollbar">
-         
-
-            <FeatureButton
-     
-            :icon="ParkingCircleIcon"
-            color="#EF4444"
-            title="Tráfico"
-            subtitle="En tiempo real"
-            :enabled="true"
-            :onClick="() => router.push('/traffic')"
-    />
-        </div>
-      </div>
-
+      <!-- TITULO -->
       <span class="w-full rounded-t-xl font-bold tracking-tight text-xl md:text-2xl text-gray-200 pl-6 md:pl-10 pt-4">
         Cerca de ti...
       </span>
@@ -100,7 +73,7 @@
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-4 md:py-0 md:px-8">
 
         <!-- LISTA -->
-        <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 
+        <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 
                  gap-6 justify-items-center">
 
           <div v-if="error" class="absolute inset-0 flex justify-center items-center text-red-400 text-xl">
@@ -164,6 +137,15 @@
       <MapButton v-if="spaces && spaces.length" :text="buttonText" @toggle="toggleMap" class="fixed" />
 
       <WelcomeSpeech />
+
+      <!-- BUSCADOR MOBILE AVANZADO -->
+      <div v-if="showSearchMenu"
+        class="p-4 w-11/12 mx-auto bg-[#1B263B]/90 rounded-2xl shadow-2xl border border-white/10">
+        <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
+          v-model:publishedDate="publishedDate" v-model:maxPrice="maxPrice" v-model:sortBy="sortBy" @search="buscar"
+          @close="showSearchMenu = false" />
+      </div>
+
     </div>
 
   </div>

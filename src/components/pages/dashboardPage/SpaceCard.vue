@@ -9,21 +9,50 @@
         <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover rounded-t-xl" />
 
         <!-- PRICE BADGE -->
-        <div class="absolute bottom-4 right-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-xl
-                    flex items-baseline gap-1 border border-white/10">
-          <span class="text-newgreen font-bold text-sm">${{ getMinPrice() }}</span>
+        <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-lg
+         px-3 py-1 rounded-full border border-white/10
+         flex items-baseline gap-1 shadow-md">
+          <span class="text-[#00E5A0] font-bold text-sm">
+            ${{ getMinPrice() }}
+          </span>
           <span class="text-gray-300 text-[10px]">/h</span>
         </div>
+
       </div>
 
       <!-- CONTENIDO -->
-      <div class="flex flex-col flex-1 p-4 rounded-2xl bg-gray-800
-         -mt-3 relative z-10 shadow-lg">
+      <div class="flex flex-col flex-1 p-4 rounded-2xl bg-gradient-to-b
+         from-[#1B263B] to-[#0D1B2A]
+         -mt-3 relative z-10 shadow-xl">
+
+        <!-- RIBBON PERIODO -->
+        <div class="absolute bottom-0 right-0 w-24 h-24 overflow-hidden pointer-events-none">
+          <div class="absolute bottom-6 -left-2 w-[140px] bg-[#00B4D8]
+           text-white text-xs font-bold uppercase text-center
+           -rotate-45 py-1 shadow-lg">
+            {{ labelHorario }}
+          </div>
+        </div>
 
         <!-- TITULO -->
-        <h3 class="text-white font-semibold text-2xl md:text-base leading-tight line-clamp-1">
+        <h3 class="text-white font-semibold text-2xl md:text-sm leading-tight line-clamp-1">
           {{ capitalizeFirst(espacio.name) }}
         </h3>
+
+        <!-- HORARIO -->
+        <div class="flex items-center gap-2 text-xs text-gray-300 mt-2">
+          <font-awesome-icon icon="clock" class="text-[#00B4D8]" />
+
+          <template v-if="espacio.reservation_period !== 'hour'">
+            <span class="font-medium">Disponible todos los días</span>
+          </template>
+
+          <template v-else>
+            <span class="font-medium">
+              {{ disponibilidad.start }} – {{ disponibilidad.end }} hs
+            </span>
+          </template>
+        </div>
 
         <!-- UBICACIÓN -->
         <p class="text-gray-300 text-md md:text-xs mt-1 line-clamp-1">
@@ -51,7 +80,7 @@
         </div>
 
         <!-- ICONOS VEHÍCULOS -->
-        <div class="flex flex-row justify-start gap-2 mt-3 flex-wrap">
+        <!-- <div class="flex flex-row justify-start gap-2 mt-3 flex-wrap">
           <div v-for="v in espacio.vehicle_capacities" :key="v.type" class="flex items-center gap-1 bg-white/5 border border-white/10 
                    px-2 py-1 rounded-lg text-gray-300">
             <font-awesome-icon :icon="['fas', `${getVehicleIcon(v.type)}`]" class="text-md md:text-xs " />
@@ -59,29 +88,7 @@
               ${{ v.price_per_hour }}/h
             </span>
           </div>
-        </div>
-
-        <!-- AVAILABILITY BADGE -->
-        <div class="mt-3 bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-gray-200 
-                 flex items-center justify-between">
-          <div class="flex items-center gap-1">
-            <span class="text-sm md:text-xs text-[#00B4D8] font-semibold uppercase">
-              {{ labelHorario }}
-            </span>
-          </div>
-
-          <div>
-            <template v-if="espacio.reservation_period !== 'hour'">
-              Todos los días 🗓️
-            </template>
-
-            <template v-else>
-              <div class="text-sm md:text-xs">
-                {{ disponibilidad.start }} - {{ disponibilidad.end }} hs
-              </div>
-            </template>
-          </div>
-        </div>
+        </div> -->
 
       </div>
 
