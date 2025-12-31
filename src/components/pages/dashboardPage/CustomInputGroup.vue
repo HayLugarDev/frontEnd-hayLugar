@@ -1,21 +1,21 @@
 <template>
     <div class="relative grid grid-cols-10 col-span-10 col-start-2 col-end-10 lg:col-span-8 lg:col-start-3 lg:col-end-10 
-      xl:col-span-6 xl:col-start-3 xl:col-end-10 items-center justify-between rounded-full shadow-xl h-14">
+      xl:col-span-6 xl:col-start-3 xl:col-end-10 items-center justify-between rounded-full shadow-md h-14 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]">
 
         <!-- Lugar -->
         <div class="col-span-3 relative flex items-center shadow-sm h-full rounded-l-full">
             <label class="absolute top-1 left-6 px-2 text-sm text-gray-300">Lugar</label>
             <input placeholder="Nombre o dirección"
-                class="text-md border-none w-full h-full rounded-full bg-gray-900 hover:bg-gray-800 px-8 text-gray-500"
+                class="text-md border-none w-full h-full rounded-full bg-transparent hover:bg-primary/10 px-8 text-gray-500"
                 :value="searchQuery" @input="e => updateValue('searchQuery', e.target.value)" />
 
         </div>
 
         <!-- Check-in -->
         <div class="col-span-3 relative flex items-center shadow-sm h-full">
-            <label class="absolute top-1 left-6 px-2 text-sm text-gray-300">Check-in</label>
+            <label class="absolute top-1 left-6 px-2 text-sm text-gray-300">Ingreso</label>
             <div
-                class="text-md border-none w-full h-full rounded-full bg-gray-900 hover:bg-gray-800 px-8 text-gray-500 flex items-center justify-center focus:outline-none">
+                class="text-md border-none w-full h-full rounded-full bg-transparent hover:bg-primary/10 px-8 text-gray-500 flex items-center justify-center focus:outline-none">
                 <VueDatePicker :model-value="checkIn" @update:model-value="(val) => updateValue('checkIn', val)"
                     :teleport="true">
                     <template #trigger>
@@ -29,9 +29,9 @@
 
         <!-- Check-out -->
         <div class="col-span-3 relative flex items-center shadow-sm h-full rounded-r-full">
-            <label class="absolute top-1 left-6 px-2 text-sm text-gray-300">Check-out</label>
+            <label class="absolute top-1 left-6 px-2 text-sm text-gray-300">Salida</label>
             <div
-                class="text-md border-none w-full h-full rounded-full bg-gray-900 hover:bg-gray-800 px-8 text-gray-500 flex items-center justify-center focus:outline-none">
+                class="text-md border-none w-full h-full rounded-full bg-transparent hover:bg-primary/10 px-8 text-gray-500 flex items-center justify-center focus:outline-none">
                 <VueDatePicker :model-value="checkOut" @update:model-value="(val) => updateValue('checkOut', val)"
                     :teleport="true">
                     <template #trigger>
