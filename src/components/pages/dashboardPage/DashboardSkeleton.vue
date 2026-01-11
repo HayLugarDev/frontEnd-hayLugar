@@ -1,57 +1,57 @@
 <template>
-  <div class="flex flex-col h-full bg-gray-700 animate-pulse text-transparent">
-    <!-- Simulación del MainHeader en modo skeleton -->
+  <div class="flex flex-col h-full pt-24 md:pt-20 animate-pulse">
+
+    <!-- HEADER -->
     <div
-      class="flex justify-between items-center border-b-2 px-4 pt-2 xl:px-16 h-20 bg-gray-500 rounded mb-4 animate-pulse">
-      <!-- Logo placeholder -->
-      <div class="w-16 h-10 bg-gray-400 rounded"></div>
+      class="fixed top-0 left-0 right-0 h-20 z-50
+             bg-white/5 backdrop-blur-xl border-b border-white/10
+             flex items-center justify-between px-6 md:px-10"
+    >
+      <div class="w-28 h-8 bg-white/10 rounded-lg"></div>
 
-      <!-- Botones de usuario placeholder -->
-      <div class="flex gap-4 items-center">
-        <div class="w-24 h-10 bg-gray-400 rounded-full"></div>
-        <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+      <div class="flex gap-3">
+        <div class="w-10 h-10 bg-white/10 rounded-full"></div>
+        <div class="w-10 h-10 bg-white/10 rounded-full"></div>
       </div>
     </div>
 
-    <!-- Floating button -->
-    <div class="hidden md:fixed md:left-1/2 md:-translate-x-1/2 md:bottom-16 w-24 h-10 bg-gray-300 rounded-full"></div>
-
-    <!-- Botón móvil de búsqueda -->
-    <div class="flex items-center justify-center bg-gray-300 mx-6 rounded-full my-4 h-12"></div>
-
-    <!-- Zona de búsqueda -->
-    <!-- <div class="hidden md:grid grid-cols-11 gap-2 px-8 py-4 bg-gray-300 rounded-md mb-4 h-20"></div>
-
-    <div class="flex flex-row justify-start items-center gap-4 pl-4">
-      <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
-      <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
-      <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
-      <div class="hidden md:flex flex-row gap-4">
-        <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
-        <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
-        <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
-        <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
-        <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
-        <div class="w-36 h-20 bg-gray-300 rounded-xl"></div>
-      </div>
-    </div> -->
-
-    <!-- Cards o mapa -->
-    <div class="flex flex-1 p-6">
-      <div class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 w-full">
-        <SkeletonSpaceCard v-for="n in 14" :key="'skeleton-' + n" />
-      </div>
+    <!-- BUSCADOR MOBILE -->
+    <div class="md:hidden px-6 mt-4">
+      <div class="h-12 rounded-full bg-white/10"></div>
     </div>
 
-
-    <!-- Header móvil en skeleton -->
-    <div class="flex md:hidden justify-between items-center px-4 pt-2 h-16 bg-gray-300 rounded mb-4 animate-pulse">
-      <div class="w-24 h-8 bg-gray-400 rounded"></div> <!-- Logo -->
-      <div class="w-10 h-10 bg-gray-400 rounded-full"></div> <!-- Menú hamburguesa -->
+    <!-- TITULO -->
+    <div class="px-6 md:px-10 mt-6">
+      <div class="w-40 h-6 bg-white/10 rounded-md"></div>
     </div>
+
+    <!-- RESULTADOS -->
+    <div class="flex flex-col gap-10 px-4 md:px-8 mt-6">
+
+      <!-- SECCIÓN CIUDAD (repetible) -->
+      <section
+        v-for="section in 4"
+        :key="'section-' + section"
+        class="relative"
+      >
+        <!-- Título ciudad -->
+        <div class="w-32 h-5 bg-white/10 rounded-md mb-4 ml-2"></div>
+
+        <!-- Slider -->
+        <div class="flex gap-4 overflow-x-hidden px-2 pb-2">
+          <SkeletonSpaceCard
+            v-for="n in 5"
+            :key="'card-' + section + '-' + n"
+            class="min-w-[260px] max-w-[260px]"
+          />
+        </div>
+      </section>
+
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import SkeletonSpaceCard from './SkeletonSpaceCard.vue';
+import SkeletonSpaceCard from './SkeletonSpaceCard.vue'
 </script>
