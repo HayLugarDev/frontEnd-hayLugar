@@ -82,10 +82,6 @@
               {{ group.city }}
             </h3>
 
-            <!-- Gradientes laterales -->
-            <div class="pointer-events-none absolute left-0 top-8 h-full w-10 z-10" />
-            <div class="pointer-events-none absolute right-0 top-8 h-full w-10z-10" />
-
             <!-- Slider horizontal -->
             <div class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4">
               <SpaceCard v-for="space in group.items" :key="space.id" :espacio="space"
