@@ -4,7 +4,7 @@
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-      <BackButton />
+    <BackButton />
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
@@ -19,8 +19,44 @@
 
     <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto space-y-4">
 
-      <!-- Carrusel en móviles -->
-      <Carousel :images="carouselImages" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
+      <!-- HERO -->
+      <section class="relative w-full h-[280px] sm:h-[360px] lg:h-[420px] rounded-b-3xl overflow-hidden">
+
+        <!-- Imagen -->
+        <Carousel :images="carouselImages" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
+
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+
+        <!-- BOTONES -->
+        <div class="absolute top-4 right-4 flex gap-3 z-10">
+
+          <!-- FAVORITO -->
+          <button @click="toggleFavourite" class="w-11 h-11 rounded-full backdrop-blur-md bg-white/20 border border-white/30
+             flex items-center justify-center transition hover:scale-110"
+            :class="activedFavouriteIcon ? 'text-red-500' : 'text-white'">
+            <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" class="text-xl" />
+          </button>
+
+          <!-- SHARE -->
+          <button @click="sharePublication" class="w-11 h-11 rounded-full backdrop-blur-md bg-white/20 border border-white/30
+             text-white flex items-center justify-center transition hover:scale-110">
+            <font-awesome-icon icon="share-alt" class="text-lg" />
+          </button>
+
+        </div>
+
+        <!-- TEXTO -->
+        <div class="absolute bottom-5 left-5 right-5 z-20">
+          <h1 class="text-2xl sm:text-3xl font-bold text-white drop-shadow">
+            {{ capitalizeFirst(space.name) }}
+          </h1>
+
+          <p class="text-white/80 text-sm mt-1">
+            {{ space.location }}
+          </p>
+        </div>
+      </section>
 
       <!-- Info del anfitrión -->
       <section v-if="space?.host"
@@ -44,38 +80,6 @@
           </div>
         </div>
       </section>
-
-      <!-- Título + Favorito + Compartir -->
-      <div
-        class="flex flex-row items-center justify-between mt-4 px-6 md:px-2 sticky top-0 sm:bg-white/10 sm:border sm:border-white/10 z-10 rounded-xl shadow-xl py-2">
-        <h1 class="text-2xl sm:text-xl font-bold text-white sm:text-primary pl-2">{{ capitalizeFirst(space.name) }}</h1>
-        <div class="flex flex-row items-center gap-4">
-          <button @click="toggleFavourite" :class="[
-            // CLASES FIJAS
-            'flex items-center justify-center w-12 h-12 rounded-full shadow-xl',
-            'transition-transform duration-200 hover:scale-110',
-            'bg-black/20 border border-white/10',
-
-            // CLASE DINÁMICA DEL ICONO
-            activedFavouriteIcon ? 'text-red-500' : 'text-gray-300',
-
-            // CLASES DE HOVER (dinámicas para no conflictuar)
-            activedFavouriteIcon
-              ? 'hover:border-red-500 hover:text-red-500'
-              : 'hover:border-primary hover:text-primary'
-          ]" title="Agregar / eliminar de favoritos">
-            <font-awesome-icon :icon="[activedFavouriteIcon ? 'fas' : 'far', 'heart']" class="text-2xl" />
-          </button>
-
-
-          <button @click="sharePublication" class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform duration-200 hover:scale-110
-         bg-black/20 border border-white/10 hover:border-primary text-gray-300 hover:text-primary"
-            title="Compartir publicación">
-            <font-awesome-icon :icon="['fas', 'share-alt']" class="text-xl" />
-          </button>
-
-        </div>
-      </div>
 
       <!-- Galería de imágenes grande -->
       <div v-if="space?.images && space.images.length > 0"
@@ -102,22 +106,23 @@
 
       <!-- Info general + Formulario -->
       <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-10 lg:gap-10">
-        <!-- Información del espacio -->
-        <!-- Información del espacio -->
-        <div class="lg:col-span-6 bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 shadow-xl">
 
-          <!-- ★ Rating + Cantidad de reseñas -->
-          <div class="flex flex-col items-center gap-2 pb-6 border-b border-white/10">
-            <div class="flex gap-1 text-2xl text-yellow-400">
-              <span v-for="v in avgRating ? Math.round(avgRating) : 5" :key="v">⭐</span>
+        <!-- Información del espacio -->
+        <div class="lg:col-span-6 md:bg-white/5 backdrop-blur-sm p-8 rounded-2xl md:border border-white/10 shadow-xl">
+
+          <!-- Rating -->
+          <div class="flex items-center gap-3">
+            <div class="flex text-yellow-400 text-2xl">
+              <span v-for="v in Math.round(avgRating)" :key="v">★</span>
             </div>
 
-            <div class="flex items-center gap-2 text-gray-300 text-lg">
-              <span>{{ totalReviews > 0 ? avgRating.toFixed(1) : '5.0' }}</span>
-              <span class="cursor-pointer hover:underline hover:text-[#00B4D8]" @click="openReviews">
-                ({{ totalReviews > 0 ? `${totalReviews} calificaciones` : "Sin calificaciones" }})
-              </span>
-            </div>
+            <span class="text-white font-semibold text-xl">
+              {{ avgRating.toFixed(1) }}
+            </span>
+
+            <button class="text-lg text-[#00B4D8] hover:underline" @click="openReviews">
+              ({{ totalReviews }} reseñas)
+            </button>
           </div>
 
           <!-- Ubicación -->
@@ -133,7 +138,7 @@
           <!-- Vehículos y tarifas -->
           <div class="mt-6 grid sm:grid-cols-2 gap-4">
             <div v-for="v in space.vehicle_capacities" :key="v.type"
-              class="p-5 bg-[#1B263B]/60 border border-white/10 rounded-xl shadow-lg hover:shadow-2xl transition-all">
+              class="p-5 md:bg-[#1B263B]/60 md:border border-white/10 rounded-xl shadow-lg hover:shadow-2xl transition-all">
               <p class="font-semibold text-lg flex items-center gap-2 text-white">
                 <font-awesome-icon :icon="['fas', getVehicleType(v.type)]" class="text-[#00B4D8] text-xl" />
                 {{ getVehicleType(v.type) }}
@@ -202,7 +207,7 @@
 
         <!-- No logueado -->
         <div v-else-if="!isLogged" class="col-span-10 lg:col-span-4 flex flex-col items-center justify-center p-8 
-         bg-[#1B263B]/70 backdrop-blur-xl rounded-xl shadow-xl border border-white/10 
+         md:bg-[#1B263B]/70 backdrop-blur-xl rounded-xl shadow-xl md:border border-white/10 
          text-center order-5 lg:order-3 text-white">
           <font-awesome-icon icon="user-lock" class="text-5xl text-[#00B4D8] mb-4" />
 
@@ -225,8 +230,8 @@
         </div>
 
         <!-- Descripción -->
-        <section class="col-span-10 p-6 rounded-xl text-xl order-6 bg-[#1B263B]/60 backdrop-blur-xl 
-         border border-white/10 shadow-xl text-white">
+        <section class="col-span-10 p-6 rounded-xl text-xl order-6 md:bg-[#1B263B]/60 backdrop-blur-xl 
+         md:border border-white/10 shadow-xl text-white">
           <p class="font-semibold flex items-center gap-2 text-newgreen">
             <font-awesome-icon icon="info-circle" class="text-[#00B4D8]" />
             Descripción:
@@ -239,7 +244,7 @@
 
         <!-- Mapa -->
         <div class="col-span-10 flex flex-col justify-start items-start h-[350px] order-7 p-4 
-         rounded-xl bg-[#1B263B]/60 backdrop-blur-xl shadow-xl border border-white/10 
+         rounded-xl md:bg-[#1B263B]/60 backdrop-blur-xl shadow-xl md:border border-white/10 
          relative overflow-hidden">
           <p class="px-2 font-semibold mb-2 text-white">Ubicación en el mapa:</p>
 

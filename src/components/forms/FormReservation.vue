@@ -1,6 +1,6 @@
 <template>
   <section
-    class="font-normal p-8 xl:p-10 rounded-2xl bg-[#1B263B]/60 backdrop-blur-xl border border-white/10 shadow-2xl space-y-6 text-white">
+    class="font-normal p-8 xl:p-10 rounded-2xl md:bg-[#1B263B]/60 backdrop-blur-xl md:border border-white/10 shadow-2xl space-y-6 text-white">
     <!-- Título -->
     <div>
       <h2 class="text-3xl font-bold text-[#00B4D8] tracking-wide">Reservá tu espacio</h2>
