@@ -20,10 +20,10 @@
     <main class="flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full xl:w-11/12 mx-auto space-y-4">
 
       <!-- HERO -->
-      <section class="relative w-full h-[280px] sm:h-[360px] lg:h-[420px] rounded-b-3xl overflow-hidden">
+      <section class="relative w-full h-[280px] sm:h-[360px] lg:h-[420px] rounded-b-3xl overflow-hidden lg:hidden">
 
         <!-- Imagen -->
-        <Carousel :images="carouselImages" class="lg:hidden w-full h-full rounded-lg" :controls="false" />
+        <Carousel :images="carouselImages" class="w-full h-full rounded-lg" :controls="false" />
 
         <!-- Overlay -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
@@ -313,7 +313,7 @@ import { useRouter, useRoute } from 'vue-router';
 import CustomGoogleMap from '../components/layout/GoogleMap.vue';
 import MainHeader from "../components/layout/header/MainHeader.vue";
 import carMarker from '../assets/logo.png';
-import Carousel from '../components/common/Carousel.vue';
+import Carousel from '../components/pages/detailSpacePage/Carousel.vue';
 import { useReservationStore } from '../store/reservationStore';
 import { useVerifyToken } from '../logic/useVerifyToken';
 import SessionExpired from '../components/common/SessionExpired.vue';

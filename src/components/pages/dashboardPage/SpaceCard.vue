@@ -1,12 +1,15 @@
 <template>
-  <router-link :to="`/espacio/${espacio.slug}`"
-    class="block transition-all duration-300 hover:-translate-y-1 hover:shadow-xl" @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave">
+  <div class="block transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer select-none"
+    @pointerdown="onPointerDown" @pointermove="onPointerMove" @pointerup="onPointerUp">
+
     <div class="rounded-2xl shadow-md flex flex-col h-full transition-all duration-300 overflow-visible">
 
       <!-- IMAGEN + CONTROLES -->
       <div class="relative w-full h-40 sm:h-40 overflow-hidden">
-        <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover rounded-t-xl" />
+        <!-- <Carousel mode="free" :images="images" :controls="hovered" class="w-full h-full object-cover rounded-t-xl" style="touch-action: pan-y" -->
+
+        <img v-if="images[0]" :src="images[0]" alt="" class="w-full h-full object-cover rounded-t-xl">
+        <img v-else :src="someImg" alt="" class="w-full h-full object-cover rounded-t-xl">
 
         <!-- PRICE BADGE -->
         <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-lg
@@ -93,16 +96,16 @@
       </div>
 
     </div>
-  </router-link>
+  </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import Carousel from '../../common/Carousel.vue'
 import fallbackImage from '../../../assets/img-haylugar.jpeg'
 import { getVehicleIcon } from '../../../utils/vehicleTypeIconTraslation'
 import { getSpaceImages } from '../../../services/spaceService'
 import { capitalizeFirst } from '../../../utils/capitalizeFirstCharAt'
+import someImg from "../../../assets/img-haylugar.jpeg";
 
 const props = defineProps({
   espacio: Object
@@ -123,24 +126,47 @@ const getMinPrice = () => {
   return prices.length ? Math.min(...prices) : '—'
 }
 
-const handleMouseEnter = async () => {
-  hovered.value = true
-  if (!props.espacio.images?.length) return
+import { useRouter } from 'vue-router'
 
-  if (images.value.length === 1 && images.value[0] === fallbackImage) {
-    const fetched = await getSpaceImages(props.espacio.id)
-    images.value = fetched.length ? fetched : [fallbackImage]
+const router = useRouter()
+
+let startX = 0
+let dragged = false
+
+const onPointerDown = (e) => {
+  startX = e.clientX
+  dragged = false
+}
+
+const onPointerMove = (e) => {
+  if (Math.abs(e.clientX - startX) > 10) {
+    dragged = true
   }
 }
 
-const handleMouseLeave = () => (hovered.value = false)
+const onPointerUp = () => {
+  if (!dragged) {
+    router.push(`/espacio/${props.espacio.slug}`)
+  }
+}
 
 const disponibilidad = computed(() => {
-  if (!props.espacio?.availability) return {}
+  const opening = props.espacio.opening_hours
+  if (!opening || opening.length === 0) {
+    return { start: '00:00', end: '23:59' }
+  }
 
-  return typeof props.espacio.availability === 'string'
-    ? JSON.parse(props.espacio.availability)
-    : props.espacio.availability
+  const today = new Date().getDay() // 0 (Domingo) - 6 (Sábado)
+  const todayHours = opening.find(d => d.day_of_week === today)
+
+  if (!todayHours) {
+    return { start: '00:00', end: '23:59' }
+  }
+
+  return {
+    start: todayHours.opening_time,
+    end: todayHours.closing_time
+  }
 })
 
 const labelHorario = computed(() => {

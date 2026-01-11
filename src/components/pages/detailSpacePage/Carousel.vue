@@ -17,7 +17,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
-import someImg from '../../assets/img-haylugar.jpeg'
+import someImg from '../../../assets/img-haylugar.jpeg'
 
 
 const props = defineProps({
