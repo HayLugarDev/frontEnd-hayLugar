@@ -5,23 +5,14 @@
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-
-    <!-- SAFE AREA -->
-    <div class="safe-top"></div>
-
-    <!-- CONTENIDO REAL -->
-    <div class="px-6 py-3 sm:py-4 xl:px-16
-           flex items-center justify-between gap-6 text-white">
-
-      <BackButton />
-    </div>
+    <BackButton />
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
   <MobileButtonNav @navigate="(path: string) => router.push(path)" class="md:hidden" :showMap="false" />
 
   <div v-if="!loadingUser"
-    class="flex flex-col space-y-6 min-h-screen pt-20 md:pt-32 sm:p-8 sm:w-2/3 mx-auto md:px-6 md:py-10 text-white">
+    class="font-normal flex flex-col space-y-6 min-h-screen py-20 md:pt-32 sm:p-8 sm:w-2/3 mx-auto md:px-6 md:py-10 text-white">
 
     <!-- Header -->
     <section class="sm:bg-white/10 sm:border border-white/10 p-6 md:p-8 rounded-2xl sm:shadow-lg">
@@ -48,36 +39,74 @@
     <section class="sm:bg-white/10 sm:border sm:border-white/10 p-6 md:p-8 rounded-2xl sm:shadow-lg">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-xl font-semibold text-primary">Mis cuentas</h3>
-        <div v-if="isLoading" class="text-sm text-gray-400">Cargando…</div>
+        <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div v-for="n in 2" :key="n"
+            class="rounded-2xl p-5 bg-gradient-to-br from-white/5 to-white/0 border border-white/10 animate-pulse">
+            <div class="h-4 w-32 bg-white/10 rounded mb-3"></div>
+            <div class="h-6 w-3/4 bg-white/10 rounded mb-4"></div>
+
+            <div class="h-3 w-full bg-white/10 rounded mb-2"></div>
+            <div class="h-3 w-5/6 bg-white/10 rounded mb-4"></div>
+
+            <div class="flex gap-3">
+              <div class="h-6 w-24 bg-white/10 rounded-full"></div>
+              <div class="h-6 w-28 bg-white/10 rounded-full"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div v-if="accounts.length === 0 && !isLoading" class="text-center py-10 text-gray-400">
-        Aún no cargaste cuentas de cobro.
-        <button class="ml-2 text-newgreen underline" @click="openCreate()">Crear ahora</button>
+      <div v-if="accounts.length === 0 && !isLoading"
+        class="flex flex-col items-center justify-center py-16 px-6 text-center rounded-2xl border border-white/10 bg-gradient-to-br from-[#0f172a]/60 to-[#020617]/80">
+        <div class="w-16 h-16 rounded-full bg-sky-500/10 flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-sky-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+          </svg>
+        </div>
+
+        <h4 class="text-lg font-semibold text-white mb-1">
+          No tenés cuentas de cobro
+        </h4>
+        <p class="text-sm text-gray-400 max-w-sm mb-6">
+          Agregá una cuenta para recibir pagos automáticamente cuando completes una reserva.
+        </p>
+
+        <button
+          class="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-medium shadow-lg shadow-sky-500/20 transition"
+          @click="openCreate()">
+          Agregar cuenta
+        </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" v-if="accounts.length">
+
+      <div class="grid grid-cols-1 gap-4" v-if="accounts.length">
         <div v-for="acc in accounts" :key="acc.id" class="border rounded-xl p-4 bg-gray-900">
-          <div class="flex items-start justify-between gap-4">
+          <div class="flex flex-col md:flex-row items-start justify-between gap-4">
             <div class="min-w-0">
               <div class="text-sm text-gray-500">Banco</div>
-              <div class="font-semibold text-gray-900 truncate">{{ acc.bank_name || '—' }}</div>
+              <div class="font-semibold text-gray-200 truncate">{{ acc.bank_name || '—' }}</div>
 
               <div class="mt-2 text-sm text-gray-500">Titular</div>
-              <div class="text-gray-900 truncate">{{ acc.account_holder || '—' }}</div>
+              <div class="text-gray-200 truncate">{{ acc.account_holder || '—' }}</div>
 
               <div class="mt-2 text-sm text-gray-500">Alias/CBU/CVU</div>
-              <div class="font-mono text-gray-900 break-all">
-                {{ showAliasOrMasked(acc.alias_cbu) }}
-              </div>
+                <div class="font-mono text-gray-200 break-all">
+                  {{ showAliasOrMasked(acc.alias_cbu) }}
+                  <button @click="copy(acc.alias_cbu)" class="ml-2 text-sm text-primary hover:underline">
+                    Copiar
+                  </button>
+                </div>
+
 
               <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <div class="text-sm text-gray-500">CUIT/CUIL</div>
-                  <div class="text-gray-900 break-all">{{ acc.tax_id || '—' }}</div>
+                  <div class="text-gray-200 break-all">{{ acc.tax_id || '—' }}</div>
                 </div>
                 <div>
                   <div class="text-sm text-gray-500">Verificada</div>
+                  <span v-if="acc.verified_at"
+                    class="absolute -top-1 -left-1 w-3 h-3 bg-emerald-400 rounded-full animate-ping"></span>
                   <div class="text-gray-900">
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
                       :class="acc.verified_at ? 'bg-emerald-100 text-newgreen' : 'bg-gray-200 text-gray-600'">
@@ -100,10 +129,10 @@
               </div>
             </div>
 
-            <div class="flex flex-col items-end gap-2 shrink-0">
+            <div class="flex flex-row md:flex-col items-end gap-2 shrink-0">
               <button class="px-3 py-1.5 rounded-lg border text-sm" :class="acc.is_default
-                ? 'border-gray-300 text-gray-400 cursor-not-allowed'
-                : 'border-primary text-primary hover:bg-primary hover:text-white transition'"
+                ? 'border-gray-300 text-newgreen cursor-not-allowed'
+                : 'border-primary text-gray-400 hover:bg-primary hover:text-white transition'"
                 :disabled="acc.is_default || busyId === acc.id" @click="makeDefault(acc)" title="Marcar como principal">
                 {{ acc.is_default ? 'Predeterminada' : 'Hacer principal' }}
               </button>
@@ -149,12 +178,16 @@
         <div class="space-y-2 text-gray-400">
           <label class="block text-sm text-gray-200">Alias o CBU/CVU</label>
 
-          <input v-model.trim="form.alias_cbu" type="text" placeholder="mi.alias.banco ó 2850XXXXXXXXXXXXXXX" class="w-full bg-white/10 border border-white/10 px-3 py-2 rounded-xl
-             focus:outline-none focus:ring-2 focus:ring-primary/60 transition" />
+          <input v-model.trim="form.alias_cbu" class="w-full bg-white/10 border rounded-xl px-3 py-2" />
 
-          <p v-if="errors.alias_cbu" class="text-xs text-rose-500">
+          <p v-if="detectAliasType(form.alias_cbu)" class="text-xs text-emerald-400 mt-1">
+            ✔ Detectado: {{ detectAliasType(form.alias_cbu) }}
+          </p>
+
+          <p v-else-if="errors.alias_cbu" class="text-xs text-rose-500">
             {{ errors.alias_cbu }}
           </p>
+
 
           <p class="text-xs text-gray-400 leading-relaxed">
             Podés ingresar un <strong>alias</strong> (ej: <em>mi.alias.banco</em>) o un
@@ -165,26 +198,42 @@
         <!-- Grid general -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-400">
 
-          <!-- Banco -->
-          <div class="flex flex-col space-y-2">
-            <label class="text-sm text-gray-200">Banco (opcional)</label>
-            <input v-model.trim="form.bank_name" type="text" placeholder="Banco Ejemplo" class="w-full bg-white/10 border border-white/10 px-3 py-2 rounded-xl
-               focus:outline-none focus:ring-2 focus:ring-primary/60 transition" />
-          </div>
-
           <!-- Titular -->
           <div class="flex flex-col space-y-2">
-            <label class="text-sm text-gray-200">Titular (opcional)</label>
+            <label class="text-sm text-gray-200">Titular</label>
             <input v-model.trim="form.account_holder" type="text" placeholder="Nombre y apellido" class="w-full bg-white/10 border border-white/10 px-3 py-2 rounded-xl
                focus:outline-none focus:ring-2 focus:ring-primary/60 transition" />
           </div>
 
           <!-- CUIT/CUIL -->
           <div class="flex flex-col space-y-2">
-            <label class="text-sm text-gray-200">CUIT/CUIL (opcional)</label>
-            <input v-model.trim="form.tax_id" type="text" placeholder="20-12345678-9" class="w-full bg-white/10 border border-white/10 px-3 py-2 rounded-xl
-               focus:outline-none focus:ring-2 focus:ring-primary/60 transition" />
+            <label class="text-sm text-gray-200">CUIT/CUIL</label>
+            <input v-model.trim="form.tax_id" placeholder="20123456789"
+              class="w-full bg-white/10 border rounded-xl px-3 py-2" />
+
+            <p v-if="form.tax_id && isValidCUIT(form.tax_id)" class="text-xs text-emerald-400">
+              ✔ CUIT válido
+            </p>
+
+            <p v-else-if="errors.tax_id" class="text-xs text-rose-500">
+              {{ errors.tax_id }}
+            </p>
           </div>
+
+          <!-- Banco -->
+          <div class="flex flex-col space-y-2">
+            <select v-model="form.bank_name" class="w-full bg-white/10 border rounded-xl px-3 py-2">
+              <option value="" disabled>Seleccioná tu banco</option>
+              <option v-for="b in BANKS" :key="b" :value="b">
+                {{ b }}
+              </option>
+            </select>
+            <p v-if="errors.bank_name" class="text-xs text-rose-500">
+              {{ errors.bank_name }}
+            </p>
+
+          </div>
+
 
         </div>
 
@@ -220,6 +269,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import BackButton from '../components/common/BackButton.vue'
 import { useRouter } from 'vue-router'
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue'
+import { detectAliasType, isValidCUIT } from '../utils/validateBankData'
+import { showToast } from '../utils/toast'
 
 /** ==== Estado usuario ==== */
 const userStore = useUserStore()
@@ -245,10 +296,28 @@ const accounts = ref<PayoutAccount[]>([])
 const isLoading = ref(false)
 const busyId = ref<number | null>(null)
 
+const BANKS = [
+  'Mercado Pago',
+  'Santander',
+  'Galicia',
+  'BBVA',
+  'Macro',
+  'Provincia',
+  'Naranja X',
+  'Ualá',
+  'Brubank'
+]
+
 /** Modal + form */
 const showModal = ref(false)
 const editingId = ref<number | null>(null)
 const submitting = ref(false)
+
+const copy = (text: string) => {
+  navigator.clipboard.writeText(text)
+  showToast('¡Copiado al portapapeles!','success')
+}
+
 
 const form = ref({
   alias_cbu: '',
@@ -322,15 +391,25 @@ function closeModal() {
 /** ==== Validaciones ==== */
 function validate() {
   const e: Record<string, string> = {}
-  const alias = String(form.value.alias_cbu || '').trim()
-  if (!alias) e.alias_cbu = 'Alias o CBU/CVU es obligatorio.'
-  // Permitimos alias libre o CBU de 22 dígitos; si no es 22 dígitos, que tenga mínimo 4 chars
-  if (alias && !is22Digits(alias) && alias.length < 4) {
-    e.alias_cbu = 'Ingresá un alias válido o un CBU/CVU de 22 dígitos.'
-  }
+
+  if (!form.value.bank_name)
+    e.bank_name = 'Seleccioná un banco'
+
+  if (!form.value.alias_cbu)
+    e.alias_cbu = 'Alias o CBU requerido'
+  else if (!detectAliasType(form.value.alias_cbu))
+    e.alias_cbu = 'Alias o CBU inválido'
+
+  if (!form.value.account_holder || form.value.account_holder.length < 3)
+    e.account_holder = 'Ingresá el titular'
+
+  if (!isValidCUIT(form.value.tax_id))
+    e.tax_id = 'CUIT/CUIL inválido'
+
   errors.value = e
   return Object.keys(e).length === 0
 }
+
 
 /** ==== Crear/editar ==== */
 async function submitForm() {

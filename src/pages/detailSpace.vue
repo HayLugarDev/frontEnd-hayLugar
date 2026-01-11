@@ -537,6 +537,18 @@ const reservar = async () => {
   }
 };
 
+const durationHours = computed(() => {
+  if (!tiempoInicial.value || !tiempoFinal.value) return 0
+
+  const inicio = new Date(tiempoInicial.value)
+  const fin = new Date(tiempoFinal.value)
+
+  if (fin <= inicio) return 0
+
+  return (fin.getTime() - inicio.getTime()) / (1000 * 60 * 60)
+})
+
+
 const onSelectedVehicle = async (vehicle) => {
   try {
     vehiculoSeleccionado.value = vehicle;
@@ -550,11 +562,14 @@ const onSelectedVehicle = async (vehicle) => {
       start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
       end_time: formatLocalDateTime(new Date(tiempoFinal.value)),
       total: totalCalculado.value,
+      deadLine: durationHours.value,
       // NO payment_data todavía
     };
 
     // 1. Crear reserva en backend (PENDING)
     const reservation = await createReservation(payload);
+
+    console.log(reservation);
 
     // 2. Guardar reserva REAL en Pinia
     reservationStore.setReservationData({
@@ -576,6 +591,9 @@ const onSelectedVehicle = async (vehicle) => {
 const totalCalculado = computed(() => {
   if (!tiempoInicial.value || !tiempoFinal.value || !space.value || !tipoVehiculo.value) return 0;
 
+  const hours = durationHours.value
+  if (!hours) return 0
+  
   const inicio = new Date(tiempoInicial.value);
   const fin = new Date(tiempoFinal.value);
 
@@ -598,26 +616,18 @@ const totalCalculado = computed(() => {
 
   if (precioHora === 0) return 0;
 
-  const diferenciaMs = fin - inicio;
-
   switch (tipoPlazoReserva.value) {
-    case 'Por hora': {
-      const horas = diferenciaMs / (1000 * 60 * 60);
-      deadLine.value = horas;
-      return Math.ceil(horas) * precioHora;
-    }
-    case 'Por día': {
-      const dias = diferenciaMs / (1000 * 60 * 60 * 24);
-      deadLine.value = dias;
-      return Math.ceil(dias) * precioHora * 24;
-    }
-    case 'Por mes': {
-      const meses = diferenciaMs / (1000 * 60 * 60 * 24 * 30);
-      deadLine.value = meses;
-      return Math.ceil(meses) * precioHora * 24 * 30;
-    }
+    case 'Por hora':
+      return Math.ceil(hours) * precioHora
+
+    case 'Por día':
+      return Math.ceil(hours / 24) * precioHora * 24
+
+    case 'Por mes':
+      return Math.ceil(hours / (24 * 30)) * precioHora * 24 * 30
+
     default:
-      return 0;
+      return 0
   }
 });
 

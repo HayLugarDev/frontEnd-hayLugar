@@ -14,7 +14,7 @@ export const useReservationStore = defineStore('reservation', {
       vehicle_type: null as string | null,
       start_time: null as string | null,
       end_time: null as string | null,
-      dead_line: null as number | null,
+      deadLine: null as number | null,
       total: 0, // ⚠️ monto base en ARS (decimal, como venía del FE)
       service_fee_cents: null as number | null, // calculado al setear
       guest_total_cents: null as number | null, // calculado al setear
@@ -83,7 +83,7 @@ export const useReservationStore = defineStore('reservation', {
         vehicle_type: null,
         start_time: null,
         end_time: null,
-        dead_line: null,
+        deadLine: null,
         total: 0,
         service_fee_cents: null,
         guest_total_cents: null,

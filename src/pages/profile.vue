@@ -4,16 +4,7 @@
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-
-    <!-- SAFE AREA -->
-    <div class="safe-top"></div>
-
-    <!-- CONTENIDO REAL -->
-    <div class="px-6 py-3 sm:py-4 xl:px-16
-           flex items-center justify-between gap-6 text-white">
-
-      <BackButton />
-    </div>
+    <BackButton />
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
