@@ -7,7 +7,7 @@
       <DashboardSkeleton />
     </div>
 
-    <div v-else class="flex flex-col h-full pt-24 md:pt-20">
+    <div v-else class="flex flex-col h-full pt-24 md:pt-20 hide-scrollbar">
 
 
       <MainHeader />
@@ -42,7 +42,12 @@
           class="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#0D1B2A] to-transparent">
         </div>
 
-        <div class="flex gap-4 px-4 overflow-x-auto hide-scrollbar">
+        <div
+  class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4
+         scroll-smooth
+         touch-pan-x
+         select-none"
+>
           <FeatureButton :icon="School" color="#06D6A0" title="Universidades" subtitle="Campus Inteligentes"
             :enabled="features.universidades" :onClick="() => router.push('/universidades')" />
 
@@ -273,7 +278,6 @@ onMounted(async () => {
   await spaceStore.setUserLocation();
   try {
     await spaceStore.fetchSpaces(true);
-    console.log("Spaces fetched:", spaces.value);
     setCenterToUserLocation();
   } finally {
     loading.value = false;
