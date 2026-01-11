@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import api from '../services/apiService';
 import { getNotificationsByUserId } from '../services/notificationService';
 import { showToast } from '../utils/toast';
+import { socket } from '../services/socket';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -20,6 +21,8 @@ export const useUserStore = defineStore('user', {
       created_at: Date
       updated_at: Date
     },
+    socketConnected: false,
+    socketSubscribed: false,
     loading: false,
     error: null as string | null,
     sessionExpired: true,
@@ -56,6 +59,9 @@ export const useUserStore = defineStore('user', {
         this.terms = response.data?.terms ?? null; // 👈 guardamos términos
         this.sessionExpired = false;
 
+        // Conectar al socket
+        await this.connectSocket();
+
         // Esperamos a que el user esté seteado antes de pedir notificaciones
         await this.fetchNotifications(user.id, { initialLoad: true });
       } catch (error: any) {
@@ -66,6 +72,32 @@ export const useUserStore = defineStore('user', {
       } finally {
         this.loading = false;
       }
+    },
+
+    async connectSocket() {
+      if (!this.user?.id) return;
+      if (socket.connected) return;
+
+      socket.connect();
+
+      socket.once("connect", () => {
+        console.log("🟢 WS conectado");
+        this.socketConnected = true;
+
+        socket.emit("subscribe", {
+          user_id: this.user!.id,
+        });
+      });
+
+      socket.once("subscribed", (data) => {
+        console.log("✅ WS subscribed:", data);
+        this.socketSubscribed = true;
+      });
+
+      socket.on("notification", ({ notification }) => {
+        if (!notification) return;
+        this.addNotification(notification);
+      });
     },
 
     async fetchNotifications(userId: number, opts: { initialLoad?: boolean } = {}) {
@@ -101,6 +133,16 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    disconnectSocket() {
+      if (!socket.connected) return;
+
+      socket.off("notification");
+      socket.disconnect();
+
+      this.socketConnected = false;
+      this.socketSubscribed = false;
+    },
+
     setUser(partialUser: Partial<typeof this.user>) {
       this.user = {
         ...this.user,
@@ -109,6 +151,7 @@ export const useUserStore = defineStore('user', {
     },
 
     clearUser() {
+      this.disconnectSocket();
       this.user = null;
       this.error = null;
       this.sessionExpired = false;

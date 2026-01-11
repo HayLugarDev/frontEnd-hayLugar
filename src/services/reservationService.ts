@@ -15,3 +15,9 @@ export async function createReservation(payload: any) {
   const { data } = await api.post("/reservations/create", payload);
   return data.reservation;
 }
+
+export async function getReservationForPayment(reservationId: number) {
+  console.log(reservationId);
+  const { data } = await api.get(`/reservations/${reservationId}/payment`, { withCredentials: true });
+  return data;
+}

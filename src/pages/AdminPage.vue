@@ -4,16 +4,7 @@
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-
-    <!-- SAFE AREA -->
-    <div class="safe-top"></div>
-
-    <!-- CONTENIDO REAL -->
-    <div class="px-6 py-3 sm:py-4 xl:px-16
-           flex items-center justify-between gap-6 text-white">
-
       <BackButton />
-    </div>
   </div>
 
   <div
@@ -83,6 +74,8 @@ onMounted(async () => {
     users.value = usersRes.data.users || usersRes.data;
     spaces.value = spacesRes.data.spaces || spacesRes.data;
     payments.value = paymentsRes.data.payments || paymentsRes.data;
+
+    console.log(payments.value);
 
     const rawReservations = reservationsRes.data.reservations || reservationsRes.data;
     reservations.value = rawReservations.map((r: any) => {

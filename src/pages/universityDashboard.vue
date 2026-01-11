@@ -4,16 +4,7 @@
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-
-    <!-- SAFE AREA -->
-    <div class="safe-top"></div>
-
-    <!-- CONTENIDO REAL -->
-    <div class="px-6 py-3 sm:py-4 xl:px-16
-           flex items-center justify-between gap-6 text-white">
-
-      <BackButton />
-    </div>
+    <BackButton />
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
@@ -69,7 +60,8 @@
         <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
                  backdrop-blur-sm shadow-sm" :class="filters.onlyAvailable
                   ? 'bg-amber-300/20 text-amber-300'
-                  : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="filters.onlyAvailable = !filters.onlyAvailable">
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'"
+          @click="filters.onlyAvailable = !filters.onlyAvailable">
           ✅ Disponibles
         </button>
 

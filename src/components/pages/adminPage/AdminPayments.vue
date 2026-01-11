@@ -28,7 +28,7 @@
         <tbody>
           <tr v-for="t in payments" :key="t.id" class="tr">
             <td class="td font-medium text-primary">#{{ t.id }}</td>
-            <td class="td">{{ t.user?.name || 'Desconocido' }}</td>
+            <td class="td">{{ t.client || 'Desconocido' }}</td>
 
             <td class="td font-semibold text-primary">
               $ {{ t.amount }}
@@ -41,7 +41,7 @@
               </span>
             </td>
 
-            <td class="td">{{ formatDate(t.payment_date) }}</td>
+            <td class="td">{{ formatDate(t.created_at) }}</td>
           </tr>
         </tbody>
       </table>
@@ -57,10 +57,10 @@ interface User {
 
 interface Payment {
   id: string;
-  user: User;
+  client: User;
   amount: number;
   payment_status: string;
-  payment_date: string;
+  created_at: string;
 }
 
 const props = defineProps<{ payments: Payment[] }>();
@@ -73,14 +73,11 @@ const formatDate = (value: string) =>
 
 const statusClass = (status: string) => {
   switch (status) {
-    case "approved":
-    case "completado":
+    case "payment_approved":
       return "bg-green-500/20 text-green-400";
     case "pending":
-    case "pendiente":
       return "bg-yellow-500/20 text-yellow-400";
     case "failed":
-    case "rechazado":
       return "bg-red-500/20 text-red-400";
     default:
       return "bg-gray-500/20 text-gray-300";

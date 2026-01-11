@@ -15,10 +15,10 @@
   </div>
 
   <div
-    class="flex flex-col min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white font-lexend w-full max-w-7xl mx-auto px-4">
+    class="flex flex-col font-normal min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white font-lexend w-full max-w-7xl mx-auto px-4">
     <MainHeader />
 
-    <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full py-6">
+    <main class="relative flex flex-col lg:rounded-lg overflow-hidden lg:px-10 w-full py-10">
 
       <!-- Usamos grid-cols-1 por defecto y md:grid-cols-9 en desktop -->
       <section class="grid grid-cols-1 md:grid-cols-9 gap-6">
@@ -53,7 +53,9 @@
             <p class="text-xl font-semibold border-b pb-2 mb-2">Conceptos facturados</p>
 
             <div class="grid grid-cols-2 gap-y-3">
-              <p class="text-gray-400">Precio por {{ hours }}:{{ minutes }} hrs</p>
+              <p class="text-gray-400">
+                Precio por {{ formattedDuration }}
+              </p>
               <p class="text-end font-medium">{{ formatARS(baseAmount) }}</p>
 
               <p class="text-gray-400">Cargo por servicio</p>
@@ -168,7 +170,7 @@
           <h3 class="text-lg font-semibold mb-4 text-center text-gray-100">
             {{
               metodoPago === 'cuenta_mp'
-                ? 'Vas a pagar con tu cuenta de Mercado Pago'
+                ? 'Ingresá acá para ser redirigido a Mercado Pago'
                 : 'Ingresá los datos de tu tarjeta'
             }}
           </h3>
@@ -236,6 +238,8 @@ import { getVehicleById } from '../services/vehicleService';
 import FormField from '../components/forms/FormField.vue';
 import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 import Logo from '../assets/logo.png'
+import { getReservationForPayment } from '../services/reservationService';
+import { formatDurationFromHours } from '../utils/formatDurationFromHopurs';
 
 const router = useRouter();
 const reservationStore = useReservationStore();
@@ -250,7 +254,7 @@ const dni = ref("");
 const direccion = ref("");
 const email = ref("");
 const total = computed(() => reserva.value.total || 0);
-const totalDuration = computed(() => reserva.value?.dead_line ?? 0);
+const totalDuration = computed(() => reserva.value?.deadLine ?? 0);
 const hours = computed(() => { return totalDuration.value ? Math.floor(totalDuration.value) : 0; });
 const minutes = computed(() => { return totalDuration.value ? Math.round((totalDuration.value - hours.value) * 60) : 0; });
 const espacio = ref<any>(null);
@@ -265,9 +269,9 @@ const formatARS = (v: number) =>
 
 const obtenerEspacio = async () => {
   try {
-    const id = reserva.value.space_id;
+    const id = reserva.value.id;
     if (!id) throw new Error("No se encontró el espacio");
-    const data = await getSpaceById(Number(id));
+    const data = await getReservationForPayment(id);
     espacio.value = data;
     console.log(espacio.value);
     return data;
@@ -296,6 +300,10 @@ onMounted(async () => {
     vehiculoSeleccionado.value = vehicleSelect;
   }
 });
+
+const formattedDuration = computed(() =>
+  formatDurationFromHours(reserva.value?.deadLine ?? 0)
+)
 
 const emailValido = computed(() => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
