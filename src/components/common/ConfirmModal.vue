@@ -2,13 +2,11 @@
   <transition name="fade">
     <div v-if="visible" class="fixed inset-0 flex items-center justify-center 
              bg-black/60 backdrop-blur-sm z-50">
-      <div class="bg-white/5 backdrop-blur-xl border border-white/10 
-               shadow-2xl rounded-2xl p-8 w-full max-w-md 
-               transform transition-all scale-100 animate-fadeInUp">
+      <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
         <div class="flex flex-col items-center text-center">
 
           <!-- Logo -->
-          <img src="../../assets/logo.png" alt="icono" class="w-20 h-20 mb-5 opacity-90 drop-shadow-lg" />
+          <img src="../../assets/logo.png" alt="icono" class="w-20 h-20 opacity-90 drop-shadow-lg" />
 
           <!-- Título -->
           <h2 class="text-2xl font-bold text-white mb-3">
@@ -18,7 +16,7 @@
           <!-- Mensaje -->
           <p v-if="isHtml" class="text-base text-gray-300 mb-6 leading-relaxed" v-html="message"></p>
 
-          <p v-else class="text-base text-gray-300 mb-6 leading-relaxed">
+          <p v-else class="text-base text-gray-300 mb-6 leading-relaxed whitespace-pre-line">
             {{ message }}
           </p>
 
@@ -33,8 +31,8 @@
             </button>
 
             <!-- Aceptar -->
-            <button @click="$emit('acept')" class="px-5 py-2 bg-[#00B4D8] text-white rounded-lg
-                     font-semibold shadow hover:bg-newgreen 
+            <button @click="$emit('acept')" class="px-5 py-2 bg-primary/20 text-white rounded-lg
+                     font-semibold shadow hover:bg-primary 
                      transition active:scale-95">
               {{ buttonText }}
             </button>
