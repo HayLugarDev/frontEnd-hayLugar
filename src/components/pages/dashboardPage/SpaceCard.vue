@@ -5,7 +5,7 @@
     <div class="rounded-2xl shadow-md flex flex-col h-full transition-all duration-300 overflow-visible">
 
       <!-- IMAGEN + CONTROLES -->
-      <div class="relative w-full h-52 sm:h-40 overflow-hidden">
+      <div class="relative w-full h-40 sm:h-40 overflow-hidden">
         <Carousel :images="images" :controls="hovered" class="w-full h-full object-cover rounded-t-xl" />
 
         <!-- PRICE BADGE -->
@@ -35,7 +35,7 @@
         </div>
 
         <!-- TITULO -->
-        <h3 class="text-white font-semibold text-2xl md:text-sm leading-tight line-clamp-1">
+        <h3 class="text-white font-semibold text-sm md:text-sm leading-tight line-clamp-1">
           {{ capitalizeFirst(espacio.name) }}
         </h3>
 
@@ -63,7 +63,7 @@
         </p>
 
         <!-- DISTANCIA -->
-        <p v-if="espacio.distancia" class="text-md md:text-[11px] text-gray-500 mt-2 flex items-center gap-1">
+        <p v-if="espacio.distancia" class="text-xs md:text-[11px] text-gray-500 mt-2 flex items-center gap-1">
           📍 A {{ espacio.distancia.toFixed(1) }} km de distancia
         </p>
 
