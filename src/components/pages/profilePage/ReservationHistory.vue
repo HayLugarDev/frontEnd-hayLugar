@@ -13,12 +13,10 @@
     </div>
 
     <div v-if="reservations.length" class="space-y-4">
-      <div v-for="(reservation, index) in reservations" :key="index" :class="[
-        'border border-gray-200 rounded-2xl bg-white/10 border-white/10 shadow-md hover:shadow-lg transition-all overflow-hidden',
-        ['cancelled', 'completed', 'failed'].includes(reservation.status) && reservation.hasRating
-          ? 'opacity-70 pointer-events-none'
-          : '']">
-        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-white/10 border border-white/10">
+      <div v-for="reservation in reservations" :key="reservation.id" :class="['rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all backdrop-blur-xl mb-6',
+          reservation.status === 'cancelled' ? 'bg-red-900/20 border border-red-700/30' :
+            'bg-gray-900/30 border border-white/10']">
+        <div class="flex justify-between items-center p-4 border-b">
           <div>
             <h3 class="text-lg font-bold text-gray-200 flex items-center gap-2">
               <font-awesome-icon icon="calendar-check" class="text-primary" />
@@ -63,7 +61,7 @@
 
         <div v-if="!['cancelled', 'completed', 'failed'].includes(reservation.status)">
 
-          <div class="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 bg-white/10 border-white/10">
+          <div class="flex flex-wrap justify-end gap-2 p-4">
 
             <!-- Pagar reserva -->
             <button v-if="reservation.status === 'payment_pending' && reservation.payment_status === 'pending'"
@@ -261,6 +259,7 @@ function paymentReservation(reservation: any) {
   }
 
   // 👉 Cargar TODO en el store
+  console.log(reservation);
   reservationStore.setReservationData(reservation);
 
   // 👉 Navegar
@@ -359,7 +358,7 @@ function confirmCancelation(reservation: any) {
 
 const cancelReservation = async () => {
   try {
-    await api.patch(`/reservations/${selectedReservation.value.id}/cancel`, { withCredentials: true });
+    await api.put(`/reservations/${selectedReservation.value.id}/cancel`, { role: 'client' }, { withCredentials: true });
 
     // Actualizar localmente el estado de la reserva en el array principal
     reservations.value = reservations.value.map((r: any) =>
@@ -371,6 +370,7 @@ const cancelReservation = async () => {
     showSuccessModal.value = false;
     showCheckInModal.value = false;
     showConfirmModal.value = false;
+    showToast('Reserva cancelada con éxito', 'success');
   } catch (error: any) {
     showErrorModal.value = true;
     errorMessage.value = error.response?.data?.message || "Error al cancelar la reserva";

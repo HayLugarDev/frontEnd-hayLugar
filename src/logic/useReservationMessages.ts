@@ -21,22 +21,22 @@ export const reservationMessages: Record<
   pending: {
     label: "Pendiente",
     client: "Debes aguardar a que el anfitrión apruebe tu reserva para poder utilizar el espacio en la fecha y hora seleccionada.",
-    owner: "Tienes una nueva solicitud de reserva pendiente de aprobación.\n\nRevisa los detalles y aprueba o rechaza la solicitud.",
+    owner: "Tienes una nueva solicitud de reserva pendiente de aprobación.\n\nRevisa los detalles y aprobá o rechazá la solicitud.",
   },
   payment_pending: {
     label: "Pago pendiente",
-    client: "Tu reserva ha sido aprobada por el anfitrión. Debes realizar el pago para confirmar tu reserva y recibir el código de check-in.",
+    client: "Tu reserva ha sido aprobada por el anfitrión. Realizá el pago para confirmar tu reserva y recibir el código de check-in.",
     owner: "El cliente debe realizar el pago para confirmar la reserva.\n\nUna vez que el pago sea aprobado, el usuario recibirá el código de check-in para ingresar a tu espacio.",
   },
   payment_approved: {
     label: "Confirmado",
-    client: "Todo está listo para que guardes tu vehículo en el horario selecc",
-    owner: "Has aprobado la reserva. El cliente podrá utilizar el espacio en el horario seleccionado una vez que realice el check-in.",
+    client: "Todo está listo para que guardes tu vehículo en el horario reservado. Recibirás el código de acceso antes del ingreso.",
+    owner: "Has aprobado la reserva. El cliente podrá utilizar el espacio en el horario seleccionado una vez que ingrese el código check-in.",
   },
   cancelled: {
-    label: "Rechazado",
-    client: "Lamentablemente el anfitrión no podrá recibir tu vehículo en la fecha seleccionada.",
-    owner: "Has rechazado la reserva. El cliente ha sido notificado.",
+    label: "Cancelada",
+    client: "La reserva ha sido cancelada. Intentá nuevamente o contactate con soporte si necesitás ayuda.",
+    owner: "La reserva ha sido cancelada.",
   },
   failed: {
     label: "Fallida",

@@ -4,16 +4,7 @@
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-
-    <!-- SAFE AREA -->
-    <div class="safe-top"></div>
-
-    <!-- CONTENIDO REAL -->
-    <div class="px-6 py-3 sm:py-4 xl:px-16
-           flex items-center justify-between gap-6 text-white">
-
-      <BackButton />
-    </div>
+    <BackButton />
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
@@ -40,10 +31,11 @@
 
       <!-- LISTA -->
       <div v-else-if="reservations.length">
-        <div v-for="reservation in reservations" :key="reservation.id"
-          class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all backdrop-blur-xl mb-6">
+        <div v-for="reservation in reservations" :key="reservation.id" :class="['rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all backdrop-blur-xl mb-6',
+          reservation.status === 'cancelled' ? 'bg-red-900/20 border border-red-700/30' :
+            'bg-gray-900/30 border border-white/10']">
           <!-- HEADER DEL CARD -->
-          <div class="flex justify-between items-center p-4 bg-white/10 border-b border-white/10">
+          <div class="flex justify-between items-center p-4 border-b border-white/10">
             <div>
               <h3 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
                 <font-awesome-icon icon="calendar-check" class="text-primary" />
@@ -80,7 +72,7 @@
                 {{ reservation.client?.name ?? '—' }}
               </p>
               <p>
-                <span class="font-semibold">🚘 Vehículo:</span>
+                <span class="font-semibold">🚘 Vehículo: </span>
                 <template v-if="reservation.vehicle">
                   {{ getVehicleType(reservation.vehicle.type) }}
                   <span class="text-gray-400">
@@ -129,7 +121,7 @@
           </div>
 
           <!-- ACCIONES -->
-          <div class="flex flex-wrap items-center justify-end gap-3 border-t border-white/10 p-4 bg-white/5">
+          <div class="flex flex-wrap items-center justify-end gap-3 p-4">
             <!-- PENDING -->
             <template v-if="isPending(reservation.status)">
               <button @click="confirmApprovedReservation(reservation)" class="btn-primary">
@@ -267,7 +259,10 @@ const fetchReservations = async () => {
   loading.value = true;
   try {
     const { data } = await api.get(`reservations/incoming/${userId}`, { withCredentials: true });
-    reservations.value = data || [];
+    reservations.value = (data || []).sort(
+      (a: any, b: any) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
   } catch (error) {
     console.error("Error al obtener reservas entrantes", error);
     reservations.value = [];
@@ -336,7 +331,7 @@ function confirmCancelation(reservation: any) {
 
 const cancelReservation = async () => {
   try {
-    await api.patch(`/reservations/${selectedReservation.value.id}/cancel`, { withCredentials: true });
+    await api.put(`/reservations/${selectedReservation.value.id}/cancel`, { role: 'owner', reason: 'Cancelada por el Anfitrión' }, { withCredentials: true });
 
     reservations.value = reservations.value.map((r: any) =>
       r.id === selectedReservation.value.id ? { ...r, status: 'cancelled' } : r
@@ -383,19 +378,28 @@ function confirmRejectReservation(reservation: any) {
 
 async function rejectReservation() {
   try {
-    await api.put(`/reservations/${selectedReservation.value.id}/cancel`, { status: 'cancelled' }, { withCredentials: true });
+    await api.put(
+      `/reservations/${selectedReservation.value.id}/cancel`,
+      {
+        role: 'owner',
+        reason: 'Reserva rechazada por el anfitrión'
+      },
+      { withCredentials: true }
+    );
 
     showConfirmModal.value = false;
     selectedReservation.value = null;
 
     await fetchReservations();
-    showToast('Reserva cancelada', 'success');
+    showToast('Reserva rechazada', 'success');
   } catch (error: any) {
     showErrorModal.value = true;
-    errorMessage.value = error.response?.data?.message || "Error al cancelar la reserva";
-    showToast('No se pudo cancelar la reserva', 'error');
+    errorMessage.value =
+      error.response?.data?.message || "Error al rechazar la reserva";
+    showToast('No se pudo rechazar la reserva', 'error');
   }
 }
+
 
 function confirmCheckinReservation(reservation: any) {
   selectedReservation.value = reservation;

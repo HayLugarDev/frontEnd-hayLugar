@@ -1,11 +1,15 @@
-// src/services/socket.ts
-import { io, type Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
-let socket: Socket | null = null;
-export function getSocket(): Socket {
-  if (!socket) {
+export const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000', {
+  withCredentials: true,
+  autoConnect: false, // ⛔ importantísimo
+});
+
+let socketIO = null;
+export function getSocket() {
+  if (!socketIO) {
     const base = import.meta.env.VITE_API_WS_BASE || 'http://localhost:3000';
-    socket = io(base, {
+    socketIO = io(base, {
       transports: ['websocket'],
       autoConnect: true,
       reconnection: true,
@@ -16,8 +20,8 @@ export function getSocket(): Socket {
   return socket;
 }
 export function disconnectSocket() {
-  if (socket) {
+  if (socketIO) {
     socket.disconnect();
-    socket = null;
+    socketIO = null;
   }
 }

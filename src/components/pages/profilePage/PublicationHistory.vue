@@ -15,8 +15,8 @@
 
     <div v-else-if="publications.length" class="space-y-4">
       <div v-for="(publication, index) in publications" :key="index"
-        class="sborder border-gray-200 rounded-2xl bg-white/10 border-white/10 shadow-md hover:shadow-lg transition-all overflow-hidden">
-        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-white/10 border-white/10">
+        class="sborder rounded-2xl shadow-md hover:shadow-lg transition-all overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b border-gray-50">
           <div>
             <h3 class="text-lg font-bold text-gray-200 flex items-center gap-2">
               <font-awesome-icon icon="warehouse" class="text-newgreen" />

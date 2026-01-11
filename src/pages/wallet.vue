@@ -5,16 +5,7 @@
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-
-    <!-- SAFE AREA -->
-    <div class="safe-top"></div>
-
-    <!-- CONTENIDO REAL -->
-    <div class="px-6 py-3 sm:py-4 xl:px-16
-           flex items-center justify-between gap-6 text-white">
-
-      <BackButton />
-    </div>
+    <BackButton />
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
@@ -36,7 +27,7 @@
         </div>
         <div class="md:text-right">
           <span class="block text-white text-sm">Saldo actual</span>
-          <span class="text-4xl font-extrabold text-newgreen tracking-tight">{{ formatARS(balance) }}</span>
+          <span class="text-4xl font-extrabold text-newgreen tracking-tight">{{ formatARS(balance) ?? loadIcon}}</span>
         </div>
       </div>
 
@@ -199,6 +190,7 @@ import BackButton from '../components/common/BackButton.vue'
 import { useRouter } from 'vue-router'
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue'
 import MainHeader from '../components/layout/header/MainHeader.vue'
+import loadIcon from "../assets/load-icon_primary.svg";
 
 const userStore = useUserStore()
 const router = useRouter();
