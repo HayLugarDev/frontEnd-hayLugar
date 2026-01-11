@@ -283,9 +283,7 @@
   height: constant(safe-area-inset-top);
 }
 
+/* Scroll horizontal fluido */
 .hide-scrollbar {
-  scrollbar-width: none;
-}
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+  -webkit-overflow-scrolling: touch;
 }
