@@ -4,16 +4,7 @@
 
     <!-- BOTÓN ATRÁS MOBILE -->
     <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-
-        <!-- SAFE AREA -->
-        <div class="safe-top"></div>
-
-        <!-- CONTENIDO REAL -->
-        <div class="px-6 py-3 sm:py-4 xl:px-16
-           flex items-center justify-between gap-6 text-white">
-
-            <BackButton />
-        </div>
+        <BackButton />
     </div>
 
     <!-- MENÚ INFERIOR MOBILE -->
@@ -104,7 +95,7 @@
                 <div class="bg-white/5 p-4 rounded-xl border border-white/10 mt-6 text-sm text-gray-300">
                     <p>Usuario desde: <span class="font-medium text-white">{{ formatDate(user.created_at) }}</span></p>
                     <p>Última actualización: <span class="font-medium text-white">{{ formatDate(user.updated_at)
-                            }}</span></p>
+                    }}</span></p>
                 </div>
             </div>
         </section>
