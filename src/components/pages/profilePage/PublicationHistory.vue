@@ -1,5 +1,5 @@
 <template>
-  <section class="sm:bg-white/10 p-8 rounded-lg sm:shadow-lg mb-8 w-full md:w-2/3">
+  <section class="p-8 rounded-lg sm:shadow-lg mb-8 w-full md:w-2/3">
 
     <div class="flex items-center justify-between mb-4">
       <div>

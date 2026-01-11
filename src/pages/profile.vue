@@ -32,7 +32,7 @@
       <KeepAlive>
         <transition name="fade-step" mode="out-in">
           <section v-if="activeSection === 'resume'" key="resume"
-            class="w-full md:w-2/3 sm:bg-white/10 sm:border-b p-10 md:p-12 sm:rounded-2xl sm:shadow-xl border-gray-600 transition-all">
+            class="w-full md:w-2/3 sm:border-b p-10 md:p-12 sm:rounded-2xl sm:shadow-xl border-gray-600 transition-all">
             <!-- Encabezado con foto y datos -->
             <div class="flex flex-row items-center justify-between gap-8 bg-gradient-to-tr from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
                         p-6 rounded-2xl shadow-xl border border-gray-700">
