@@ -72,15 +72,27 @@
       <!-- RESULTADOS -->
       <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-4 md:py-0 md:px-8">
 
-        <!-- LISTA -->
-        <div v-if="!showMap" class="relative flex-1 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 
-                 gap-6 justify-items-center">
+        <div v-if="!showMap" class="flex flex-col gap-10 w-full">
 
-          <div v-if="error" class="absolute inset-0 flex justify-center items-center text-red-400 text-xl">
-            {{ error }}
-          </div>
+          <section v-for="group in spacesByCity" :key="group.city" class="relative">
+            <!-- Título ciudad / provincia -->
+            <h3 class="text-lg md:text-xl font-normal mb-4 pl-2" :class="group.city.startsWith('Provincia')
+              ? 'text-amber-300'
+              : 'text-white'">
+              {{ group.city }}
+            </h3>
 
-          <SpaceCard v-for="space in spaces" :key="space.id" :espacio="space" class="w-full max-w-sm" />
+            <!-- Gradientes laterales -->
+            <div class="pointer-events-none absolute left-0 top-8 h-full w-10 z-10" />
+            <div class="pointer-events-none absolute right-0 top-8 h-full w-10z-10" />
+
+            <!-- Slider horizontal -->
+            <div class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4">
+              <SpaceCard v-for="space in group.items" :key="space.id" :espacio="space"
+                class="min-w-[260px] max-w-[260px]" />
+            </div>
+          </section>
+
         </div>
 
         <!-- MAPA -->
@@ -197,6 +209,58 @@ const publishedDate = ref(null);
 const maxPrice = ref('');
 const sortBy = ref('nearest');
 
+const spacesByCity = computed(() => {
+  if (!spaces.value?.length) return []
+
+  const cityMap = {}
+  const provinceMap = {}
+
+  // 👉 Tomamos como provincia principal la del espacio más cercano
+  const baseProvince = spaces.value
+    .slice()
+    .sort((a, b) => a.distance - b.distance)[0]
+    ?.location?.split(',')[2]?.trim()
+
+  spaces.value.forEach(space => {
+    const parts = space.location.split(',').map(p => p.trim())
+
+    const city = parts[1] || 'Otras'
+    const province = parts[2] || 'Otras'
+
+    // 👉 Si es la misma provincia, va por ciudad
+    if (province === baseProvince) {
+      if (!cityMap[city]) cityMap[city] = []
+      cityMap[city].push(space)
+    }
+    // 👉 Si NO, va al grupo de provincias
+    else {
+      const provinceKey = `Provincia de ${province}`
+      if (!provinceMap[provinceKey]) provinceMap[provinceKey] = []
+      provinceMap[provinceKey].push(space)
+    }
+  })
+
+  // Ordenar por cercanía
+  const normalize = (map) =>
+    Object.entries(map).map(([label, items]) => {
+      items.sort((a, b) => a.distance - b.distance)
+      return {
+        city: label,
+        items,
+        nearestDistance: items[0]?.distance ?? Infinity
+      }
+    })
+
+  const cityGroups = normalize(cityMap)
+    .sort((a, b) => a.nearestDistance - b.nearestDistance)
+
+  const provinceGroups = normalize(provinceMap)
+    .sort((a, b) => a.city.localeCompare(b.city)) // opcional
+
+  // 👉 IMPORTANTE: provincias SIEMPRE al final
+  return [...cityGroups, ...provinceGroups]
+})
+
 const {
   center,
   zoom,
@@ -213,6 +277,7 @@ onMounted(async () => {
   await spaceStore.setUserLocation();
   try {
     await spaceStore.fetchSpaces(true);
+    console.log("Spaces fetched:", spaces.value);
     setCenterToUserLocation();
   } finally {
     loading.value = false;
