@@ -4,16 +4,7 @@
 
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
-
-    <!-- SAFE AREA -->
-    <div class="safe-top"></div>
-
-    <!-- CONTENIDO REAL -->
-    <div class="px-6 py-3 sm:py-4 xl:px-16
-           flex items-center justify-between gap-6 text-white">
-
       <BackButton />
-    </div>
   </div>
 
   <!-- MENÚ INFERIOR MOBILE -->
@@ -198,7 +189,7 @@
           :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
           @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
           @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event"
-          @reservar="reservar" />
+          @reservar="reservar()" />
 
         <!-- Botón para dueño -->
         <div v-else-if="isOwner"
@@ -273,7 +264,11 @@
     @confirm="requiresTerms ? redirigirATerminos() : showErrorModal = false" />
 
   <VehicleSelectModal :show="showVehicleModal" :vehicles="vehiculosUsuario" :vehicleType="getVehicleKey(tipoVehiculo)"
-    @selected="onSelectedVehicle" :isHtml="modalIsHtml" @close="showVehicleModal = false" />
+    @selected="onVehicleSelected" @close="showVehicleModal = false" />
+
+  <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
+    @close="showConfirmModal = false" @acept="modalConfig.onConfirm" />
+
 
   <!-- ===== FOOTER ===== -->
   <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
@@ -303,6 +298,7 @@
       </div>
     </div>
   </footer>
+
 </template>
 
 
@@ -343,6 +339,7 @@ import logo from "../assets/logo.png";
 import { isWithinAvailability } from '../utils/availability';
 import { capitalizeDay } from '../utils/capitalizeDay';
 import { createReservation } from '../services/reservationService';
+import ConfirmModal from '../components/common/ConfirmModal.vue';
 
 const spaceStore = useSpaceStore()
 const { selectedSpace: space, favorites } = storeToRefs(spaceStore)
@@ -377,6 +374,72 @@ const avgRating = ref(0);
 const totalReviews = ref(0);
 
 const imageErrorOccurred = ref(false);
+
+const showConfirmModal = ref(false);
+
+const modalConfig = ref({
+  message: '',
+  buttonText: 'Aceptar',
+  onConfirm: () => { }
+});
+
+const onVehicleSelected = (vehicle) => {
+  vehiculoSeleccionado.value = vehicle;
+
+  showVehicleModal.value = false;
+
+  openConfirmModal();
+};
+
+
+const openConfirmModal = () => {
+  modalConfig.value = {
+    message: `
+      ¿Confirmás la solicitud de reserva en el espacio "${space.value.name}"?
+
+      🚗 Vehículo: ${vehiculoSeleccionado.value.model} (${vehiculoSeleccionado.value.license_plate})
+      ⏱️ Plazo: ${tipoPlazoReserva.value}
+      📅 Ingreso: ${new Date(tiempoInicial.value).toLocaleString()}
+      📅 Salida: ${new Date(tiempoFinal.value).toLocaleString()}
+
+      💰 Total: $${totalCalculado.value.toLocaleString()}
+    `,
+    buttonText: 'Enviar solicitud',
+    onConfirm: confirmarReserva
+  };
+
+  showConfirmModal.value = true;
+};
+
+const confirmarReserva = async () => {
+  showConfirmModal.value = false;
+
+  try {
+    const payload = {
+      owner_id: space.value.owner_id,
+      space_id: space.value.id,
+      vehicle_id: vehiculoSeleccionado.value.id,
+      vehicle_type: getVehicleKey(tipoVehiculo.value),
+      start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
+      end_time: formatLocalDateTime(new Date(tiempoFinal.value)),
+      total: totalCalculado.value,
+      deadLine: durationHours.value,
+    };
+
+    const reservation = await createReservation(payload);
+
+    reservationStore.setReservationData({
+      ...payload,
+      id: reservation.id,
+      status: reservation.status,
+    });
+
+    router.push('/reservation-request/confirmed');
+  } catch (error) {
+    console.error(error);
+    router.push('/reservation-request/failed');
+  }
+};
 
 const carouselImages = computed(() => {
   if (!space.value?.images || space.value.images.length === 0) {
@@ -519,6 +582,8 @@ const reservar = async () => {
   await verifyToken();
   if (isSessionInvalid.value) return;
 
+
+
   try {
     const vehiculos = await getAllVehicles();
     vehiculosUsuario.value = vehiculos.filter(v => v.type === getVehicleKey(tipoVehiculo.value));
@@ -548,52 +613,12 @@ const durationHours = computed(() => {
   return (fin.getTime() - inicio.getTime()) / (1000 * 60 * 60)
 })
 
-
-const onSelectedVehicle = async (vehicle) => {
-  try {
-    vehiculoSeleccionado.value = vehicle;
-
-    const payload = {
-      owner_id: space.value.owner_id,
-      space_id: space.value.id,
-      vehicle_id: vehiculoSeleccionado.value.id,
-      user_vehicle_id: vehicle.id,
-      vehicle_type: getVehicleKey(tipoVehiculo.value),
-      start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
-      end_time: formatLocalDateTime(new Date(tiempoFinal.value)),
-      total: totalCalculado.value,
-      deadLine: durationHours.value,
-      // NO payment_data todavía
-    };
-
-    // 1. Crear reserva en backend (PENDING)
-    const reservation = await createReservation(payload);
-
-    console.log(reservation);
-
-    // 2. Guardar reserva REAL en Pinia
-    reservationStore.setReservationData({
-      ...payload,
-      id: reservation.id,
-      status: reservation.status,
-    });
-
-    // 3. Ir a página de confirmación
-    router.push(`/reservation-request/confirmed`);
-
-  } catch (error) {
-    console.error(error);
-    router.push('/reservation-request/failed');
-  }
-};
-
-
 const totalCalculado = computed(() => {
   if (!tiempoInicial.value || !tiempoFinal.value || !space.value || !tipoVehiculo.value) return 0;
 
   const hours = durationHours.value
   if (!hours) return 0
-  
+
   const inicio = new Date(tiempoInicial.value);
   const fin = new Date(tiempoFinal.value);
 
