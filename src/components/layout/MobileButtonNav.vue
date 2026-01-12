@@ -30,9 +30,15 @@
       </li>
 
       <!-- NOTIFICACIONES -->
-      <li v-if="userStore.user" @click="$emit('navigate', '/notifications')"
-        class="flex flex-col items-center text-xs cursor-pointer" :class="isActive('/notifications')">
+      <li v-if="userStore.user" @click="handleNotificationsClick"
+        class="relative flex flex-col items-center text-xs cursor-pointer" :class="isActive('/notifications')">
+
         <font-awesome-icon icon="bell" class="text-2xl mb-1" />
+
+        <!-- Punto rojo -->
+        <span v-if="hasUnreadNotifications"
+          class="absolute top-1 right-5 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+
         <h1>Notif.</h1>
       </li>
 
@@ -59,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useUserStore } from "../../store/userStore";
 import decoPublica from "../../assets/deco-publica.png";
@@ -72,7 +78,28 @@ const { verifyToken, isSessionInvalid } = useVerifyToken();
 // Recibo desde el padre si el mapa está activado
 const props = defineProps<{ showMap: boolean }>();
 
-defineEmits(["toggle-map", "navigate"]);
+const emit = defineEmits(["toggle-map", "navigate"]);
+
+// Notificaciones pendientes
+const pendingNotifications = computed(() =>
+  userStore.notifications.filter(n => n.status === "pending")
+);
+
+const hasUnreadNotifications = computed(() =>
+  pendingNotifications.value.length > 0
+);
+
+// Click en notificaciones (mobile)
+function handleNotificationsClick() {
+  if (hasUnreadNotifications.value) {
+    userStore.markAllAsRead();
+  } else {
+    sessionStorage.setItem("blinkNotification", "true");
+  }
+
+  // navega igual que ahora
+  emit("navigate", "/notifications");
+}
 
 const route = useRoute();
 
