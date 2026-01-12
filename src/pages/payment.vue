@@ -86,106 +86,83 @@
           </div>
         </div>
 
-        <!-- 🧍 Datos de facturación -->
-        <div class="bg-white/10 border border-white/10 p-6 rounded-2xl shadow-md md:col-span-5 flex flex-col gap-4">
-          <!-- Vehículo -->
-          <div v-if="reserva.vehicle_type"
-            class="bg-white/10 border-white/10 p-4 rounded-lg border border-gray-200 shadow-sm">
-            <div class="flex justify-between items-center mb-2">
-              <h3 class="text-md font-semibold text-white">Vehículo Seleccionado</h3>
-              <font-awesome-icon
-                :icon="reserva.vehicle_type === 'car' ? 'car' : reserva.vehicle_type === 'motorcycle' ? 'motorcycle' : 'bicycle'"
-                class="text-white" />
-            </div>
-            <div v-if="vehiculoSeleccionado" class="text-gray-200">
-              <p>Marca: {{ vehiculoSeleccionado.brand }}</p>
-              <p>Modelo: {{ vehiculoSeleccionado.model }}</p>
-              <p>Patente: {{ vehiculoSeleccionado.license_plate ?? 'No aplica' }}</p>
-            </div>
-          </div>
+        <!-- 🧾 FACTURACIÓN + PAGO (SLIDE HORIZONTAL) -->
+        <div class="md:col-span-5 overflow-hidden relative">
+          <div class="flex w-[200%] transition-transform duration-500 ease-in-out"
+            :class="selectedMethod ? '-translate-x-1/2' : 'translate-x-0'">
 
-          <!-- Inputs -->
-          <div class="flex flex-col gap-2">
-            <h2 class="text-lg font-semibold mb-1">Datos de Facturación</h2>
-            <FormField v-model="nombre" placeholder="Nombre completo" />
-            <FormField v-model="dni" placeholder="Número de documento" />
-            <FormField v-model="direccion" placeholder="Domicilio" />
-            <FormField v-model="email" placeholder="Correo electrónico" />
-            <p v-if="email && !emailValido" class="text-red-500 text-sm">
-              Ingresá un correo electrónico válido.
-            </p>
-          </div>
+            <!-- 🧍 FACTURACIÓN -->
+            <div class="w-1/2 pr-4">
+              <div class="bg-white/10 border border-white/10 p-6 rounded-2xl shadow-md flex flex-col gap-4">
 
-          <!-- Continuar -->
-          <button v-if="datosCompletos" @click="selectedMethod = true"
-            class="mt-4 w-full flex justify-center items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl text-lg font-bold shadow-md hover:shadow-xl transition-all">
-            Continuar
-          </button>
+                <!-- Vehículo -->
+                <div v-if="reserva.vehicle_type" class="bg-white/10 border-white/10 p-4 rounded-lg border shadow-sm">
+                  <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-md font-semibold text-white">Vehículo Seleccionado</h3>
+                    <font-awesome-icon
+                      :icon="reserva.vehicle_type === 'car' ? 'car' : reserva.vehicle_type === 'motorcycle' ? 'motorcycle' : 'bicycle'" />
+                  </div>
+                  <div v-if="vehiculoSeleccionado" class="text-gray-200">
+                    <p>Marca: {{ vehiculoSeleccionado.brand }}</p>
+                    <p>Modelo: {{ vehiculoSeleccionado.model }}</p>
+                    <p>Patente: {{ vehiculoSeleccionado.license_plate ?? 'No aplica' }}</p>
+                  </div>
+                </div>
+
+                <!-- Inputs -->
+                <div class="flex flex-col gap-2">
+                  <h2 class="text-lg font-semibold mb-1">Datos de Facturación</h2>
+                  <FormField v-model="nombre" placeholder="Nombre completo" />
+                  <FormField v-model="dni" placeholder="Número de documento" />
+                  <FormField v-model="direccion" placeholder="Domicilio" />
+                  <FormField v-model="email" placeholder="Correo electrónico" />
+                  <p v-if="email && !emailValido" class="text-red-500 text-sm">
+                    Ingresá un correo electrónico válido.
+                  </p>
+                </div>
+
+                <!-- Continuar -->
+                <button :disabled="!datosCompletos" @click="selectedMethod = true"
+                  class="mt-4 w-full bg-primary disabled:opacity-40 text-white px-6 py-3 rounded-xl text-lg font-bold shadow-md hover:shadow-xl transition-all">
+                  Continuar al pago →
+                </button>
+              </div>
+            </div>
+
+            <!-- 💳 PAGO -->
+            <div class="w-1/2 pl-4">
+              <div class="bg-white/10 border border-white/10 p-6 rounded-2xl shadow-xl flex flex-col gap-6">
+
+                <button @click="selectedMethod = false" class="text-sm text-gray-300 hover:text-white w-fit">
+                  ← Volver a facturación
+                </button>
+
+                <h2 class="flex justify-center">Seleccioná el método de pago</h2>
+
+                <!-- Métodos -->
+                <div class="flex justify-center gap-4">
+                  <button @click="verifyPaymentMethod('tarjeta')" class="payment-btn">
+                    💳 Tarjeta
+                  </button>
+
+                  <button @click="verifyPaymentMethod('cuenta_mp')" class="payment-btn mp">
+                    <img src="../assets/logo-mercadopago.png" class="h-6" />
+                    Mercado Pago
+                  </button>
+                </div>
+
+                <!-- Bricks -->
+                <div>
+                  <div v-show="metodoPago === 'cuenta_mp'" id="walletBrick_container" />
+                  <div v-show="metodoPago === 'tarjeta'" id="cardPaymentBrick_container" />
+                </div>
+
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
-
-      <!-- 💳 Método de pago -->
-      <div v-if="datosCompletos && selectedMethod" class="w-full flex flex-col items-center gap-4 mt-10 mb-6">
-        <h2 class="text-lg font-semibold text-gray-200">Seleccioná el método de pago</h2>
-
-        <div class="flex flex-wrap justify-center gap-4">
-          <button @click="verifyPaymentMethod('tarjeta')" :class="[
-            'flex items-center gap-3 px-6 py-3 rounded-2xl font-medium border transition-all duration-300 shadow-sm hover:shadow-lg',
-            metodoPago === 'tarjeta'
-              ? 'bg-primary text-white border-primary scale-105'
-              : 'bg-white/10 border border-white/10 text-gray-200 border-gray-300 hover:border-primary/40'
-          ]">
-            <font-awesome-icon icon="credit-card" class="text-xl" />
-            <span>Tarjeta de crédito / débito</span>
-            <span v-if="metodoPago === 'tarjeta'"
-              class="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
-              Seleccionado
-            </span>
-
-          </button>
-
-          <button @click="verifyPaymentMethod('cuenta_mp')" :class="[
-            'flex items-center gap-3 px-6 py-3 rounded-2xl font-medium border transition-all duration-300 shadow-sm hover:shadow-lg',
-            metodoPago === 'cuenta_mp'
-              ? 'bg-[#009ee3] text-white border-[#009ee3] scale-105'
-              : 'bg-white/10 border border-white/10 text-gray-200 border-gray-300 hover:border-[#009ee3]/40'
-          ]">
-            <img src="../assets/logo-mercadopago.png" alt="Mercado Pago" class="h-8 w-auto" />
-            <span>Cuenta Mercado Pago</span>
-
-            <span v-if="metodoPago === 'cuenta_mp'"
-              class="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
-              Seleccionado
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <!-- 💸 Zona de pago -->
-      <transition name="fade">
-        <div v-if="datosCompletos && metodoPago" class="mt-8 w-full max-w-xl mx-auto 
-           bg-white/10 border border-white/10 
-           rounded-2xl p-6 shadow-xl">
-
-          <h3 class="text-lg font-semibold mb-4 text-center text-gray-100">
-            {{
-              metodoPago === 'cuenta_mp'
-                ? 'Ingresá acá para ser redirigido a Mercado Pago'
-                : 'Ingresá los datos de tu tarjeta'
-            }}
-          </h3>
-
-          <div class="flex justify-center">
-            <div v-show="metodoPago === 'cuenta_mp'" id="walletBrick_container" class="w-full"></div>
-
-            <div v-show="metodoPago === 'tarjeta'" id="cardPaymentBrick_container" class="w-full"></div>
-          </div>
-
-          <p v-if="metodoPago === 'cuenta_mp'" class="text-xs text-gray-400 text-center mt-4">
-            Serás redirigido a Mercado Pago para finalizar el pago de forma segura.
-          </p>
-        </div>
-      </transition>
 
     </main>
 
@@ -377,25 +354,24 @@ const initWalletBrick = async () => {
   const mp = new window.MercadoPago(PUBLIC_KEY, { locale: 'es-AR' });
   const bricksBuilder = mp.bricks();
 
-  // Persistir datos de facturación
   reservationStore.setReservationData({
     payment_method: metodoPago.value,
     payment_data: {
       invoice_name: nombre.value,
       invoice_dni: dni.value,
       invoice_address: direccion.value,
-      invoice_email: email.value
-    }
+      invoice_email: email.value,
+    },
   });
 
-  // 1️⃣ asegurarse de que la reserva existe
-  const reservationResponse = await reservationStore.submitReservation();
+  // Sincroniza datos de facturación antes de procesar el pago
+  await reservationStore.syncReservation();
 
-  const reservationId =
-    reservationResponse?.reservation?.id ||
-    reservationResponse?.data?.reservation?.id;
+  const reservationId = reserva.value.id;
 
-  if (!reservationId) throw new Error("No se pudo crear la reserva");
+  if (!reservationId) {
+    throw new Error("Reserva inválida");
+  }
 
   // 2️⃣ crear preference ya con ID real
   try {
@@ -539,36 +515,24 @@ const confirmarPagoTarjeta = async (
   paymentTypeId?: string,
 ) => {
 
-  // Persistir datos de facturación
+  const reservationId = reserva.value.id;
+  if (!reservationId) {
+    alert("Reserva inválida");
+    return;
+  }
+
   reservationStore.setReservationData({
     payment_method: metodoPago.value,
     payment_data: {
       invoice_name: nombre.value,
       invoice_dni: dni.value,
       invoice_address: direccion.value,
-      invoice_email: email.value
-    }
+      invoice_email: email.value,
+    },
   });
 
-  // Crear reserva pendiente si no existe
-  let reservationResponse: any;
-  try {
-    reservationResponse = await reservationStore.submitReservation();
-  } catch (err) {
-    console.error("Error al crear la reserva:", err);
-    alert("Ocurrió un error al crear la reserva. Intenta nuevamente.");
-    return;
-  }
-
-  const reservationId =
-    reservationResponse?.reservation?.id ||
-    reservationResponse?.data?.reservation?.id;
-
-  if (!reservationId) {
-    console.error("reservationId no encontrado:", reservationResponse);
-    alert("Error interno: no se pudo obtener el ID de la reserva.");
-    return;
-  }
+  // Sincroniza datos de facturación antes de procesar el pago
+  await reservationStore.syncReservation();
 
   const idemKey = `rsv-${reservationId}-${Date.now()}`;
 
@@ -633,5 +597,14 @@ const confirmarPagoTarjeta = async (
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.payment-btn {
+  @apply flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 transition text-white font-medium;
+}
+
+.payment-btn.mp {
+  background-color: #009ee3;
+  border-color: #009ee3;
 }
 </style>
