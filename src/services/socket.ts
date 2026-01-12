@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-export const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000', {
+export const socket = io(import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000', {
   withCredentials: true,
   autoConnect: false, // ⛔ importantísimo
 });
@@ -8,7 +8,7 @@ export const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000'
 let socketIO = null;
 export function getSocket() {
   if (!socketIO) {
-    const base = import.meta.env.VITE_API_WS_BASE || 'http://localhost:3000';
+    const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
     socketIO = io(base, {
       transports: ['websocket'],
       autoConnect: true,
