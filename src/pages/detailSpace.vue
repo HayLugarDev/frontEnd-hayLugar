@@ -486,7 +486,6 @@ const obtenerEspacio = async () => {
   const slug = route.params.slug
   const space = await spaceStore.fetchSpaceBySlug(slug)
 
-  console.log(space);
   if (!space) return
 
   avgRating.value = space.average_rating || 5
@@ -494,11 +493,9 @@ const obtenerEspacio = async () => {
 
   if (isLogged.value) {
     const favorites = await spaceStore.fetchFavoriteSpaces()
-    console.log(favorites);
     activedFavouriteIcon.value = await spaceStore.isFavorite(space.id)
   }
-  console.log('Es favorito?', activedFavouriteIcon.value);
-  console.log(space.images);
+
 };
 
 onMounted(async () => {
@@ -691,7 +688,6 @@ const toggleFavourite = async () => {
     const spaceId = space.value.id;
     const isFav = activedFavouriteIcon.value;
 
-    console.log(spaceId, isFav);
     if (!isFav) {
       // AGREGAR
       activedFavouriteIcon.value = true;  // ← cambio instantáneo sin re-render global
