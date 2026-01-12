@@ -13,7 +13,7 @@ onMounted(async ()=> userStore.fetchUser());
 <template>
   <div class="safe-area-container flex flex-col min-h-screen raleway bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]">
 
-    <router-view />
+    <router-view :key="$route.fullPath" />
     <CookieBanner />
     <Toast />
   </div>

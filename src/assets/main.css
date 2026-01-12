@@ -283,7 +283,29 @@
   height: constant(safe-area-inset-top);
 }
 
-/* Scroll horizontal fluido */
+/* En tu CSS global o en el componente */
 .hide-scrollbar {
-  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;  /* IE y Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari y Opera */
+}
+
+/* Asegúrate de que el contenedor pueda hacer scroll */
+.scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain; /* Previene scroll en cascada */
+}
+
+.touch-pan-y {
+  touch-action: pan-y;
+}
+
+.carousel {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }

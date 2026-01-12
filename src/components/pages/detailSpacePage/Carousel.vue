@@ -1,99 +1,92 @@
 <template>
-  <!-- Si hay imágenes -->
   <div v-if="displayedImages.length" class="relative w-full overflow-hidden mb-2">
-    <div class="flex transition-transform duration-500" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
-      <div v-for="(img, index) in displayedImages" :key="index" class="w-full flex-shrink-0 aspect-square">
-        <img :src="img" class="w-full h-full object-cover" alt="Imagen del espacio" @error="onImageError(index)" />
+    <!-- Viewport -->
+    <div class="w-full overflow-hidden">
+      <!-- Track -->
+      <div class="flex transition-transform duration-500 ease-out" :style="trackStyle">
+        <div v-for="(img, index) in displayedImages" class="flex-shrink-0 aspect-square"
+          :style="{ width: `${100 / displayedImages.length}%` }">
+
+          <img :src="img" class="w-full h-full object-cover" @error="onImageError(index)" />
+        </div>
       </div>
     </div>
+
+    <!-- Botón izquierda -->
+    <button v-if="showControls" @click="prevSlide" class="nav-btn left-2 z-10">
+      ‹
+    </button>
+
+    <!-- Botón derecha -->
+    <button v-if="showControls" @click="nextSlide" class="nav-btn right-2 z-10">
+      ›
+    </button>
   </div>
 
-  <!-- Fallback absoluto: si no hay imágenes válidas -->
-  <div v-else class="w-full flex-shrink-0 aspect-square">
-    <img :src="someImg" class="w-full h-full object-cover" alt="Imagen por defecto" />
+  <!-- Fallback -->
+  <div v-else class="w-full aspect-square">
+    <img :src="someImg" class="w-full h-full object-cover" />
   </div>
 </template>
 
-
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, computed } from 'vue'
 import someImg from '../../../assets/img-haylugar.jpeg'
-
 
 const props = defineProps({
   controls: Boolean,
   images: {
     type: Array,
-    required: true,
     default: () => []
   }
 })
 
 const currentSlide = ref(0)
+
 const displayedImages = ref(
-  props.images?.length ? [...props.images] : [someImg] // ← fallback inicial
+  props.images.length ? [...props.images] : [someImg]
 )
 
 watch(
   () => props.images,
-  (newImgs) => {
-    displayedImages.value = newImgs?.length ? [...newImgs] : [someImg]
+  (imgs) => {
+    displayedImages.value = imgs.length ? [...imgs] : [someImg]
+    currentSlide.value = 0
   },
   { immediate: true }
 )
 
-const onImageError = (index) => {
-  displayedImages.value[index] = someImg
-}
+const showControls = computed(
+  () => props.controls && displayedImages.value.length > 1
+)
 
-// Swipe / touch controls
-const startX = ref(0)
-const startY = ref(0)
-const endX = ref(0)
-const isSwiping = ref(false)
+/* 🔑 CLAVE DEL FUNCIONAMIENTO */
+const trackStyle = computed(() => ({
+  width: `${displayedImages.value.length * 100}%`,
+  transform: `translateX(-${
+    currentSlide.value * (100 / displayedImages.value.length)
+  }%)`
+}))
+
 
 const nextSlide = () => {
-  currentSlide.value = (currentSlide.value + 1) % displayedImages.value.length
+  currentSlide.value =
+    (currentSlide.value + 1) % displayedImages.value.length
 }
 
 const prevSlide = () => {
-  currentSlide.value = (currentSlide.value - 1 + displayedImages.value.length) % displayedImages.value.length
+  currentSlide.value =
+    (currentSlide.value - 1 + displayedImages.value.length) %
+    displayedImages.value.length
 }
 
-const handleSwipe = () => {
-  const distance = endX.value - startX.value
-  if (distance > 50) prevSlide()
-  else if (distance < -50) nextSlide()
+const onImageError = (index) => {
+  displayedImages.value[index] = someImg
 }
-
-onMounted(() => {
-  const container = document.querySelector('.flex')
-  if (!container) return
-
-  const handleTouchStart = (e) => {
-    startX.value = e.touches[0].clientX
-    startY.value = e.touches[0].clientY
-    isSwiping.value = false
-  }
-
-  const handleTouchMove = (e) => {
-    const deltaX = e.touches[0].clientX - startX.value
-    const deltaY = e.touches[0].clientY - startY.value
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      isSwiping.value = true
-      e.preventDefault()
-    }
-  }
-
-  const handleTouchEnd = (e) => {
-    if (isSwiping.value) {
-      endX.value = e.changedTouches[0].clientX
-      handleSwipe()
-    }
-  }
-
-  container.addEventListener('touchstart', handleTouchStart, { passive: false })
-  container.addEventListener('touchmove', handleTouchMove, { passive: false })
-  container.addEventListener('touchend', handleTouchEnd)
-})
 </script>
+
+<style scoped>
+.nav-btn {
+  @apply absolute top-1/2 -translate-y-1/2 bg-black/40 backdrop-blur-sm text-white text-2xl w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/60 transition shadow-lg;
+}
+</style>
