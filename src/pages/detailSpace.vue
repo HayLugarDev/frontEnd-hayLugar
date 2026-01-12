@@ -194,7 +194,7 @@
           :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
           @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
           @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event"
-          @reservar="reservar()" />
+          @reservar="reservar()" :availability="disponibilidad"/>
 
         <!-- Botón para dueño -->
         <div v-else-if="isOwner"
