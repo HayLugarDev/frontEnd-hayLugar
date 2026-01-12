@@ -50,7 +50,7 @@
           </template>
 
           <template v-else>
-            <span class="font-medium">
+            <span v-if="disponibilidad.start && disponibilidad.end" class="font-medium">
               {{ disponibilidad.start }} – {{ disponibilidad.end }} hs
             </span>
           </template>
@@ -150,22 +150,11 @@ const onPointerUp = () => {
 }
 
 const disponibilidad = computed(() => {
-  const opening = props.espacio.opening_hours
-  if (!opening || opening.length === 0) {
-    return { start: '00:00', end: '23:59' }
-  }
+  if (!props.espacio?.availability) return null
 
-  const today = new Date().getDay() // 0 (Domingo) - 6 (Sábado)
-  const todayHours = opening.find(d => d.day_of_week === today)
-
-  if (!todayHours) {
-    return { start: '00:00', end: '23:59' }
-  }
-
-  return {
-    start: todayHours.opening_time,
-    end: todayHours.closing_time
-  }
+  return typeof props.espacio.availability === 'string'
+    ? JSON.parse(props.espacio.availability)
+    : props.espacio.availability
 })
 
 const labelHorario = computed(() => {
