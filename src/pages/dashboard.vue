@@ -87,7 +87,7 @@
             </h3>
 
             <!-- Slider horizontal -->
-            <div class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4" style="touch-action: pan-x">
+            <div class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4">
               <SpaceCard v-for="space in group.items" :key="space.id" :espacio="space"
                 class="min-w-[260px] max-w-[260px]" />
             </div>
