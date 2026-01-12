@@ -250,7 +250,6 @@ const obtenerEspacio = async () => {
     if (!id) throw new Error("No se encontró el espacio");
     const data = await getReservationForPayment(id);
     espacio.value = data;
-    console.log(espacio.value);
     return data;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
