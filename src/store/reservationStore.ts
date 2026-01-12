@@ -51,6 +51,27 @@ export const useReservationStore = defineStore('reservation', {
       this.reservation = { ...this.reservation, ...data };
     },
 
+
+    /**     
+     * * Sincroniza la reserva actual con el backend (actualiza los datos).
+     */
+    async syncReservation() {
+      if (!this.reservation.id) {
+        throw new Error("Reserva sin ID");
+      }
+
+      await api.put(
+        `/reservations/${this.reservation.id}/payment-data`,
+        {
+          payment_method: this.reservation.payment_method,
+          payment_data: this.reservation.payment_data,
+          service_fee_cents: this.reservation.service_fee_cents,
+          guest_total_cents: this.reservation.guest_total_cents,
+        },
+        { withCredentials: true }
+      );
+    },
+
     /**
      * Envía la reserva al backend para guardarla en la base de datos.
      */

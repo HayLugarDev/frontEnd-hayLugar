@@ -80,18 +80,30 @@ export const useUserStore = defineStore('user', {
 
       socket.connect();
 
-      socket.once("connect", () => {
+      socket.on("connect", () => {
         console.log("🟢 WS conectado");
+
         this.socketConnected = true;
+        this.socketSubscribed = false;
 
         socket.emit("subscribe", {
           user_id: this.user!.id,
         });
       });
 
-      socket.once("subscribed", (data) => {
+      socket.on("subscribed", (data) => {
         console.log("✅ WS subscribed:", data);
         this.socketSubscribed = true;
+      });
+
+      socket.on("disconnect", (reason) => {
+        console.warn("🔌 WS disconnected:", reason);
+        this.socketConnected = false;
+        this.socketSubscribed = false;
+      });
+
+      socket.on("reconnect", () => {
+        console.log("🔁 WS reconnected");
       });
 
       socket.on("notification", ({ notification }) => {
