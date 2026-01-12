@@ -1,8 +1,7 @@
 <template>
-  <div class="block transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer select-none"
-    @pointerdown="onPointerDown" @pointermove="onPointerMove" @pointerup="onPointerUp">
+  <div class="block hover:shadow-xl cursor-pointer select-none">
 
-    <div class="rounded-2xl shadow-md flex flex-col h-full transition-all duration-300 overflow-visible">
+    <div class="rounded-2xl shadow-md flex flex-col h-full" @click="router.push(`/espacio/${props.espacio.slug}`)">
 
       <!-- IMAGEN + CONTROLES -->
       <div class="relative w-full h-40 sm:h-40 overflow-hidden">

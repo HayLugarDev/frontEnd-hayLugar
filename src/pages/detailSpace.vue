@@ -23,7 +23,7 @@
       <section class="relative w-full h-[280px] sm:h-[360px] lg:h-[420px] rounded-b-3xl overflow-hidden lg:hidden">
 
         <!-- Imagen -->
-        <Carousel :images="carouselImages" class="w-full h-full rounded-lg" :controls="false" />
+        <Carousel :images="carouselImages" class="w-full h-full rounded-lg" :controls="true" />
 
         <!-- Overlay -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>

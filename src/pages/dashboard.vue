@@ -1,5 +1,5 @@
 <template>
-  <div
+  <div :key="dashboardKey"
     class="font-normal relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-x-hidden">
 
     <!-- LOADING -->
@@ -7,8 +7,7 @@
       <DashboardSkeleton />
     </div>
 
-    <div v-else class="flex flex-col h-full pt-24 md:pt-20 hide-scrollbar">
-
+    <div v-else class="flex flex-col h-full pt-24 md:pt-20">
 
       <MainHeader />
 
@@ -88,7 +87,7 @@
             </h3>
 
             <!-- Slider horizontal -->
-            <div class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4">
+            <div class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4" style="touch-action: pan-x">
               <SpaceCard v-for="space in group.items" :key="space.id" :espacio="space"
                 class="min-w-[260px] max-w-[260px]" />
             </div>
@@ -167,9 +166,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue';
+import { ref, onMounted, nextTick, computed, watch } from 'vue';
 import { InfoWindow } from 'vue3-google-map';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import CustomGoogleMap from '../components/layout/GoogleMap.vue';
 import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue';
 import MainHeader from '../components/layout/header/MainHeader.vue';
@@ -194,6 +193,7 @@ const features = {
 };
 
 const router = useRouter();
+const route = useRoute();
 const spaceStore = useSpaceStore();
 const { spaces, loading, error } = storeToRefs(spaceStore);
 
@@ -209,6 +209,8 @@ const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
 const publishedDate = ref(null);
 const maxPrice = ref('');
 const sortBy = ref('nearest');
+
+const dashboardKey = ref(0)
 
 const spacesByCity = computed(() => {
   if (!spaces.value?.length) return []
@@ -302,4 +304,11 @@ const buscar = async () => {
 const toggleMap = () => (showMap.value = !showMap.value);
 const toggleSearchMenu = () => (showSearchMenu.value = !showSearchMenu.value);
 const handleMarkerClick = (espacio) => router.push(`/espacio/${espacio.slug}`);
+
+watch(
+  () => route.fullPath,
+  () => {
+    dashboardKey.value++
+  }
+)
 </script>
