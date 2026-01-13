@@ -1,27 +1,21 @@
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
-export const socket = io(import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000', {
-  withCredentials: true,
-  autoConnect: false, // ⛔ importantísimo
-});
+let socket: Socket | null = null;
 
-let socketIO = null;
 export function getSocket() {
-  if (!socketIO) {
-    const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-    socketIO = io(base, {
-      transports: ['websocket'],
-      autoConnect: true,
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 500,
+  if (!socket) {
+    socket = io(import.meta.env.VITE_BASE_URL || 'http://localhost:3000', {
+      withCredentials: true,
+      autoConnect: false, // 🔒 CLAVE
+      transports: ['websocket'], // evita polling raro
     });
   }
   return socket;
 }
+
 export function disconnectSocket() {
-  if (socketIO) {
+  if (socket) {
     socket.disconnect();
-    socketIO = null;
+    socket = null;
   }
 }

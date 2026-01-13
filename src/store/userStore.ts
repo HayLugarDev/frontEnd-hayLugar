@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import api from '../services/apiService';
 import { getNotificationsByUserId } from '../services/notificationService';
 import { showToast } from '../utils/toast';
-import { socket } from '../services/socket';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -74,44 +73,6 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async connectSocket() {
-      if (!this.user?.id) return;
-      if (socket.connected) return;
-
-      socket.connect();
-
-      socket.on("connect", () => {
-        console.log("🟢 WS conectado");
-
-        this.socketConnected = true;
-        this.socketSubscribed = false;
-
-        socket.emit("subscribe", {
-          user_id: this.user!.id,
-        });
-      });
-
-      socket.on("subscribed", (data) => {
-        console.log("✅ WS subscribed:", data);
-        this.socketSubscribed = true;
-      });
-
-      socket.on("disconnect", (reason) => {
-        console.warn("🔌 WS disconnected:", reason);
-        this.socketConnected = false;
-        this.socketSubscribed = false;
-      });
-
-      socket.on("reconnect", () => {
-        console.log("🔁 WS reconnected");
-      });
-
-      socket.on("notification", ({ notification }) => {
-        if (!notification) return;
-        this.addNotification(notification);
-      });
-    },
-
     async fetchNotifications(userId: number, opts: { initialLoad?: boolean } = {}) {
       try {
         const notifications = await getNotificationsByUserId(userId);
@@ -143,16 +104,6 @@ export const useUserStore = defineStore('user', {
         this.notificationsLoaded = true;
         return [];
       }
-    },
-
-    disconnectSocket() {
-      if (!socket.connected) return;
-
-      socket.off("notification");
-      socket.disconnect();
-
-      this.socketConnected = false;
-      this.socketSubscribed = false;
     },
 
     setUser(partialUser: Partial<typeof this.user>) {
