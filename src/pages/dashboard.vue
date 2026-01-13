@@ -78,20 +78,38 @@
 
         <div v-if="!showMap" class="flex flex-col gap-10 w-full">
 
-          <section v-for="group in spacesByCity" :key="group.city" class="relative">
-            <!-- Título ciudad / provincia -->
-            <h3 class="text-lg md:text-xl font-normal mb-4 pl-2" :class="group.city.startsWith('Provincia')
-              ? 'text-amber-300'
-              : 'text-white'">
-              {{ group.city }}
-            </h3>
+          <section v-for="group in spacesByCity" :key="group.city" class="relative group">
 
-            <!-- Slider horizontal -->
-            <div class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4">
+            <div class="flex flex-row justify-between items-center">
+              <h3 class="text-lg md:text-xl font-normal mb-4 pl-2">
+                {{ group.city }}
+              </h3>
+
+              <div class="flex flex-row justify-between gap-2 rounded-full">
+                <!-- BOTÓN IZQUIERDA (desktop) -->
+                <button class="hidden md:flex bg-black/20 hover:bg-black/40 backdrop-blur-md
+                  px-3 py-1 rounded-full transition opacity-0 group-hover:opacity-100" @click="scrollLeft(group.city)">
+                  ‹
+                </button>
+
+                <!-- BOTÓN DERECHA (desktop) -->
+                <button class="hidden md:flex bg-black/20 hover:bg-black/40 backdrop-blur-md
+                  px-3 py-1 rounded-full transition opacity-0 group-hover:opacity-100"
+                  @click="scrollRight(group.city)">
+                  ›
+                </button>
+              </div>
+            </div>
+
+            <!-- SLIDER -->
+            <div :ref="el => setSliderRef(group.city, el)"
+              class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4 scroll-smooth">
               <SpaceCard v-for="space in group.items" :key="space.id" :espacio="space"
                 class="min-w-[260px] max-w-[260px]" />
             </div>
+
           </section>
+
 
         </div>
 
@@ -203,6 +221,28 @@ const checkOut = ref("");
 const showMap = ref(false);
 const showSearchMenu = ref(false);
 const refSeccionResultados = ref(null);
+
+const sliderRefs = ref({})
+
+const scrollLeft = (key) => {
+  sliderRefs.value[key]?.scrollBy({
+    left: -320,
+    behavior: 'smooth',
+  })
+}
+
+const scrollRight = (key) => {
+  sliderRefs.value[key]?.scrollBy({
+    left: 320,
+    behavior: 'smooth',
+  })
+}
+
+const setSliderRef = (key, el) => {
+  if (el) {
+    sliderRefs.value[key] = el
+  }
+}
 
 const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
 
