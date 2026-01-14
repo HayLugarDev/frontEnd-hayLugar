@@ -24,16 +24,16 @@
           <div
             class="bg-white/10 border border-white/10 p-5 rounded-2xl shadow-md flex items-start gap-5 hover:shadow-lg transition">
             <!-- Imagen responsiva: tamaños relativos a breakpoint -->
-            <img v-if="espacio?.images?.[0]" :src="espacio.images[0]"
+            <img v-if="espacio?.space.images?.[0]" :src="espacio.space.images[0]"
               class="w-20 h-20 md:w-28 md:h-28 object-cover rounded-lg shadow-sm" />
             <div>
-              <h3 class="text-lg font-semibold">{{ espacio?.name }}</h3>
-              <p class="text-gray-400 text-sm">{{ espacio?.location }}</p>
+              <h3 class="text-lg font-semibold">{{ espacio?.space.name }}</h3>
+              <p class="text-gray-400 text-sm">{{ espacio?.space.location }}</p>
 
               <div class="flex items-center gap-1 text-gray-200 text-sm mt-1">
-                <span><span class="text-yellow-600">★</span> {{ espacio?.space_reviews > 0 ?
-                  espacio.average_rating.toFixed(1) : '5.0' }}</span>
-                <span>({{ espacio?.space_reviews?.length || 0 }})</span>
+                <span><span class="text-yellow-600">★</span> {{ espacio?.space.space_reviews > 0 ?
+                  espacio.space.average_rating.toFixed(1) : '5.0' }}</span>
+                <span>({{ espacio?.space.space_reviews?.length || 0 }})</span>
                 <span class="font-medium">{{ ratingLabel }}</span>
               </div>
             </div>
