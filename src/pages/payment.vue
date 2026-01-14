@@ -24,7 +24,7 @@
           <div
             class="bg-white/10 border border-white/10 p-5 rounded-2xl shadow-md flex items-start gap-5 hover:shadow-lg transition">
             <!-- Imagen responsiva: tamaños relativos a breakpoint -->
-            <img v-if="espacio?.space.images?.[0]" :src="espacio.space.images[0]"
+            <img v-if="espacio?.space?.images[0]" :src="espacio?.space?.images[0]"
               class="w-20 h-20 md:w-28 md:h-28 object-cover rounded-lg shadow-sm" />
             <div>
               <h3 class="text-lg font-semibold">{{ espacio?.space.name }}</h3>
