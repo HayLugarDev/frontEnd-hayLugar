@@ -2,11 +2,12 @@
 import { defineStore } from 'pinia';
 import api from '../services/apiService';
 import { useUserStore } from './userStore';
+import { updateReservationPaymentData } from '../services/reservationService';
 
 export const useReservationStore = defineStore('reservation', {
   state: () => ({
     reservation: {
-      id: null as number | null,
+      id: null as string | null,
       user_id: null as number | null,
       owner_id: null as number | null,
       space_id: null as number | null,
@@ -20,6 +21,7 @@ export const useReservationStore = defineStore('reservation', {
       guest_total_cents: null as number | null, // calculado al setear
       payment_method: null as string | null,
       payment_data: null as Record<string, any> | null,
+      space: {}
     },
     loading: false,
     error: null as string | null,
@@ -60,16 +62,12 @@ export const useReservationStore = defineStore('reservation', {
         throw new Error("Reserva sin ID");
       }
 
-      await api.put(
-        `/reservations/${this.reservation.id}/payment-data`,
-        {
-          payment_method: this.reservation.payment_method,
-          payment_data: this.reservation.payment_data,
-          service_fee_cents: this.reservation.service_fee_cents,
-          guest_total_cents: this.reservation.guest_total_cents,
-        },
-        { withCredentials: true }
-      );
+      await updateReservationPaymentData(this.reservation.id, {
+        payment_method: this.reservation.payment_method,
+        payment_data: this.reservation.payment_data,
+        service_fee_cents: this.reservation.service_fee_cents,
+        guest_total_cents: this.reservation.guest_total_cents,
+      });
     },
 
     /**

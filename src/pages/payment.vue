@@ -24,16 +24,15 @@
           <div
             class="bg-white/10 border border-white/10 p-5 rounded-2xl shadow-md flex items-start gap-5 hover:shadow-lg transition">
             <!-- Imagen responsiva: tamaños relativos a breakpoint -->
-            <img v-if="espacio?.space?.images[0]" :src="espacio?.space?.images[0]"
+            <img v-if="spaceImages" :src="spaceImages[0]"
               class="w-20 h-20 md:w-28 md:h-28 object-cover rounded-lg shadow-sm" />
             <div>
               <h3 class="text-lg font-semibold">{{ espacio?.space.name }}</h3>
               <p class="text-gray-400 text-sm">{{ espacio?.space.location }}</p>
 
               <div class="flex items-center gap-1 text-gray-200 text-sm mt-1">
-                <span><span class="text-yellow-600">★</span> {{ espacio?.space.space_reviews > 0 ?
-                  espacio.space.average_rating.toFixed(1) : '5.0' }}</span>
-                <span>({{ espacio?.space.space_reviews?.length || 0 }})</span>
+                <span><span class="text-yellow-600">★</span> {{ espacio?.space.average_rating ? 
+                espacio?.space.average_rating.toFixed(1) : '5.0' }}</span>
                 <span class="font-medium">{{ ratingLabel }}</span>
               </div>
             </div>
@@ -199,7 +198,7 @@ import { useRouter } from 'vue-router';
 import api from '../services/apiService';
 import { useReservationStore } from '../store/reservationStore';
 import { loadMercadoPago } from '@mercadopago/sdk-js';
-import { getSpaceById } from '../services/spaceService';
+import { getSpaceById, getSpaceImages } from '../services/spaceService';
 import BackButton from '../components/common/BackButton.vue';
 import MainHeader from "../components/layout/header/MainHeader.vue";
 import { getVehicleById } from '../services/vehicleService';
@@ -226,6 +225,7 @@ const totalDuration = computed(() => reserva.value?.deadLine ?? 0);
 const hours = computed(() => { return totalDuration.value ? Math.floor(totalDuration.value) : 0; });
 const minutes = computed(() => { return totalDuration.value ? Math.round((totalDuration.value - hours.value) * 60) : 0; });
 const espacio = ref<any>(null);
+const spaceImages = ref<string[]>([]);
 const vehiculoSeleccionado = ref(null);
 const selectedMethod = ref(false);
 
@@ -237,10 +237,13 @@ const formatARS = (v: number) =>
 
 const obtenerEspacio = async () => {
   try {
-    const id = reserva.value.id;
+    const id = String(reserva.value.id);
     if (!id) throw new Error("No se encontró el espacio");
     const data = await getReservationForPayment(id);
     espacio.value = data;
+    const images = await getSpaceImages(espacio.value.id);
+    console.log(images);
+    spaceImages.value = images;
     return data;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
@@ -400,7 +403,7 @@ const initWalletBrick = async () => {
         },
         onSubmit: async () => {
           console.log("🕒 Pago enviado a Mercado Pago, esperando webhook...");
-          await checkPaymentStatus(reservationId);
+          await checkPaymentStatus(String(reservationId));
         },
       },
     });
@@ -477,13 +480,13 @@ const initCardBrick = async () => {
   }
 };
 
-const checkPaymentStatus = async (reservationId: number) => {
+const checkPaymentStatus = async (reservationId: string) => {
   const maxAttempts = 10;
   let attempts = 0;
 
   const interval = setInterval(async () => {
     attempts++;
-    const res = await api.get(`/payments/payment-status/${reservationId}`);
+    const res = await api.get(`/payments/payment-status/${reserva.value.id}`);
     const status = res.data.status;
 
     console.log("🔎 Estado de pago:", status);
