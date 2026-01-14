@@ -263,6 +263,7 @@ const fetchReservations = async () => {
       (a: any, b: any) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
+    console.log(data);
   } catch (error) {
     console.error("Error al obtener reservas entrantes", error);
     reservations.value = [];
@@ -305,7 +306,7 @@ function confirmApprovedReservation(reservation: any) {
 
 async function approveReservation() {
   try {
-    await api.put(`/reservations/${selectedReservation.value.id}/status`, { status: 'payment_pending' }, { withCredentials: true });
+    await api.put(`/reservations/u/${selectedReservation.value.id}/status`, { status: 'payment_pending' }, { withCredentials: true });
 
     showConfirmModal.value = false;
     selectedReservation.value = null;
