@@ -17,7 +17,6 @@ export async function createReservation(payload: any) {
 }
 
 export async function getReservationForPayment(reservationId: number) {
-  console.log(reservationId);
   const { data } = await api.get(`/reservations/${reservationId}/payment`, { withCredentials: true });
   return data;
 }
