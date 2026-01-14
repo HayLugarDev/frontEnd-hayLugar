@@ -380,6 +380,10 @@ const initWalletBrick = async () => {
       description: "Reserva de espacio",
       email: email.value,
       userId: reserva.value.user_id,
+      metadata: {
+        reservationId,
+        userId: reserva.value.user_id
+      },
     }, { withCredentials: true });
 
     const preferenceId = res.data.preference_id;
