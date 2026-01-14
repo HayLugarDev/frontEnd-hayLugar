@@ -485,7 +485,6 @@ const disponibilidad = computed(() => {
 const obtenerEspacio = async () => {
   const slug = route.params.slug
   const space = await spaceStore.fetchSpaceBySlug(slug)
-  console.log(space);
 
   if (!space) return
 

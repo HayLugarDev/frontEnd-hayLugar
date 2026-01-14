@@ -34,9 +34,9 @@
 
         <div class="p-5 space-y-3 text-sm text-gray-200">
           <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
-            <p><span class="font-semibold">📍 Espacio:</span> {{ reservation.space.name }}</p>
-            <p><span class="font-semibold">📫 Dirección:</span> {{ reservation.space.location.split(',')[0] }}</p>
-            <p><span class="font-semibold">👤 Anfitrión:</span> {{ reservation.owner.name }}</p>
+            <p><span class="font-semibold">📍 Espacio:</span> {{ reservation?.space?.name }}</p>
+            <p><span class="font-semibold">📫 Dirección:</span> {{ reservation?.space?.location.split(',')[0] }}</p>
+            <p><span class="font-semibold">👤 Anfitrión:</span> {{ reservation?.owner?.name }}</p>
             <p>
               <span class="font-semibold">🚘 Vehículo:</span>
               {{ getVehicleType(reservation.vehicle.type) }}
@@ -233,7 +233,7 @@ async function confirmCheckIn() {
   if (!selectedReservation.value) return;
 
   try {
-    await api.post(`/reservations/${selectedReservation.value.id}/verify-checkin`,
+    await api.post(`/reservations/u/${selectedReservation.value.id}/verify-checkin`,
       { code: checkInCode.value },
       { withCredentials: true }
     );
@@ -300,7 +300,7 @@ const completeReservation = async () => {
   if (!selectedReservation.value) return;
 
   try {
-    await api.put(`/reservations/${selectedReservation.value.reservation_id}/finalize`, { withCredentials: true });
+    await api.put(`/reservations/u/${selectedReservation.value.reservation_id}/finalize`, { withCredentials: true });
 
     // Actualizar localmente el estado de la reserva
     selectedReservation.value = selectedReservation.value.map((r: { id: number; }) =>
@@ -358,7 +358,7 @@ function confirmCancelation(reservation: any) {
 
 const cancelReservation = async () => {
   try {
-    await api.put(`/reservations/${selectedReservation.value.id}/cancel`, { role: 'client' }, { withCredentials: true });
+    await api.put(`/reservations/u/${selectedReservation.value.id}/cancel`, { role: 'client' }, { withCredentials: true });
 
     // Actualizar localmente el estado de la reserva en el array principal
     reservations.value = reservations.value.map((r: any) =>
