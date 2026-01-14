@@ -114,7 +114,6 @@ export const useUserStore = defineStore('user', {
     },
 
     clearUser() {
-      this.disconnectSocket();
       this.user = null;
       this.error = null;
       this.sessionExpired = false;
