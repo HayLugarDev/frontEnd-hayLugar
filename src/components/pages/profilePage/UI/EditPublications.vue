@@ -83,9 +83,9 @@
         <div class="mt-6">
           <h3 class="text-xl font-semibold text-primary mb-4">Vehículos aceptados</h3>
           <div class="flex flex-col gap-3">
-            <VehicleFormOption v-for="type in vehicleTypes" :key="type.value" :value="type.value" :title="type.title"
-              :text="type.description" :configured="!!vehicleMap[type.value]" :configuration="vehicleMap[type.value]"
-              @configure="openConfig(type.value)" @save="saveConfiguration" />
+            <VehicleFormOption v-for="type in vehicleTypes" :key="type.value + JSON.stringify(vehicleMap[type.value] || {})"
+             :value="type.value" :title="type.title" :text="type.description" :configured="!!vehicleMap[type.value]" 
+             :configuration="vehicleMap[type.value]" @configure="openConfig(type.value)" @save="saveConfiguration" />
           </div>
           <VehicleModal v-if="selectedType" :type="selectedType" :existing="vehicleMap[selectedType]"
             @save="saveConfiguration" @close="selectedType = null" />

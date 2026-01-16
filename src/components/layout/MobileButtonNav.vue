@@ -25,8 +25,8 @@
       <li @click="userStore.user ? $emit('navigate', '/add-space') : verifyToken('/add-space');" class="relative -mt-6 bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center 
                  shadow-lg shadow-primary/40 border-2 border-white/20 cursor-pointer">
         <font-awesome-icon icon="plus" class="text-2xl" />
-        <img :src="decoPublica" alt="Publicar ahora"
-          class="absolute -bottom-10 -right-2 h-24 rotate-12 pointer-events-none select-none" />
+        <!-- <img :src="decoPublica" alt="Publicar ahora"
+          class="absolute -bottom-10 -right-2 h-24 rotate-12 pointer-events-none select-none" /> -->
       </li>
 
       <!-- NOTIFICACIONES -->

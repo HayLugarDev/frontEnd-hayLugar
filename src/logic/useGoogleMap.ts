@@ -1,6 +1,20 @@
 import { ref } from 'vue';
 import logoMarker from '../assets/logo.png';
 
+const userAddress = ref<string>('')
+
+export async function resolveUserAddress(coords: google.maps.LatLngLiteral) {
+    if (!window.google) return
+
+    const geocoder = new google.maps.Geocoder()
+
+    geocoder.geocode({ location: coords }, (results, status) => {
+        if (status === 'OK' && results?.length) {
+            userAddress.value = results[0].formatted_address
+        }
+    })
+}
+
 export function useGoogleMap() {
     const center = ref({ lat: -26.8333, lng: -65.2167 });
     const zoom = ref(15);
@@ -22,75 +36,74 @@ export function useGoogleMap() {
     };
 
     const setCenterToUserLocation = () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    center.value = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                },
-                (err) => {
-                    console.error("Error al obtener geolocalización:", err);
-                }
-            );
-        }
+        if (!navigator.geolocation) return
+
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const coords = {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude,
+            }
+
+            center.value = coords
+            resolveUserAddress(coords)
+        })
     };
-const setCenterToLocation = (lat: number, lng: number) => {
-    center.value = { lat, lng };
-};
+    const setCenterToLocation = (lat: number, lng: number) => {
+        center.value = { lat, lng };
+    };
 
     const mapOptions = ref({
-          styles: [
-      {
-        elementType: 'geometry',
-        stylers: [{ color: '#eaeaea' }]
-      },
-      {
-        elementType: 'labels.text.fill',
-        stylers: [{ color: '#333' }]
-      },
-      {
-        featureType: 'poi',
-        stylers: [{ visibility: 'off' }]
-      },
-      {
-        featureType: 'road',
-        elementType: 'geometry',
-        stylers: [{ color: '#d6d6d6' }]
-      },
-      {
-        featureType: 'road',
-        elementType: 'labels.icon',
-        stylers: [{ visibility: 'off' }]
-      },
-      {
-        featureType: 'water',
-        elementType: 'geometry',
-        stylers: [{ color: '#c9e3f1' }]
-      },
-      {
-        featureType: 'transit',
-        stylers: [{ visibility: 'off' }]
-      }
-    ],
-    disableDefaultUI: true,
-    draggable: true,
-    zoomControl: true,
-    fullscreenControl: false,
-    scrollwheel: true,
-    streetViewControl: false
-  });
+        styles: [
+            {
+                elementType: 'geometry',
+                stylers: [{ color: '#eaeaea' }]
+            },
+            {
+                elementType: 'labels.text.fill',
+                stylers: [{ color: '#333' }]
+            },
+            {
+                featureType: 'poi',
+                stylers: [{ visibility: 'off' }]
+            },
+            {
+                featureType: 'road',
+                elementType: 'geometry',
+                stylers: [{ color: '#d6d6d6' }]
+            },
+            {
+                featureType: 'road',
+                elementType: 'labels.icon',
+                stylers: [{ visibility: 'off' }]
+            },
+            {
+                featureType: 'water',
+                elementType: 'geometry',
+                stylers: [{ color: '#c9e3f1' }]
+            },
+            {
+                featureType: 'transit',
+                stylers: [{ visibility: 'off' }]
+            }
+        ],
+        disableDefaultUI: true,
+        draggable: true,
+        zoomControl: true,
+        fullscreenControl: false,
+        scrollwheel: true,
+        streetViewControl: false
+    });
 
     return {
         center,
         zoom,
+        userAddress,
         hoveredSpace,
         getMarkerOptions,
         handleMouseOver,
         handleMouseOut,
         mapOptions,
         setCenterToUserLocation,
-        setCenterToLocation 
+        setCenterToLocation
     };
 }
