@@ -122,10 +122,17 @@ const localConfig = ref({
 watch(
   () => props.configuration,
   (newVal) => {
-    localConfig.value.capacity = newVal?.capacity || ''
-    localConfig.value.price_per_hour = newVal?.price_per_hour || ''
-  }
-)
+    if (!newVal) return;
+
+    localConfig.value = {
+      type: props.value,
+      capacity: newVal.capacity,
+      price_per_hour: newVal.price_per_hour
+    }
+  },
+  { immediate: true }
+);
+
 
 function toggleExpanded() {
   expanded.value = !expanded.value

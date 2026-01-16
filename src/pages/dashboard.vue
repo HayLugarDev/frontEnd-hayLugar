@@ -114,11 +114,53 @@
         </div>
 
         <!-- MAPA -->
-        <div v-else class="w-full h-full">
+        <div class="relative w-full h-full rounded-2xl overflow-hidden
+            border border-white/10
+            shadow-[0_20px_60px_rgba(0,0,0,.45)]">
+
+          <!-- Overlay gradiente -->
+          <div class="pointer-events-none absolute inset-0
+              bg-gradient-to-t from-[#0D1B2A]/80 via-transparent to-transparent z-10"></div>
+
+          <div class="absolute top-4 left-4 z-20
+            bg-[#1B263B]/90 backdrop-blur-xl
+            border border-white/10
+            rounded-xl px-4 py-3 shadow-xl">
+
+            <p class="text-xs text-[#90CAF9]">Mostrando espacios cerca de</p>
+            <p class="font-semibold max-w-[220px] truncate">
+              {{ userAddress.split(',')[0] || 'Ubicando tu posición…' }}
+            </p>
+
+          </div>
+
+          <button class="absolute bottom-6 left-6 z-20
+            bg-[#1B263B]/90 hover:bg-[#24334d]
+            border border-white/10
+            backdrop-blur-xl
+            rounded-full p-3 shadow-xl transition" @click="setCenterToUserLocation">
+            📍
+          </button>
+
           <CustomGoogleMap class="rounded-xl overflow-hidden shadow-2xl border border-white/10" :center="center"
-            :zoom="zoom" :options="mapOptions" :showUserMarker="true" :userPosition="center">
+            :zoom="zoom" :options="mapOptions" locateUser>
             <GMapMarker v-for="space in spaces" :key="space.id" :options="getMarkerOptions(space)"
               @mouseover="handleMouseOver(space)" @mouseout="handleMouseOut" @click="() => handleMarkerClick(space)" />
+
+            <div class="rounded-xl overflow-hidden bg-white shadow-xl">
+              <div class="bg-[#1B263B] px-3 py-2">
+                <h3 class="text-sm font-semibold text-white">
+                  {{ hoveredSpace?.name }}
+                </h3>
+              </div>
+
+              <div class="p-3 text-[#0D1B2A] text-sm space-y-1">
+                <p class="text-xs text-gray-500">{{ hoveredSpace?.location }}</p>
+                <p class="font-semibold text-[#00B4D8]">
+                  ${{ hoveredSpace?.price_per_hour }} / hora
+                </p>
+              </div>
+            </div>
 
             <InfoWindow v-if="hoveredSpace && hoveredSpace.latitude"
               :position="{ lat: Number(hoveredSpace.latitude), lng: Number(hoveredSpace.longitude) }"
@@ -307,6 +349,7 @@ const spacesByCity = computed(() => {
 const {
   center,
   zoom,
+  userAddress,
   hoveredSpace,
   getMarkerOptions,
   handleMouseOver,
