@@ -244,7 +244,7 @@ function toggleTraffic() {
   trafficEnabled.value = !trafficEnabled.value;
 }
 
-/* ===================== SYNC ===================== */
+/* ==================== SYNC ===================== */
 
 watch(selectedProvince, (p) => {
   if (!p) return;
