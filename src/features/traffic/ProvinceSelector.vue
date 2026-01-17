@@ -1,28 +1,27 @@
 <template>
-  <div class="flex flex-col gap-3 ">
+  <div class="flex flex-col gap-3">
 
-    <!-- ===== PROVINCIA ===== -->
-    <div class="flex flex-col gap-2 ">
+    <!-- ================= PROVINCIA ================= -->
+    <div class="flex flex-col gap-2">
       <label class="text-xs text-white/70">Provincia</label>
 
       <div class="flex gap-2 items-center">
-    <select
-  class="w-full bg-[#020617] text-white border border-white/10 
-         rounded-xl px-3 py-2 text-sm outline-none 
-         focus:ring-2 focus:ring-white/20"
-  :value="modelValue"
-  @change="onProvinceChange"
->
-  <option
-    v-for="p in provinces"
-    :key="p.id"
-    :value="p.id"
-    class="bg-[#020617] text-white"
-  >
-    {{ p.name }}
-  </option>
-</select>
-
+        <select
+          class="w-full bg-[#020617] text-white border border-white/10
+                 rounded-xl px-3 py-2 text-sm outline-none
+                 focus:ring-2 focus:ring-white/20"
+          :value="modelValue"
+          @change="onProvinceChange"
+        >
+          <option
+            v-for="p in provinces"
+            :key="p.id"
+            :value="p.id"
+            class="bg-[#020617] text-white"
+          >
+            {{ p.name }}
+          </option>
+        </select>
 
         <button
           type="button"
@@ -35,10 +34,10 @@
       </div>
     </div>
 
-    <!-- ===== VISTAS DESTACADAS ===== -->
+    <!-- ================= VISTAS / SUB-ZONAS ================= -->
     <div
       v-if="currentProvince?.views?.length"
-      class="flex flex-col gap-2 "
+      class="flex flex-col gap-2"
     >
       <label class="text-xs text-white/60">
         Vista destacada
@@ -49,12 +48,11 @@
           v-for="view in currentProvince.views"
           :key="view.id"
           type="button"
-          class="px-3 py-1.5 rounded-full text-xs border transition
-                 backdrop-blur"
+          class="px-3 py-1.5 rounded-full text-xs border transition backdrop-blur"
           :class="viewButtonClass(view.id)"
           @click="selectView(view.id)"
         >
-          {{ view.name }}
+          {{ view.label }}
         </button>
       </div>
     </div>
@@ -87,7 +85,7 @@ const emit = defineEmits<{
 
 /* ===================== COMPUTEDS ===================== */
 
-const currentProvince = computed(() =>
+const currentProvince = computed<ProvinceConfig | undefined>(() =>
   props.provinces.find(p => p.id === props.modelValue)
 )
 
@@ -96,14 +94,15 @@ const currentProvince = computed(() =>
 function onProvinceChange(e: Event) {
   const value = (e.target as HTMLSelectElement).value as ProvinceId
 
+  // cambio de provincia
   emit("update:modelValue", value)
 
-  // 🔄 reset vista al cambiar provincia
+  // reset sub-zona (clave para coherencia con hot zones)
   emit("update:viewId", null)
 }
 
-function selectView(viewId: string) {
-  emit("update:viewId", viewId)
+function selectView(id: string) {
+  emit("update:viewId", id)
 }
 
 function viewButtonClass(id: string) {

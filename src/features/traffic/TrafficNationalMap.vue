@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-[72vh] mt-8 sm:mt-10 ">
+  <div class="relative w-full h-[65vh] sm:h-[72vh] mt-6 sm:mt-10">
 
     <!-- ================= MAPA BASE ================= -->
     <TrafficGoogleMap
@@ -8,7 +8,6 @@
       :zoom="zoom"
       :options="mapOptions"
     >
-      <!-- Capas: tráfico real + zonas calientes + simulación -->
       <TrafficLayers
         :provinceId="provinceId"
         :viewId="viewId"
@@ -17,35 +16,51 @@
         :simLevel="simLevel"
         :center="center"
       />
-
     </TrafficGoogleMap>
 
-    <!-- ================= OVERLAY IZQ ================= -->
-    <div class="absolute top-6 left-4 z-20 pointer-events-none">
+    <!-- ================= OVERLAY IZQUIERDO ================= -->
+    <!-- Desktop / Tablet -->
+    <div class="hidden sm:block absolute top-6 left-4 z-20">
       <div
-        class="pointer-events-auto w-[320px] bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] backdrop-blur-xl 
-               border border-white/10 rounded-2xl p-4 shadow-xl"
+        class="w-[320px] bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+               backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl"
       >
         <ProvinceSelector
-            v-model="provinceId"
-            v-model:viewId="viewId"
-            :provinces="provinces"
-            @locate="flyToSelection"
-          />
-
+          v-model="provinceId"
+          v-model:viewId="viewId"
+          :provinces="provinces"
+          @locate="flyToSelection"
+        />
       </div>
     </div>
 
-    <!-- ================= OVERLAY DER ================= -->
-    <div class="absolute top-4 right-4 z-20 pointer-events-none">
+    <!-- Mobile selector (top) -->
+    <div class="sm:hidden absolute top-3 left-3 right-3 z-20">
       <div
-        class="pointer-events-auto w-[380px] bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] backdrop-blur-xl 
-               border border-white/10 rounded-2xl p-4 shadow-xl"
+        class="bg-[#020617]/90 backdrop-blur border border-white/10
+               rounded-xl p-3 shadow-xl"
+      >
+        <ProvinceSelector
+          v-model="provinceId"
+          v-model:viewId="viewId"
+          :provinces="provinces"
+          compact
+          @locate="flyToSelection"
+        />
+      </div>
+    </div>
+
+    <!-- ================= PANEL DERECHO ================= -->
+    <!-- Desktop -->
+    <div class="hidden sm:block absolute top-4 right-4 z-20">
+      <div
+        class="w-[380px] bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+               backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl"
       >
         <TrafficImpactPanel
           :title="panelTitle"
           subtitle="Vista nacional · datos en tiempo real"
-          :focusCityLabel="selectedProvince?.focusCityLabel || ''"
+          :focusCityLabel="activeZoneLabel"
           :isPeak="isPeak"
           :trafficEnabled="trafficEnabled"
           :narrative="narrative"
@@ -60,17 +75,42 @@
       </div>
     </div>
 
+    <!-- Mobile bottom sheet -->
+    <div class="sm:hidden absolute bottom-3 left-3 right-3 z-20">
+      <div
+        class="bg-[#020617]/95 backdrop-blur-xl border border-white/10
+               rounded-2xl p-4 shadow-2xl"
+      >
+        <TrafficImpactPanel
+          :title="panelTitle"
+          subtitle="Vista nacional"
+          :focusCityLabel="activeZoneLabel"
+          :isPeak="isPeak"
+          :trafficEnabled="trafficEnabled"
+          :narrative="narrative"
+          :level="simLevel"
+          compact
+          @publish="$emit('publish')"
+          @toggleTraffic="toggleTraffic"
+        />
+
+        <div class="mt-2">
+          <TrafficDisclaimer />
+        </div>
+      </div>
+    </div>
+
     <!-- ================= OVERLAY INFERIOR ================= -->
     <div
-      class="absolute bottom-4 left-4 right-4 z-20 flex justify-between pointer-events-none"
+      class="absolute bottom-3 left-3 right-3 z-10 flex justify-center pointer-events-none"
     >
       <div
-        class="pointer-events-auto px-3 py-2 rounded-xl 
-               bg-[#020617]/80 backdrop-blur border border-white/10 text-xs"
+        class="px-3 py-2 rounded-xl
+               bg-[#020617]/80 backdrop-blur
+               border border-white/10 text-xs text-center"
       >
         {{ peakText }}
       </div>
-
     </div>
 
   </div>
@@ -91,7 +131,7 @@ import { usePeakSchedule } from "../../logic/usePeakSchedule";
 
 defineEmits<{ (e: "publish"): void }>();
 
-/* ===================== DATA BASE ===================== */
+/* ===================== DATA ===================== */
 
 const provinces = PROVINCES;
 const provinceId = ref<ProvinceId>(provinces[0].id);
@@ -113,30 +153,40 @@ const zoom = ref<number>(
 /* ===================== CURRENT VIEW ===================== */
 
 const currentView = computed(() => {
-  if (!viewId.value || !selectedProvince.value?.presets) return null;
+  if (!viewId.value || !selectedProvince.value?.views) return null;
   return (
-    selectedProvince.value.presets.find(v => v.id === viewId.value) ?? null
+    selectedProvince.value.views.find(v => v.id === viewId.value) ?? null
   );
 });
 
-/* ===================== TRAFFIC STATE ===================== */
+/* ===================== LABEL ===================== */
+
+const activeZoneLabel = computed(() => {
+  return (
+    currentView.value?.label ||
+    selectedProvince.value?.focusCityLabel ||
+    selectedProvince.value?.name ||
+    ""
+  );
+});
+
+/* ===================== TRAFFIC ===================== */
 
 const trafficEnabled = ref(true);
 const simEnabled = ref(true);
 
-/* ===================== HORARIO PICO ===================== */
+/* ===================== PEAK ===================== */
 
 const { isPeakNow } = usePeakSchedule();
-
 const isPeak = computed(() => isPeakNow.value);
 
 const peakText = computed(() =>
   isPeak.value
-    ? "Horario pico detectado · alta presión de estacionamiento"
+    ? "Horario pico · alta presión de estacionamiento"
     : "Fuera de horario pico · flujo urbano moderado"
 );
 
-/* ===================== NIVEL DE INTENSIDAD ===================== */
+/* ===================== LEVEL ===================== */
 
 const simLevel = computed<"green" | "yellow" | "red">(() => {
   if (isPeak.value) return "red";
@@ -144,37 +194,33 @@ const simLevel = computed<"green" | "yellow" | "red">(() => {
   return "green";
 });
 
-/* ===================== CTA CONTEXTUAL ===================== */
+/* ===================== COPY ===================== */
 
 const narrative = computed(() => {
-  const place =
-    currentView.value?.label ||
-    selectedProvince.value?.focusCityLabel ||
-    selectedProvince.value?.name ||
-    "esta zona";
+  const place = activeZoneLabel.value || "esta zona";
 
   if (isPeak.value) {
-    return `Alta demanda ahora en ${place}. La congestión urbana incrementa fuertemente la búsqueda de estacionamiento. Si tenés un espacio disponible cerca, este es el mejor momento para publicarlo.`;
+    return `Alta demanda ahora en ${place}. La congestión urbana incrementa la búsqueda de estacionamiento.`;
   }
 
   if (trafficEnabled.value) {
-    return `El tráfico en vivo muestra flujo constante en ${place}. Publicar tu espacio ahora te posiciona mejor para la próxima franja de alta demanda.`;
+    return `El tráfico en vivo muestra flujo constante en ${place}.`;
   }
 
-  return `Explorá el mapa urbano de ${place} y detectá oportunidades donde la movilidad genera demanda de estacionamiento.`;
+  return `Explorá el mapa urbano de ${place} y detectá oportunidades.`;
 });
-
-/* ===================== UI ===================== */
 
 const panelTitle = computed(
   () => `Tráfico en vivo · ${selectedProvince.value?.name ?? ""}`
 );
 
+/* ===================== MAP OPTIONS ===================== */
+
 const mapOptions = computed<google.maps.MapOptions>(() => ({
   clickableIcons: false,
   styles: [
     { featureType: "poi", stylers: [{ visibility: "off" }] },
-    { featureType: "transit", stylers: [{ visibility: "off" }] },
+    { featureType: "transit", stylers: [{ visibility: "on" }] },
   ],
 }));
 
@@ -198,11 +244,7 @@ function toggleTraffic() {
   trafficEnabled.value = !trafficEnabled.value;
 }
 
-function toggleSim() {
-  simEnabled.value = !simEnabled.value;
-}
-
-/* ===================== SYNC PROVINCIA ===================== */
+/* ===================== SYNC ===================== */
 
 watch(selectedProvince, (p) => {
   if (!p) return;
@@ -211,4 +253,3 @@ watch(selectedProvince, (p) => {
   zoom.value = p.zoom;
 });
 </script>
-
