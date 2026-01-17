@@ -1,5 +1,17 @@
 <template>
 
+  <div v-if="isCheckingPayment"
+    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md">
+    <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mb-6"></div>
+    <p class="text-lg font-semibold text-white">
+      Procesando tu pago…
+    </p>
+    <p class="text-sm text-gray-300 mt-2">
+      Esto puede tardar unos segundos
+    </p>
+  </div>
+
+
   <!-- BOTÓN ATRÁS MOBILE -->
   <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
     <BackButton />
@@ -24,15 +36,15 @@
           <div
             class="bg-white/10 border border-white/10 p-5 rounded-2xl shadow-md flex items-start gap-5 hover:shadow-lg transition">
             <!-- Imagen responsiva: tamaños relativos a breakpoint -->
-            <img v-if="spaceImages" :src="spaceImages[0]"
+            <img v-if="spaceImages.length" :src="spaceImages[0]"
               class="w-20 h-20 md:w-28 md:h-28 object-cover rounded-lg shadow-sm" />
             <div>
               <h3 class="text-lg font-semibold">{{ espacio?.space.name }}</h3>
               <p class="text-gray-400 text-sm">{{ espacio?.space.location }}</p>
 
               <div class="flex items-center gap-1 text-gray-200 text-sm mt-1">
-                <span><span class="text-yellow-600">★</span> {{ espacio?.space.average_rating ? 
-                espacio?.space.average_rating.toFixed(1) : '5.0' }}</span>
+                <span><span class="text-yellow-600">★</span> {{ espacio?.space.average_rating ?
+                  espacio?.space.average_rating.toFixed(1) : '5.0' }}</span>
                 <span class="font-medium">{{ ratingLabel }}</span>
               </div>
             </div>
@@ -225,12 +237,16 @@ const totalDuration = computed(() => reserva.value?.deadLine ?? 0);
 const hours = computed(() => { return totalDuration.value ? Math.floor(totalDuration.value) : 0; });
 const minutes = computed(() => { return totalDuration.value ? Math.round((totalDuration.value - hours.value) * 60) : 0; });
 const espacio = ref<any>(null);
-const spaceImages = ref<string[]>([]);
 const vehiculoSeleccionado = ref(null);
 const selectedMethod = ref(false);
 
 const errorMessage = ref("");
 const showErrorModal = ref(false);
+
+//Respuestas MP
+const isReturningFromMP = ref(false);
+const isCheckingPayment = ref(false);
+
 
 const formatARS = (v: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(Number(v || 0));
@@ -241,35 +257,63 @@ const obtenerEspacio = async () => {
     if (!id) throw new Error("No se encontró el espacio");
     const data = await getReservationForPayment(id);
     espacio.value = data;
-    const images = await getSpaceImages(espacio.value.id);
-    console.log(images);
-    spaceImages.value = images;
+    console.log(espacio.value.space.images[0])
     return data;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
   }
 };
 
+const spaceImages = computed<string[]>(() => {
+  const imgs = espacio.value?.space?.images;
+
+  if (!imgs) return [];
+
+  if (typeof imgs === 'string') {
+    try {
+      return JSON.parse(imgs);
+    } catch {
+      return [];
+    }
+  }
+
+  return imgs;
+});
+
 onMounted(async () => {
+  const query = router.currentRoute.value.query;
+
+  // 🔁 Vuelta desde Mercado Pago
+  if (query.payment_id || query.status) {
+    isReturningFromMP.value = true;
+    isCheckingPayment.value = true;
+
+    const reservationId = reserva.value?.id;
+
+    if (reservationId) {
+      await checkPaymentStatus(String(reservationId));
+      return; // ⛔ NO seguir con validaciones normales
+    }
+  }
+
+  // ⚠️ Flujo normal
   await obtenerEspacio();
 
   if (!reserva.value) {
-    console.warn('Intento de acceso inválido a pago');
     router.push('/dashboard');
     return;
   }
 
   if (!reservationStore.reservation.space_id || !reservationStore.reservation.start_time) {
-    console.error('Error en envío de datos.');
     router.push('/dashboard');
   }
 
   const vehicle_id = reservationStore.reservation.vehicle_id;
   if (vehicle_id) {
-    const vehicleSelect = await getVehicleById(vehicle_id);
-    vehiculoSeleccionado.value = vehicleSelect;
+    vehiculoSeleccionado.value = await getVehicleById(vehicle_id);
   }
 });
+
 
 const formattedDuration = computed(() =>
   formatDurationFromHours(reserva.value?.deadLine ?? 0)
@@ -361,6 +405,7 @@ const initWalletBrick = async () => {
   await reservationStore.syncReservation();
 
   const reservationId = reserva.value.id;
+  console.log(reservationId)
 
   if (!reservationId) {
     throw new Error("Reserva inválida");
@@ -481,27 +526,38 @@ const initCardBrick = async () => {
 };
 
 const checkPaymentStatus = async (reservationId: string) => {
-  const maxAttempts = 10;
+  const maxAttempts = 12;
   let attempts = 0;
 
   const interval = setInterval(async () => {
     attempts++;
-    const res = await api.get(`/payments/payment-status/${reserva.value.id}`);
+
+    const res = await api.get(`/payments/u/${reservationId}/payment-status`);
     const status = res.data.status;
 
     console.log("🔎 Estado de pago:", status);
 
     if (status === "approved") {
       clearInterval(interval);
-      router.push({ path: '/confirmacion', query: { id: reserva.value.id } });
+      router.push('/confirmacion');
+      return;
     }
 
+    if (status === "rejected") {
+      clearInterval(interval);
+      isCheckingPayment.value = false;
+      showErrorModal.value = true;
+      errorMessage.value = "El pago fue rechazado.";
+      return;
+    }
 
     if (attempts >= maxAttempts) {
       clearInterval(interval);
-      console.warn("⏰ Tiempo de espera agotado. No se confirmó el pago.");
+      isCheckingPayment.value = false;
+      showErrorModal.value = true;
+      errorMessage.value = "No se pudo confirmar el pago. Intentá nuevamente.";
     }
-  }, 5000); // cada 5 segundos
+  }, 4000);
 };
 
 // Función para confirmar el pago utilizando el Checkout API
