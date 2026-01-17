@@ -1,18 +1,29 @@
-import { Ref, watch } from 'vue'
-import { useGoogleMapsReady } from '../../logic/useGoogleMapsReady'
+import { Ref, watch } from "vue"
+import { useGoogleMapsReady } from "../../logic/useGoogleMapsReady"
 
-export type SimLevel = 'green' | 'yellow' | 'red'
+export type SimLevel = "green" | "yellow" | "red"
+
+type Vehicle = {
+  marker: google.maps.Marker
+  vx: number
+  vy: number
+}
 
 export class VehicleSimLayer {
   private mapRef: Ref<google.maps.Map | null>
-  private vehicles: google.maps.Marker[] = []
+  private vehicles: Vehicle[] = []
   private running = false
 
-  private level: SimLevel = 'green'
+  /* ===================== STATE ===================== */
+
+  private level: SimLevel = "green"                 // UX / narrativa
   private center: google.maps.LatLngLiteral | null = null
+  private weight = 0                                 // densidad real 0..1
+
+  private rafId: number | null = null
+  private stopWatch: (() => void) | null = null
 
   private isReady = useGoogleMapsReady().isReady
-  private stopWatch: (() => void) | null = null
 
   constructor(mapRef: Ref<google.maps.Map | null>) {
     this.mapRef = mapRef
@@ -20,14 +31,29 @@ export class VehicleSimLayer {
 
   /* ===================== CONFIG ===================== */
 
-  configure(level: SimLevel, center: google.maps.LatLngLiteral) {
-    const levelChanged = this.level !== level
+  /**
+   * Punto único de control.
+   * TODAS las opciones se derivan de estos parámetros.
+   */
+  configure(
+    level: SimLevel,
+    center: google.maps.LatLngLiteral,
+    weight: number = 0
+  ) {
+    const w = Math.max(0, Math.min(1, weight))
+
+    const needsRestart =
+      this.level !== level ||
+      this.weight !== w ||
+      !this.center ||
+      Math.abs(this.center.lat - center.lat) > 1e-6 ||
+      Math.abs(this.center.lng - center.lng) > 1e-6
 
     this.level = level
     this.center = center
+    this.weight = w
 
-    // 🔁 Si cambia el nivel, recreamos vehículos
-    if (this.running && levelChanged) {
+    if (this.running && needsRestart) {
       this.stop()
       this.start()
     }
@@ -45,6 +71,7 @@ export class VehicleSimLayer {
 
         this.running = true
         this.spawnVehicles(map)
+        this.animate()
       },
       { immediate: true }
     )
@@ -52,91 +79,150 @@ export class VehicleSimLayer {
 
   stop() {
     this.running = false
+
+    if (this.rafId) cancelAnimationFrame(this.rafId)
+    this.rafId = null
+
     this.stopWatch?.()
     this.stopWatch = null
 
-    this.vehicles.forEach(v => v.setMap(null))
+    this.vehicles.forEach(v => v.marker.setMap(null))
     this.vehicles = []
   }
 
   /* ===================== SPAWN ===================== */
 
   private spawnVehicles(map: google.maps.Map) {
-    if (!(window as any).google?.maps?.Marker || !this.center) return
+    if (!this.center) return
 
-    const count =
-      this.level === 'green' ? 12 :
-      this.level === 'yellow' ? 28 :
-      45
+    // Cantidad derivada SOLO de densidad
+    const min = 6
+    const max = 60
+    const count = Math.round(min + (max - min) * this.weight)
 
     for (let i = 0; i < count; i++) {
-      const rotation = Math.random() * 360
+      const angle = this.spawnAngle()
+      const speed = this.baseSpeed()
 
       const marker = new google.maps.Marker({
         position: this.randomPoint(this.center),
         map,
-        zIndex: 9999, // 🔥 siempre encima del tráfico
-        opacity: 0.85,
+        zIndex: 9999,
+        opacity: 0.9,
+        clickable: false,
         icon: {
           path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-          scale: 4.5,              // 🔥 MÁS GRANDE
+          scale: 4.5,
           strokeColor: this.levelColor(),
-          strokeWeight: 2.5,       // 🔥 MÁS CONTRASTE
+          strokeWeight: 2.5,
           fillColor: this.levelColor(),
           fillOpacity: 1,
-          rotation,
+          rotation: (angle * 180) / Math.PI,
         },
       })
 
-      this.vehicles.push(marker)
-      this.animate(marker)
+      this.vehicles.push({
+        marker,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+      })
     }
   }
 
   /* ===================== ANIMATION ===================== */
 
-  private animate(marker: google.maps.Marker) {
-    if (!this.running) return
+  private animate = () => {
+    if (!this.running || !this.center) return
 
-    setTimeout(() => {
-      if (!this.running) return
+    const radius = this.radiusLimit()
+    const friction = this.friction()
 
-      const pos = marker.getPosition()
+    this.vehicles.forEach(v => {
+      const pos = v.marker.getPosition()
       if (!pos) return
 
-      const dx = (Math.random() - 0.5) * 0.0008
-      const dy = (Math.random() - 0.5) * 0.0008
+      // Fricción → embotellamiento
+      v.vx *= friction
+      v.vy *= friction
 
-      marker.setPosition({
-        lat: pos.lat() + dx,
-        lng: pos.lng() + dy,
-      })
+      let lat = pos.lat() + v.vy
+      let lng = pos.lng() + v.vx
 
-      // 🔄 Rotación dinámica (sensación de flujo)
-      const icon = marker.getIcon() as google.maps.Symbol
-      if (icon) {
-        icon.rotation = Math.atan2(dy, dx) * (180 / Math.PI)
-        marker.setIcon(icon)
+      // Mantener dentro del área activa
+      const dist =
+        Math.abs(lat - this.center!.lat) +
+        Math.abs(lng - this.center!.lng)
+
+      if (dist > radius) {
+        const angle = this.spawnAngle()
+        const speed = this.baseSpeed()
+        v.vx = Math.cos(angle) * speed
+        v.vy = Math.sin(angle) * speed
+        lat = pos.lat()
+        lng = pos.lng()
       }
 
-      this.animate(marker)
-    }, 700)
+      v.marker.setPosition({ lat, lng })
+
+      const icon = v.marker.getIcon() as google.maps.Symbol
+      if (icon) {
+        icon.rotation = Math.atan2(v.vy, v.vx) * (180 / Math.PI)
+        v.marker.setIcon(icon)
+      }
+    })
+
+    this.rafId = requestAnimationFrame(this.animate)
   }
 
-  /* ===================== UTILS ===================== */
+  /* ===================== BEHAVIOR ===================== */
+
+  /** Corredores urbanos (avenidas simuladas) */
+  private spawnAngle() {
+    // A mayor densidad, más direccionalidad
+    if (this.weight < 0.35) {
+      return Math.random() * Math.PI * 2
+    }
+
+    // Ejes principales
+    const base =
+      Math.random() > 0.5 ? 0 : Math.PI / 2
+
+    // Variación leve para naturalidad
+    return base + (Math.random() - 0.5) * 0.4
+  }
+
+  /** Velocidad base */
+  private baseSpeed() {
+    // Más densidad → más lento
+    return Math.max(
+      0.00005,
+      0.0003 - this.weight * 0.00018
+    )
+  }
+
+  /** Fricción tipo embotellamiento */
+  private friction() {
+    return 0.996 - this.weight * 0.02
+  }
+
+  /** Área activa */
+  private radiusLimit() {
+    return 0.007 + this.weight * 0.035
+  }
 
   private randomPoint(center: google.maps.LatLngLiteral) {
+    const r = this.radiusLimit()
     return {
-      lat: center.lat + (Math.random() - 0.5) * 0.015,
-      lng: center.lng + (Math.random() - 0.5) * 0.015,
+      lat: center.lat + (Math.random() - 0.5) * r,
+      lng: center.lng + (Math.random() - 0.5) * r,
     }
   }
 
   private levelColor() {
     switch (this.level) {
-      case 'green': return '#00E676'
-      case 'yellow': return '#FFD600'
-      case 'red': return '#FF1744'
+      case "green": return "#00E676"
+      case "yellow": return "#FFD600"
+      case "red": return "#FF1744"
     }
   }
 }

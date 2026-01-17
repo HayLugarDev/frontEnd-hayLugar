@@ -1,351 +1,256 @@
 <template>
-  <div :key="dashboardKey"
-    class="font-normal relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-x-hidden">
+  <div
+    :key="dashboardKey"
+    class="font-normal relative min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] text-white overflow-x-hidden"
+  >
 
     <!-- LOADING -->
-    <div v-if="loading || !spaces">
-      <DashboardSkeleton />
-    </div>
+    <DashboardSkeleton v-if="loading || !spaces" />
 
     <div v-else class="flex flex-col h-full pt-24 md:pt-20">
 
       <MainHeader />
 
       <!-- MENÚ INFERIOR MOBILE -->
-      <MobileButtonNav @toggle-map="toggleMap" @navigate="(path) => router.push(path)" class="md:hidden"
-        :showMap="showMap" />
+      <MobileButtonNav
+        class="md:hidden"
+        :showMap="showMap"
+        @toggle-map="toggleMap"
+        @navigate="path => router.push(path)"
+      />
 
       <!-- BUSCADOR MOBILE -->
-      <button v-if="!showSearchMenu" @click="toggleSearchMenu" class="flex md:hidden items-center justify-center 
+      <button
+        v-if="!showSearchMenu"
+        @click="toggleSearchMenu"
+        class="flex md:hidden items-center justify-center 
                bg-white/10 text-white border-b border-white/20
                shadow-xl backdrop-blur-md p-4 mx-6 rounded-full my-4 gap-2 
-               hover:bg-white/20 transition">
-        <font-awesome-icon icon="search" class="text-sm" />
-        <span>Comenzar busqueda</span>
+               hover:bg-white/20 transition"
+      >
+        🔍 <span>Comenzar búsqueda</span>
       </button>
 
       <!-- BUSCADOR DESKTOP -->
-      <div class="hidden md:grid md:grid-cols-11 px-8 py-4 items-center gap-4
-               bg-white/5 backdrop-blur-xl shadow-xl border-b border-white/10">
-
-        <CustomInputGroup v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
-          :onSearch="buscar" />
+      <div
+        class="hidden md:grid md:grid-cols-11 px-8 py-4 items-center gap-4
+               bg-white/5 backdrop-blur-xl shadow-xl border-b border-white/10"
+      >
+        <CustomInputGroup
+          v-model:searchQuery="searchQuery"
+          v-model:checkIn="checkIn"
+          v-model:checkOut="checkOut"
+          :onSearch="buscar"
+        />
       </div>
 
-      <!-- NAVBAR -->
-      <!-- <div class="relative py-4">
-        <div
-          class="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-[#0D1B2A] to-transparent">
-        </div>
-        <div
-          class="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#0D1B2A] to-transparent">
-        </div>
-
-        <div
-  class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4
-         scroll-smooth
-         touch-pan-x
-         select-none"
->
-          <FeatureButton :icon="School" color="#06D6A0" title="Universidades" subtitle="Campus Inteligentes"
-            :enabled="features.universidades" :onClick="() => router.push('/universidades')" />
-
-          <FeatureButton :icon="ParkingSquare" color="#00B4D8" title="Medido" subtitle="Calles en tiempo real"
-            :enabled="features.medido" :onClick="() => router.push('/meteredParkingDashboard')" />
-
-          <FeatureButton :icon="Ticket" color="#FFD166" title="Eventos" subtitle="Festivales & shows"
-            :enabled="features.eventos" :onClick="() => router.push('/events')" />
-
-          <FeatureButton :icon="Factory" color="#8ECAE6" title="Industrial" subtitle="Operaciones en tiempo real"
-            :enabled="features.industrial" :onClick="() => router.push('/industrial-dashboard')" />
-
-          <FeatureButton :icon="ParkingSquare" color="#90BE6D" title="Playas" subtitle="Estacioná en tiempo real"
-            :enabled="features.playas" :onClick="() => router.push('/playa-dashboard')" />
-
-          <FeatureButton :icon="ParkingCircleIcon" color="#EF4444" title="Tráfico" subtitle="En tiempo real"
-            :enabled="true" :onClick="() => router.push('/traffic')" />
-
-        </div>
-      </div> -->
-
       <!-- TITULO -->
-      <span class="w-full rounded-t-xl font-bold tracking-tight text-xl md:text-2xl text-gray-200 pl-6 md:pl-10 pt-4">
+      <span class="w-full font-bold tracking-tight text-xl md:text-2xl text-gray-200 pl-6 md:pl-10 pt-4">
         Cerca de ti...
       </span>
 
       <!-- RESULTADOS -->
-      <div v-if="!showSearchMenu" ref="refSeccionResultados" class="flex flex-1 w-full h-full p-4 md:py-0 md:px-8">
+      <div
+        v-if="!showSearchMenu"
+        ref="refSeccionResultados"
+        class="flex flex-1 w-full h-full p-4 md:py-0 md:px-8"
+      >
 
+        <!-- LISTA -->
         <div v-if="!showMap" class="flex flex-col gap-10 w-full">
-
-          <section v-for="group in spacesByCity" :key="group.city" class="relative group">
-
-            <div class="flex flex-row justify-between items-center">
-              <h3 class="text-lg md:text-xl font-normal mb-4 pl-2">
+          <section
+            v-for="group in spacesByCity"
+            :key="group.city"
+            class="relative group"
+          >
+            <div class="flex justify-between items-center">
+              <h3 class="text-lg md:text-xl mb-4 pl-2">
                 {{ group.city }}
               </h3>
 
-              <div class="flex flex-row justify-between gap-2 rounded-full">
-                <!-- BOTÓN IZQUIERDA (desktop) -->
-                <button class="hidden md:flex bg-black/20 hover:bg-black/40 backdrop-blur-md
-                  px-3 py-1 rounded-full transition opacity-0 group-hover:opacity-100" @click="scrollLeft(group.city)">
+              <div class="hidden md:flex gap-2">
+                <button
+                  class="bg-black/20 hover:bg-black/40 px-3 py-1 rounded-full"
+                  @click="scrollLeft(group.city)"
+                >
                   ‹
                 </button>
-
-                <!-- BOTÓN DERECHA (desktop) -->
-                <button class="hidden md:flex bg-black/20 hover:bg-black/40 backdrop-blur-md
-                  px-3 py-1 rounded-full transition opacity-0 group-hover:opacity-100"
-                  @click="scrollRight(group.city)">
+                <button
+                  class="bg-black/20 hover:bg-black/40 px-3 py-1 rounded-full"
+                  @click="scrollRight(group.city)"
+                >
                   ›
                 </button>
               </div>
             </div>
 
-            <!-- SLIDER -->
-            <div :ref="el => setSliderRef(group.city, el)"
-              class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4 scroll-smooth">
-              <SpaceCard v-for="space in group.items" :key="space.id" :espacio="space"
-                class="min-w-[260px] max-w-[260px]" />
+            <div
+              :ref="el => setSliderRef(group.city, el)"
+              class="flex gap-4 overflow-x-auto hide-scrollbar px-2 pb-4 scroll-smooth"
+            >
+              <SpaceCard
+                v-for="space in group.items"
+                :key="space.id"
+                :espacio="space"
+                class="min-w-[260px] max-w-[260px]"
+              />
             </div>
-
           </section>
-
-
         </div>
 
-        <!-- MAPA -->
-        <div class="relative w-full h-full rounded-2xl overflow-hidden
-            border border-white/10
-            shadow-[0_20px_60px_rgba(0,0,0,.45)]">
+        <!-- MAPA (LAZY REAL) -->
+        <div
+          v-if="showMap"
+          class="relative w-full h-full rounded-2xl overflow-hidden
+                 border border-white/10
+                 shadow-[0_20px_60px_rgba(0,0,0,.45)]"
+        >
+          <div
+            class="pointer-events-none absolute inset-0
+                   bg-gradient-to-t from-[#0D1B2A]/80 via-transparent to-transparent z-10"
+          />
 
-          <!-- Overlay gradiente -->
-          <div class="pointer-events-none absolute inset-0
-              bg-gradient-to-t from-[#0D1B2A]/80 via-transparent to-transparent z-10"></div>
-
-          <div class="absolute top-4 left-4 z-20
-            bg-[#1B263B]/90 backdrop-blur-xl
-            border border-white/10
-            rounded-xl px-4 py-3 shadow-xl">
-
+          <div
+            class="absolute top-4 left-4 z-20
+                   bg-[#1B263B]/90 backdrop-blur-xl
+                   border border-white/10
+                   rounded-xl px-4 py-3 shadow-xl"
+          >
             <p class="text-xs text-[#90CAF9]">Mostrando espacios cerca de</p>
             <p class="font-semibold max-w-[220px] truncate">
               {{ userAddress.split(',')[0] || 'Ubicando tu posición…' }}
             </p>
-
           </div>
 
-          <button class="absolute bottom-6 left-6 z-20
-            bg-[#1B263B]/90 hover:bg-[#24334d]
-            border border-white/10
-            backdrop-blur-xl
-            rounded-full p-3 shadow-xl transition" @click="setCenterToUserLocation">
+          <button
+            class="absolute bottom-6 left-6 z-20
+                   bg-[#1B263B]/90 hover:bg-[#24334d]
+                   border border-white/10
+                   rounded-full p-3 shadow-xl"
+            @click="setCenterToUserLocation"
+          >
             📍
           </button>
 
-          <CustomGoogleMap class="rounded-xl overflow-hidden shadow-2xl border border-white/10" :center="center"
-            :zoom="zoom" :options="mapOptions" locateUser>
-            <GMapMarker v-for="space in spaces" :key="space.id" :options="getMarkerOptions(space)"
-              @mouseover="handleMouseOver(space)" @mouseout="handleMouseOut" @click="() => handleMarkerClick(space)" />
+          <CustomGoogleMap
+            :center="center"
+            :zoom="zoom"
+            :options="mapOptions"
+            locateUser
+          >
+            <GMapMarker
+              v-for="space in spaces"
+              :key="space.id"
+              :options="getMarkerOptions(space)"
+              @mouseover="handleMouseOver(space)"
+              @mouseout="handleMouseOut"
+              @click="() => handleMarkerClick(space)"
+            />
 
-            <div class="rounded-xl overflow-hidden bg-white shadow-xl">
-              <div class="bg-[#1B263B] px-3 py-2">
-                <h3 class="text-sm font-semibold text-white">
-                  {{ hoveredSpace?.name }}
-                </h3>
-              </div>
-
-              <div class="p-3 text-[#0D1B2A] text-sm space-y-1">
-                <p class="text-xs text-gray-500">{{ hoveredSpace?.location }}</p>
-                <p class="font-semibold text-[#00B4D8]">
-                  ${{ hoveredSpace?.price_per_hour }} / hora
-                </p>
-              </div>
-            </div>
-
-            <InfoWindow v-if="hoveredSpace && hoveredSpace.latitude"
-              :position="{ lat: Number(hoveredSpace.latitude), lng: Number(hoveredSpace.longitude) }"
-              @closeclick="handleMouseOut">
+            <InfoWindow
+              v-if="hoveredSpace?.latitude"
+              :position="{
+                lat: Number(hoveredSpace.latitude),
+                lng: Number(hoveredSpace.longitude)
+              }"
+              @closeclick="handleMouseOut"
+            >
               <div class="p-2 text-[#0D1B2A]">
-                <h3 class="text-lg font-bold text-[#1B263B]">{{ hoveredSpace.name }}</h3>
+                <h3 class="font-bold">{{ hoveredSpace.name }}</h3>
                 <p class="text-sm">{{ hoveredSpace.location }}</p>
-                <p class="text-sm text-[#00B4D8] font-semibold">${{ hoveredSpace.price_per_hour }}/hora</p>
+                <p class="text-sm font-semibold text-[#00B4D8]">
+                  ${{ hoveredSpace.price_per_hour }}/hora
+                </p>
               </div>
             </InfoWindow>
           </CustomGoogleMap>
         </div>
-
       </div>
 
-      <!-- ===== FOOTER ===== -->
-      <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
-              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
-
-          <!-- Branding -->
-          <div class="flex items-center gap-2">
-            <span class="text-white font-semibold tracking-wide">HayLugar</span>
-            <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
-          </div>
-
-          <!-- Links -->
-          <div class="flex gap-6">
-            <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
-              Política de Privacidad
-            </router-link>
-
-            <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
-              Términos y Condiciones
-            </router-link>
-          </div>
-
-          <!-- Extra -->
-          <div class="text-xs text-[#78909C]">
-            Movilidad inteligente
-          </div>
-        </div>
-      </footer>
-
-      <!-- BOTÓN MAPA (DESKTOP) -->
-      <MapButton v-if="spaces && spaces.length" :text="buttonText" @toggle="toggleMap" class="fixed" />
-
-      <WelcomeSpeech />
+      <!-- BOTÓN MAPA -->
+      <MapButton
+        v-if="spaces?.length"
+        class="fixed"
+        :text="buttonText"
+        @toggle="toggleMap"
+      />
 
       <!-- BUSCADOR MOBILE AVANZADO -->
-      <div v-if="showSearchMenu"
-        class="p-4 w-11/12 mx-auto bg-[#1B263B]/90 rounded-2xl shadow-2xl border border-white/10">
-        <AdvancedMobileSearch v-model:searchQuery="searchQuery" v-model:checkIn="checkIn" v-model:checkOut="checkOut"
-          v-model:publishedDate="publishedDate" v-model:maxPrice="maxPrice" v-model:sortBy="sortBy" @search="buscar"
-          @close="showSearchMenu = false" />
-      </div>
+      <AdvancedMobileSearch
+        v-if="showSearchMenu"
+        v-model:searchQuery="searchQuery"
+        v-model:checkIn="checkIn"
+        v-model:checkOut="checkOut"
+        v-model:publishedDate="publishedDate"
+        v-model:maxPrice="maxPrice"
+        v-model:sortBy="sortBy"
+        @search="buscar"
+        @close="showSearchMenu = false"
+      />
 
+      <WelcomeSpeech />
     </div>
-
   </div>
-
-
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed, watch } from 'vue';
-import { InfoWindow } from 'vue3-google-map';
-import { useRoute, useRouter } from 'vue-router';
-import CustomGoogleMap from '../components/layout/GoogleMap.vue';
-import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue';
-import MainHeader from '../components/layout/header/MainHeader.vue';
-import MapButton from '../components/pages/dashboardPage/MapButton.vue';
-import CustomInputGroup from "../components/pages/dashboardPage/CustomInputGroup.vue";
-import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkeleton.vue';
-import { useGoogleMap } from '../logic/useGoogleMap';
-import AdvancedMobileSearch from '../components/pages/dashboardPage/AdvancedMobileSearch.vue';
-import WelcomeSpeech from '../components/layout/WelcomeSpeech.vue';
-import { useSpaceStore } from '../store/spaceStore';
+import { ref, computed, onMounted, watch, nextTick, defineAsyncComponent } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { School, ParkingSquare, Ticket, Factory, ParkingCircleIcon, HouseIcon } from 'lucide-vue-next'
-import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
-import FeatureButton from '../components/pages/dashboardPage/FeatureButton.vue';
+import { InfoWindow } from 'vue3-google-map'
 
-const features = {
-  playas: import.meta.env.VITE_FEATURE_PLAYAS === "true",
-  universidades: import.meta.env.VITE_FEATURE_UNIVERSIDADES === "true",
-  medido: import.meta.env.VITE_FEATURE_MEDIDO === "true",
-  eventos: import.meta.env.VITE_FEATURE_EVENTOS === "true",
-  industrial: import.meta.env.VITE_FEATURE_INDUSTRIAL === "true",
-};
+import MainHeader from '../components/layout/header/MainHeader.vue'
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue'
+import CustomInputGroup from '../components/pages/dashboardPage/CustomInputGroup.vue'
+import DashboardSkeleton from '../components/pages/dashboardPage/DashboardSkeleton.vue'
+import MapButton from '../components/pages/dashboardPage/MapButton.vue'
 
-const router = useRouter();
-const route = useRoute();
-const spaceStore = useSpaceStore();
-const { spaces, loading, error } = storeToRefs(spaceStore);
+import { useSpaceStore } from '../store/spaceStore'
+import { useGoogleMap } from '../logic/useGoogleMap'
 
-const searchQuery = ref("");
-const checkIn = ref("");
-const checkOut = ref("");
-const showMap = ref(false);
-const showSearchMenu = ref(false);
-const refSeccionResultados = ref(null);
+/* ===== LAZY COMPONENTS ===== */
+const CustomGoogleMap = defineAsyncComponent(() =>
+  import('../components/layout/GoogleMap.vue')
+)
+const SpaceCard = defineAsyncComponent(() =>
+  import('../components/pages/dashboardPage/SpaceCard.vue')
+)
+const AdvancedMobileSearch = defineAsyncComponent(() =>
+  import('../components/pages/dashboardPage/AdvancedMobileSearch.vue')
+)
+const WelcomeSpeech = defineAsyncComponent(() =>
+  import('../components/layout/WelcomeSpeech.vue')
+)
 
-const sliderRefs = ref({})
+/* ===== STATE ===== */
+const router = useRouter()
+const route = useRoute()
+const spaceStore = useSpaceStore()
+const { spaces, loading } = storeToRefs(spaceStore)
 
-const scrollLeft = (key) => {
-  sliderRefs.value[key]?.scrollBy({
-    left: -320,
-    behavior: 'smooth',
-  })
-}
+const searchQuery = ref('')
+const checkIn = ref('')
+const checkOut = ref('')
+const publishedDate = ref(null)
+const maxPrice = ref('')
+const sortBy = ref('nearest')
 
-const scrollRight = (key) => {
-  sliderRefs.value[key]?.scrollBy({
-    left: 320,
-    behavior: 'smooth',
-  })
-}
-
-const setSliderRef = (key, el) => {
-  if (el) {
-    sliderRefs.value[key] = el
-  }
-}
-
-const buttonText = computed(() => showMap.value ? 'Ver Lista' : 'Ver Mapa');
-
-const publishedDate = ref(null);
-const maxPrice = ref('');
-const sortBy = ref('nearest');
-
+const showMap = ref(false)
+const showSearchMenu = ref(false)
+const refSeccionResultados = ref(null)
 const dashboardKey = ref(0)
 
-const spacesByCity = computed(() => {
-  if (!spaces.value?.length) return []
+const buttonText = computed(() =>
+  showMap.value ? 'Ver Lista' : 'Ver Mapa'
+)
 
-  const cityMap = {}
-  const provinceMap = {}
+/* ===== SLIDERS ===== */
+const sliderRefs = ref({})
+const setSliderRef = (key, el) => el && (sliderRefs.value[key] = el)
+const scrollLeft = key => sliderRefs.value[key]?.scrollBy({ left: -320, behavior: 'smooth' })
+const scrollRight = key => sliderRefs.value[key]?.scrollBy({ left: 320, behavior: 'smooth' })
 
-  // 👉 Tomamos como provincia principal la del espacio más cercano
-  const baseProvince = spaces.value
-    .slice()
-    .sort((a, b) => a.distance - b.distance)[0]
-    ?.location?.split(',')[2]?.trim()
-
-  spaces.value.forEach(space => {
-    const parts = space.location.split(',').map(p => p.trim())
-
-    const city = parts[1] || 'Otras'
-    const province = parts[2] || 'Otras'
-
-    // 👉 Si es la misma provincia, va por ciudad
-    if (province === baseProvince) {
-      if (!cityMap[city]) cityMap[city] = []
-      cityMap[city].push(space)
-    }
-    // 👉 Si NO, va al grupo de provincias
-    else {
-      const provinceKey = `Provincia de ${province}`
-      if (!provinceMap[provinceKey]) provinceMap[provinceKey] = []
-      provinceMap[provinceKey].push(space)
-    }
-  })
-
-  // Ordenar por cercanía
-  const normalize = (map) =>
-    Object.entries(map).map(([label, items]) => {
-      items.sort((a, b) => a.distance - b.distance)
-      return {
-        city: label,
-        items,
-        nearestDistance: items[0]?.distance ?? Infinity
-      }
-    })
-
-  const cityGroups = normalize(cityMap)
-    .sort((a, b) => a.nearestDistance - b.nearestDistance)
-
-  const provinceGroups = normalize(provinceMap)
-    .sort((a, b) => a.city.localeCompare(b.city)) // opcional
-
-  // 👉 IMPORTANTE: provincias SIEMPRE al final
-  return [...cityGroups, ...provinceGroups]
-})
-
+/* ===== MAP LOGIC ===== */
 const {
   center,
   zoom,
@@ -356,18 +261,55 @@ const {
   handleMouseOut,
   mapOptions,
   setCenterToUserLocation
-} = useGoogleMap();
+} = useGoogleMap()
 
+/* ===== GROUPING ===== */
+const spacesByCity = computed(() => {
+  const list = spaces.value
+  if (!list?.length) return []
+
+  const baseProvince = list
+    .slice()
+    .sort((a, b) => a.distance - b.distance)[0]
+    ?.location?.split(',')[2]?.trim()
+
+  const cityMap = {}
+  const provinceMap = {}
+
+  list.forEach(space => {
+    const [, city = 'Otras', province = 'Otras'] =
+      space.location.split(',').map(p => p.trim())
+
+    if (province === baseProvince) {
+      cityMap[city] ||= []
+      cityMap[city].push(space)
+    } else {
+      const key = `Provincia de ${province}`
+      provinceMap[key] ||= []
+      provinceMap[key].push(space)
+    }
+  })
+
+  const normalize = map =>
+    Object.entries(map).map(([city, items]) => ({
+      city,
+      items: items.sort((a, b) => a.distance - b.distance),
+      nearestDistance: items[0]?.distance ?? Infinity
+    }))
+
+  return [
+    ...normalize(cityMap).sort((a, b) => a.nearestDistance - b.nearestDistance),
+    ...normalize(provinceMap)
+  ]
+})
+
+/* ===== ACTIONS ===== */
 onMounted(async () => {
-  loading.value = true;
-  await spaceStore.setUserLocation();
-  try {
-    await spaceStore.fetchSpaces(true);
-    setCenterToUserLocation();
-  } finally {
-    loading.value = false;
-  }
-});
+  loading.value = true
+  spaceStore.setUserLocation()      // no bloquea render
+  await spaceStore.fetchSpaces(true)
+  loading.value = false
+})
 
 const buscar = async () => {
   await spaceStore.fetchFilteredSpaces({
@@ -376,22 +318,15 @@ const buscar = async () => {
     checkOut: checkOut.value,
     publishedDate: publishedDate.value,
     maxPrice: maxPrice.value,
-    sortBy: sortBy.value,
-  });
-  await nextTick();
-  if (refSeccionResultados.value && searchQuery.value) {
-    refSeccionResultados.value.scrollIntoView({ behavior: 'smooth' });
-  }
-};
+    sortBy: sortBy.value
+  })
+  await nextTick()
+  refSeccionResultados.value?.scrollIntoView({ behavior: 'smooth' })
+}
 
-const toggleMap = () => (showMap.value = !showMap.value);
-const toggleSearchMenu = () => (showSearchMenu.value = !showSearchMenu.value);
-const handleMarkerClick = (espacio) => router.push(`/espacio/${espacio.slug}`);
+const toggleMap = () => (showMap.value = !showMap.value)
+const toggleSearchMenu = () => (showSearchMenu.value = !showSearchMenu.value)
+const handleMarkerClick = space => router.push(`/espacio/${space.slug}`)
 
-watch(
-  () => route.fullPath,
-  () => {
-    dashboardKey.value++
-  }
-)
+watch(() => route.fullPath, () => dashboardKey.value++)
 </script>
