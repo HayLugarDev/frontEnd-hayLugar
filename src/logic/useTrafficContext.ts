@@ -1,12 +1,12 @@
 import { computed, Ref } from "vue"
-import type { HotZone } from "../features/traffic/HotZonesLayer"
+import { HotZoneRuntime as HotZone } from "../features/traffic/HotZonesLayer";
 
 export function useTrafficContext(
   zones: Ref<HotZone[]>,
   isPeak: Ref<boolean>
 ) {
   return computed(() => {
-    const hasRed = zones.value.some(z => z.level === "red")
+    const hasRed = zones.value.some(z => z.intensity === 'red')
 
     if (isPeak.value && hasRed) {
       return {
