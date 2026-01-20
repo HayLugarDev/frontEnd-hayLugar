@@ -37,6 +37,7 @@ export type ProvinceView = {
   center: { lat: number; lng: number };
   zoom: number;
   focusCityLabel: string;
+  label:string;
 };
 
 export type ProvinceConfig = {

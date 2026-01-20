@@ -1,9 +1,12 @@
-export type HotZone = {
+// HotZonesLayer.ts
+
+export type HotZoneRuntime = {
   id: string
   title: string
   position: google.maps.LatLngLiteral
-  level: 'green' | 'yellow' | 'red'
-  weight?: number
+  tier: 1 | 2 | 3 | 4 | 5
+  intensity: 'green' | 'yellow' | 'red'
+  weight: number // 0..1
 }
 
 type ZonePulse = {
@@ -19,7 +22,7 @@ export class HotZonesLayer {
 
   private circlesOuter: google.maps.Circle[] = []
   private circlesInner: google.maps.Circle[] = []
-  private labels: google.maps.Marker[] = []
+  private labels: (google.maps.Marker | null)[] = []
   private pulses: ZonePulse[] = []
 
   private rafId: number | null = null
@@ -30,13 +33,14 @@ export class HotZonesLayer {
     this.map = map
   }
 
-  mount(zones: HotZone[]) {
+  /* ===================== MOUNT ===================== */
+
+  mount(zones: HotZoneRuntime[]) {
     this.unmount()
     this.active = true
 
     zones.forEach((z, idx) => {
-      const weight = z.weight ?? 2
-      const baseRadius = 200 + weight * 70
+      const baseRadius = this.radiusFromWeight(z.weight, z.tier)
 
       this.pulses[idx] = {
         baseRadius,
@@ -44,15 +48,17 @@ export class HotZonesLayer {
         phase: Math.random() * Math.PI * 2,
       }
 
+      const color = this.color(z.intensity)
+
       const outer = new google.maps.Circle({
         map: this.map,
         center: z.position,
         radius: baseRadius,
         strokeOpacity: 0,
-        fillColor: this.color(z.level),
+        fillColor: color,
         fillOpacity: 0.10,
         clickable: false,
-        zIndex: 999,
+        zIndex: 900 + z.tier,
       })
 
       const inner = new google.maps.Circle({
@@ -60,26 +66,29 @@ export class HotZonesLayer {
         center: z.position,
         radius: baseRadius * 0.6,
         strokeOpacity: 0,
-        fillColor: this.color(z.level),
+        fillColor: color,
         fillOpacity: 0.22,
         clickable: false,
-        zIndex: 1000,
+        zIndex: 950 + z.tier,
       })
 
-      const label = new google.maps.Marker({
-        map: this.map,
-        position: z.position,
-        clickable: false,
-        label: {
-          text: z.title.toUpperCase(),
-          color: '#FFFFFF',
-          fontSize: '11px',
-          fontWeight: '700',
-          className: 'hotzone-label',
-        },
-        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 0 },
-        zIndex: 1001,
-      })
+      const label =
+        z.tier >= 3
+          ? new google.maps.Marker({
+              map: this.map,
+              position: z.position,
+              clickable: false,
+              label: {
+                text: z.title.toUpperCase(),
+                color: '#FFFFFF',
+                fontSize: '11px',
+                fontWeight: '700',
+                className: 'hotzone-label',
+              },
+              icon: { path: google.maps.SymbolPath.CIRCLE, scale: 0 },
+              zIndex: 1000 + z.tier,
+            })
+          : null
 
       this.circlesOuter.push(outer)
       this.circlesInner.push(inner)
@@ -90,6 +99,49 @@ export class HotZonesLayer {
     this.animate()
   }
 
+  /* ===================== UPDATE (NUEVO) ===================== */
+
+  update(zones: HotZoneRuntime[]) {
+    zones.forEach((z, i) => {
+      const outer = this.circlesOuter[i]
+      const inner = this.circlesInner[i]
+      const label = this.labels[i]
+      const pulse = this.pulses[i]
+
+      if (!outer || !inner || !pulse) return
+
+      const newBaseRadius = this.radiusFromWeight(z.weight, z.tier)
+      const color = this.color(z.intensity)
+
+      pulse.baseRadius = newBaseRadius
+
+      outer.setOptions({
+        fillColor: color,
+        zIndex: 900 + z.tier,
+      })
+
+      inner.setOptions({
+        fillColor: color,
+        zIndex: 950 + z.tier,
+      })
+
+      if (label) {
+       label.setOptions({
+    zIndex: 1000 + z.tier,
+    label: {
+      text: z.title.toUpperCase(),
+      color: '#FFFFFF',
+      fontSize: '11px',
+      fontWeight: '700',
+      className: 'hotzone-label',
+    },
+        })
+      }
+    })
+  }
+
+  /* ===================== UNMOUNT ===================== */
+
   unmount() {
     this.active = false
     if (this.rafId) cancelAnimationFrame(this.rafId)
@@ -99,7 +151,7 @@ export class HotZonesLayer {
 
     this.circlesOuter.forEach(c => c.setMap(null))
     this.circlesInner.forEach(c => c.setMap(null))
-    this.labels.forEach(l => l.setMap(null))
+    this.labels.forEach(l => l?.setMap(null))
 
     this.circlesOuter = []
     this.circlesInner = []
@@ -109,14 +161,16 @@ export class HotZonesLayer {
     this.t = 0
   }
 
+  /* ===================== INTERNALS ===================== */
+
   private attachZoomListener() {
-    this.zoomListener = this.map.addListener("zoom_changed", () => {
+    this.zoomListener = this.map.addListener('zoom_changed', () => {
       this.zoom = this.map.getZoom() ?? 12
     })
   }
 
   private zoomScale() {
-    return Math.max(0.6, Math.min(1.4, 12 / this.zoom))
+    return Math.max(0.6, Math.min(1.35, 12 / this.zoom))
   }
 
   private animate = () => {
@@ -143,9 +197,21 @@ export class HotZonesLayer {
     this.rafId = requestAnimationFrame(this.animate)
   }
 
-  private color(level: 'green' | 'yellow' | 'red') {
-    if (level === 'green') return '#00E676'
-    if (level === 'yellow') return '#FFD600'
+  private radiusFromWeight(weight: number, tier: number) {
+    const tierBase = {
+      1: 120,
+      2: 160,
+      3: 220,
+      4: 300,
+      5: 360,
+    }[tier]
+
+    return tierBase + weight * 180
+  }
+
+  private color(intensity: 'green' | 'yellow' | 'red') {
+    if (intensity === 'green') return '#00E676'
+    if (intensity === 'yellow') return '#FFD600'
     return '#FF1744'
   }
 }

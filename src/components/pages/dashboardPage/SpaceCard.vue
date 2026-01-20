@@ -7,8 +7,8 @@
       <div class="relative w-full h-40 sm:h-40 overflow-hidden">
         <!-- <Carousel mode="free" :images="images" :controls="hovered" class="w-full h-full object-cover rounded-t-xl" style="touch-action: pan-y" -->
 
-        <img v-if="images[0]" :src="images[0]" alt="" class="w-full h-full object-cover rounded-t-xl">
-        <img v-else :src="someImg" alt="" class="w-full h-full object-cover rounded-t-xl">
+        <img loading="lazy" v-if="images[0]" :src="images[0]" alt="" class="w-full h-full object-cover rounded-t-xl">
+        <img loading="lazy" v-else :src="someImg" alt="" class="w-full h-full object-cover rounded-t-xl">
 
         <!-- PRICE BADGE -->
         <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-lg
