@@ -6,7 +6,8 @@ export type ReservationMessageStatus =
   | "verified"
   | "in_progress"
   | "completed"
-  | "cancelled";
+  | "cancelled"
+  | "expired";
 
 type ReservationRole = "client" | "owner";
 
@@ -58,6 +59,11 @@ export const reservationMessages: Record<
     client: "Completaste correctamente tu retiro de vehículo.",
     owner: "La reserva ha finalizado correctamente.",
   },
+  expired: {
+    label: 'Expirada',
+    client: '⛔ El tiempo de la reserva finalizó sin completarse',
+    owner: '⛔ El tiempo de la reserva finalizó sin completarse'
+  }
 };
 
 export const statusColors: Record<ReservationMessageStatus, string> = {
@@ -69,4 +75,5 @@ export const statusColors: Record<ReservationMessageStatus, string> = {
   verified: "bg-blue-100 text-blue-800 border border-blue-300",
   in_progress: "bg-indigo-100 text-indigo-800 border border-indigo-300",
   completed: "bg-emerald-100 text-emerald-800 border border-emerald-300",
+  expired: "bg-red-600 text-white"
 };

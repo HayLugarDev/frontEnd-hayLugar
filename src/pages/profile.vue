@@ -222,8 +222,12 @@ function normalizeSection(s?: string | null): typeof activeSection.value {
 // Arranque: leer query y normalizar
 onMounted(async () => {
 
-  await verifyToken();
-  if (isSessionInvalid.value) return;
+  await userStore.fetchUser();
+
+  if (!userStore.user) {
+    router.replace('/login');
+    return;
+  }
 
   console.log(usuario.value);
   const sectionFromUrl = route.query.section as string | undefined;
