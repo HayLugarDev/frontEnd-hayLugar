@@ -13,9 +13,14 @@
     </div>
 
     <div v-if="reservations.length" class="space-y-4">
-      <div v-for="reservation in reservations" :key="reservation.id" :class="['rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all backdrop-blur-xl mb-6',
-          reservation.status === 'cancelled' ? 'bg-red-900/20 border border-red-700/30' :
-            'bg-gray-900/30 border border-white/10']">
+      <div v-for="reservation in reservations" :key="reservation.id" :class="[
+        'rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all backdrop-blur-xl mb-6',
+        reservation.status === 'cancelled' ||
+          reservation.status === 'failed' ||
+          isReservationExpired(reservation)
+          ? 'bg-red-900/20 border border-red-700/30'
+          : 'bg-gray-900/30 border border-white/10'
+      ]">
         <div class="flex justify-between items-center p-4 border-b">
           <div>
             <h3 class="text-lg font-bold text-gray-200 flex items-center gap-2">
@@ -24,7 +29,12 @@
             </h3>
             <p class="text-xs text-gray-400">{{ formatDate(reservation.created_at) }}</p>
           </div>
-          <span :class="[
+          <span v-if="isReservationExpired(reservation)"
+            class="px-3 py-1 rounded-full text-xs font-semibold bg-red-600 text-white">
+            Expirada
+          </span>
+
+          <span v-else :class="[
             'px-3 py-1 rounded-full text-xs font-semibold',
             statusColors[reservation.status] || 'bg-gray-100 text-gray-600'
           ]">
@@ -45,8 +55,14 @@
           </div>
 
           <p class="text-red-400 text-sm italic mt-2">
-            {{ getStatusInfo(reservation.status).message }}
+            <span v-if="isReservationExpired(reservation)">
+              ⛔ El tiempo de esta reserva ya finalizó
+            </span>
+            <span v-else>
+              {{ getStatusInfo(reservation.status).message }}
+            </span>
           </p>
+
 
           <div class="flex flex-wrap justify-between items-center mt-2">
             <div class="text-sm">
@@ -59,7 +75,7 @@
           </div>
         </div>
 
-        <div v-if="!['cancelled', 'completed', 'failed'].includes(reservation.status)">
+        <div v-if="!['cancelled', 'completed', 'failed', 'expired'].includes(reservation.status)">
 
           <div class="flex flex-wrap justify-end gap-2 p-4">
 
@@ -84,7 +100,8 @@
             </button>
 
             <!-- Cancelar -->
-            <button v-if="reservation.status === 'pending' && reservation.payment_status === 'pending'" @click="confirmCancelation(reservation)"
+            <button v-if="reservation.status === 'pending' && reservation.payment_status === 'pending'"
+              @click="confirmCancelation(reservation)"
               class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition-all">
               <font-awesome-icon icon="ban" /> Cancelar
             </button>
@@ -168,6 +185,7 @@ import { verifyActiveSession } from '../../../middleware/verifyToken';
 import SessionExpired from '../../common/SessionExpired.vue';
 import { useVerifyToken } from '../../../logic/useVerifyToken';
 import { useReservationStore } from '../../../store/reservationStore';
+import isReservationExpired from '../../../utils/isReservationExpired';
 
 const reservationStore = useReservationStore();
 
@@ -249,7 +267,11 @@ async function confirmCheckIn() {
 }
 
 function paymentReservation(reservation: any) {
-  // Seguridad extra
+  if (isReservationExpired(reservation)) {
+    showToast('Esta reserva ya expiró y no puede pagarse', 'error');
+    return;
+  }
+
   if (
     reservation.status !== 'payment_pending' ||
     reservation.payment_status !== 'pending'
@@ -258,11 +280,7 @@ function paymentReservation(reservation: any) {
     return;
   }
 
-  // 👉 Cargar TODO en el store
-  console.log(reservation);
   reservationStore.setReservationData(reservation);
-
-  // 👉 Navegar
   router.push('/reservations/pago');
 }
 
@@ -401,7 +419,6 @@ function updateCountdowns() {
 
       if (diff <= 0) {
         countdowns.value[reservation.id] = "00:00:00";
-        reservation.status = "completed"; // opcional, si querés marcarlo finalizado automáticamente
       } else {
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
