@@ -16,8 +16,10 @@
       <!-- HEADER -->
       <header class="mb-8">
         <h2 class="text-3xl font-bold text-primary flex items-center gap-2">
-          🧾 Reservas entrantes
+          <CalendarCheck class="w-6 h-6" />
+          Reservas entrantes
         </h2>
+
         <p class="text-sm text-gray-400 mt-1">
           Gestioná tus reservas recibidas de forma clara y rápida
         </p>
@@ -38,7 +40,7 @@
           <div class="flex justify-between items-center p-4 border-b border-white/10">
             <div>
               <h3 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
-                <font-awesome-icon icon="calendar-check" class="text-primary" />
+                <CalendarCheck class="w-5 h-5 text-primary" />
                 Reserva #{{ reservation.id }}
               </h3>
               <p class="text-xs text-gray-400">
@@ -60,19 +62,35 @@
             <!-- DATOS GRID -->
             <div class="grid md:grid-cols-2 gap-4 text-sm">
               <p>
-                <span class="font-semibold">📍 Espacio:</span>
+                <span class="font-semibold flex items-center gap-1">
+                  <MapPin class="w-4 h-4 text-primary" />
+                  Espacio:
+                </span>
+
                 {{ reservation.space?.name ?? '—' }}
               </p>
               <p>
-                <span class="font-semibold">🗺 Dirección:</span>
+                <span class="font-semibold flex items-center gap-1">
+                  <Map class="w-4 h-4 text-primary" />
+                  Dirección:
+                </span>
+
                 {{ (reservation.space?.location || '—').split(',')[0] }}
               </p>
               <p>
-                <span class="font-semibold">👤 Usuario:</span>
+                <span class="font-semibold flex items-center gap-1">
+                  <User class="w-4 h-4 text-primary" />
+                  Usuario:
+                </span>
+
                 {{ reservation.client?.name ?? '—' }}
               </p>
               <p>
-                <span class="font-semibold">🚘 Vehículo: </span>
+                <span class="font-semibold flex items-center gap-1">
+                  <Car class="w-4 h-4 text-primary" />
+                  Vehículo:
+                </span>
+
                 <template v-if="reservation.vehicle">
                   {{ getVehicleType(reservation.vehicle.type) }}
                   <span class="text-gray-400">
@@ -87,6 +105,14 @@
             <p class="text-sm text-gray-400 italic">
               {{ getStatusInfo(reservation.status).message }}
             </p>
+
+            <div class="flex flex-wrap justify-start sm:space-x-6 items-center mt-2">
+                <p><span class="font-semibold">Ingreso:</span> {{ formatDateSmart(reservation.start_time) }}</p>
+                <p><span class="font-semibold">Salida:</span> {{ formatDateSmart(reservation.end_time) }}</p>
+                <p v-if="reservation.status === 'in_progress'" class="text-red-600 font-bold mt-1">
+                  ⏳ Tiempo restante: {{ countdowns[reservation.id] || 'Cargando...' }}
+                </p>
+            </div>
 
             <!-- BADGES -->
             <div class="flex flex-wrap gap-2 pt-1">
@@ -114,29 +140,39 @@
 
             <!-- COUNTDOWN -->
             <div v-if="reservation.status === 'in_progress'" class="mt-2">
-              <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold shadow">
-                ⏱ {{ countdowns[reservation.id] || 'Cargando...' }}
+              <span
+                class="flex items-center gap-2 px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold shadow">
+                <Clock class="w-4 h-4" />
+                {{ countdowns[reservation.id] || 'Cargando...' }}
               </span>
+
             </div>
           </div>
+
 
           <!-- ACCIONES -->
           <div class="flex flex-wrap items-center justify-end gap-3 p-4">
             <!-- PENDING -->
             <template v-if="isPending(reservation.status)">
               <button @click="confirmApprovedReservation(reservation)" class="btn-primary">
-                <font-awesome-icon :icon="['fas', 'check']" /> Aprobar
+                <Check class="w-4 h-4" />
+                Aprobar
               </button>
+
               <button @click="confirmRejectReservation(reservation)" class="btn-danger">
-                <font-awesome-icon :icon="['fas', 'xmark']" /> Rechazar
+                <X class="w-4 h-4" />
+                Rechazar
               </button>
+
             </template>
 
             <!-- VERIFICAR -->
             <template v-else-if="reservation.status === 'verified'">
               <button @click="confirmCheckinReservation(reservation)" class="btn-green">
-                <font-awesome-icon :icon="['fas', 'check']" /> Check-in realizado
+                <BadgeCheck class="w-4 h-4" />
+                Check-in realizado
               </button>
+
               <button @click="confirmRejectReservation(reservation)" class="btn-danger">
                 <font-awesome-icon :icon="['fas', 'xmark']" /> Rechazar
               </button>
@@ -146,10 +182,14 @@
             <template v-else-if="canFinalize(reservation)">
               <button @click="confirmFinalizeReservation(reservation)" class="btn-primary-gradient"
                 :disabled="quoteLoading && selectedReservation?.id === reservation.id">
-                <font-awesome-icon :icon="['fas', 'money-bill']" />
-                {{ (quoteLoading && selectedReservation?.id === reservation.id) ? 'Calculando…' : 'Finalizar y cobrar'
+                <CreditCard class="w-4 h-4" />
+                {{
+                  (quoteLoading && selectedReservation?.id === reservation.id)
+                    ? 'Calculando…'
+                    : 'Finalizar y cobrar'
                 }}
               </button>
+
 
               <span v-if="quote && selectedReservation?.id === reservation.id" class="text-sm text-gray-300">
                 Total: {{ formatCents(quote.final_cents) }}
@@ -170,8 +210,10 @@
             <!-- CANCELAR -->
             <button v-if="!['pending', 'cancelled', 'completed', 'failed', 'verified'].includes(reservation.status)"
               @click="confirmCancelation(reservation)" class="btn-danger">
+              <Ban class="w-4 h-4" />
               Cancelar
             </button>
+
           </div>
         </div>
       </div>
@@ -216,9 +258,23 @@ import MainHeader from '../components/layout/header/MainHeader.vue';
 import BackButton from '../components/common/BackButton.vue';
 import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
 import { showToast } from '../utils/toast';
-import { formatDate } from '../utils/FormatDate';
+import { formatDate, formatDateSmart } from '../utils/FormatDate';
 import SessionExpired from '../components/common/SessionExpired.vue';
 import { useVerifyToken } from '../logic/useVerifyToken';
+import {
+  CalendarCheck,
+  MapPin,
+  Map,
+  User,
+  Car,
+  Check,
+  X,
+  Clock,
+  CreditCard,
+  BadgeCheck,
+  Ban
+} from 'lucide-vue-next';
+
 
 const reservations = ref<any[]>([]);
 const userStore = useUserStore();
@@ -263,7 +319,6 @@ const fetchReservations = async () => {
       (a: any, b: any) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-    console.log(data);
   } catch (error) {
     console.error("Error al obtener reservas entrantes", error);
     reservations.value = [];
@@ -332,7 +387,7 @@ function confirmCancelation(reservation: any) {
 
 const cancelReservation = async () => {
   try {
-    await api.put(`/reservations/${selectedReservation.value.id}/cancel`, { role: 'owner', reason: 'Cancelada por el Anfitrión' }, { withCredentials: true });
+    await api.put(`/reservations/u/${selectedReservation.value.id}/cancel`, { role: 'owner', reason: 'Cancelada por el Anfitrión' }, { withCredentials: true });
 
     reservations.value = reservations.value.map((r: any) =>
       r.id === selectedReservation.value.id ? { ...r, status: 'cancelled' } : r
@@ -353,7 +408,7 @@ const cancelReservation = async () => {
 
 async function inProgressReservation() {
   try {
-    await api.put(`/reservations/${selectedReservation.value.id}/status`, { status: 'in_progress' }, { withCredentials: true });
+    await api.put(`/reservations/u/${selectedReservation.value.id}/status`, { status: 'in_progress' }, { withCredentials: true });
 
     showConfirmModal.value = false;
     selectedReservation.value = null;
@@ -380,7 +435,7 @@ function confirmRejectReservation(reservation: any) {
 async function rejectReservation() {
   try {
     await api.put(
-      `/reservations/${selectedReservation.value.id}/cancel`,
+      `/reservations/u/${selectedReservation.value.id}/cancel`,
       {
         role: 'owner',
         reason: 'Reserva rechazada por el anfitrión'
