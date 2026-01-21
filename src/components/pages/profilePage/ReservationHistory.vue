@@ -75,7 +75,8 @@
           </div>
         </div>
 
-        <div v-if="!['cancelled', 'completed', 'failed', 'expired'].includes(reservation.status)">
+        <div
+          v-if="!['cancelled', 'completed', 'failed', 'expired'].includes(reservation.status) && !isReservationExpired(reservation)">
 
           <div class="flex flex-wrap justify-end gap-2 p-4">
 
