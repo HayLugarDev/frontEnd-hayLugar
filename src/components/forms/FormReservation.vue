@@ -108,8 +108,8 @@ import FuturisticDatepicker from "../common/FuturisticDatepicker.vue";
 const props = defineProps({
   tipoVehiculo: String,
   tipoPlazoReserva: String,
-  tiempoInicial: Number,
-  tiempoFinal: Number,
+  tiempoInicial: Date,
+  tiempoFinal: Date,
   totalCalculado: Number,
   vehicleOptions: Array,
   availability: {
@@ -130,13 +130,17 @@ watch(
   () => [props.tipoPlazoReserva, props.tiempoInicial],
   ([plazo, checkIn]) => {
     if (plazo === 'Por hora' && checkIn) {
-      // Si el checkout está vacío o es de otro día, lo setea al mismo día
       const checkInDate = new Date(checkIn);
-      const defaultCheckOut = new Date(checkInDate.getTime() + 60 * 60 * 1000); // +1h
-      emit('update:tiempoFinal', defaultCheckOut.getTime());
+
+      const defaultCheckOut = new Date(checkInDate);
+      defaultCheckOut.setHours(defaultCheckOut.getHours() + 1);
+
+      // emitir Date, NO timestamp
+      emit('update:tiempoFinal', defaultCheckOut);
     }
   }
 );
+
 
 // Helpers
 function parseTimeString(timeStr) {

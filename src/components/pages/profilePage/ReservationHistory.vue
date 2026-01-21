@@ -66,8 +66,8 @@
 
           <div class="flex flex-wrap justify-between items-center mt-2">
             <div class="text-sm">
-              <p><span class="font-semibold">Check-In:</span> {{ formatDate(reservation.start_time) }}</p>
-              <p><span class="font-semibold">Check-Out:</span> {{ formatDate(reservation.end_time) }}</p>
+              <p><span class="font-semibold">Ingreso:</span> {{ formatDateSmart (reservation.start_time) }}</p>
+              <p><span class="font-semibold">Salida:</span> {{ formatDateSmart (reservation.end_time) }}</p>
               <p v-if="reservation.status === 'in_progress'" class="text-red-600 font-bold mt-1">
                 ⏳ Tiempo restante: {{ countdowns[reservation.id] || 'Cargando...' }}
               </p>
@@ -187,6 +187,7 @@ import SessionExpired from '../../common/SessionExpired.vue';
 import { useVerifyToken } from '../../../logic/useVerifyToken';
 import { useReservationStore } from '../../../store/reservationStore';
 import isReservationExpired from '../../../utils/isReservationExpired';
+import { formatDate, formatDateSmart } from '../../../utils/FormatDate';
 
 const reservationStore = useReservationStore();
 
@@ -404,11 +405,6 @@ const getStatusInfo = (status: ReservationMessageStatus) => ({
 // setInterval(() => {
 //   userStore.checkReservationsForUpcoming();
 // }, 60000);
-
-const formatDate = (value: string): string => {
-  const date = new Date(value);
-  return date.toLocaleString();
-};
 
 function updateCountdowns() {
   const now = new Date().getTime();

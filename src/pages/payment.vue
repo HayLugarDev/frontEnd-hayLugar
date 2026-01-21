@@ -257,7 +257,6 @@ const obtenerEspacio = async () => {
     if (!id) throw new Error("No se encontró el espacio");
     const data = await getReservationForPayment(id);
     espacio.value = data;
-    console.log(espacio.value.space.images[0])
     return data;
   } catch (error) {
     console.error("Error al obtener el espacio:", error);
@@ -288,6 +287,9 @@ onMounted(async () => {
     isReturningFromMP.value = true;
     isCheckingPayment.value = true;
 
+    // 🧼 LIMPIAR URL (clave)
+    window.history.replaceState({}, "", "/pago");
+
     const reservationId = reserva.value?.id;
 
     if (reservationId) {
@@ -304,7 +306,10 @@ onMounted(async () => {
     return;
   }
 
-  if (!reservationStore.reservation.space_id || !reservationStore.reservation.start_time) {
+  if (
+    !reservationStore.reservation.space_id ||
+    !reservationStore.reservation.start_time
+  ) {
     router.push('/dashboard');
   }
 
@@ -313,6 +318,7 @@ onMounted(async () => {
     vehiculoSeleccionado.value = await getVehicleById(vehicle_id);
   }
 });
+
 
 
 const formattedDuration = computed(() =>
@@ -405,7 +411,6 @@ const initWalletBrick = async () => {
   await reservationStore.syncReservation();
 
   const reservationId = reserva.value.id;
-  console.log(reservationId)
 
   if (!reservationId) {
     throw new Error("Reserva inválida");
@@ -426,7 +431,6 @@ const initWalletBrick = async () => {
     }, { withCredentials: true });
 
     const preferenceId = res.data.preference_id;
-    console.log("🟢 Preferencia creada:", preferenceId);
 
     await bricksBuilder.create("wallet", "walletBrick_container", {
       initialization: {

@@ -75,8 +75,6 @@ onMounted(async () => {
     spaces.value = spacesRes.data.spaces || spacesRes.data;
     payments.value = paymentsRes.data.payments || paymentsRes.data;
 
-    console.log(payments.value);
-
     const rawReservations = reservationsRes.data.reservations || reservationsRes.data;
     reservations.value = rawReservations.map((r: any) => {
       const user = users.value.find((u) => u.id === r.user_id);
