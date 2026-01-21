@@ -193,8 +193,8 @@
           :tipoVehiculo="tipoVehiculo" :tipoPlazoReserva="tipoPlazoReserva" :tiempoInicial="tiempoInicial"
           :tiempoFinal="tiempoFinal" :totalCalculado="totalCalculado" :vehicleOptions="vehicleOptions"
           @update:tipoVehiculo="tipoVehiculo = $event" @update:tipoPlazoReserva="tipoPlazoReserva = $event"
-          @update:tiempoInicial="tiempoInicial = $event" @update:tiempoFinal="tiempoFinal = $event"
-          @reservar="reservar()" :availability="disponibilidad"/>
+          @update:tiempoInicial="onTiempoInicial" @update:tiempoFinal="onTiempoFinal" @reservar="reservar()"
+          :availability="disponibilidad" />
 
         <!-- Botón para dueño -->
         <div v-else-if="isOwner"
@@ -329,7 +329,7 @@ import ImageModal from '../components/common/ImageModal.vue';
 import { addFavorite, removeFavorite, getUserFavorites } from '../services/favoriteService';
 import { getVehicleType } from '../utils/vehicleTypeIconTraslation';
 import { showToast } from '../utils/toast';
-import { formatLocalDateTime } from '../utils/FormatDate';
+import { formatDate, formatDateSmart, formatLocalDateTime, toLocalMysqlDatetime } from '../utils/FormatDate';
 import { imageGridPosition } from '../utils/imageGrid';
 import { getReviewsBySpace } from "../services/reviewService";
 import ReviewsModal from '../components/common/ReviewsModal.vue';
@@ -404,8 +404,8 @@ const openConfirmModal = () => {
 
       🚗 Vehículo: ${vehiculoSeleccionado.value.model} (${vehiculoSeleccionado.value.license_plate})
       ⏱️ Plazo: ${tipoPlazoReserva.value}
-      📅 Ingreso: ${new Date(tiempoInicial.value).toLocaleString()}
-      📅 Salida: ${new Date(tiempoFinal.value).toLocaleString()}
+      📅 Ingreso: ${formatDateSmart (tiempoInicial.value)}
+      📅 Salida: ${formatDateSmart (tiempoFinal.value)}
 
       💰 Total: $${totalCalculado.value.toLocaleString()}
     `,
@@ -420,13 +420,17 @@ const confirmarReserva = async () => {
   showConfirmModal.value = false;
 
   try {
+
+    const start = tiempoInicial.value;
+    const end = tiempoFinal.value;
+
     const payload = {
       owner_id: space.value.owner_id,
       space_id: space.value.id,
       vehicle_id: vehiculoSeleccionado.value.id,
       vehicle_type: getVehicleKey(tipoVehiculo.value),
-      start_time: formatLocalDateTime(new Date(tiempoInicial.value)),
-      end_time: formatLocalDateTime(new Date(tiempoFinal.value)),
+      start_time: toLocalMysqlDatetime(start),
+      end_time: toLocalMysqlDatetime(end),
       total: totalCalculado.value,
       deadLine: durationHours.value,
     };
@@ -540,6 +544,13 @@ const sharePublication = async () => {
   }
 };
 
+const onTiempoInicial = (value) => {
+  tiempoInicial.value = value instanceof Date ? value : new Date(value)
+}
+
+const onTiempoFinal = (value) => {
+  tiempoFinal.value = value instanceof Date ? value : new Date(value)
+}
 
 const redirigirATerminos = () => {
   showErrorModal.value = false;
@@ -583,8 +594,6 @@ const reservar = async () => {
 
   await verifyToken();
   if (isSessionInvalid.value) return;
-
-
 
   try {
     const vehiculos = await getAllVehicles();

@@ -288,6 +288,9 @@ onMounted(async () => {
     isReturningFromMP.value = true;
     isCheckingPayment.value = true;
 
+    // 🧼 LIMPIAR URL (clave)
+    window.history.replaceState({}, "", "/pago");
+
     const reservationId = reserva.value?.id;
 
     if (reservationId) {
@@ -304,7 +307,10 @@ onMounted(async () => {
     return;
   }
 
-  if (!reservationStore.reservation.space_id || !reservationStore.reservation.start_time) {
+  if (
+    !reservationStore.reservation.space_id ||
+    !reservationStore.reservation.start_time
+  ) {
     router.push('/dashboard');
   }
 
@@ -313,6 +319,7 @@ onMounted(async () => {
     vehiculoSeleccionado.value = await getVehicleById(vehicle_id);
   }
 });
+
 
 
 const formattedDuration = computed(() =>
