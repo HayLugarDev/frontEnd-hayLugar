@@ -1,10 +1,18 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
+
+  <MainHeader />
+
+  <!-- BOTÓN ATRÁS MOBILE -->
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-16">
     <!-- Header -->
     <section class="py-16 px-6 text-center max-w-4xl mx-auto">
       <h1 class="text-3xl md:text-4xl font-bold mb-2">Términos y Condiciones de Uso</h1>
       <p class="text-gray-300">Última actualización: <span class="font-semibold">10/10/2025</span></p>
-      <p class="text-gray-400 mt-2 text-sm">
+      <p class="text-gray-300 mt-2 text-sm">
         Este documento forma parte integral de la
         <RouterLink to="/PrivacyPolicy" class="text-accent underline">Política de Privacidad</RouterLink>
         y la
@@ -19,7 +27,8 @@
 
         <p>
           <strong>HayLugar</strong> es una plataforma operada por <strong>FOUNDAR S.A.S.</strong>
-          (CUIT <em>30-71910647-8</em>, domicilio legal <em>[Congreso 851 Piso 11, San Miguel de Tucumán, Argentina]</em>).
+          (CUIT <em>30-71910647-8</em>, domicilio legal <em>[Congreso 851 Piso 11, San Miguel de Tucumán,
+            Argentina]</em>).
           Al acceder o utilizar la plataforma, el usuario acepta plenamente estos Términos.
         </p>
 
@@ -37,8 +46,10 @@
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">2. Objeto y Alcance</h2>
           <p>
-            La Plataforma conecta Usuarios con Anfitriones. HayLugar no es propietaria ni responsable de los espacios ofrecidos
-            y no garantiza disponibilidad, condiciones ni seguridad. El contrato se celebra directamente entre Usuario y Anfitrión.
+            La Plataforma conecta Usuarios con Anfitriones. HayLugar no es propietaria ni responsable de los espacios
+            ofrecidos
+            y no garantiza disponibilidad, condiciones ni seguridad. El contrato se celebra directamente entre Usuario y
+            Anfitrión.
           </p>
         </div>
 
@@ -53,7 +64,8 @@
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">4. Rol de HayLugar</h2>
-          <p>Actúa únicamente como intermediario tecnológico entre Usuarios y Anfitriones. No administra los espacios ni garantiza su calidad, seguridad o legalidad.</p>
+          <p>Actúa únicamente como intermediario tecnológico entre Usuarios y Anfitriones. No administra los espacios ni
+            garantiza su calidad, seguridad o legalidad.</p>
         </div>
 
         <div>
@@ -68,12 +80,14 @@
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">6. Reservas y Pagos</h2>
-          <p>Las reservas se efectúan exclusivamente en la Plataforma. Se confirman una vez aprobado el pago por Mercado Pago.</p>
+          <p>Las reservas se efectúan exclusivamente en la Plataforma. Se confirman una vez aprobado el pago por Mercado
+            Pago.</p>
         </div>
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">7. Cancelaciones y Reembolsos</h2>
-          <p>Cancelaciones con más de 12 h de anticipación → reembolso total. Dentro de las 12 h previas → puede aplicarse penalidad según política del anuncio.</p>
+          <p>Cancelaciones con más de 12 h de anticipación → reembolso total. Dentro de las 12 h previas → puede
+            aplicarse penalidad según política del anuncio.</p>
           <p>Si el Anfitrión cancela, el Usuario recibe reembolso completo.</p>
         </div>
 
@@ -89,7 +103,8 @@
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">9. Opiniones y Calificaciones</h2>
-          <p>Los usuarios pueden opinar con respeto y veracidad. HayLugar podrá eliminar contenido ofensivo, falso o difamatorio.</p>
+          <p>Los usuarios pueden opinar con respeto y veracidad. HayLugar podrá eliminar contenido ofensivo, falso o
+            difamatorio.</p>
         </div>
 
         <div>
@@ -99,17 +114,21 @@
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">11. Propiedad Intelectual</h2>
-          <p>Todo el software, marcas y logotipos son propiedad de FOUNDAR S.A.S. Los contenidos generados por usuarios otorgan una licencia no exclusiva a la Plataforma.</p>
+          <p>Todo el software, marcas y logotipos son propiedad de FOUNDAR S.A.S. Los contenidos generados por usuarios
+            otorgan una licencia no exclusiva a la Plataforma.</p>
         </div>
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">12. Privacidad y Cookies</h2>
-          <p>El tratamiento de datos personales se rige por la <RouterLink to="/privacidad" class="text-primary underline">Política de Privacidad</RouterLink> y la <RouterLink to="/cookies" class="text-primary underline">Política de Cookies</RouterLink>.</p>
+          <p>El tratamiento de datos personales se rige por la <RouterLink to="/PrivacyPolicy"
+              class="text-primary underline">Política de Privacidad</RouterLink> y la <RouterLink to="/cookies"
+              class="text-primary underline">Política de Cookies</RouterLink>.</p>
         </div>
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">13. Responsabilidad, Exenciones e Indemnidad</h2>
-          <p>La Plataforma se ofrece “tal cual”. El Usuario exime a HayLugar de responsabilidad por daños derivados del uso de los espacios o la aplicación.</p>
+          <p>La Plataforma se ofrece “tal cual”. El Usuario exime a HayLugar de responsabilidad por daños derivados del
+            uso de los espacios o la aplicación.</p>
         </div>
 
         <div>
@@ -119,9 +138,11 @@
 
         <div>
           <h2 class="text-xl font-bold text-primary mb-2">15. Autoridades y Contacto</h2>
-          <ul class="list-disc ml-6 space-y-1">
-            <li>Soporte: <a href="mailto:apphaylugar@gmail.com" class="text-primary underline font-semibold">apphaylugar@gmail.com</a></li>
-            <li>Defensa del Consumidor: <a href="https://www.argentina.gob.ar/defensadelconsumidor" target="_blank" class="text-primary underline font-semibold">https://www.argentina.gob.ar/defensadelconsumidor</a></li>
+          <ul class="list-disc space-y-1 flex-wrap">
+            <li>Soporte: <a href="mailto:apphaylugar@gmail.com"
+                class="text-primary underline font-semibold">soportehaylugar@gmail.com</a></li>
+            <li>Defensa del Consumidor: <a href="https://www.argentina.gob.ar/defensadelconsumidor" target="_blank"
+                class="text-primary underline font-semibold">https://www.argentina.gob.ar/defensadelconsumidor</a></li>
           </ul>
         </div>
 
@@ -136,10 +157,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import MainHeader from '../components/layout/header/MainHeader.vue';
+import BackButton from '../components/common/BackButton.vue';
 const currentYear = computed(() => new Date().getFullYear())
 </script>
 
 <style scoped>
-a { transition: color .2s ease }
-a:hover { color: #0ea5e9 }
+a {
+  transition: color .2s ease
+}
+
+a:hover {
+  color: #0ea5e9
+}
 </style>

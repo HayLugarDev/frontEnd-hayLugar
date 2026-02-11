@@ -8,9 +8,9 @@
       <font-awesome-icon :icon="openMenu ? 'fa-angle-up' : 'fa-angle-down'" class="text-gray-500 ml-2" />
     </div>
 
-    <ul v-if="openMenu" class="absolute z-10 mt-2 bg-white border rounded-md w-full shadow-md animate-fade-in">
+    <ul v-if="openMenu" class="absolute z-10 mt-2 bg-gray-900 border rounded-md w-full shadow-md animate-fade-in">
       <li v-for="(option, index) in options" :key="index" @click="selectOption(option)"
-        class="p-2 hover:bg-gray-100 cursor-pointer transition-colors">
+        class="p-2 hover:bg-gray-500 cursor-pointer transition-colors">
         {{ option }}
       </li>
     </ul>

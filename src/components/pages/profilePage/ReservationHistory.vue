@@ -1,9 +1,9 @@
 <template>
-  <section class="lg:bg-white p-2 md:p-8 rounded-lg shadow-lg mb-8 w-full md:w-2/3">
+  <section class=" p-8 rounded-lg sm:shadow-lg mb-8 w-full md:w-2/3">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h2 class="text-2xl font-bold text-primary">📅 Tus reservas</h2>
-        <p class="text-sm text-gray-600 px-4">Revisá el estado y detalles de tus reservas activas o pasadas</p>
+        <h2 class="text-2xl font-bold text-white">📅 Tus reservas</h2>
+        <p class="text-md text-gray-400 px-4">Revisá el estado y detalles de tus reservas activas o pasadas</p>
       </div>
     </div>
 
@@ -13,20 +13,28 @@
     </div>
 
     <div v-if="reservations.length" class="space-y-4">
-      <div v-for="(reservation, index) in reservations" :key="index" :class="[
-        'border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden',
-        ['cancelled', 'completed', 'failed'].includes(reservation.status) && reservation.hasRating
-          ? 'opacity-70 pointer-events-none'
-          : '']">
-        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+      <div v-for="reservation in reservations" :key="reservation.id" :class="[
+        'rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all backdrop-blur-xl mb-6',
+        reservation.status === 'cancelled' ||
+          reservation.status === 'failed' ||
+          isReservationExpired(reservation)
+          ? 'bg-red-900/20 border border-red-700/30'
+          : 'bg-gray-900/30 border border-white/10'
+      ]">
+        <div class="flex justify-between items-center p-4 border-b">
           <div>
-            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <h3 class="text-lg font-bold text-gray-200 flex items-center gap-2">
               <font-awesome-icon icon="calendar-check" class="text-primary" />
               Reserva #{{ reservation.id }}
             </h3>
-            <p class="text-xs text-gray-500">{{ formatDate(reservation.created_at) }}</p>
+            <p class="text-xs text-gray-400">{{ formatDate(reservation.created_at) }}</p>
           </div>
-          <span :class="[
+          <span v-if="isReservationExpired(reservation)"
+            class="px-3 py-1 rounded-full text-xs font-semibold bg-red-600 text-white">
+            Expirada
+          </span>
+
+          <span v-else :class="[
             'px-3 py-1 rounded-full text-xs font-semibold',
             statusColors[reservation.status] || 'bg-gray-100 text-gray-600'
           ]">
@@ -34,11 +42,11 @@
           </span>
         </div>
 
-        <div class="p-5 space-y-3 text-sm text-gray-700">
+        <div class="p-5 space-y-3 text-sm text-gray-200">
           <div class="grid md:grid-cols-2 gap-x-4 gap-y-2">
-            <p><span class="font-semibold">📍 Espacio:</span> {{ reservation.space.name }}</p>
-            <p><span class="font-semibold">📫 Dirección:</span> {{ reservation.space.location.split(',')[0] }}</p>
-            <p><span class="font-semibold">👤 Anfitrión:</span> {{ reservation.owner.name }}</p>
+            <p><span class="font-semibold">📍 Espacio:</span> {{ reservation?.space?.name }}</p>
+            <p><span class="font-semibold">📫 Dirección:</span> {{ reservation?.space?.location.split(',')[0] }}</p>
+            <p><span class="font-semibold">👤 Anfitrión:</span> {{ reservation?.owner?.name }}</p>
             <p>
               <span class="font-semibold">🚘 Vehículo:</span>
               {{ getVehicleType(reservation.vehicle.type) }}
@@ -46,14 +54,20 @@
             </p>
           </div>
 
-          <p class="text-gray-600 text-sm italic mt-2">
-            {{ getStatusInfo(reservation.status).message }}
+          <p class="text-red-400 text-sm italic mt-2">
+            <span v-if="isReservationExpired(reservation)">
+              ⛔ El tiempo de esta reserva ya finalizó
+            </span>
+            <span v-else>
+              {{ getStatusInfo(reservation.status).message }}
+            </span>
           </p>
+
 
           <div class="flex flex-wrap justify-between items-center mt-2">
             <div class="text-sm">
-              <p><span class="font-semibold">Check-In:</span> {{ formatDate(reservation.start_time) }}</p>
-              <p><span class="font-semibold">Check-Out:</span> {{ formatDate(reservation.end_time) }}</p>
+              <p><span class="font-semibold">Ingreso:</span> {{ formatDateSmart (reservation.start_time) }}</p>
+              <p><span class="font-semibold">Salida:</span> {{ formatDateSmart (reservation.end_time) }}</p>
               <p v-if="reservation.status === 'in_progress'" class="text-red-600 font-bold mt-1">
                 ⏳ Tiempo restante: {{ countdowns[reservation.id] || 'Cargando...' }}
               </p>
@@ -61,9 +75,17 @@
           </div>
         </div>
 
-        <div v-if="!['cancelled', 'completed', 'failed'].includes(reservation.status)">
+        <div
+          v-if="!['cancelled', 'completed', 'failed', 'expired'].includes(reservation.status) && !isReservationExpired(reservation)">
 
-          <div class="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 bg-gray-50">
+          <div class="flex flex-wrap justify-end gap-2 p-4">
+
+            <!-- Pagar reserva -->
+            <button v-if="reservation.status === 'payment_pending' && reservation.payment_status === 'pending'"
+              @click="paymentReservation(reservation)"
+              class="flex items-center gap-2 bg-newgreen text-white px-4 py-2 rounded-xl shadow hover:bg-green-600 transition-all">
+              <font-awesome-icon icon="credit-card" /> Pagar reserva
+            </button>
 
             <!-- Check-in -->
             <button v-if="reservation.status === 'approved'" @click="checkInInit(reservation)"
@@ -79,7 +101,8 @@
             </button>
 
             <!-- Cancelar -->
-            <button v-if="reservation.status === 'pending'" @click="confirmCancelation(reservation)"
+            <button v-if="reservation.status === 'pending' && reservation.payment_status === 'pending'"
+              @click="confirmCancelation(reservation)"
               class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition-all">
               <font-awesome-icon icon="ban" /> Cancelar
             </button>
@@ -96,14 +119,23 @@
       </div>
     </div>
 
-    <p v-else-if="!loading" class="text-gray-500">No tienes reservas anteriores.</p>
+    <!-- Sin reservas -->
+    <div v-else class="text-center text-gray-500 mt-10 flex flex-col items-center justify-center">
+      <p class="text-lg font-medium">No tienes ninguna reserva activa.</p>
+      <button v-if="!reservations.length" @click="router.push('/dashboard')"
+        class="flex items-center gap-2 text-newgreen font-semibold bg-white/10 px-4 py-2 rounded-xl shadow hover:bg-white/20 transition-all mt-4">
+        <font-awesome-icon :icon="['fas', 'circle-plus']" />
+        ¡Hacé tu primera reserva!
+      </button>
+    </div>
 
     <!-- Modal CheckIn -->
-    <div v-if="showCheckInModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div v-if="showCheckInModal"
+      class="fixed inset-0 flex items-center justify-center bg-white/10 border border-white/10 z-50">
       <div class="bg-white rounded-lg shadow-lg p-6 w-96">
         <h2 class="text-lg font-bold mb-4">Verificar Check-In</h2>
 
-        <p class="text-sm text-gray-600 mb-2">
+        <p class="text-sm text-gray-200 mb-2">
           Ingresa el código de verificación proporcionado por el anfitrión (Solo mayúsculas):
         </p>
 
@@ -114,7 +146,7 @@
           <button @click="showCheckInModal = false" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300">
             Cancelar
           </button>
-          <button @click="confirmCheckIn" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+          <button @click="confirmCheckIn" class="px-4 py-2 rounded-lg bg-newgreen/20 hover:bg-newgreen/30 text-white">
             Confirmar
           </button>
         </div>
@@ -130,7 +162,9 @@
       @submit="handleRatingSubmit" />
 
     <StatusModal :visible="showErrorModal" type="error" title="¡Atención!"
-      message="Ocurrió un error al procesar la acción" icon="/src/assets/logo.png" @confirm="showErrorModal = false" />
+      message="Ocurrió un error al procesar la acción" :icon="logo" @confirm="showErrorModal = false" />
+
+    <SessionExpired :sessionExpired="isSessionInvalid" />
   </section>
 </template>
 
@@ -147,6 +181,15 @@ import ConfirmModal from '../../common/ConfirmModal.vue';
 import ItemSkeleton from '../../layout/skeletons/ItemSkeleton.vue';
 import RatingModal from '../../common/RatingModal.vue';
 import { showToast } from '../../../utils/toast';
+import logo from "../../../assets/logo.png";
+import { verifyActiveSession } from '../../../middleware/verifyToken';
+import SessionExpired from '../../common/SessionExpired.vue';
+import { useVerifyToken } from '../../../logic/useVerifyToken';
+import { useReservationStore } from '../../../store/reservationStore';
+import isReservationExpired from '../../../utils/isReservationExpired';
+import { formatDate, formatDateSmart } from '../../../utils/FormatDate';
+
+const reservationStore = useReservationStore();
 
 const reservations = ref([]);
 const userStore = useUserStore();
@@ -158,6 +201,8 @@ const showErrorCheckinModal = ref(false);
 const showSuccessModal = ref(false);
 const showConfirmModal = ref(false);
 const loading = ref(true);
+
+const { verifyToken, isSessionInvalid } = useVerifyToken();
 
 const checkInEnabled = ref<Record<number, boolean>>({});
 
@@ -194,27 +239,21 @@ const fetchReservations = async () => {
   loading.value = false;
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await verifyToken();
+  if (isSessionInvalid.value) return;
+
+  await fetchReservations();
   updateCheckInEnabled(); // inicial
+  setInterval(updateCountdowns, 1000);
   setInterval(updateCheckInEnabled, 1000); // actualización en tiempo real
 });
-
-onMounted(async () => {
-  await fetchReservations();
-  setInterval(updateCountdowns, 1000);
-});
-
-function openCheckInModal() {
-  showErrorModal.value = false;
-  showSuccessModal.value = false;
-  showCheckInModal.value = true;
-}
 
 async function confirmCheckIn() {
   if (!selectedReservation.value) return;
 
   try {
-    const response = await api.post(`/reservations/${selectedReservation.value.id}/verify-checkin`,
+    await api.post(`/reservations/u/${selectedReservation.value.id}/verify-checkin`,
       { code: checkInCode.value },
       { withCredentials: true }
     );
@@ -222,13 +261,29 @@ async function confirmCheckIn() {
     selectedReservation.value.status = "verified";
     showCheckInModal.value = false;
 
+    showToast('Check-In verificado con éxito. ¡Yá podés estacionar!', 'success');
+
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || "Error al verificar código";
   }
 }
 
-function goToReservation() {
-  router.push('/profile?section=reservas')
+function paymentReservation(reservation: any) {
+  if (isReservationExpired(reservation)) {
+    showToast('Esta reserva ya expiró y no puede pagarse', 'error');
+    return;
+  }
+
+  if (
+    reservation.status !== 'payment_pending' ||
+    reservation.payment_status !== 'pending'
+  ) {
+    showToast('Esta reserva no puede pagarse en este momento', 'error');
+    return;
+  }
+
+  reservationStore.setReservationData(reservation);
+  router.push('/reservations/pago');
 }
 
 function checkInInit(reservation: any) {
@@ -265,7 +320,7 @@ const completeReservation = async () => {
   if (!selectedReservation.value) return;
 
   try {
-    await api.put(`/reservations/${selectedReservation.value.reservation_id}/finalize`, { withCredentials: true });
+    await api.put(`/reservations/u/${selectedReservation.value.reservation_id}/finalize`, { withCredentials: true });
 
     // Actualizar localmente el estado de la reserva
     selectedReservation.value = selectedReservation.value.map((r: { id: number; }) =>
@@ -323,7 +378,7 @@ function confirmCancelation(reservation: any) {
 
 const cancelReservation = async () => {
   try {
-    await api.patch(`/reservations/${selectedReservation.value.id}/cancel`, { withCredentials: true });
+    await api.put(`/reservations/u/${selectedReservation.value.id}/cancel`, { role: 'client' }, { withCredentials: true });
 
     // Actualizar localmente el estado de la reserva en el array principal
     reservations.value = reservations.value.map((r: any) =>
@@ -335,6 +390,7 @@ const cancelReservation = async () => {
     showSuccessModal.value = false;
     showCheckInModal.value = false;
     showConfirmModal.value = false;
+    showToast('Reserva cancelada con éxito', 'success');
   } catch (error: any) {
     showErrorModal.value = true;
     errorMessage.value = error.response?.data?.message || "Error al cancelar la reserva";
@@ -350,11 +406,6 @@ const getStatusInfo = (status: ReservationMessageStatus) => ({
 //   userStore.checkReservationsForUpcoming();
 // }, 60000);
 
-const formatDate = (value: string): string => {
-  const date = new Date(value);
-  return date.toLocaleString();
-};
-
 function updateCountdowns() {
   const now = new Date().getTime();
 
@@ -365,7 +416,6 @@ function updateCountdowns() {
 
       if (diff <= 0) {
         countdowns.value[reservation.id] = "00:00:00";
-        reservation.status = "completed"; // opcional, si querés marcarlo finalizado automáticamente
       } else {
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -380,3 +430,21 @@ function updateCountdowns() {
 }
 
 </script>
+
+<style scoped>
+section {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

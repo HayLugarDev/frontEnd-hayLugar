@@ -1,39 +1,46 @@
 <template>
-  <GMapMap
-    ref="mapRef"
-    class="w-full h-[500px] rounded-lg shadow-md"
-    :center="mapCenter"
-    :zoom="zoomComputed"
-    :options="optionsComputed"
-    map-type-id="roadmap"
-    @load="onLoadEvent"
-    @tilesloaded="onTilesLoaded"
-  >
+  <GMapMap ref="mapRef" class="w-full h-[500px] rounded-lg shadow-md" :center="mapCenter" :zoom="zoomComputed"
+    :options="optionsComputed" map-type-id="roadmap" @load="onLoadEvent" @tilesloaded="onTilesLoaded">
+
     <!-- Marcador del usuario -->
-    <GMapMarker
-      v-if="userMarker"
-      :position="userMarker"
-    />
+    <GMapMarker v-if="userMarker" :position="userMarker" :icon="{
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 8,
+      fillColor: '#00B4D8',
+      fillOpacity: 1,
+      strokeColor: '#ffffff',
+      strokeWeight: 2,
+    }" />
+
+    <!-- Halo -->
+    <GMapMarker v-if="userMarker" :position="userMarker" :icon="{
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 20,
+      fillColor: '#00B4D8',
+      fillOpacity: 0.15,
+      strokeWeight: 0,
+    }" />
+
     <slot />
   </GMapMap>
 
   <!-- HUD de debug opcional -->
-  <div
-    v-if="debug && debugStatus"
-    class="fixed bottom-4 left-4 z-[9999] px-3 py-2 rounded-md text-xs font-semibold"
+  <div v-if="debug && debugStatus" class="fixed bottom-4 left-4 z-[9999] px-3 py-2 rounded-md text-xs font-semibold"
     :style="{
       background: 'rgba(0,0,0,.75)',
       color: 'white',
       border: '1px solid rgba(255,255,255,.2)',
       boxShadow: '0 6px 24px rgba(0,0,0,.24)'
-    }"
-  >
+    }">
     {{ debugStatus }}
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, provide, ref, watch, nextTick, computed } from 'vue'
+
+// Expose google to template
+const google = (window as any).google
 
 type AnyMap = {
   setCenter?: (c: google.maps.LatLngLiteral) => void
@@ -47,6 +54,7 @@ const props = defineProps<{
   zoom?: number
   options?: google.maps.MapOptions
   debug?: boolean
+  locateUser?: boolean   // 👈 nueva prop
 }>()
 
 const debug = props.debug ?? false
@@ -58,7 +66,7 @@ const optionsComputed = computed<google.maps.MapOptions>(() => ({
   streetViewControl: true,
   mapTypeControl: false,
   fullscreenControl: true,
-  ...props.options, 
+  ...props.options,
 }))
 
 
@@ -161,8 +169,12 @@ onMounted(async () => {
   if (m) setMap(m)
   else setDebug('⚠️ No map instance yet. Waiting for @load / @tilesloaded…')
 
-  locateUser()
+  // ✅ Solo localizar usuario si está permitido
+  if (props.locateUser) {
+    locateUser()
+  }
 })
+
 
 /** Recenter dinámico si cambia center */
 watch(

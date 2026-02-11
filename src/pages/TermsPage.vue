@@ -1,4 +1,10 @@
 <template>
+
+  <!-- BOTÓN ATRÁS MOBILE -->
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+      <BackButton />
+  </div>
+
   <div class="min-h-screen bg-secondary flex flex-col">
     <div class="flex-grow flex items-start justify-center bg-primary py-10">
       <div class="bg-white p-6 md:rounded-xl shadow-2xl border-2 w-full md:w-3/4 lg:w-1/2">
@@ -27,6 +33,7 @@
 import { onMounted, ref, computed } from 'vue'
 import api from '../services/apiService'     // 👉 cliente Axios con baseURL = VITE_API_BASE_URL
 import axios from 'axios'                    // 👉 instancia default para traer el HTML estático
+import BackButton from '../components/common/BackButton.vue'
 
 type Terms = {
   version: string
@@ -69,5 +76,7 @@ onMounted(load)
 </script>
 
 <style scoped>
-.prose :deep(img){max-width:100%}
+.prose :deep(img) {
+  max-width: 100%
+}
 </style>

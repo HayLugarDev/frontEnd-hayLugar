@@ -1,82 +1,94 @@
 <template>
-    <div
-        class="flex flex-col max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 gap-6 min-h-[80vh] animate-fade-in">
+    <div class="flex flex-col max-w-xl mx-auto p-8 gap-8 md:min-h-[80vh] animate-fade-in">
+
         <!-- Título -->
-        <div class="text-center">
-            <h1 class="text-primary text-3xl sm:text-4xl font-bold mb-2">
+        <div class="text-center space-y-1">
+            <h1 class="text-primary text-3xl sm:text-4xl font-extrabold">
                 ¿Dónde está ubicado tu espacio?
             </h1>
-            <p class="text-gray-500 text-sm sm:text-base">
+            <p class="text-gray-300 text-sm sm:text-base">
                 Seleccioná la dirección exacta para que los usuarios puedan encontrarlo fácilmente.
             </p>
         </div>
 
         <!-- Autocomplete -->
-        <div v-if="!modelValue.direccion">
-            <label class="block text-sm font-semibold text-gray-900 mb-1">Calle</label>
+        <div v-if="!modelValue.direccion" class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-100">
+                Dirección
+            </label>
 
-            <!-- GMapAutocomplete con el input visible -->
-            <GMapAutocomplete v-model="direccion" :value="direccion"
-                class="text-gray-900 mt-1 block w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-primary focus:outline-none transition"
-                placeholder="Ingresá tu dirección" @place_changed="handlePlaceChanged" />
+            <div class="relative">
+                <GMapAutocomplete v-model="direccion" :value="direccion" @place_changed="handlePlaceChanged"
+                    placeholder="Ingresá tu dirección" class="w-full bg-white/5 text-gray-200 border border-white/10 rounded-xl px-4 py-3 pl-11
+                 placeholder-gray-400 focus:ring-2 focus:ring-primary focus:outline-none backdrop-blur-sm" />
+
+                <!-- Ícono ubicación -->
+                <MapPin class="w-5 h-5 text-primary absolute left-3 top-1/2 -translate-y-1/2" />
+            </div>
         </div>
 
+        <!-- Botón: seleccionar manualmente -->
+        <button class="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 backdrop-blur border border-white/10
+             text-white font-medium shadow hover:bg-white/20 transition-all duration-300"
+            @click="showManualMap = true">
 
-        <!-- Botón para seleccionar manualmente -->
-        <div class="flex justify-center my-2">
-            <button
-                class="flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-indigo-500 to-primary text-white font-semibold shadow-md hover:from-indigo-600 hover:to-primary-dark transition-all duration-300 text-base"
-                @click="showManualMap = true">
-                <font-awesome-icon icon="map-marker-alt" class="text-lg" />
-                Seleccionar manualmente en el mapa
-            </button>
-        </div>
+            <LocateFixed class="w-5 h-5 text-primary" />
+            No encuentro mi dirección
+        </button>
 
-        <!-- Mensaje si seleccionó manualmente -->
+        <!-- Aviso: seleccionó manual -->
         <transition name="fade">
-            <p v-if="selectedMethod === 'manual'" class="text-xs text-amber-600 text-center">
-                📍 Ubicación elegida manualmente en el mapa
+            <p v-if="selectedMethod === 'manual'"
+                class="text-xs text-amber-500 text-center flex items-center justify-center gap-1">
+
+                <Info class="w-4 h-4" />
+                Ubicación elegida manualmente en el mapa
             </p>
         </transition>
 
         <!-- Detalles adicionales -->
         <transition name="fade">
-            <div v-if="location" class="mt-4">
-                <label class="block text-sm font-semibold text-gray-900 mb-1">
-                    Referencias adicionales
+            <div v-if="location" class="space-y-2 mt-2">
+                <label class="block text-sm font-semibold text-gray-100">
+                    Referencias adicionales (opcional)
                 </label>
-                <input type="text" v-model="locationDetails"
-                    class="block w-full border border-gray-300 rounded-xl p-4 text-gray-600 focus:ring-2 focus:ring-primary focus:outline-none transition"
-                    placeholder="Ej: Edificio A, Planta Baja, etc." />
+
+                <input v-model="locationDetails" type="text" placeholder="Ej: Edificio A, Planta Baja, Timbre 3..."
+                    class="w-full bg-white/5 border border-white/10 text-gray-200 rounded-xl px-4 py-3
+                 placeholder-gray-400 focus:ring-2 focus:ring-primary backdrop-blur-sm" />
             </div>
         </transition>
 
         <!-- Navegación -->
-        <div class="flex justify-between mt-auto space-x-4 pt-6">
-            <button @click="emit('prev')"
-                class="px-6 py-2 border-2 border-primary text-primary rounded-full font-semibold hover:bg-primary hover:text-white transition-all">
+        <div class="flex justify-between mt-auto pt-6">
+
+            <button @click="emit('prev')" class="px-6 py-2 border border-primary text-primary rounded-full font-semibold
+               hover:bg-primary hover:text-white transition-all duration-200">
                 Anterior
             </button>
-            <button @click="nextStep"
-                class="px-8 py-2 bg-primary text-white rounded-full font-bold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
+
+            <button @click="nextStep" class="px-8 py-2 bg-primary text-white rounded-full font-bold shadow-lg
+               hover:bg-primary/90 active:scale-95 transition-all">
                 Siguiente ➜
             </button>
         </div>
 
         <!-- Modal de error -->
         <StatusModal :visible="showErrorModal" type="error" title="Dirección faltante"
-            message="Por favor, seleccioná una dirección antes de continuar." icon="/src/assets/logo.png"
+            message="Por favor, seleccioná una dirección antes de continuar." :icon="logo"
             @confirm="showErrorModal = false" />
 
-        <!-- Modal con mapa manual -->
+        <!-- Mapa manual -->
         <SelectLocationMap v-if="showManualMap" @close="showManualMap = false" @selected="handleManualLocation" />
     </div>
 </template>
+
 
 <script setup>
 import { computed, ref, watch, onMounted } from 'vue'
 import StatusModal from '../addSpacePage/StatusModal.vue'
 import SelectLocationMap from '../addSpacePage/SelectLocationMap.vue'
+import logo from '../../../assets/logo.png'
 
 const props = defineProps(['modelValue']);
 const emit = defineEmits(['update:modelValue', 'next', 'prev']);
@@ -92,39 +104,35 @@ watch(
     }
 )
 
-const updateDireccionManualmente = (e) => {
-    const value = e.target.value
-    direccion.value = value
-    emit('update:modelValue', {
-        ...props.modelValue,
-        location: value,
-        latitude: null,
-        longitude: null
-    })
-}
-
 const handlePlaceChanged = (place) => {
-    const components = place.address_components || []
+    if (!place || !place.address_components) return;
 
-    const streetNumber = components.find(c => c.types.includes('street_number'))?.long_name || ''
-    const route = components.find(c => c.types.includes('route'))?.long_name || ''
-    const locality = components.find(c => c.types.includes('locality') || c.types.includes('sublocality'))?.long_name || ''
-    const province = components.find(c => c.types.includes('administrative_area_level_1'))?.long_name || ''
-    const country = components.find(c => c.types.includes('country'))?.long_name || ''
+    const components = place.address_components;
 
-    const street = [route, streetNumber].filter(Boolean).join(' ')
-    const parts = [street, locality, province, country].filter(Boolean)
-    const fullAddress = parts.join(', ');
+    // ✅ Filtramos el código postal completamente
+    const getComponent = (type) =>
+        components.find((c) => c.types.includes(type))?.long_name || '';
 
-    direccion.value = fullAddress;
+    const streetNumber = getComponent('street_number');
+    const route = getComponent('route');
+    const locality = getComponent('locality') || getComponent('sublocality') || '';
+    const province = getComponent('administrative_area_level_1');
+    const country = getComponent('country');
 
+    const street = [route, streetNumber].filter(Boolean).join(' ');
+    const parts = [street, locality, province, country].filter(Boolean);
+    const cleanAddress = parts.join(', ');
+
+    const finalAddress = cleanAddress.replace(/\s{2,}/g, ' ').trim();
+
+    direccion.value = finalAddress;
     emit('update:modelValue', {
         ...props.modelValue,
-        location: fullAddress,
-        latitude: place.geometry.location.lat(),
-        longitude: place.geometry.location.lng()
-    })
-}
+        location: finalAddress,
+        latitude: place.geometry?.location?.lat() || null,
+        longitude: place.geometry?.location?.lng() || null,
+    });
+};
 
 const handleManualLocation = (payload) => {
     // Debug: ver qué llega

@@ -19,13 +19,35 @@ import FAQView from '../pages/FAQView.vue'
 import CookiesPolicy from '../pages/CookiesPolicy.vue'
 import PrivacyPolicyView from '../pages/PrivacyPolicyView.vue'
 import termsConditions from '../pages/termsConditions.vue'
-
+import EventDashboard from '../pages/EventDashboard.vue'
+import EventDetail from '../pages/EventDetail.vue'
+import ReservationQR from '../pages/ReservationQR.vue'
+import ImpactDashboard from '../pages/ImpactDashboard.vue'
+import IndustrialDashboard from '../pages/IndustrialDashboard.vue'
+import AdminPage from '../pages/AdminPage.vue'
+import PlayaDashboard from '../pages/PlayaDashboard.vue'
+import PersonalProfile from '../pages/PersonalProfile.vue'
+import OwnerProfile from '../pages/OwnerProfile.vue'
+import ReservationIncoming from '../pages/ReservationIncoming.vue'
+import OwnerPublications from '../pages/OwnerPublications.vue'
+import UserVehicles from '../pages/UserVehicles.vue'
+import Wallet from '../pages/wallet.vue'
+import PayoutAccounts from '../pages/PayoutAccounts.vue'
+import IndustrialDetail from '../pages/IndustrialDetail.vue'
+import IndustrialSpaceCreate from '../pages/IndustrialSpaceCreate.vue'
+import IndustrialParkCreate from '../pages/IndustrialParkCreate.vue'
+import IndustrialReservation from '../pages/IndustrialReservation.vue'
+import LandingB2B from '../pages/LandingB2B.vue'
+import ReservationRequest from '../pages/reservationRequest.vue'
+import ReservationRequestFailed from '../pages/reservationRequestFailed.vue'
+import TrafficNationalView from '../pages/TrafficNationalView.vue'
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
 const AcceptTerms = () => import('../pages/AcceptTerms.vue')
 
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'landing', component: landingHayLugar },
+  { path: '/corporativo', component: LandingB2B },
   { path: '/login', name: 'login', component: login },
   { path: '/register', component: register },
   { path: '/google-success', name: 'GoogleSuccess', component: GoogleSuccess },
@@ -42,13 +64,23 @@ const routes: RouteRecordRaw[] = [
 
   { path: '/add-space', component: addSpace, meta: { requiresAuth: true } },
   { path: '/espacio/:slug', component: detailSpace },
-  { path: '/pago', component: payment, meta: { requiresAuth: true } },
+  { path: '/reservations/pago', component: payment, meta: { requiresAuth: true } },
+  { path: '/reservation-request/confirmed', component: ReservationRequest, meta: { requiresAuth: true } },
+  { path: '/reservation-request/failed', component: ReservationRequestFailed, meta: { requiresAuth: true } },
   { path: '/confirmacion', component: confirmaReserva, meta: { requiresAuth: true } },
   { path: '/profile', component: profile, meta: { requiresAuth: true } },
+  { path: '/personal-profile-user', component: PersonalProfile, meta: { requiresAuth: true } },
+  { path: '/personal-profile-owner', component: OwnerProfile, meta: { requiresAuth: true } },
+  { path: '/personal-wallet-user', component: Wallet, meta: { requiresAuth: true } },
+  { path: '/personal-accounts-user', component: PayoutAccounts, meta: { requiresAuth: true } },
   { path: '/notifications', component: Notifications, meta: { requiresAuth: true } },
   { path: '/add-vehicle', component: AddVehicle, meta: { requiresAuth: true } },
   { path: '/help', component: Help, meta: { requiresAuth: false } },
-
+  { path: '/owner/mypublications', name: 'publications', component: OwnerPublications, meta: { requiresAuth: true } },
+  { path: '/owner/reservation-incoming', name: 'reservation-incoming', component: ReservationIncoming, meta: { requiresAuth: true } },
+  { path: '/vehicles/user-vehicles', name: 'user-vehicles', component: UserVehicles,  meta: { requiresAuth: true } },
+  
+  
   {
     path: '/universidades',
     name: 'Universities',
@@ -61,7 +93,43 @@ const routes: RouteRecordRaw[] = [
     component: meteredParkingDashboard,
     meta: { requiresAuth: false },
   },
+
+  { path: '/events', component: EventDashboard, meta: { requiresAuth: false } },
+{
+  path: '/events/:id',
+  name: 'EventDetail',
+  component: EventDetail,
+  meta: { requiresAuth: true },
+  props: true, // 👈 habilita recibir "id" como prop
+},
+{ path: '/industrial/new-park', component: IndustrialParkCreate },
+{ path: '/industrial/new-space', component: IndustrialSpaceCreate },
+{
+  path: '/industrial/:slug',
+  name: 'IndustrialDetail',
+   component: IndustrialDetail
+},
+{
+  path: '/industrial/:slug/industrial-reservation',
+  name: 'IndustrialReservatio',
+   component: IndustrialReservation
+},
+
+
+{ path: '/event-qr/:token', name: 'ReservationQR', component: ReservationQR },
+
+{ path: '/impact-dashboard', name: 'ImpactDashboard', component: ImpactDashboard },
+
+{ path: '/industrial-dashboard', name: 'IndustrialDashboard', component:IndustrialDashboard },
+
+{ path: '/playa-dashboard', name: 'PlayaDashboard', component:PlayaDashboard },
+{ path: '/traffic', name: 'TrafficNationalView', component:TrafficNationalView },
+// Admin Page
+{ path: '/admin-page', name: 'adminPage', component: AdminPage, meta: { requiresAuth: true } },
+
+
 ]
+
 
 const router = createRouter({
   history: createWebHistory(),

@@ -1,13 +1,22 @@
-export type ReservationStatus = 'pending' | 'approved' | 'failed' | 'verified' | 'in_progress' | 'completed' | 'cancelled';
+export type ReservationStatus = 'pending'
+    | 'payment_pending'
+    | 'payment_approved'
+    | 'failed'
+    | 'verified'
+    | 'in_progress'
+    | 'completed'
+    | 'cancelled';
+;
 // Creamos un mapa fuertemente tipado
 export const stateTraslation: Record<ReservationStatus, string> = {
-  pending: 'PENDIENTE',
-  approved: 'CONFIRMADA',
-  failed: 'FALLIDA',
-  verified: 'VERIFICADA',
-  in_progress: 'EN PROGRESO',
-  completed: 'FINALIZADA',
-  cancelled: 'CENCELADA',
+  pending: 'RESERVA PENDIENTE',
+  payment_pending: 'PAGO DE RESERVA PENDIENTE',
+  payment_approved: 'PAGO DE RESERVA APROBADO',
+  failed: 'RESERVA FALLIDA',
+  verified: 'RESERVA VERIFICADA',
+  in_progress: 'RESERVA EN PROGRESO',
+  completed: 'RESERVA FINALIZADA',
+  cancelled: 'RESERVA CANCELADA',
 };
 
 // Función reutilizable

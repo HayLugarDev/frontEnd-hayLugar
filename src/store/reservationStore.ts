@@ -2,11 +2,12 @@
 import { defineStore } from 'pinia';
 import api from '../services/apiService';
 import { useUserStore } from './userStore';
+import { updateReservationPaymentData } from '../services/reservationService';
 
 export const useReservationStore = defineStore('reservation', {
   state: () => ({
     reservation: {
-      id: null as number | null,
+      id: null as string | null,
       user_id: null as number | null,
       owner_id: null as number | null,
       space_id: null as number | null,
@@ -14,12 +15,13 @@ export const useReservationStore = defineStore('reservation', {
       vehicle_type: null as string | null,
       start_time: null as string | null,
       end_time: null as string | null,
-      dead_line: null as number | null,
+      deadLine: null as number | null,
       total: 0, // ⚠️ monto base en ARS (decimal, como venía del FE)
       service_fee_cents: null as number | null, // calculado al setear
       guest_total_cents: null as number | null, // calculado al setear
       payment_method: null as string | null,
       payment_data: null as Record<string, any> | null,
+      space: {}
     },
     loading: false,
     error: null as string | null,
@@ -49,6 +51,23 @@ export const useReservationStore = defineStore('reservation', {
       }
 
       this.reservation = { ...this.reservation, ...data };
+    },
+
+
+    /**     
+     * * Sincroniza la reserva actual con el backend (actualiza los datos).
+     */
+    async syncReservation() {
+      if (!this.reservation.id) {
+        throw new Error("Reserva sin ID");
+      }
+
+      await updateReservationPaymentData(this.reservation.id, {
+        payment_method: this.reservation.payment_method,
+        payment_data: this.reservation.payment_data,
+        service_fee_cents: this.reservation.service_fee_cents,
+        guest_total_cents: this.reservation.guest_total_cents,
+      });
     },
 
     /**
@@ -83,7 +102,7 @@ export const useReservationStore = defineStore('reservation', {
         vehicle_type: null,
         start_time: null,
         end_time: null,
-        dead_line: null,
+        deadLine: null,
         total: 0,
         service_fee_cents: null,
         guest_total_cents: null,

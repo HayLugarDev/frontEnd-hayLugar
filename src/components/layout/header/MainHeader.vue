@@ -1,55 +1,97 @@
 <template>
-  <header
-    class="bg-gray-50 gap-4 w-full z-50 md:flex md:flex-row justify-between items-center border-b-2 px-6 py-2 xl:px-16 fixed md:static shadow-md md:shadow-none rounded-b-xl">
-    <Logo width="12" @click="router.push('/dashboard')"
-      class="hidden md:block" />
-      <div v-if="routeConfig.showSalirButton" @click="router.push('/dashboard')" class="w-full flex flex-row justify-end">
-        <button
-          class="text-gray-600 sm:text-md hover:shadow-lg py-2 px-4 rounded-full cursor-pointer">
-          Salir
+  <header class="fixed top-0 left-0 right-0 z-20
+         bg-gradient-to-r from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+         border-b border-white/10 shadow-lg md:shadow-none">
+
+    <!-- SAFE AREA -->
+    <div class="safe-top"></div>
+
+    <!-- CONTENIDO REAL -->
+    <div class="px-6 py-3 sm:py-4 xl:px-16
+           flex items-center justify-between gap-6 text-white">
+
+      <!-- LEFT: LOGO + TITULO -->
+      <div class="flex items-center gap-4 cursor-pointer" @click="router.push('/dashboard')">
+        <Logo width="12" class="drop-shadow-lg" />
+
+        <!-- Texto principal mobile-->
+        <span>
+          <h1 class="md:hidden font-bold tracking-tight sm:text-lg text-white">
+            Estacionamiento inteligente
+          </h1>
+        </span>
+
+        <!-- Texto principal desktop-->
+        <span class="hidden md:block font-bold tracking-tight text-xl 
+               text-white hover:text-accent transition-colors duration-200">
+          Encontrá tu próximo estacionamiento
+        </span>
+      </div>
+
+      <!-- RIGHT AREA: MENÚ/ BOTONES -->
+      <div v-if="authChecked" class="flex items-center gap-2 md:gap-3">
+
+        <!-- Botón menú mobile -->
+        <!-- <button 
+        @click="showMobileMenu = true"
+        class="block md:hidden w-12 h-12 rounded-full text-2xl text-white/80 hover:text-white"
+      >
+        <font-awesome-icon icon="fa-align-justify" />
+      </button> -->
+
+        <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
+        <button @click="verifyToken('/add-space')"
+          class="hidden md:block bg-[#06D6A0] hover:bg-[#00B4D8] text-[#0D1B2A] font-semibold px-4 py-2 rounded-xl shadow-lg text-sm transition-all">
+          + Publica tu espacio
         </button>
-      </div>
-    <div v-if="authChecked" class="flex flex-row justify-between gap-2">
-      <div v-if="route.path !== '/add-space' && route.path !== '/add-vehicle'"
-        class="relative flex flex-row sm:gap-2 items-center max-h-12 text-gray-800">
-        <font-awesome-icon icon="fa-regular fa-circle-question"
-          class="hidden md:block p-3 w-6 h-6 rounded-full cursor-pointer text-gray-400" @click="openHelp" />
-        <div class="">
-          <!-- Botón visible solo en mobile -->
-          <button @click="showMobileMenu = true"
-            class="block md:hidden w-11 h-11 rounded-full">
-            <font-awesome-icon icon="fa-align-justify" />
-          </button>
 
-          <!-- Menú lateral en mobile -->
-          <MobileUserMenu v-model="showMobileMenu" @navigate="handleNavigate" />
-        </div>
-      </div>
-      <div class="flex flex-row gap-1">
+        <!-- <button
+    @click="router.push('/industrial/new-space')"
+    class="bg-[#06D6A0] hover:bg-[#00B4D8] text-[#0D1B2A] font-semibold px-4 py-2 rounded-xl shadow-lg text-sm transition-all"
+  >
+    + Crear Espacio
+  </button> -->
+        <!-- <button
+    @click="router.push('/industrial/new-park')"
+    class="bg-white/10 hover:bg-white/20 text-sm px-4 py-2 rounded-xl border border-white/20 transition-all"
+  >
+    + Crear Parque
+  </button> -->
+
+        <!-- Botón ayuda -->
+        <!-- <font-awesome-icon 
+        icon="fa-regular fa-circle-question"
+        class="w-10 h-10 rounded-full cursor-pointer text-gray-400 hover:text-gray-300 transition"
+        @click="openHelp"
+      /> -->
+
+        <!-- Notificaciones -->
         <NotificationDropdown v-if="routeConfig.showNotificationButton" />
-        <MapButton :text="buttonText" color="gray-800" @click="toggleMap" class="md:hidden" />
-        <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
-        <BackButton v-if="routeConfig.showBackButton" />
-      </div>
-    </div>
-    <template v-else>
-      <!-- Skeleton Loader -->
-      <div
-        class="hidden md:flex justify-between items-center border-b-2 px-4 pt-2 xl:px-10 xl:mx-16 h-20 bg-gray-300 rounded mb-4 animate-pulse">
-        <!-- Logo placeholder -->
-        <div class="w-16 h-10 bg-gray-400 rounded"></div>
 
-        <!-- Botones de usuario placeholder -->
-        <div class="flex gap-4 items-center">
-          <div class="w-24 h-10 bg-gray-400 rounded-full"></div>
-          <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
-        </div>
+        <!-- Botón mapa (mobile only) -->
+        <MapButton :text="buttonText" color="white" background="primary" @click="toggleMap" class="md:hidden" />
+
+        <!-- Menú usuario -->
+        <UserMenu v-if="routeConfig.showUserMenuButton" @navigate="handleNavigate" />
+
       </div>
-    </template>
+
+      <!-- LOADER -->
+      <template v-else>
+        <div class="flex items-center gap-4 animate-pulse">
+          <div class="w-10 h-10 bg-white/20 rounded-full"></div>
+          <div class="w-24 h-8 bg-white/20 rounded-lg"></div>
+        </div>
+      </template>
+
+    </div>
+
   </header>
+
   <HelpModal :visible="activatedModal" @close="activatedModal = false" />
   <SessionExpired :sessionExpired="isSessionInvalid" />
 </template>
+
 
 <script setup lang="ts">
 import Logo from '../Logo.vue';
@@ -63,7 +105,6 @@ import NotificationDropdown from './NotificationDropdown.vue';
 import UserMenu from '../UserMenu.vue';
 import MobileUserMenu from './MobileUserMenu.vue';
 import MapButton from '../../pages/dashboardPage/MapButton.vue';
-import BackButton from '../../common/BackButton.vue';
 import HelpModal from '../HelpModal.vue';
 
 const userStore = useUserStore();

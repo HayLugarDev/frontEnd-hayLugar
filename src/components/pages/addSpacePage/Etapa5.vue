@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-br from-primary via-primary/90 to-dark text-white animate-fade-in"
+    class="md:min-h-[80vh] flex flex-col items-center justify-center px-8 sm:px-6 py-12 text-white animate-fade-in"
   >
     <!-- Capa decorativa -->
     <div class="pointer-events-none absolute inset-0 overflow-hidden -z-10">
@@ -10,20 +10,20 @@
 
     <!-- Contenedor principal -->
     <div
-      class="bg-white/90 text-gray-800 rounded-2xl shadow-2xl border border-white/30 backdrop-blur-lg w-full max-w-3xl p-10 space-y-8"
+      class="backdrop-blur-lg w-full max-w-3xl space-y-8 "
     >
       <!-- Título -->
       <div class="text-center">
         <h2 class="text-3xl font-extrabold text-primary mb-2">
             Resumen antes de publicar
         </h2>
-        <p class="text-gray-500 text-sm">
+        <p class="text-gray-300 text-sm">
           Verificá los datos antes de confirmar tu publicación
         </p>
       </div>
 
       <!-- Datos principales -->
-      <div class="grid sm:grid-cols-2 gap-4">
+      <div class="grid sm:grid-cols-2 gap-4 p-2">
         <div>
           <p class="text-gray-500 text-sm">📍 Nombre</p>
           <p class="font-semibold text-lg">{{ modelValue.name }}</p>

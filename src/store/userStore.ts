@@ -15,9 +15,13 @@ export const useUserStore = defineStore('user', {
       address?: string;
       role?: string;
       profile_picture?: string;
-      termsAccepted: boolean  
+      termsAccepted: boolean
       acceptedTermsVersion: string | null
+      created_at: Date
+      updated_at: Date
     },
+    socketConnected: false,
+    socketSubscribed: false,
     loading: false,
     error: null as string | null,
     sessionExpired: true,
@@ -54,10 +58,12 @@ export const useUserStore = defineStore('user', {
         this.terms = response.data?.terms ?? null; // 👈 guardamos términos
         this.sessionExpired = false;
 
+        // Conectar al socket
+        await this.connectSocket();
+
         // Esperamos a que el user esté seteado antes de pedir notificaciones
         await this.fetchNotifications(user.id, { initialLoad: true });
       } catch (error: any) {
-        console.error('fetchUser error:', error.response?.data ?? error.message ?? error);
         if (error.response?.status === 401) {
           this.expireSession();
         }
@@ -100,19 +106,11 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    setUser(user: {
-      id: number;
-      name: string;
-      email: string;
-      last_name?: string;
-      dni?: string;
-      phone?: string;
-      address?: string;
-      role?: string;
-      profile_picture?: string;
-    }) {
-      this.user = user;
-      this.sessionExpired = false;
+    setUser(partialUser: Partial<typeof this.user>) {
+      this.user = {
+        ...this.user,
+        ...partialUser
+      };
     },
 
     clearUser() {
@@ -144,6 +142,13 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    markAllAsRead() {
+      this.notifications = this.notifications.map((n: any) => ({
+        ...n,
+        status: 'read'
+      }));
+    },
+
     markAsRead(id: number) {
       const idx = this.notifications.findIndex((n: any) => n.id === id);
       if (idx >= 0) {
@@ -160,23 +165,5 @@ export const useUserStore = defineStore('user', {
     setReservations(reservas: any[]) {
       this.reservations = reservas;
     },
-
-    // checkReservationsForUpcoming() {
-    //   const ahora = Date.now();
-    //   this.reservations.forEach((reserva: any) => {
-    //     const inicio = new Date(reserva.start_time).getTime();
-    //     const diffMinutos = (inicio - ahora) / (1000 * 60);
-
-    //     if (diffMinutos > 0 && diffMinutos <= 10) {
-    //       this.addNotification({
-    //         id: Date.now(),
-    //         message: `Tu reserva comienza en ${Math.round(diffMinutos)} minutos`,
-    //         status: "pending",
-    //         changed_at: new Date(),
-    //         type: "reminder",
-    //       });
-    //     }
-    //   });
-    // },
   },
 });

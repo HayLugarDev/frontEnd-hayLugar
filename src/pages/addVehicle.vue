@@ -1,14 +1,19 @@
 <template>
     <MainHeader />
-    <BackButton class="md:hidden" />
-    <div class="relative w-full h-full mx-auto py-14">
+
+    <!-- BOTÓN ATRÁS MOBILE -->
+    <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+        <BackButton />
+    </div>
+
+    <div class="relative w-full h-full mx-auto pt-20 md:pt-24 sm:p-8">
         <!-- Instrucciones iniciales -->
         <transition name="fade-step" mode="out-in">
             <div :key="currentStep">
                 <!-- Paso 0: Instrucciones -->
                 <div v-if="currentStep === 0" class="rounded-lg border-gray-300">
                     <header>
-                        <h1 class="text-3xl font-bold text-center text-primary mb-8 border-b md:border-none p-2">
+                        <h1 class="text-2xl md:text-3xl font-bold text-center text-primary mb-8 mt-4 md:mt-0 p-2">
                             Registrá tu vehículo y comenzá a disfrutar de HayLugar
                         </h1>
                     </header>
@@ -18,39 +23,39 @@
                         <div class="flex flex-col gap-6 px-4 xl:px-12">
                             <!-- Tarjeta 1 -->
                             <div
-                                class="flex items-start gap-4 p-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:shadow-md transition">
+                                class="flex items-start gap-4 p-4 bg-white/10 border border-white/10 rounded-lg shadow-sm hover:shadow-md transition">
                                 <div class="text-primary text-3xl">
                                     🚗
                                 </div>
                                 <div>
-                                    <h2 class="font-semibold text-xl text-black mb-1">Tipos de vehículos</h2>
-                                    <p class="text-gray-700">Podés seleccionar camioneta, automóvil, motocicleta,
+                                    <h2 class="font-semibold text-xl text-white mb-1">Tipos de vehículos</h2>
+                                    <p class="text-gray-300">Podés seleccionar camioneta, automóvil, motocicleta,
                                         bicicleta o monopatín.</p>
                                 </div>
                             </div>
 
                             <!-- Tarjeta 2 -->
                             <div
-                                class="flex items-start gap-4 p-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:shadow-md transition">
+                                class="flex items-start gap-4 p-4 bg-white/10 border border-white/10 rounded-lg shadow-sm hover:shadow-md transition">
                                 <div class="text-primary text-3xl">
                                     📝
                                 </div>
                                 <div>
-                                    <h2 class="font-semibold text-xl text-black mb-1">Detalles del vehículo</h2>
-                                    <p class="text-gray-700">Te solicitaremos datos como patente (no aplica a
+                                    <h2 class="font-semibold text-xl text-white mb-1">Detalles del vehículo</h2>
+                                    <p class="text-gray-300">Te solicitaremos datos como patente (no aplica a
                                         bicicletas), marca, modelo, y color.</p>
                                 </div>
                             </div>
 
                             <!-- Tarjeta 3 -->
                             <div
-                                class="flex items-start gap-4 p-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:shadow-md transition">
+                                class="flex items-start gap-4 p-4 bg-white/10 border border-white/10 rounded-lg shadow-sm hover:shadow-md transition">
                                 <div class="text-primary text-3xl">
                                     📍
                                 </div>
                                 <div>
-                                    <h2 class="font-semibold text-xl text-black mb-1">Comenzá a usar la app</h2>
-                                    <p class="text-gray-700">Una vez confirmado tu vehículo, ya podés usar nuestros
+                                    <h2 class="font-semibold text-xl text-white mb-1">Comenzá a usar la app</h2>
+                                    <p class="text-gray-300">Una vez confirmado tu vehículo, ya podés usar nuestros
                                         servicios para encontrar tu próximo estacionamiento.</p>
                                 </div>
                             </div>
@@ -82,39 +87,43 @@
         </transition>
     </div>
 
-    <!-- Modal de Éxito -->
-    <transition name="fade">
-        <div v-if="showSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-                <div class="flex flex-col items-center">
-                    <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-                    <h2 class="text-3xl font-bold text-primary mb-2">¡Éxito!</h2>
-                    <p class="text-lg text-gray-700 text-center mb-6">Los cambios se han guardado correctamente.</p>
-                    <button @click="closeSuccesModal"
-                        class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                        Continuar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </transition>
+    <!-- Modal de éxito -->
+    <StatusModal :visible="showSuccessModal" type="success" title="Excelente!"
+        message="Registrarte correctamente tu vehículo en HayLugar." :icon="logo" @confirm="closeSuccesModal" />
 
-    <!-- Modal de Error -->
-    <transition name="fade">
-        <div v-if="showErrorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-                <div class="flex flex-col items-center">
-                    <img src="/src/assets/logo.jpeg" alt="Logo" class="w-20 h-20 mb-4" />
-                    <h2 class="text-3xl font-bold text-red-600 mb-2">¡Error!</h2>
-                    <p class="text-lg text-gray-700 text-center mb-6">{{ errorMessage }}</p>
-                    <button @click="closeErrorModal"
-                        class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-800 transition">
-                        Intentar de Nuevo
-                    </button>
-                </div>
+    <!-- Modal de error -->
+    <StatusModal :visible="showErrorModal" type="error" title="¡Atención!" :message="errorMessage" :icon="logo"
+        @confirm="showErrorModal = false" />
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+              gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+
+            <!-- Branding -->
+            <div class="flex items-center gap-2">
+                <span class="text-white font-semibold tracking-wide">HayLugar</span>
+                <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
+            </div>
+
+            <!-- Links -->
+            <div class="flex gap-6">
+                <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+                    Política de Privacidad
+                </router-link>
+
+                <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+                    Términos y Condiciones
+                </router-link>
+            </div>
+
+            <!-- Extra -->
+            <div class="text-xs text-[#78909C]">
+                Movilidad inteligente
             </div>
         </div>
-    </transition>
+    </footer>
+
 </template>
 
 <script setup>
@@ -127,6 +136,7 @@ import Etapa1 from '../components/pages/addVehiclePage/Etapa1.vue';
 import Etapa2 from '../components/pages/addVehiclePage/Etapa2.vue';
 import Etapa3 from '../components/pages/addVehiclePage/Etapa3.vue';
 import BackButton from '../components/common/BackButton.vue';
+import StatusModal from '../components/pages/addSpacePage/StatusModal.vue';
 
 const router = useRouter();
 const currentStep = ref(0); // 0 = instrucciones, 1 = formulario
@@ -219,7 +229,7 @@ const closeSuccesModal = () => {
 };
 
 const closeErrorModal = () => {
-  showErrorModal.value = false;
+    showErrorModal.value = false;
 };
 
 const nextFirstStep = () => {

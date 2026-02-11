@@ -1,11 +1,22 @@
 <template>
-    <MainHeader />
-    <div class="min-h-screen bg-secondary md:px-6 py-20 md:py-8">
 
-        <section class="bg-white rounded-2xl shadow-lg p-4 md:p-8 max-w-3xl mx-auto border border-gray-100">
+    <MainHeader />
+
+    <!-- BOTÓN ATRÁS MOBILE -->
+    <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+        <BackButton />
+    </div>
+
+    <!-- MENÚ INFERIOR MOBILE -->
+    <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
+
+    <div
+        class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A] pt-20 md:pt-24 md:px-6 md:py-10 text-white">
+
+        <section class="p-6 md:p-10 max-w-3xl mx-auto">
             <!-- Título -->
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-3 drop-shadow">
                     <font-awesome-icon icon="history" />
                     Notificaciones
                 </h2>
@@ -16,52 +27,62 @@
                 <ItemSkeleton />
             </div>
 
-            <!-- Lista -->
+            <!-- Lista de Notificaciones -->
             <ul v-else-if="notifications.length" class="flex flex-col gap-4">
-                <li v-for="(notification, index) in notifications" :key="index"
-                    class="bg-gradient-to-br from-white to-blue-50 border border-blue-100 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden p-5 flex flex-col gap-3">
+                <li v-for="(notification, index) in notifications" :key="index" :class="[
+                    'px-5 py-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg',
+                    'hover:bg-white/10 transition-all cursor-pointer flex flex-col gap-4',
+                    blink && index === 0
+                        ? 'animate-jump ring-2 ring-[#00B4D8]/60 bg-[#00B4D8]/10'
+                        : ''
+                ]">
+
                     <!-- Header -->
                     <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 rounded-full flex items-center justify-center" :class="notification.reservation_status === 'approved'
-                                ? 'bg-green-100 text-green-500'
-                                : 'bg-blue-100 text-blue-600'">
+                        <div class="flex items-center gap-4">
+                            <!-- Icon container -->
+                            <div class="p-3 rounded-xl flex items-center justify-center shadow" :class="notification.reservation_status === 'approved'
+                                ? 'bg-green-500/20 text-green-300'
+                                : 'bg-blue-500/20 text-blue-300'">
                                 <font-awesome-icon :icon="notification.reservation_status === 'approved'
                                     ? 'check-circle'
-                                    : 'bell'" class="text-xl" />
+                                    : 'bell'" class="text-lg" />
                             </div>
 
                             <div class="flex flex-col">
-                                <span class="font-semibold text-gray-800 text-base leading-tight">
+                                <span class="font-semibold text-white text-base leading-tight">
                                     {{ getSpanishReservationStatus(notification.reservation_status) }}
                                 </span>
-                                <span class="text-xs text-gray-500">
+                                <span class="text-xs text-gray-300">
                                     Recibida: {{ formatDate(notification.changed_at) }}
                                 </span>
                             </div>
                         </div>
 
                         <button @click="openConfirm(notification, 'delete')"
-                            class="text-gray-400 hover:text-red-500 transition" title="Eliminar notificación">
+                            class="text-gray-400 hover:text-red-400 transition" title="Eliminar notificación">
                             <font-awesome-icon icon="fa-regular fa-trash-can" class="text-lg" />
                         </button>
                     </div>
 
                     <!-- Mensaje -->
-                    <p class="text-gray-700 text-xs leading-relaxed">
+                    <p class="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
                         {{ notification.message }}
                     </p>
 
+
                     <!-- Botones -->
-                    <div class="flex justify-end flex-wrap gap-2 mt-2">
-                        <!-- owner -->
+                    <div class="flex justify-end flex-wrap gap-2 mt-1">
+
+                        <!-- Owner - pendiente -->
                         <button
                             v-if="notification.reservation_status !== 'approved' && notification.reservation_role === 'owner'"
                             @click="goToIncomingReservations"
-                            class="px-4 py-2 bg-primary text-white text-sm rounded-lg font-semibold shadow hover:bg-blue-700 transition active:scale-95">
+                            class="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg font-semibold shadow hover:bg-blue-600 transition active:scale-95">
                             Verificar ahora
                         </button>
 
+                        <!-- Owner - aprobada -->
                         <button
                             v-else-if="notification.reservation_status === 'approved' && notification.reservation_role === 'owner'"
                             @click="goToIncomingReservations"
@@ -69,9 +90,9 @@
                             Ir a reserva
                         </button>
 
-                        <!-- client -->
+                        <!-- Client -->
                         <button v-if="notification.reservation_role === 'client'" @click="goToReservations"
-                            class="px-4 py-2 bg-primary text-white text-sm rounded-lg font-semibold shadow hover:bg-blue-700 transition active:scale-95">
+                            class="px-4 py-2 bg-[#00B4D8] text-white text-sm rounded-lg font-semibold shadow hover:bg-newgreen transition active:scale-95">
                             Ir a reserva
                         </button>
                     </div>
@@ -79,17 +100,18 @@
             </ul>
 
             <!-- Sin notificaciones -->
-            <div v-else class="text-center py-10 text-gray-500 space-y-2">
-                <font-awesome-icon icon="bell-slash" class="text-3xl text-gray-400" />
+            <div v-else class="text-center py-12 text-gray-400 space-y-3">
+                <font-awesome-icon icon="bell-slash" class="text-4xl text-gray-500" />
                 <p>No hay notificaciones.</p>
             </div>
         </section>
 
         <ConfirmModal :visible="showConfirmModal" :message="modalConfig.message" :button-text="modalConfig.buttonText"
             @close="showConfirmModal = false" @acept="() => { modalConfig.onConfirm(); showConfirmModal = false }" />
+
+        <SessionExpired :sessionExpired="isSessionInvalid" />
     </div>
 </template>
-
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
@@ -103,12 +125,37 @@ import ConfirmModal from '../components/common/ConfirmModal.vue';
 import { statusColors } from '../logic/useReservationMessages';
 import loadIcon from "../assets/load-icon_secondary.svg";
 import ItemSkeleton from '../components/layout/skeletons/ItemSkeleton.vue';
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
+import { useVerifyToken } from '../logic/useVerifyToken';
+import SessionExpired from '../components/common/SessionExpired.vue';
 
 const router = useRouter();
 const notifications = ref([]);
 const userStore = useUserStore();
 const showConfirmModal = ref(false);
 const loading = ref(true);
+
+const { verifyToken, isSessionInvalid } = useVerifyToken();
+
+const blink = ref(false);
+
+onMounted(async () => {
+
+    await verifyToken();
+    if (isSessionInvalid.value) return;
+
+    await fetchNotifications();
+    const shouldBlink = sessionStorage.getItem('blinkNotification');
+
+    if (shouldBlink) {
+        blink.value = true;
+        sessionStorage.removeItem('blinkNotification');
+
+        setTimeout(() => {
+            blink.value = false;
+        }, 2000);
+    }
+});
 
 const modalConfig = ref({
     message: '',
@@ -175,11 +222,11 @@ const fetchNotifications = async () => {
 };
 
 const goToReservations = () => {
-    return router.push('/profile?section=reservas');
+    return router.push('/profile?section=reservas-anteriores');
 };
 
 const goToIncomingReservations = () => {
-    return router.push('/profile?section=reservas-entrantes');
+    return router.push('/owner/reservation-incoming');
 };
 
 
@@ -194,8 +241,6 @@ const markNotificationsAsRead = async (ids: number[]) => {
         console.error("Error al marcar como leídas", error);
     }
 };
-
-onMounted(fetchNotifications);
 
 const formatDate = (value: string): string => {
     const date = new Date(value);

@@ -1,10 +1,10 @@
 <template>
-  <section class="lg:bg-white p-2 md:p-8 rounded-2xl shadow-xl mb-8 w-full md:w-2/3 border border-gray-200">
+  <section class="p-2 md:p-8 rounded-2xl shadow-xl mb-8">
     <!-- Título -->
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h2 class="text-2xl font-bold text-primary">⭐ Mis Calificaciones</h2>
-        <p class="text-sm text-gray-600 px-4">Leé lo que otros opinan sobre tus espacios y tu atención</p>
+        <h2 class="hidden md:flex text-2xl font-bold text-primary">Últimas calificaciones</h2>
+        <p class="text-sm text-gray-400 px-4">Leé lo que otros opinan sobre tus espacios y tu atención</p>
       </div>
     </div>
 
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Sin reseñas -->
-    <div v-else-if="reviews.length === 0" class="text-gray-500 text-center py-10 text-sm">
+    <div v-else-if="reviews.length === 0" class="text-gray-400 text-center py-10 text-sm">
       Aún no tienes calificaciones.
     </div>
 
@@ -24,16 +24,16 @@
       <div
         v-for="r in reviews"
         :key="r.id"
-        class="border border-gray-200 rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-md hover:shadow-lg transition-all overflow-hidden p-5"
+        class="rounded-2xl bg-white/10 shadow-md hover:shadow-lg transition-all overflow-hidden p-5"
       >
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-3">
           <div class="flex items-center gap-3">
             <!-- Avatar del revisor -->
-            <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-lg font-semibold shadow-sm">
+            <div class="w-12 h-12 rounded-full bg-primary/50 flex items-center justify-center text-gray-200 text-lg font-semibold shadow-sm">
               {{ getInitials(r.reviewer?.name, r.reviewer?.last_name) }}
             </div>
             <div>
-              <p class="font-semibold text-gray-800">
+              <p class="font-semibold text-gray-200">
                 {{ r.reviewer?.name }} {{ r.reviewer?.last_name }}
               </p>
               <p class="text-xs text-gray-400">Fecha: {{ formatDate(r.created_at) }}</p>
@@ -53,14 +53,14 @@
         </div>
 
         <!-- Comentario -->
-        <p class="text-gray-700 text-sm leading-relaxed border-l-4 border-primary/40 pl-3">
+        <p class="text-gray-400 text-sm leading-relaxed border-l-4 border-primary/40 pl-3">
           "{{ r.comment }}"
         </p>
 
         <!-- Información del espacio -->
         <div
           v-if="r.space"
-          class="mt-3 flex items-center justify-between text-xs text-gray-500 bg-gray-100 rounded-xl p-2 px-3"
+          class="mt-3 flex items-center justify-between text-xs text-gray-200 bg-white/10 border-white/10 rounded-xl p-2 px-3"
         >
           <span class="flex items-center gap-1">
             <font-awesome-icon icon="warehouse" class="text-primary" />

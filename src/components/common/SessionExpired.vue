@@ -26,15 +26,37 @@ const closeModal = () => {
 
 <template>
   <transition name="fade">
-    <div v-if="sessionExpired" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full transform transition-all scale-95">
-        <div class="flex flex-col items-center">
-          <img :src="logo" alt="HayLugar" class="mx-auto w-20 h-20 mb-4 drop-shadow-lg select-none" loading="eager" />
-          <!-- <h2 class="text-3xl font-bold text-primary mb-2">Hay Lugar</h2> -->
-          <p class="text-lg text-gray-700 text-center mb-6">
+    <div
+      v-if="sessionExpired"
+      class="fixed inset-0 flex items-center justify-center 
+             bg-black/60 backdrop-blur-sm z-50"
+    >
+      <div
+        class="bg-white/5 backdrop-blur-xl border border-white/10 
+               shadow-2xl rounded-2xl p-8 w-full max-w-md 
+               transform transition-all scale-100 animate-fadeInUp"
+      >
+        <div class="flex flex-col items-center text-center">
+
+          <!-- Logo -->
+          <img
+            :src="logo"
+            alt="HayLugar"
+            class="mx-auto w-20 h-20 mb-4 drop-shadow-lg opacity-90 select-none"
+            loading="eager"
+          />
+
+          <!-- Mensaje -->
+          <p class="text-base text-gray-300 leading-relaxed mb-6">
             Tenés que iniciar sesión para utilizar esta función.
           </p>
-          <button @click="closeModal" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+
+          <!-- Botón -->
+          <button
+            @click="closeModal"
+            class="px-6 py-3 bg-[#00B4D8] text-white rounded-lg font-semibold 
+                   shadow hover:bg-newgreen transition active:scale-95"
+          >
             Iniciar Sesión
           </button>
         </div>
@@ -44,13 +66,18 @@ const closeModal = () => {
 </template>
 
 <style>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
+.animate-fadeInUp {
+  animation: fadeInUp 0.35s ease-out;
 }
 </style>

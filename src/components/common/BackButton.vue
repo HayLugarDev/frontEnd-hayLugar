@@ -1,8 +1,10 @@
 <template>
-  <button @click="goBack"
-    class="md:hidden text-gray-600 sm:text-md hover:shadow-lg py-2 px-4 rounded-full cursor-pointer">
-    Atrás
-  </button>
+   <button
+          @click="goBack"
+          class="text-gray-200 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+        >
+          Atrás
+        </button>
 </template>
 
 <script setup>

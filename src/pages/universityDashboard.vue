@@ -1,189 +1,198 @@
 <template>
-  <div class="relative min-h-screen bg-secondary">
-    <MainHeader />
 
-    <!-- Encabezado + tabs -->
-    <div class="px-6 pt-20 md:pt-4 flex items-center gap-3">
-      <h2 class="text-2xl sm:text-3xl font-bold text-primary">
-        Estacionamientos Inteligentes — UTN
-      </h2>
-      <div class="ml-auto flex items-center gap-2">
-        <button
-          class="px-3 py-1.5 rounded-full text-sm font-medium border bg-white hover:bg-gray-50 transition"
-          :class="showMap ? 'text-primary border-primary/30' : 'text-gray-700 border-gray-300'"
-          @click="showMap = true"
-        >
+  <MainHeader />
+
+  <!-- BOTÓN ATRÁS MOBILE -->
+  <div class="w-full flex justify-end p-4 sm:hidden fixed top-0 left-0 z-50">
+    <BackButton />
+  </div>
+
+  <!-- MENÚ INFERIOR MOBILE -->
+  <MobileButtonNav @navigate="(path) => router.push(path)" class="md:hidden" :showMap="false" />
+
+  <div class="min-h-screen bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]
+           text-white overflow-hidden">
+    <!-- ===== HEADER + TABS ===== -->
+    <header class="relative z-10 px-6 pt-16 py-4 md:px-12 flex flex-col items-center
+             bg-gradient-to-b from-black/20 to-transparent md:hidden">
+      <div class="flex items-center gap-3">
+        <img :src="logo" alt="HayLugar" class="h-10 w-10" />
+        <h1 class="text-2xl font-semibold tracking-wide drop-shadow">
+          Universidades Inteligentes – UTN
+        </h1>
+      </div>
+
+      <!-- Tabs en mobile -->
+      <div class="flex items-center gap-2 ml-auto">
+        <button class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
+                 backdrop-blur-md bg-white/10 hover:bg-white/20 shadow-md"
+          :class="showMap ? 'text-newgreen' : 'text-gray-300'" @click="showMap = true">
           Mapa
         </button>
-        <button
-          class="px-3 py-1.5 rounded-full text-sm font-medium border bg-white hover:bg-gray-50 transition"
-          :class="!showMap ? 'text-primary border-primary/30' : 'text-gray-700 border-gray-300'"
-          @click="showMap = false"
-        >
+
+        <button class="px-4 py-1.5 rounded-xl text-sm font-medium transition-all border border-white/10
+                 backdrop-blur-md bg-white/10 hover:bg-white/20 shadow-md"
+          :class="!showMap ? 'text-newgreen' : 'text-gray-300'" @click="showMap = false">
           Lista
         </button>
       </div>
-    </div>
+    </header>
 
-    <!-- Filtros -->
-    <div class="px-4 mt-3 flex flex-wrap gap-2 items-center">
-      <button
-        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
-        :class="filters.groups.students ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-white text-gray-700 border-gray-300'"
-        @click="toggleGroup('students')"
-      >
-        🎓 Alumnos
-      </button>
-      <button
-        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
-        :class="filters.groups.staff ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white text-gray-700 border-gray-300'"
-        @click="toggleGroup('staff')"
-      >
-        🧑‍🏫 Docentes
-      </button>
-      <button
-        class="px-3 py-1.5 rounded-full text-sm font-semibold transition border"
-        :class="filters.onlyAvailable ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-white text-gray-700 border-gray-300'"
-        @click="filters.onlyAvailable = !filters.onlyAvailable"
-      >
-        ✅ Sólo disponibles
-      </button>
+    <!-- ===== FILTROS ===== -->
+    <section class="mt-6 px-6 container mx-auto py-4 rounded-2xl bg-white/5 
+             backdrop-blur-xl border border-white/10 shadow-lg">
+      <div class="flex flex-wrap gap-3 items-center">
+        <!-- Botones -->
+        <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+                 backdrop-blur-sm shadow-sm" :class="filters.groups.students
+                  ? 'bg-newgreen/30 text-newgreen'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="toggleGroup('students')">
+          🎓 Alumnos
+        </button>
 
-      <span class="ml-auto text-xs text-gray-500">
-        Última actualización: {{ lastUpdatedText }}
-      </span>
-    </div>
+        <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+                 backdrop-blur-sm shadow-sm" :class="filters.groups.staff
+                  ? 'bg-[#00B4D8]/30 text-[#00B4D8]'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'" @click="toggleGroup('staff')">
+          🧑‍🏫 Docentes
+        </button>
 
-    <div class="p-4 z-30">
-      <div v-if="error" class="text-red-500 mb-4">{{ error }}</div>
+        <button class="px-4 py-2 rounded-xl text-sm font-semibold transition-all border border-white/10
+                 backdrop-blur-sm shadow-sm" :class="filters.onlyAvailable
+                  ? 'bg-amber-300/20 text-amber-300'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'"
+          @click="filters.onlyAvailable = !filters.onlyAvailable">
+          ✅ Disponibles
+        </button>
 
-      <!-- MAPA -->
-      <div v-if="showMap" class="w-full h-[68vh] relative rounded-xl overflow-hidden shadow">
-        <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions">
-          <!-- Zonas exactas (polígonos) -->
-          <GMapPolygon
-            v-for="(zona, i) in zonasFiltradas"
-            :key="'zone-'+i"
-            :paths="zona.paths"
-            :options="{ ...zona.options, clickable: false, zIndex: 1 }"
-          />
+        <!-- Actualización -->
+        <span class="ml-auto text-xs text-[#B0BEC5]">
+          Última actualización: {{ lastUpdatedText }}
+        </span>
+      </div>
+    </section>
 
-          <!-- Pin fijo de la Universidad (UTN FRT) -->
-          <GMapMarker
-            :position="utnMarkerPosition"
-            :icon="universityIcon"
-            :options="{ zIndex: 3, clickable: false }"
-          />
+    <!-- ===== CONTENIDO MAPA / LISTA ===== -->
+    <section class="p-6 container mx-auto">
+      <!-- ===== MAPA ===== -->
+      <div v-if="showMap" class="w-full h-[68vh] relative rounded-2xl overflow-hidden shadow-2xl 
+               bg-[#0D1B2A]/60 border border-white/10 backdrop-blur-xl">
+        <CustomGoogleMap :center="center" :zoom="zoom" :options="mapOptions" :locateUser="true">
+          <GMapPolygon v-for="(zona, i) in zonasFiltradas" :key="'zone-' + i" :paths="zona.paths"
+            :options="{ ...zona.options, clickable: false, zIndex: 1 }" />
 
-          <!-- Marcadores con iconos por grupo/estado y clic habilitado -->
-          <GMapMarker
-            v-for="(espacio, idx) in espaciosFiltrados"
-            :key="'mk-'+espacio.id+'-'+idx"
-            :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }"
-            :icon="getMarkerIcon(espacio)"
-            :options="{ zIndex: 2, clickable: true }"
-            @mouseover="setHovered(espacio)"
-            @mouseout="clearHovered"
-            @click="openAccessModal(espacio)"
-          />
+          <GMapMarker :position="utnMarkerPosition" :icon="universityIcon" :options="{ zIndex: 3, clickable: false }" />
+
+          <GMapMarker v-for="(espacio, idx) in espaciosFiltrados" :key="'mk-' + espacio.id + '-' + idx"
+            :position="{ lat: Number(espacio.latitude), lng: Number(espacio.longitude) }" :icon="getMarkerIcon(espacio)"
+            :options="{ zIndex: 2 }" @mouseover="setHovered(espacio)" @mouseout="clearHovered"
+            @click="openAccessModal(espacio)" />
         </CustomGoogleMap>
 
-        <!-- Panel lateral (hover) -->
+        <!-- ===== PANEL HOVER ===== -->
         <transition name="slide-fade">
-          <div
-            v-if="hoveredSpace"
-            class="absolute right-4 top-4 w-[320px] bg-white border border-gray-200 rounded-xl shadow-lg p-4"
-          >
+          <aside v-if="hoveredSpace" class="absolute right-4 top-4 w-[320px]
+                   bg-[#1B263B]/80 backdrop-blur-xl border border-white/10 
+                   rounded-2xl shadow-2xl p-5">
             <div class="flex items-start gap-3">
-              <div
-                class="px-2 py-0.5 rounded text-xs font-semibold"
-                :class="badgeClass(hoveredSpace)"
-              >
+              <span class="px-3 py-1 rounded-lg text-xs font-semibold" :class="badgeClass(hoveredSpace)">
                 {{ groupLabel(hoveredSpace) }}
-              </div>
-              <div class="ml-auto text-xs" :class="hoveredSpace.capacity > 0 ? 'text-emerald-600' : 'text-rose-600'">
+              </span>
+
+              <span class="ml-auto text-xs font-semibold"
+                :class="hoveredSpace.capacity > 0 ? 'text-newgreen' : 'text-rose-400'">
                 {{ hoveredSpace.capacity > 0 ? 'Disponible' : 'Completo' }}
-              </div>
+              </span>
             </div>
 
-            <h3 class="mt-2 text-lg font-semibold text-gray-900 leading-tight">
+            <h3 class="mt-3 text-lg font-semibold leading-tight">
               {{ hoveredSpace.name }}
             </h3>
-            <p class="text-sm text-gray-600 mt-1">📍 {{ hoveredSpace.location }}</p>
 
-            <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
-              <div class="p-2 rounded bg-gray-50">
-                <div class="text-gray-500">Capacidad</div>
-                <div class="font-semibold">
-                  {{ hoveredSpace.capacity ?? capacityFromVehicle(hoveredSpace) }}
-                </div>
+            <p class="text-sm text-[#B0BEC5] mt-1">📍 {{ hoveredSpace.location }}</p>
+
+            <!-- Datos -->
+            <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+              <div class="p-3 rounded-xl bg-white/5 border border-white/10 shadow-inner">
+                <div class="text-[#B0BEC5]">Capacidad</div>
+                <div class="font-semibold">{{ hoveredSpace.capacity }}</div>
               </div>
-              <div class="p-2 rounded bg-gray-50">
-                <div class="text-gray-500">Grupo</div>
+
+              <div class="p-3 rounded-xl bg-white/5 border border-white/10 shadow-inner">
+                <div class="text-[#B0BEC5]">Grupo</div>
                 <div class="font-semibold">{{ groupLabel(hoveredSpace) }}</div>
               </div>
             </div>
 
-            <button
-              class="mt-4 w-full bg-primary text-white font-semibold rounded-lg py-2 hover:bg-primary-dark transition"
-              @click="openAccessModal(hoveredSpace)"
-            >
+            <button class="mt-4 w-full bg-[#00B4D8] hover:bg-newgreen text-dark font-semibold 
+                     rounded-xl py-2 transition-all shadow-md" @click="openAccessModal(hoveredSpace)">
               Confirmar acceso
             </button>
-          </div>
+          </aside>
         </transition>
 
-        <!-- Leyenda -->
-        <div
-          class="absolute left-4 bottom-4 bg-white/90 backdrop-blur border border-gray-200 rounded-lg shadow p-3 text-xs text-gray-700"
-        >
-          <div class="font-semibold mb-2">Leyenda</div>
+        <!-- ===== LEYENDA ===== -->
+        <div class="absolute left-4 bottom-4 p-4 rounded-xl bg-[#1B263B]/80 backdrop-blur-xl
+                 border border-white/10 shadow-xl text-xs text-gray-200">
+          <div class="font-semibold text-white mb-2">Leyenda</div>
 
           <div class="flex items-center gap-2 mb-1">
-            <span class="inline-block w-3 h-3 rounded-full bg-emerald-500"></span>
-            <span>Zona Alumnos</span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500"></span><span>Zona Alumnos</span>
           </div>
           <div class="flex items-center gap-2 mb-2">
-            <span class="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-            <span>Zona Docentes</span>
+            <span class="w-3 h-3 rounded-full bg-blue-500"></span><span>Zona Docentes</span>
           </div>
 
           <div class="flex items-center gap-2 mb-1">
-            <img :src="icons.students.available" class="w-4 h-4" alt="Alumno disponible" />
+            <img :src="icons.students.available" class="w-4 h-4" />
             <span>Alumno — Disponible</span>
           </div>
           <div class="flex items-center gap-2 mb-1">
-            <img :src="icons.students.full" class="w-4 h-4" alt="Alumno completo" />
+            <img :src="icons.students.full" class="w-4 h-4" />
             <span>Alumno — Completo</span>
           </div>
           <div class="flex items-center gap-2 mb-1">
-            <img :src="icons.staff.available" class="w-4 h-4" alt="Docente disponible" />
+            <img :src="icons.staff.available" class="w-4 h-4" />
             <span>Docente — Disponible</span>
           </div>
           <div class="flex items-center gap-2">
-            <img :src="icons.staff.full" class="w-4 h-4" alt="Docente completo" />
+            <img :src="icons.staff.full" class="w-4 h-4" />
             <span>Docente — Completo</span>
           </div>
         </div>
       </div>
 
-      <!-- LISTA -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <SpaceCard
-          v-for="espacio in espaciosFiltrados"
-          :key="espacio.id"
-          :espacio="espacio"
-        />
+      <!-- ===== LISTA ===== -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SpaceCard v-for="espacio in espaciosFiltrados" :key="espacio.id" :espacio="espacio" />
       </div>
-    </div>
+    </section>
 
-    <!-- Modal Confirmar Acceso (legajo + patente) -->
-    <ConfirmAccessModal
-      :open="modalOpen"
-      :space="selectedSpace"
-      @close="modalOpen = false"
-      @success="onAccessSuccess"
-    />
+    <ConfirmAccessModal :open="modalOpen" :space="selectedSpace" @close="modalOpen = false"
+      @success="onAccessSuccess" />
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="mt-10 border-t border-white/10 bg-[#0D1B2A]/80 backdrop-blur-xl">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between 
+                gap-4 px-6 py-8 text-[#B0BEC5] text-sm">
+        <div class="flex items-center gap-2">
+          <span class="text-white font-semibold tracking-wide">HayLugar</span>
+          <span class="text-xs text-[#78909C]">© {{ new Date().getFullYear() }}</span>
+        </div>
+
+        <div class="flex gap-6">
+          <router-link to="/PrivacyPolicy" class="hover:text-white transition-colors duration-200">
+            Política de Privacidad
+          </router-link>
+
+          <router-link to="/termsConditions" class="hover:text-white transition-colors duration-200">
+            Términos y Condiciones
+          </router-link>
+        </div>
+
+        <div class="text-xs text-[#78909C]">Universidad inteligente</div>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -192,9 +201,15 @@ import { ref, computed, onMounted } from 'vue'
 import MainHeader from '../components/layout/header/MainHeader.vue'
 import CustomGoogleMap from '../components/layout/GoogleMap.vue'
 import SpaceCard from '../components/pages/dashboardPage/SpaceCard.vue'
+import logo from '../assets/logo.png'
 import { getUniversitySpaces } from '../services/universityService'
 import { useUniversityMap } from '../logic/useUniversityMap'
 import ConfirmAccessModal from '../components/confirmAccessDialog.vue'
+import MobileButtonNav from '../components/layout/MobileButtonNav.vue'
+import { useRouter } from 'vue-router'
+import BackButton from '../components/common/BackButton.vue'
+
+const router = useRouter();
 
 /** ICONOS (SVG en data-URI) */
 const icons = {
@@ -206,9 +221,9 @@ const icons = {
   },
   staff: {
     available:
-     'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23E8F7EF"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%2310B981"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%2322C55E"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%2310B981"/></svg>',
+      'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23E8F7EF"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%2310B981"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%2322C55E"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%2310B981"/></svg>',
     full:
-     'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23FDECEC"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%23DC2626"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%23EF4444"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%23DC2626"/></svg>'
+      'data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="%23000000" flood-opacity="0.3"/></filter></defs><circle cx="32" cy="32" r="30" fill="%23FDECEC"/><g filter="url(%23s)"><path d="M6 24l26-10 26 10-26 10L6 24z" fill="%23DC2626"/><path d="M16 30v8c0 2 10 6 16 6s16-4 16-6v-8l-16 6-16-6z" fill="%23EF4444"/></g><path d="M48 28v8a2 2 0 0 0 4 0v-8h-4z" fill="%23DC2626"/></svg>'
   },
   university:
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQxDogY_QPvIai_GqjWgiHGJVSL7TwaMS4jA&s'
@@ -289,7 +304,7 @@ const capacityFromVehicle = (esp) => {
 
 // Normalización de access_group (backend puede mandar docentes/teacher/etc.)
 const normalizeGroup = (g) =>
-  (g && ['staff','docentes','teacher','profesor','profesores'].includes(String(g).toLowerCase()))
+  (g && ['staff', 'docentes', 'teacher', 'profesor', 'profesores'].includes(String(g).toLowerCase()))
     ? 'staff'
     : 'students'
 
@@ -366,6 +381,7 @@ onMounted(async () => {
 .slide-fade-leave-active {
   transition: all .18s ease;
 }
+
 .slide-fade-enter-from,
 .slide-fade-leave-to {
   opacity: 0;

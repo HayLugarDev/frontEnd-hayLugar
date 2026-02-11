@@ -1,229 +1,656 @@
-<!-- src/views/LandingHayLugar.vue -->
 <template>
-  <div class="min-h-screen text-white bg-dark selection:bg-accent/30 selection:text-white">
-    <!-- ===== HERO ===== -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-dark">
-      <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+  <div class="min-h-screen bg-[#020617] text-white selection:bg-accent/30 selection:text-white">
+    <!-- HEADER -->
+    <MainHeader />
+
+    <!-- ============================ HERO ============================ -->
+    <section
+      class="relative overflow-hidden pt-28 pb-36 bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#020617]"
+    >
+      <!-- Halos -->
+      <div class="pointer-events-none absolute inset-0 -z-10">
         <div class="halo halo--lg"></div>
         <div class="halo halo--sm"></div>
       </div>
 
-      <header class="container mx-auto px-6 pt-10 md:pt-24 pb-12 md:pb-16 grid lg:grid-cols-[1.1fr_.9fr] gap-10 items-center">
-        <div>
-          <div class="flex items-center gap-4 group">
-            <img :src="logo" alt="HayLugar" class="h-16 w-16 md:h-24 md:w-24 xl:h-28 xl:w-28 transition-transform duration-300 ease-out group-hover:scale-110" />
-            <h1 class="font-extrabold tracking-tight text-4xl md:text-6xl xl:text-7xl leading-[0.95]">
-              Encontrá tu lugar.
-            </h1>
+      <div class="container mx-auto px-6 flex flex-col items-center text-center max-w-4xl">
+        <!-- Badge -->
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10
+                 text-xs font-medium text-white/70 mb-6"
+        >
+          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Nacido en Argentina · Estacionamiento inteligente en tiempo real
+        </div>
+
+        <!-- LOGO -->
+        <Logo
+          width="56"
+          class="mb-4 md:mb-5 drop-shadow-lg opacity-90 hover:opacity-100 transition"
+        />
+
+        <!-- TITULO -->
+        <h1 class="font-extrabold tracking-tight leading-[0.95] text-4xl md:text-6xl xl:text-7xl">
+          Encontrá estacionamiento<br />
+          donde lo necesitás, cuando lo necesitás.
+        </h1>
+
+        <!-- DESCRIPTION -->
+        <p class="mt-6 text-lg md:text-xl text-white/80 leading-relaxed max-w-2xl">
+          Cocheras privadas, playas y espacios reales
+          <span class="font-semibold text-accent">disponibles en tiempo real</span>.
+          Reservá o publicá tu espacio en minutos.
+        </p>
+
+        <!-- CTA PRINCIPAL -->
+        <div class="w-full max-w-xl mt-10 space-y-3">
+          <button
+            @click="goTo('/dashboard')"
+            class="w-full py-4 rounded-xl text-[#0D1B2A] font-semibold
+                   bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
+                   shadow-lg shadow-cyan-900/30
+                   hover:from-[#06D6A0] hover:to-[#00B4D8]
+                   transition-all duration-300"
+          >
+            🔍 Buscar estacionamiento
+          </button>
+
+          <button
+            @click="goTo('/login')"
+            class="text-sm text-white/70 hover:text-white transition"
+          >
+            💰 Tengo un espacio y quiero publicarlo
+          </button>
+
+          <p class="text-xs text-white/60">
+            Sin llamadas · Sin vueltas · Todo desde el celular
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ CÓMO FUNCIONA ============================ -->
+    <section class="py-24 bg-gradient-to-b from-[#020617] to-[#0B1220] border-b border-white/10">
+      <div class="container mx-auto px-6 max-w-6xl text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+          Cómo funciona HayLugar
+        </h2>
+
+        <p class="text-white/70 max-w-2xl mx-auto mb-16">
+          Tres pasos simples para estacionar sin vueltas o convertir tu espacio en ingresos.
+        </p>
+
+        <div class="grid gap-10 md:grid-cols-3">
+          <div
+            class="relative rounded-2xl border border-white/10 bg-white/5 p-8
+                   hover:border-accent transition group"
+          >
+            <span
+              class="absolute -top-4 left-1/2 -translate-x-1/2
+                     bg-accent text-[#0D1B2A] text-sm font-bold
+                     px-4 py-1 rounded-full shadow-lg"
+            >
+              Paso 1
+            </span>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3">
+              Buscá o publicá un espacio
+            </h3>
+
+            <p class="text-white/70 leading-relaxed">
+              Ingresá tu ubicación para encontrar estacionamiento disponible
+              o publicá tu espacio en pocos minutos.
+            </p>
           </div>
 
-          <p class="mt-4 text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl">
-            HayLugar conecta personas: quienes necesitan estacionar con quienes tienen un espacio libre.  
-            Una red creada en Argentina que impulsa la microeconomía urbana con confianza, tecnología y comunidad.
+          <div
+            class="relative rounded-2xl border border-white/10 bg-white/5 p-8
+                   hover:border-accent transition group"
+          >
+            <span
+              class="absolute -top-4 left-1/2 -translate-x-1/2
+                     bg-accent text-[#0D1B2A] text-sm font-bold
+                     px-4 py-1 rounded-full shadow-lg"
+            >
+              Paso 2
+            </span>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3">
+              Reservá o confirmá acceso
+            </h3>
+
+            <p class="text-white/70 leading-relaxed">
+              Todo se gestiona desde la plataforma:
+              disponibilidad en tiempo real, acceso claro y sin intermediarios.
+            </p>
+          </div>
+
+          <div
+            class="relative rounded-2xl border border-white/10 bg-white/5 p-8
+                   hover:border-accent transition group"
+          >
+            <span
+              class="absolute -top-4 left-1/2 -translate-x-1/2
+                     bg-accent text-[#0D1B2A] text-sm font-bold
+                     px-4 py-1 rounded-full shadow-lg"
+            >
+              Paso 3
+            </span>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3">
+              Estacioná o generá ingresos
+            </h3>
+
+            <p class="text-white/70 leading-relaxed">
+              Usá el espacio reservado con tranquilidad
+              o empezá a ganar dinero con un lugar que antes estaba vacío.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-16">
+          <button
+            @click="goTo('/dashboard')"
+            class="px-8 py-4 rounded-full text-[#0D1B2A] font-semibold
+                   bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
+                   shadow-lg shadow-cyan-900/30
+                   hover:from-[#06D6A0] hover:to-[#00B4D8]
+                   transition-all duration-300"
+          >
+            Empezar ahora
+          </button>
+
+          <p class="mt-4 text-sm text-white/60">
+            Sin contratos · Sin costos ocultos · 100% digital
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ MAPA DE TRÁFICO URBANO ============================ -->
+<section class="py-24 bg-gradient-to-b from-[#020617] to-[#0B1220] border-b border-white/10">
+  <div class="container mx-auto px-6 max-w-6xl">
+
+    <!-- Header -->
+    <div class="max-w-3xl mx-auto text-center mb-14">
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full 
+               bg-white/5 border border-white/10 text-xs text-white/70 mb-6"
+      >
+        <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+        Tráfico urbano en tiempo real
+      </div>
+
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">
+        Donde hay tráfico, hay demanda de estacionamiento.
+      </h2>
+
+      <p class="text-white/70 text-lg leading-relaxed">
+        HayLugar analiza el flujo urbano en tiempo real para mostrar
+        dónde la ciudad genera mayor presión de estacionamiento.
+        <br class="hidden md:block" />
+        Si tenés un espacio cerca de estas zonas, hay una oportunidad real.
+      </p>
+    </div>
+
+    <!-- Content -->
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+
+      <!-- Visual -->
+      <div
+        class="relative rounded-2xl overflow-hidden border border-white/10
+               bg-white/5 shadow-2xl"
+      >
+        <!-- Reemplazar por imagen / gif / video -->
+        <img
+          src="../../assets/traffic-preview.png"
+          alt="Mapa de tráfico urbano HayLugar"
+          class="w-full h-full object-cover opacity-90"
+        />
+
+        <!-- Overlay caption -->
+        <div
+          class="absolute bottom-4 left-4 right-4
+                 bg-[#020617]/80 backdrop-blur
+                 border border-white/10 rounded-xl p-3 text-sm"
+        >
+          🔴 Zonas calientes detectadas · Horario pico activo
+        </div>
+      </div>
+
+      <!-- Text + CTA -->
+      <div class="flex flex-col gap-6">
+        <p class="text-white/70 leading-relaxed">
+          Horarios pico, zonas calientes y ciudades con alta circulación
+          explican por qué estacionar se vuelve un problema…
+          y por qué tu espacio puede ser parte de la solución.
+        </p>
+
+        <div class="flex gap-4">
+          <a
+            href="/traffic"
+            class="inline-flex items-center justify-center
+                   px-6 py-3 rounded-full font-semibold
+                   text-[#0D1B2A]
+                   bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
+                   shadow-lg shadow-cyan-900/30
+                   hover:from-[#06D6A0] hover:to-[#00B4D8]
+                   transition-all duration-300"
+          >
+            Explorar mapa de tráfico
+          </a>
+
+          <span class="text-xs text-white/50 self-center">
+            Vista informativa · datos en vivo
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+    <!-- ============================ PARA QUIÉN ES ============================ -->
+    <section class="py-20 bg-[#020617] border-b border-white/10">
+      <div class="container mx-auto px-6 max-w-5xl text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-3">
+          Dos formas simples de usar HayLugar
+        </h2>
+        <p class="text-white/70 max-w-2xl mx-auto mb-12">
+          Elegí cómo participar y empezá en minutos.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 p-8 hover:border-accent transition"
+          >
+            <h3 class="text-xl font-semibold mb-2">
+              Necesito estacionar ahora
+            </h3>
+            <p class="text-white/70 mb-4">
+              Encontrá espacios reales cerca tuyo, con disponibilidad en tiempo real.
+            </p>
+
+            <button
+              @click="goTo('/dashboard')"
+              class="px-6 py-3 w-full rounded-full text-[#0D1B2A] font-semibold
+                     bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
+                     shadow-lg shadow-cyan-900/20
+                     hover:from-[#06D6A0] hover:to-[#00B4D8]
+                     transition-all duration-300"
+            >
+              Buscar estacionamiento
+            </button>
+          </div>
+
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 p-8 hover:border-accent transition"
+          >
+            <h3 class="text-xl font-semibold mb-2">
+              Tengo un espacio disponible
+            </h3>
+            <p class="text-white/70 mb-4">
+              Convertí un espacio vacío en ingresos sin complicaciones.
+            </p>
+
+            <button
+              @click="goTo('/login')"
+              class="px-6 py-3 w-full rounded-full text-[#0D1B2A] font-semibold
+                     bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
+                     shadow-lg shadow-cyan-900/20
+                     hover:from-[#06D6A0] hover:to-[#00B4D8]
+                     transition-all duration-300"
+            >
+              Publicar mi espacio
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ PRUEBA SOCIAL ============================ -->
+    <section class="py-24 bg-gradient-to-b from-[#020617] to-[#020617]">
+      <div class="container mx-auto px-6 max-w-6xl text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+          Nacido en Tucumán. Pensado para todo el país.
+        </h2>
+
+        <p class="text-white/70 max-w-3xl mx-auto mb-16">
+          HayLugar empieza resolviendo un problema local y escala ciudad por ciudad,
+          conectando espacios reales con personas que necesitan estacionar.
+        </p>
+
+        <div class="grid gap-8 md:grid-cols-3">
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 p-8
+                   hover:border-accent transition"
+          >
+            <p class="text-4xl font-bold text-accent mb-2">🇦🇷</p>
+            <p class="font-semibold mb-1">Desarrollo argentino</p>
+            <p class="text-white/60 text-sm">
+              Producto creado y operado localmente.
+            </p>
+          </div>
+
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 p-8
+                   hover:border-accent transition"
+          >
+            <p class="text-4xl font-bold text-accent mb-2">📍</p>
+            <p class="font-semibold mb-1">Expansión progresiva</p>
+            <p class="text-white/60 text-sm">
+              Nuevas zonas habilitadas todas las semanas.
+            </p>
+          </div>
+
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 p-8
+                   hover:border-accent transition"
+          >
+            <p class="text-4xl font-bold text-accent mb-2">🚗</p>
+            <p class="font-semibold mb-1">Espacios reales</p>
+            <p class="text-white/60 text-sm">
+              Cocheras, playas y espacios verificados.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-16">
+          <p class="text-sm text-white/60 mb-3">
+            ¿Todavía no está disponible en tu ciudad?
           </p>
 
-          <div class="mt-6 flex flex-wrap items-center gap-2">
-            <span class="badge-solid bg-emerald-500">Pagos seguros</span>
-            <span class="badge-solid bg-blue-500">Usuarios verificados</span>
-            <span class="badge-solid bg-amber-500">Soporte humano</span>
-            <span class="badge-solid bg-blue-400">100% argentino</span>
-          </div>
-
-          <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-xl">
-            <button class="btn btn--accent w-full sm:w-auto" @click="goTo('/dashboard')">Buscar estacionamiento</button>
-            <button class="btn btn--ghost w-full sm:w-auto" @click="goTo('/login')">Compartir mi espacio</button>
-          </div>
-
-          <div class="mt-6">
-            <p class="text-sm uppercase tracking-wide text-white/90 mb-2">Zonas activas</p>
-            <div class="flex flex-wrap items-center gap-2 text-sm ">
-              <span v-for="(z,i) in zonas" :key="i" class="chip text-white/90">{{ z }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- MAP -->
-        <div>
-          <div class="card glass text-primary">
-            <div class="flex items-center justify-between">
-              <h3 class="h3">Mapa en tiempo real</h3>
-              <span class="text-xs text-white/70">Vista demo</span>
-            </div>
-
-            <div ref="mapWrap" class="mt-4 rounded-lg overflow-hidden shadow-md h-[380px] w-full bg-white/5 ring-1 ring-white/10">
-              <transition name="fade">
-                <CustomGoogleMap
-                  v-if="mapReady"
-                  class="h-full w-full"
-                  :center="center"
-                  :zoom="zoom"
-                  :options="mapOptions"
-                >
-                  <GMapMarker
-                    v-for="espacio in espacios"
-                    :key="espacio.id"
-                    :options="getMarkerOptions(espacio)"
-                    @click="() => handleMarkerClick(espacio)"
-                  />
-                </CustomGoogleMap>
-              </transition>
-              <div v-if="!mapReady" class="h-full w-full grid place-items-center">
-                <div class="skeleton w-10/12 h-4 rounded mb-2"></div>
-                <div class="skeleton w-9/12 h-4 rounded mb-2"></div>
-                <div class="skeleton w-8/12 h-4 rounded"></div>
-              </div>
-            </div>
-
-            <div class="mt-3 flex items-center justify-between">
-              <p class="text-xs text-white/80">* Cada punto representa un espacio compartido por la comunidad.</p>
-              <button class="btn btn--tiny" @click="setCenterToUserLocation">Usar mi ubicación</button>
-            </div>
-          </div>
-        </div>
-      </header>
-    </section>
-
-    <!-- ===== COMO FUNCIONA ===== -->
-    <section class="py-16 bg-white text-gray-900">
-      <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center">¿Cómo funciona HayLugar?</h2>
-        <p class="text-center text-gray-600 mt-2">Tecnología simple para hacer más fácil la vida urbana.</p>
-
-        <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div v-for="(p,i) in pasos" :key="i" class="card-step">
-            <div class="step-number">{{ i+1 }}</div>
-            <h4 class="title">{{ p.title }}</h4>
-            <p class="desc">{{ p.desc }}</p>
-          </div>
+          <button
+            class="text-sm font-semibold text-accent hover:underline"
+            @click="goTo('/contacto')"
+          >
+            Avisanos dónde estás y aceleramos la llegada
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- ===== TESTIMONIOS ===== -->
-    <section class="py-16 bg-gray-50 text-gray-900">
-      <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center">Lo que dicen quienes ya usan HayLugar</h2>
-        <p class="text-center text-gray-600 mt-2">Confianza real, historias reales.</p>
+    <!-- ============================ CAPTURA DE LEADS (WhatsApp) ============================ -->
+    <section class="py-24 bg-gradient-to-b from-[#020617] to-[#0B1220] border-t border-white/10">
+      <div class="container mx-auto px-6 max-w-4xl text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+          ¿Todavía no hay espacios en tu zona?
+        </h2>
 
-        <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="(t,i) in testimonios" :key="i" class="testimonial-card">
-            <p class="text-gray-700 italic leading-relaxed">“{{ t.text }}”</p>
-            <div class="flex items-center gap-3 mt-4">
-              <div>
-                <p class="font-semibold text-gray-900">{{ t.name }}</p>
-                <p class="text-sm text-gray-600">{{ t.city }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== CTA FINAL ===== -->
-    <section class="py-16 bg-gradient-to-br from-primary via-primary/90 to-dark text-white">
-      <div class="container mx-auto px-6 text-center">
-        <h3 class="text-3xl md:text-4xl font-bold">Un movimiento que empezó en los barrios y llega a todo el país</h3>
-        <p class="mt-3 text-white/90 max-w-2xl mx-auto">
-          Sumate a la red inteligente de estacionamientos.  
-          Porque cuando compartimos espacio, ganamos todos.
+        <p class="text-white/70 max-w-2xl mx-auto mb-10">
+          Estamos habilitando nuevas ciudades constantemente.
+          Dejanos tu ciudad y te avisamos apenas lleguemos.
         </p>
-        <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <button class="btn btn--accent w-full sm:w-auto" @click="goTo('/dashboard')">Buscar estacionamiento</button>
-          <button class="btn btn--ghost w-full sm:w-auto" @click="goTo('/login')">Compartir mi espacio</button>
+
+        <div
+          class="max-w-2xl mx-auto bg-white/5 border border-white/10
+                 rounded-2xl p-6 backdrop-blur-xl"
+        >
+          <form @submit.prevent="sendWhatsAppLead" class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1 relative">
+              <input
+                v-model.trim="leadLocation"
+                type="text"
+                placeholder="Tu ciudad o provincia"
+                list="argentinaProvincesList"
+                autocomplete="address-level1"
+                class="w-full px-4 py-3 rounded-xl bg-white/10 text-white
+                       border border-white/20 focus:outline-none
+                       focus:ring-2 focus:ring-accent/50"
+              />
+              <datalist id="argentinaProvincesList">
+                <option v-for="prov in argentinaProvinces" :key="prov" :value="prov" />
+              </datalist>
+            </div>
+
+            <button
+              type="submit"
+              class="px-6 py-3 rounded-full text-[#0D1B2A] font-semibold
+                     bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
+                     shadow-lg shadow-cyan-900/20
+                     hover:from-[#06D6A0] hover:to-[#00B4D8]
+                     transition-all duration-300
+                     inline-flex items-center justify-center gap-2"
+            >
+              <span class="text-lg leading-none">🟢</span>
+              Enviar WhatsApp
+            </button>
+          </form>
+
+          <p class="text-xs text-white/50 mt-4">
+            No spam · Solo avisos cuando lleguemos a tu zona
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="border-t border-white/10 bg-dark text-white/70">
-      <div class="container mx-auto px-6 py-6 text-center text-sm">
-        © {{ currentYear }} HayLugar · La nueva microeconomía urbana — Tecnología argentina con impacto social
-      </div>
-      <div class="border-t border-white/10">
-        <div class="container mx-auto px-6 py-4 text-center text-sm flex flex-col md:flex-row items-center justify-center gap-3">
-          <RouterLink to="/cookies" class="hover:text-white transition-colors">Política de Cookies</RouterLink>
-          <RouterLink to="/PrivacyPolicy" class="hover:text-white transition-colors">Política de Privacidad</RouterLink>
-          <RouterLink to="/termsConditions" class="hover:text-white transition-colors">Términos y Condiciones</RouterLink>
-          <RouterLink to="/FAQView" class="hover:text-white transition-colors">Preguntas Frecuentes</RouterLink>
-        </div>
-      </div>
-    </footer>
+    <slot name="rest-of-landing" />
 
+    <!-- ============================ FOOTER ============================ -->
+    <section class="bg-gradient-to-b from-[#020617] via-[#020617] to-[#0EA5E9]/10 mt-16 pt-10 pb-8">
+      <footer
+        class="max-w-6xl mx-auto bg-white text-[#0F172A] rounded-[32px]
+               shadow-[0_-10px_40px_rgba(15,23,42,0.25)]
+               px-6 md:px-10 py-10"
+      >
+        <!-- Logo -->
+        <div class="flex flex-col gap-4 mb-8">
+          <div class="flex items-center gap-3">
+            <Logo width="20" class="drop-shadow-lg cursor-pointer" />
+          </div>
+          <div class="h-px bg-[#E2E8F0]" />
+        </div>
+
+        <!-- GRID -->
+        <div class="grid gap-10 md:grid-cols-[2fr,2fr,2fr,2fr]">
+          <!-- Sobre -->
+          <div>
+            <h4 class="text-lg font-semibold mb-4 text-[#0F172A]">Sobre HayLugar</h4>
+            <ul class="space-y-2 text-sm text-[#475569]">
+              <li><router-link to="/help" class="hover:text-accent">Cómo funciona</router-link></li>
+              <li><router-link to="/FAQView" class="hover:text-accent">Preguntas frecuentes</router-link></li>
+              <li><router-link to="/add-space" class="hover:text-accent">Ser anfitrión</router-link></li>
+              <li><router-link to="/corporativo" class="hover:text-accent">Corporativo</router-link></li>
+            </ul>
+          </div>
+
+          <!-- Países -->
+          <div>
+            <h4 class="text-lg font-semibold mb-4 text-[#0F172A]">Países</h4>
+            <ul class="space-y-2 text-sm text-[#475569]">
+              <li class="flex items-center justify-between cursor-default hover:text-accent">
+                Argentina <span class="text-xs text-[#94A3B8]">▾</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Empresa -->
+          <div>
+            <h4 class="text-lg font-semibold mb-4 text-[#0F172A]">Empresa</h4>
+            <ul class="space-y-2 text-sm text-[#475569]">
+              <li><router-link to="/termsConditions" class="hover:text-accent">Términos y condiciones</router-link></li>
+              <li><router-link to="/PrivacyPolicy" class="hover:text-accent">Política de privacidad</router-link></li>
+              <li>
+                
+                <a
+                  :href="whatsappLink('Hola! Quiero contactarme con HayLugar.')"
+                  target="_blank"
+                  rel="noopener"
+                  class="hover:text-accent inline-flex items-center gap-2"
+                >
+                 
+                  Contacto <img src="../../assets/wp-logo.png" alt="WhatsApp" class="w-7 h-7" />
+                </a>
+              </li>
+            </ul>
+          </div>
+   <!-- Redes -->
+    
+       <!-- Redes sociales -->
+<div class="flex flex-col gap-3">
+  <span class="text-sm font-semibold text-[#0F172A]">
+    Seguinos
+  </span>
+
+  <div
+    class="flex items-center gap-4 px-4 py-3 rounded-xl"
+  >
+    <a
+      href="https://www.linkedin.com/company/hay-lugar/"
+      target="_blank"
+      rel="noopener"
+      class="hover:scale-110 transition-transform"
+    >
+      <img src="../../assets/linkedin.png" alt="LinkedIn" class="w-7 h-7" />
+    </a>
+
+    <a
+      href="https://www.instagram.com/haylugarok"
+      target="_blank"
+      rel="noopener"
+      class="hover:scale-110 transition-transform"
+    >
+      <img src="../../assets/instagram.png" alt="Instagram" class="w-7 h-7" />
+    </a>
+
+    <a
+      href="https://www.tiktok.com/@apphaylugar"
+      target="_blank"
+      rel="noopener"
+      class="hover:scale-110 transition-transform"
+    >
+      <img src="../../assets/tiktok.png" alt="TikTok" class="w-7 h-7" />
+    </a>
+  </div>
+</div>
+
+        </div>
+
+        <!-- Store badges en horizontal abajo -->
+        <div class="h-px bg-[#E2E8F0] mt-10 mb-6" />
+
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <a href="#" class="w-[150px] hover:opacity-90 transition">
+              <img :src="googlePlayBadge" alt="Google Play" class="w-full h-auto object-contain" />
+            </a>
+            <a href="#" class="w-[150px] hover:opacity-90 transition">
+              <img :src="appStoreBadge" alt="App Store" class="w-full h-auto object-contain" />
+            </a>
+            
+          </div>
+
+          <div class="text-center text-xs text-[#94A3B8]">
+            © {{ currentYear }} · HayLugar · Todos los derechos reservados.
+          </div>
+        </div>
+        
+      </footer>
+      
+    </section>
+
+    <!-- Cookie banner -->
     <CookieBanner />
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+<script setup>
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import CustomGoogleMap from '../components/layout/GoogleMap.vue'
-import CookieBanner from '../components/common/CookieBanner.vue'
-import logo from '../assets/logo.png'
-import logoMarker from '../assets/logo.png'
 
-type Espacio = { id: number; name: string; latitude: number; longitude: number; price_per_hour: number }
+import MainHeader from '../components/layout/header/MainHeader.vue'
+import CookieBanner from '../components/common/CookieBanner.vue'
+import Logo from '../components/layout/Logo.vue'
+
+import googlePlayBadge from '../../assets/GooglePlay.png'
+import appStoreBadge from '../../assets/appstore.png'
 
 const router = useRouter()
-const goTo = (path: string) => router.push(path)
+const goTo = (path) => router.push(path)
 const currentYear = computed(() => new Date().getFullYear())
-const zonas = ['Centro', 'Plaza', 'Costanera', 'Parque']
 
-const pasos = ref([
-  { title: 'Encontrá un espacio', desc: 'Abrí el mapa y elegí el lugar más cercano.' },
-  { title: 'Reservá desde tu celular', desc: 'En segundos, sin efectivo ni llamadas.' },
-  { title: 'Estacioná tranquilo', desc: 'Tu lugar te espera y tu pago está asegurado.' },
-  { title: 'Generá ingresos', desc: 'Si tenés un espacio libre, compartilo y ganá.' },
-])
+// WhatsApp helpers
+const WHATSAPP_PHONE = '5493813198254' // +54 9 3813 19-8254
 
-const testimonios = ref([
-  { text: 'Empecé compartiendo la cochera de mi casa en Yerba Buena. En un mes ya tenía ingresos fijos y vecinos nuevos.', name: 'Laura M.', city: 'Yerba Buena, Tucumán' },
-  { text: 'Trabajo en el centro y perdía horas buscando lugar. Con HayLugar reservo antes de salir y estaciono sin vueltas.', name: 'Diego R.', city: 'Córdoba Capital' },
-  { text: 'Soy estudiante y alquilo mi cochera cuando no la uso. Es ingreso extra y ayuda a otros.', name: 'Lucía F.', city: 'San Miguel de Tucumán' },
-])
+const whatsappLink = (message) => {
+  const text = encodeURIComponent(message)
+  return `https://wa.me/${WHATSAPP_PHONE}?text=${text}`
+}
 
-const center = ref({ lat: -34.6037, lng: -58.3816 })
-const zoom = ref(13)
-const mapOptions = ref({
-  styles: [{ elementType: 'geometry', stylers: [{ color: '#eaeaea' }] }],
-  disableDefaultUI: true,
-  zoomControl: true,
-})
-const espacios = ref([
-  { id: 1, name: 'Centro', latitude: -34.6037, longitude: -58.3816, price_per_hour: 500 },
-  { id: 2, name: 'Parque', latitude: -34.601, longitude: -58.385, price_per_hour: 400 },
-])
-const handleMarkerClick = (espacio: Espacio) => router.push({ path: '/dashboard', query: { lat: espacio.latitude, lng: espacio.longitude } })
-const getMarkerOptions = (espacio: Espacio) => ({ position: { lat: espacio.latitude, lng: espacio.longitude }, icon: { url: logoMarker, scaledSize: { width: 40, height: 40 } as any } })
-const setCenterToUserLocation = () => { if (!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(pos => (center.value = { lat: pos.coords.latitude, lng: pos.coords.longitude })) }
+// Lead capture
+const leadLocation = ref('')
 
-const mapReady = ref(false)
-const mapWrap = ref<HTMLElement | null>(null)
-onMounted(() => {
-  if (!mapWrap.value) return
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { mapReady.value = true; io.disconnect() } })
-  }, { rootMargin: '200px' })
-  io.observe(mapWrap.value)
-})
+const argentinaProvinces = [
+  "Ciudad Autónoma de Buenos Aires",
+  "Buenos Aires",
+  "Catamarca",
+  "Chaco",
+  "Chubut",
+  "Córdoba",
+  "Corrientes",
+  "Entre Ríos",
+  "Formosa",
+  "Jujuy",
+  "La Pampa",
+  "La Rioja",
+  "Mendoza",
+  "Misiones",
+  "Neuquén",
+  "Río Negro",
+  "Salta",
+  "San Juan",
+  "San Luis",
+  "Santa Cruz",
+  "Santa Fe",
+  "Santiago del Estero",
+  "Tierra del Fuego, Antártida e Islas del Atlántico Sur",
+  "Tucumán"
+]
+
+const sendWhatsAppLead = () => {
+  const loc = (leadLocation.value || '').trim()
+  const msg = loc
+    ? `Hola! Soy de ${loc} y quiero que HayLugar llegue a mi zona. ¿Me avisan cuando esté disponible?`
+    : `Hola! Quiero que HayLugar llegue a mi zona. ¿Me avisan cuando esté disponible?`
+
+  window.open(whatsappLink(msg), '_blank', 'noopener,noreferrer')
+}
 </script>
 
 <style scoped>
-.btn{ @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 font-semibold transition-all duration-200; }
-.btn--ghost{ @apply bg-white/10 text-white border border-white/30 hover:bg-white/15 hover:shadow; }
-.btn--accent{ @apply bg-accent text-white hover:bg-accent/90 hover:shadow; }
-.btn--tiny{ @apply text-xs px-3 py-1 rounded-full border border-white/70 hover:border-accent; }
-.badge-solid{ @apply text-xs font-semibold tracking-wide uppercase rounded-full px-3 py-1 shadow-sm; }
-.chip{ @apply rounded-full px-3 py-1 border border-white/20 bg-white/10 backdrop-blur-sm shadow-sm; }
-.card{ @apply rounded-2xl bg-white/80 backdrop-blur-md p-6 shadow ring-1 ring-white/10; }
-.card-step{ @apply bg-white rounded-2xl p-6 shadow ring-1 ring-gray-100 text-center; }
-.step-number{ @apply h-10 w-10 mx-auto mb-3 rounded-full bg-accent/10 text-accent font-bold grid place-items-center; }
-.testimonial-card{ @apply bg-white rounded-2xl p-6 shadow ring-1 ring-gray-100 transition hover:-translate-y-1 hover:shadow-lg; }
-.h3{ @apply text-xl font-bold text-gray-900; }
-.halo{ @apply absolute rounded-full blur-3xl; animation: float 12s ease-in-out infinite; }
-.halo--lg{ @apply -right-40 -top-40 h-[28rem] w-[28rem] bg-white/10; }
-.halo--sm{ @apply -left-32 -bottom-40 h-[26rem] w-[26rem] bg-accent/20; }
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(12px)}}
-.skeleton{ @apply animate-pulse bg-gradient-to-r from-white/10 via-white/5 to-white/10 rounded; }
-.fade-enter-active,.fade-leave-active{transition:opacity .25s ease;}
-.fade-enter-from,.fade-leave-to{opacity:0;}
+/* Halos */
+.halo {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(48px);
+  opacity: 0.75;
+  animation: float 14s ease-in-out infinite;
+}
+
+.halo--lg {
+  right: -11rem;
+  top: -8rem;
+  width: 28rem;
+  height: 28rem;
+  background: rgba(59, 130, 246, 0.4);
+}
+
+.halo--sm {
+  left: -8rem;
+  bottom: -10rem;
+  width: 26rem;
+  height: 26rem;
+  background: rgba(45, 212, 191, 0.5);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(12px);
+  }
+}
 </style>

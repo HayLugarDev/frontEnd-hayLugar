@@ -1,13 +1,25 @@
-import { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.haylugar.app',
   appName: 'HayLugar',
-  webDir: 'dist', // donde Vite genera la build
-  bundledWebRuntime: false,
+  webDir: 'dist',
+
+  // ✅ configuración del servidor para producción
   server: {
-    androidScheme: 'https'
-  }
+    url: 'https://haylugar.com.ar', // dominio productivo (frontend deployado)
+    cleartext: false,
+    allowNavigation: [
+      'haylugar.com.ar',
+      '*.haylugar.com.ar',
+      'maps.googleapis.com', // para mapas
+      'www.google.com',
+      '*.googleapis.com'
+    ],
+  },
+
+  
+
 };
 
 export default config;
