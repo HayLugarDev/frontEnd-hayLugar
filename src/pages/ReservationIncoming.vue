@@ -328,10 +328,21 @@ const fetchReservations = async () => {
 };
 
 // ================== ESTADO ==================
-const getStatusInfo = (status: ReservationMessageStatus) => ({
-  label: reservationMessages[status].label,
-  message: reservationMessages[status].owner
-});
+const getStatusInfo = (status: ReservationMessageStatus | string) => {
+  const info = reservationMessages[status as ReservationMessageStatus];
+
+  if (!info) {
+    return {
+      label: status,
+      message: 'Estado desconocido'
+    };
+  }
+
+  return {
+    label: info.label,
+    message: info.owner
+  };
+};
 
 function isPending(status: string) {
   return status === 'pending';
