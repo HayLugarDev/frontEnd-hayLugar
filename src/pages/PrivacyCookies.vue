@@ -148,7 +148,7 @@
 
 <script setup>
 import MainHeader from '../components/layout/header/MainHeader.vue'
-import CookieBanner from '../components/common/CookieBanner.vue'
+import CookieBanner from '../components/common/ConsentBanner.vue'
 import BackButton from '../components/common/BackButton.vue';
 </script>
 

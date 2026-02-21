@@ -1,5 +1,5 @@
 // src/services/meteredRealtime.ts
-import { getSocket } from './socket';
+import { getSocket } from './socketClient';
 
 export type MeteredStatus = 'free' | 'limited' | 'full' | 'unknown';
 

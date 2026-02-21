@@ -560,7 +560,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import MainHeader from '../components/layout/header/MainHeader.vue'
-import CookieBanner from '../components/common/CookieBanner.vue'
+import CookieBanner from '../components/common/ConsentBanner.vue'
 import Logo from '../components/layout/Logo.vue'
 
 import googlePlayBadge from '../../assets/GooglePlay.png'

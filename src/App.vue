@@ -3,8 +3,8 @@ import { onMounted, watch } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import { useUserStore } from './store/userStore';
 import Toast from './components/common/Toast.vue';
-import CookieBanner from './components/common/CookieBanner.vue';
-import { getSocket } from './services/socket';
+import CookieBanner from './components/common/ConsentBanner.vue';
+import { getSocket } from './services/socketClient';
 
 const userStore = useUserStore();
 

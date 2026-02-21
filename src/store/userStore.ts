@@ -2,39 +2,67 @@ import { defineStore } from 'pinia';
 import api from '../services/apiService';
 import { getNotificationsByUserId } from '../services/notificationService';
 import { showToast } from '../utils/toast';
+import { getSocket, disconnectSocket } from "../services/socketClient";
+
+/* =========================
+   TYPES
+========================= */
+
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  last_name?: string;
+  dni?: string;
+  phone?: string;
+  address?: string;
+  role?: string;
+  profile_picture?: string;
+  termsAccepted: boolean;
+  acceptedTermsVersion: string | null;
+  created_at: Date;
+  updated_at: Date;
+};
+
+type TermsState = {
+  requiredVersion: string | null;
+  documentUrl: string | null;
+  outdated: boolean;
+};
+
+type Notification = {
+  id?: number;
+  reservation_id?: number;
+  type?: string;
+  status?: string;
+  changed_at?: string;
+  [key: string]: any;
+};
+
+/* =========================
+   STORE
+========================= */
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: null as null | {
-      id: number;
-      name: string;
-      email: string;
-      last_name?: string;
-      dni?: string;
-      phone?: string;
-      address?: string;
-      role?: string;
-      profile_picture?: string;
-      termsAccepted: boolean
-      acceptedTermsVersion: string | null
-      created_at: Date
-      updated_at: Date
-    },
+    user: null as User | null,
+
     socketConnected: false,
     socketSubscribed: false,
+
     loading: false,
     error: null as string | null,
+
     sessionExpired: true,
     token: null as string | null,
-    notifications: [] as any[],
-    notificationsLoaded: false, // <- para saber si ya cargamos la primera vez
+
+    notifications: [] as Notification[],
+    notificationsLoaded: false,
+    toastShown: false,
+
     reservations: [] as any[],
-    toastShown: false, // <- nuevo flag
-    terms: null as null | { //<- estado de términos
-      requiredVersion: string | null;
-      documentUrl: string | null;
-      outdated: boolean;
-    },
+
+    terms: null as TermsState | null,
   }),
 
   getters: {
@@ -42,74 +70,56 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
+
+    /* =========================
+       USER SESSION
+    ========================= */
+
     async fetchUser() {
       this.loading = true;
       this.error = null;
+
       try {
-        const response = await api.get('/auth/google-session', { withCredentials: true });
-        // Manejo defensivo de la forma de la respuesta
+        const response = await api.get('/auth/google-session', {
+          withCredentials: true
+        });
+
         const user = response.data?.user ?? response.data;
+
         if (!user?.id) {
-          throw new Error('No se recibió user desde /auth/google-session');
+          throw new Error('No se recibió user válido');
         }
 
-        this.user = user;
-        this.token = response.data?.token ?? null; // por si acaso
-        this.terms = response.data?.terms ?? null; // 👈 guardamos términos
+        this.user = user as User;
+        this.token = response.data?.token ?? null;
+        this.terms = response.data?.terms ?? null;
+
         this.sessionExpired = false;
 
-        // Conectar al socket
         await this.connectSocket();
-
-        // Esperamos a que el user esté seteado antes de pedir notificaciones
         await this.fetchNotifications(user.id, { initialLoad: true });
+
       } catch (error: any) {
         if (error.response?.status === 401) {
           this.expireSession();
         }
+
         this.error = 'No se pudo cargar la información del usuario';
       } finally {
         this.loading = false;
       }
     },
 
-    async fetchNotifications(userId: number, opts: { initialLoad?: boolean } = {}) {
-      try {
-        const notifications = await getNotificationsByUserId(userId);
+    setUser(partialUser: Partial<User>) {
+      if (!this.user) return;
 
-        const sorted = [...notifications].sort(
-          (a: any, b: any) =>
-            new Date(b.changed_at).getTime() - new Date(a.changed_at).getTime()
-        );
+      const cleanUpdate = Object.fromEntries(
+        Object.entries(partialUser).filter(([_, v]) => v !== undefined)
+      ) as Partial<User>;
 
-        this.notifications = sorted;
-        this.notificationsLoaded = true;
-
-        // 🔑 Solo mostrar en la primera carga después de login
-        if (opts.initialLoad && !this.toastShown) {
-          const hasPending = sorted.some((n: any) => n.status === 'pending');
-          if (hasPending) {
-            showToast?.('¡Tienes nuevas notificaciones!', 'success');
-            this.toastShown = true; // marcamos que ya mostramos el toast inicial
-          }
-        }
-
-        return sorted;
-      } catch (err: any) {
-        console.error(
-          'fetchNotifications error:',
-          err.response?.data ?? err.message ?? err
-        );
-        this.notifications = [];
-        this.notificationsLoaded = true;
-        return [];
-      }
-    },
-
-    setUser(partialUser: Partial<typeof this.user>) {
       this.user = {
         ...this.user,
-        ...partialUser
+        ...cleanUpdate,
       };
     },
 
@@ -117,6 +127,7 @@ export const useUserStore = defineStore('user', {
       this.user = null;
       this.error = null;
       this.sessionExpired = false;
+      this.disconnectSocket();
     },
 
     expireSession() {
@@ -128,17 +139,73 @@ export const useUserStore = defineStore('user', {
       this.sessionExpired = value;
     },
 
-    setNotifications(list: any[]) {
+    /* =========================
+       NOTIFICATIONS
+    ========================= */
+
+    async fetchNotifications(
+      userId: number,
+      opts: { initialLoad?: boolean } = {}
+    ) {
+      try {
+        const notifications = await getNotificationsByUserId(userId);
+
+        const sorted = [...notifications].sort(
+          (a: any, b: any) =>
+            new Date(b.changed_at).getTime() -
+            new Date(a.changed_at).getTime()
+        );
+
+        this.notifications = sorted;
+        this.notificationsLoaded = true;
+
+        if (opts.initialLoad && !this.toastShown) {
+          const hasPending = sorted.some(
+            (n: any) => n.status === 'pending'
+          );
+
+          if (hasPending) {
+            showToast?.('¡Tienes nuevas notificaciones!', 'success');
+            this.toastShown = true;
+          }
+        }
+
+        return sorted;
+
+      } catch (err: any) {
+        console.error(
+          'fetchNotifications error:',
+          err.response?.data ?? err.message ?? err
+        );
+
+        this.notifications = [];
+        this.notificationsLoaded = true;
+        return [];
+      }
+    },
+
+    setNotifications(list: Notification[]) {
       this.notifications = list;
     },
 
     addNotification(notification: any) {
-      this.notifications.unshift(notification);
+      const n = notification?.notification ?? notification;
+      if (!n) return;
+
+      const key = `${n.reservation_id ?? ""}|${n.type ?? ""}|${n.changed_at ?? ""}`;
+
+      const exists = this.notifications.some((x: any) => {
+        const k = `${x.reservation_id ?? ""}|${x.type ?? ""}|${x.changed_at ?? ""}`;
+        return k === key;
+      });
+
+      if (exists) return;
+
+      this.notifications.unshift(n);
       this.notifications = [...this.notifications];
 
-      // 📩 Si la nueva notificación está pendiente, mostramos toast
-      if (notification.status === 'pending') {
-        showToast?.('¡Tienes una nueva notificación!', 'success');
+      if (n.status === "pending") {
+        showToast?.("¡Tienes una nueva notificación!", "success");
       }
     },
 
@@ -150,10 +217,12 @@ export const useUserStore = defineStore('user', {
     },
 
     markAsRead(id: number) {
-      const idx = this.notifications.findIndex((n: any) => n.id === id);
+      const idx = this.notifications.findIndex(
+        (n: any) => n.id === id
+      );
+
       if (idx >= 0) {
         this.notifications[idx].status = 'read';
-        // forzar reactividad
         this.notifications = [...this.notifications];
       }
     },
@@ -162,8 +231,61 @@ export const useUserStore = defineStore('user', {
       this.notifications = [];
     },
 
+    /* =========================
+       RESERVATIONS
+    ========================= */
+
     setReservations(reservas: any[]) {
       this.reservations = reservas;
+    },
+
+    /* =========================
+       SOCKET
+    ========================= */
+
+    async connectSocket() {
+      if (!this.user?.id) return;
+
+      const s = getSocket();
+
+      s.removeAllListeners("connect");
+      s.removeAllListeners("disconnect");
+      s.removeAllListeners("connect_error");
+      s.removeAllListeners("notification");
+      s.removeAllListeners("subscribed");
+
+      s.on("connect", () => {
+        this.socketConnected = true;
+      });
+
+      s.on("subscribed", () => {
+        this.socketSubscribed = true;
+      });
+
+      s.on("disconnect", () => {
+        this.socketConnected = false;
+        this.socketSubscribed = false;
+      });
+
+      s.on("connect_error", (err: any) => {
+        this.socketConnected = false;
+        this.socketSubscribed = false;
+        console.warn("[socket] connect_error:", err?.message || err);
+      });
+
+      s.on("notification", (data: any) => {
+        const n = data?.notification ?? data;
+        if (!n) return;
+        this.addNotification(n);
+      });
+
+      if (!s.connected) s.connect();
+    },
+
+    disconnectSocket() {
+      this.socketConnected = false;
+      this.socketSubscribed = false;
+      disconnectSocket();
     },
   },
 });
