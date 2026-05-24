@@ -5,7 +5,7 @@
     <BackButton />
   </div>
 
-  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-16">
+  <div class="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-dark text-white pt-10 md:pt-8">
     <section class="py-16 px-6 text-center max-w-4xl mx-auto">
       <h1 class="text-3xl md:text-4xl font-bold mb-2">Política de Privacidad</h1>
       <p class="text-gray-300">Última actualización: <span class="font-semibold">10 de octubre de 2025</span></p>
