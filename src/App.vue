@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch, computed } from 'vue';
+import { onMounted, watch, computed, ref } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import { useUserStore } from './store/userStore';
 import Toast from './components/common/Toast.vue';
@@ -8,13 +8,10 @@ import { getSocket } from './services/socket';
 
 const route = useRoute();
 const userStore = useUserStore();
-
 const socket = getSocket();
 
-/**
- * Rutas públicas donde NO hace falta consultar usuario.
- * Agregá acá tu landing, términos, privacidad, etc.
- */
+const authChecked = ref(false);
+
 const publicRoutes = [
   '/',
   '/home',
@@ -27,18 +24,28 @@ const isPublicRoute = computed(() => {
   return publicRoutes.includes(route.path);
 });
 
-/**
- * Evita que el router-view remonte todo por cambios mínimos.
- * Si no necesitás forzar remount, podés directamente quitar el :key.
- */
 const routeViewKey = computed(() => {
   return route.name ? String(route.name) : route.path;
 });
 
-onMounted(async () => {
-  /**
-   * Registramos listeners del socket una sola vez.
-   */
+const fetchUserIfNeeded = async (): Promise<void> => {
+  if (isPublicRoute.value) {
+    return;
+  }
+
+  if (authChecked.value) {
+    return;
+  }
+
+  try {
+    authChecked.value = true;
+    await userStore.fetchUser();
+  } catch (error) {
+    console.error('Error al validar sesión:', error);
+  }
+};
+
+onMounted(() => {
   socket.off('connect');
   socket.on('connect', () => {
     console.log('🟢 WS conectado');
@@ -48,20 +55,16 @@ onMounted(async () => {
   socket.on('disconnect', () => {
     console.log('🔴 WS desconectado');
   });
+});
 
-  /**
-   * Si estoy en landing pública, no consulto backend.
-   */
-  if (isPublicRoute.value) {
-    return;
-  }
+watch(
+  () => route.path,
+  async () => {
+    await fetchUserIfNeeded();
+  },
+  { immediate: true }
+);
 
-  /**
-   * Idealmente el store debería tener una bandera tipo:
-   * userStore.hasFetchedUser
-   * userStore.isUserLoaded
-   * userStore.initialized
-   */
 watch(
   () => userStore.isAuthenticated,
   (isAuth) => {
