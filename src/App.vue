@@ -62,11 +62,6 @@ onMounted(async () => {
    * userStore.isUserLoaded
    * userStore.initialized
    */
-  if (!userStore.hasFetchedUser) {
-    await userStore.fetchUser();
-  }
-});
-
 watch(
   () => userStore.isAuthenticated,
   (isAuth) => {
