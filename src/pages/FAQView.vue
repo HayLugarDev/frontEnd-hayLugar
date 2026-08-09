@@ -55,7 +55,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import MainHeader from '../components/layout/header/MainHeader.vue'
 import BackButton from '../components/common/BackButton.vue'
 
 const opened = ref(null)

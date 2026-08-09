@@ -142,8 +142,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import BackButton from '../components/common/BackButton.vue';
-import MainHeader from '../components/layout/header/MainHeader.vue';
-import MobileButtonNav from '../components/layout/MobileButtonNav.vue';
 
 const router = useRouter();
 </script>

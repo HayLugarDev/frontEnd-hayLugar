@@ -155,7 +155,6 @@
 
 <script setup>
 import BackButton from '../components/common/BackButton.vue';
-import MainHeader from '../components/layout/header/MainHeader.vue';
 
 /* Solo usa RouterLink desde el router principal */
 </script>

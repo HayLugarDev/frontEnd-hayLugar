@@ -1,44 +1,15 @@
+```vue
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
-import { RouterView, useRoute } from 'vue-router';
-import { useUserStore } from './store/userStore';
-import Toast from './components/common/Toast.vue';
-import CookieBanner from './components/common/CookieBanner.vue';
-import { getSocket } from './services/socket';
-
-const userStore = useUserStore();
-
-onMounted(async ()=> userStore.fetchUser());
-
-watch(
-  () => userStore.isAuthenticated,
-  (isAuth) => {
-    const socket = getSocket();
-
-    if (isAuth && !socket.connected) {
-      console.log('🔌 Conectando WS...');
-      socket.connect();
-      
-      socket.on("connect", () => {
-        console.log("🟢 WS conectado")});
-    }
-
-    if (!isAuth && socket.connected) {
-      console.log('🔌 Desconectando WS...');
-      socket.disconnect();
-    }
-  },
-  { immediate: true }
-);
-
+import CookieBanner from './components/common/CookieBanner.vue'
 </script>
 
 <template>
-  <div class="safe-area-container flex flex-col min-h-screen raleway bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]">
-
+  <div
+    class="safe-area-container min-h-screen raleway bg-gradient-to-br from-[#0D1B2A] via-[#1B263B] to-[#0D1B2A]"
+  >
     <router-view :key="$route.fullPath" />
+
     <CookieBanner />
-    <Toast />
   </div>
 </template>
 
@@ -54,3 +25,4 @@ watch(
   padding-bottom: constant(safe-area-inset-bottom);
 }
 </style>
+```
