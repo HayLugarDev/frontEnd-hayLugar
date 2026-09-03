@@ -41,6 +41,8 @@ import LandingB2B from '../pages/LandingB2B.vue'
 import ReservationRequest from '../pages/reservationRequest.vue'
 import ReservationRequestFailed from '../pages/reservationRequestFailed.vue'
 import TrafficNationalView from '../pages/TrafficNationalView.vue'
+import downloadApp from '../pages/downloadApp.vue'
+
 // ✅ Nuevas páginas (lazy import recomendado para reducir bundle):
 const TermsPage = () => import('../pages/TermsPage.vue')
 const AcceptTerms = () => import('../pages/AcceptTerms.vue')
@@ -126,6 +128,8 @@ const routes: RouteRecordRaw[] = [
 { path: '/traffic', name: 'TrafficNationalView', component:TrafficNationalView },
 // Admin Page
 { path: '/admin-page', name: 'adminPage', component: AdminPage, meta: { requiresAuth: true } },
+
+{ path: '/download-app-test', name: 'app-download', component: downloadApp },
 
 
 ]

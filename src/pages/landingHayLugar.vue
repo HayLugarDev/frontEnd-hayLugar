@@ -6,7 +6,9 @@
     <header
       class="fixed inset-x-0 top-0 z-50 w-full border-b border-white/10 bg-[#020617]/85 backdrop-blur-xl"
     >
-      <div class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div
+        class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8"
+      >
         <div class="flex min-w-0 items-center gap-3">
           <div class="logo-lock logo-lock--header">
             <Logo width="28" />
@@ -16,6 +18,7 @@
             <p class="truncate text-sm font-bold text-white">
               HayLugAR
             </p>
+
             <p class="hidden text-xs text-white/50 sm:block">
               Smart parking urbano
             </p>
@@ -23,14 +26,22 @@
         </div>
 
         <nav class="hidden items-center gap-6 text-sm text-white/65 md:flex">
-          <a href="#app" class="transition hover:text-white">La app</a>
-          <a href="#red" class="transition hover:text-white">Red urbana</a>
-          <a href="#monetizar" class="transition hover:text-white">Monetizar</a>
+          <a href="#app" class="transition hover:text-white">
+            La app
+          </a>
+
+          <a href="#red" class="transition hover:text-white">
+            Red urbana
+          </a>
+
+          <a href="#monetizar" class="transition hover:text-white">
+            Monetizar
+          </a>
         </nav>
 
-        <button
-          type="button"
-          @click="scrollToDownload"
+        <!-- DESCARGAR APP -->
+        <router-link
+          to="/download-app-test"
           class="shrink-0 rounded-full px-4 py-2 text-xs font-semibold text-[#0D1B2A]
                  sm:px-5 sm:text-sm
                  bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
@@ -39,7 +50,7 @@
                  transition-all duration-300"
         >
           Descargar app
-        </button>
+        </router-link>
       </div>
     </header>
 
@@ -57,13 +68,16 @@
         class="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-6
                lg:grid-cols-[1.05fr_0.95fr] lg:px-8"
       >
-        <!-- Copy -->
+        <!-- COPY -->
         <div class="text-center lg:text-left">
           <div
             class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5
                    px-3 py-1 text-xs font-medium text-white/70"
           >
-            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span
+              class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"
+            ></span>
+
             Disponible desde la app · Hecha en Argentina
           </div>
 
@@ -74,65 +88,71 @@
             Estacioná mejor. Hacé rendir tu espacio.
           </h1>
 
-          <p class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/78 md:text-lg lg:mx-0">
+          <p
+            class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/78 md:text-lg lg:mx-0"
+          >
             HayLugAR conecta conductores con cocheras, playas y espacios disponibles.
             Una forma más simple de moverse por la ciudad y una oportunidad concreta
             para quienes tienen un lugar sin usar.
           </p>
 
-          <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
-            <button
-              type="button"
-              @click="openDownload('android')"
+          <!-- ÚNICO CTA DE APP -->
+          <div
+            class="mt-9 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start"
+          >
+            <router-link
+              to="/download-app-test"
               class="rounded-xl px-7 py-4 text-[#0D1B2A] font-semibold
                      bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
                      shadow-lg shadow-cyan-900/30
                      hover:from-[#06D6A0] hover:to-[#00B4D8]
                      transition-all duration-300"
             >
-              Descargar para Android
-            </button>
-
-            <button
-              type="button"
-              @click="openDownload('ios')"
-              class="rounded-xl px-7 py-4 font-semibold text-white
-                     bg-white/5 border border-white/15
-                     hover:bg-white/10 hover:border-white/25
-                     transition-all duration-300"
-            >
-              Descargar para iPhone
-            </button>
+              Probar HayLugAR
+            </router-link>
           </div>
 
           <p class="mt-4 text-xs text-white/55">
-            La web es solo el punto de entrada. La experiencia completa vive en la app.
+            Encontrá espacios, publicá el tuyo y descubrí una nueva forma de estacionar.
           </p>
         </div>
 
-        <!-- Animated phone -->
+        <!-- ANIMATED PHONE -->
         <div class="phone-perspective relative mx-auto w-full max-w-[390px]">
-          <div class="absolute inset-0 rounded-full bg-[#00B4D8]/20 blur-3xl"></div>
+          <div
+            class="absolute inset-0 rounded-full bg-[#00B4D8]/20 blur-3xl"
+          ></div>
 
           <div
             class="phone-shell-3d relative rounded-[2rem] border border-white/10 bg-white/5 p-4
                    shadow-2xl shadow-cyan-950/40 backdrop-blur-xl"
           >
-            <div class="phone-screen overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#020617]">
+            <div
+              class="phone-screen overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#020617]"
+            >
               <div class="border-b border-white/10 p-5">
                 <div class="flex items-center justify-between gap-4">
                   <div>
-                    <p class="text-xs text-white/45">HayLugAR App</p>
-                    <p class="text-lg font-semibold">Lugares cerca tuyo</p>
+                    <p class="text-xs text-white/45">
+                      HayLugAR App
+                    </p>
+
+                    <p class="text-lg font-semibold">
+                      Lugares cerca tuyo
+                    </p>
                   </div>
 
-                  <span class="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-300">
+                  <span
+                    class="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-300"
+                  >
                     En vivo
                   </span>
                 </div>
               </div>
 
-              <div class="map-3d relative h-60 overflow-hidden bg-[#081827]">
+              <div
+                class="map-3d relative h-60 overflow-hidden bg-[#081827]"
+              >
                 <div class="absolute inset-0 app-grid opacity-40"></div>
                 <div class="scan-line"></div>
 
@@ -166,7 +186,10 @@
                   class="absolute bottom-4 left-4 right-4 rounded-xl border border-white/10
                          bg-[#020617]/82 p-3 backdrop-blur"
                 >
-                  <p class="text-xs text-white/50">Zona con demanda activa</p>
+                  <p class="text-xs text-white/50">
+                    Zona con demanda activa
+                  </p>
+
                   <p class="mt-1 text-sm font-semibold">
                     Lugares disponibles cerca del destino
                   </p>
@@ -176,9 +199,15 @@
               <div class="space-y-3 p-4">
                 <div class="app-row">
                   <div>
-                    <p class="font-semibold">Cochera privada</p>
-                    <p class="text-xs text-white/45">Lista para recibir reservas</p>
+                    <p class="font-semibold">
+                      Cochera privada
+                    </p>
+
+                    <p class="text-xs text-white/45">
+                      Lista para recibir reservas
+                    </p>
                   </div>
+
                   <span class="app-pill bg-emerald-400/15 text-emerald-300">
                     Activa
                   </span>
@@ -186,9 +215,15 @@
 
                 <div class="app-row">
                   <div>
-                    <p class="font-semibold">Playa de estacionamiento</p>
-                    <p class="text-xs text-white/45">Capacidad visible desde la app</p>
+                    <p class="font-semibold">
+                      Playa de estacionamiento
+                    </p>
+
+                    <p class="text-xs text-white/45">
+                      Capacidad visible desde la app
+                    </p>
                   </div>
+
                   <span class="app-pill bg-cyan-400/15 text-cyan-200">
                     Red
                   </span>
@@ -196,9 +231,15 @@
 
                 <div class="app-row">
                   <div>
-                    <p class="font-semibold">Espacio institucional</p>
-                    <p class="text-xs text-white/45">Accesos más ordenados</p>
+                    <p class="font-semibold">
+                      Espacio institucional
+                    </p>
+
+                    <p class="text-xs text-white/45">
+                      Accesos más ordenados
+                    </p>
                   </div>
+
                   <span class="app-pill bg-[#FFC72C]/15 text-[#FFC72C]">
                     Smart
                   </span>
@@ -207,12 +248,15 @@
             </div>
           </div>
         </div>
-        <!-- End phone -->
+        <!-- END PHONE -->
       </div>
     </section>
 
-    <!-- ============================ DOWNLOAD STRIP ============================ -->
-    <section id="download" class="border-y border-white/10 bg-[#020617] py-8">
+    <!-- ============================ APP ENTRY CTA ============================ -->
+    <section
+      id="download"
+      class="border-y border-white/10 bg-[#020617] py-8"
+    >
       <div class="mx-auto max-w-6xl px-6 lg:px-8">
         <div
           class="flex flex-col items-center justify-between gap-5 rounded-2xl border border-white/10
@@ -220,38 +264,33 @@
         >
           <div class="text-center md:text-left">
             <p class="font-semibold">
-              Descargá HayLugAR y empezá desde la app.
+              Todo empieza en HayLugAR.
             </p>
+
             <p class="mt-1 text-sm text-white/55">
-              Para encontrar lugar, publicar un espacio o sumarte a una red urbana en crecimiento.
+              Conocé la experiencia y probá nuestra nueva plataforma.
             </p>
           </div>
 
-          <div class="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              @click="openDownload('android-store')"
-              class="store-badge"
-              aria-label="Descargar en Google Play"
-            >
-              <img :src="googlePlayBadge" alt="Google Play" />
-            </button>
-
-            <button
-              type="button"
-              @click="openDownload('ios-store')"
-              class="store-badge"
-              aria-label="Descargar en App Store"
-            >
-              <img :src="appStoreBadge" alt="App Store" />
-            </button>
-          </div>
+          <router-link
+            to="/download-app-test"
+            class="rounded-xl px-6 py-3 text-sm font-semibold text-[#0D1B2A]
+                   bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
+                   shadow-lg shadow-cyan-900/30
+                   hover:from-[#06D6A0] hover:to-[#00B4D8]
+                   transition-all duration-300"
+          >
+            Conocer la app
+          </router-link>
         </div>
       </div>
     </section>
 
     <!-- ============================ APP VALUE ============================ -->
-    <section id="app" class="border-b border-white/10 bg-gradient-to-b from-[#020617] to-[#0B1220] py-20">
+    <section
+      id="app"
+      class="border-b border-white/10 bg-gradient-to-b from-[#020617] to-[#0B1220] py-20"
+    >
       <div class="mx-auto max-w-6xl px-6 text-center lg:px-8">
         <h2 class="mb-4 text-3xl font-bold md:text-4xl">
           Una solución simple para un problema de todos los días.
@@ -265,7 +304,11 @@
         <div class="grid gap-6 md:grid-cols-3">
           <div class="landing-card">
             <span class="step-pill">01</span>
-            <h3 class="mt-6 mb-3 text-xl font-semibold">Encontrar lugar</h3>
+
+            <h3 class="mt-6 mb-3 text-xl font-semibold">
+              Encontrar lugar
+            </h3>
+
             <p class="leading-relaxed text-white/70">
               El conductor puede resolver su estacionamiento desde el celular,
               sin depender de recorridos innecesarios ni llamadas.
@@ -274,7 +317,11 @@
 
           <div class="landing-card">
             <span class="step-pill">02</span>
-            <h3 class="mt-6 mb-3 text-xl font-semibold">Publicar un espacio</h3>
+
+            <h3 class="mt-6 mb-3 text-xl font-semibold">
+              Publicar un espacio
+            </h3>
+
             <p class="leading-relaxed text-white/70">
               Una cochera, una playa o un espacio disponible puede transformarse
               en una nueva fuente de ingresos.
@@ -283,7 +330,11 @@
 
           <div class="landing-card">
             <span class="step-pill">03</span>
-            <h3 class="mt-6 mb-3 text-xl font-semibold">Mover mejor la ciudad</h3>
+
+            <h3 class="mt-6 mb-3 text-xl font-semibold">
+              Mover mejor la ciudad
+            </h3>
+
             <p class="leading-relaxed text-white/70">
               Menos vueltas para estacionar, mejor uso del espacio existente
               y una red preparada para crecer por zonas.
@@ -294,7 +345,10 @@
     </section>
 
     <!-- ============================ RED URBANA ============================ -->
-    <section id="red" class="border-b border-white/10 bg-[#020617] py-20">
+    <section
+      id="red"
+      class="border-b border-white/10 bg-[#020617] py-20"
+    >
       <div class="mx-auto max-w-6xl px-6 lg:px-8">
         <div class="grid items-center gap-10 md:grid-cols-2">
           <div>
@@ -319,23 +373,43 @@
 
           <div class="grid grid-cols-2 gap-4">
             <div class="network-card">
-              <p class="text-sm text-white/50">Privado</p>
-              <p class="mt-2 font-semibold">Cocheras particulares</p>
+              <p class="text-sm text-white/50">
+                Privado
+              </p>
+
+              <p class="mt-2 font-semibold">
+                Cocheras particulares
+              </p>
             </div>
 
             <div class="network-card">
-              <p class="text-sm text-white/50">Comercial</p>
-              <p class="mt-2 font-semibold">Playas de estacionamiento</p>
+              <p class="text-sm text-white/50">
+                Comercial
+              </p>
+
+              <p class="mt-2 font-semibold">
+                Playas de estacionamiento
+              </p>
             </div>
 
             <div class="network-card">
-              <p class="text-sm text-white/50">Institucional</p>
-              <p class="mt-2 font-semibold">Universidades y empresas</p>
+              <p class="text-sm text-white/50">
+                Institucional
+              </p>
+
+              <p class="mt-2 font-semibold">
+                Universidades y empresas
+              </p>
             </div>
 
             <div class="network-card">
-              <p class="text-sm text-white/50">Urbano</p>
-              <p class="mt-2 font-semibold">Municipios y vía pública</p>
+              <p class="text-sm text-white/50">
+                Urbano
+              </p>
+
+              <p class="mt-2 font-semibold">
+                Municipios y vía pública
+              </p>
             </div>
           </div>
         </div>
@@ -343,7 +417,10 @@
     </section>
 
     <!-- ============================ MONETIZACION ============================ -->
-    <section id="monetizar" class="border-b border-white/10 bg-gradient-to-b from-[#020617] to-[#0B1220] py-20">
+    <section
+      id="monetizar"
+      class="border-b border-white/10 bg-gradient-to-b from-[#020617] to-[#0B1220] py-20"
+    >
       <div class="mx-auto max-w-6xl px-6 lg:px-8">
         <div
           class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-cyan-950/20 md:p-10"
@@ -360,38 +437,54 @@
                 para operar desde el celular.
               </p>
 
-              <button
-                type="button"
-                @click="openDownload('owner')"
-                class="mt-8 rounded-full px-8 py-4 text-[#0D1B2A] font-semibold
+              <!-- CTA APP -->
+              <router-link
+                to="/download-app-test"
+                class="mt-8 inline-flex rounded-full px-8 py-4 text-[#0D1B2A] font-semibold
                        bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
                        shadow-lg shadow-cyan-900/30
                        hover:from-[#06D6A0] hover:to-[#00B4D8]
                        transition-all duration-300"
               >
-                Descargar app y sumar mi espacio
-              </button>
+                Sumar mi espacio
+              </router-link>
             </div>
 
-            <div class="rounded-2xl border border-white/10 bg-[#020617]/70 p-5">
+            <div
+              class="rounded-2xl border border-white/10 bg-[#020617]/70 p-5"
+            >
               <div class="space-y-4">
                 <div class="metric-row">
                   <span>Espacios</span>
-                  <strong>Cocheras, playas e instituciones</strong>
+
+                  <strong>
+                    Cocheras, playas e instituciones
+                  </strong>
                 </div>
 
                 <div class="metric-row">
                   <span>Uso</span>
-                  <strong>Por hora, día o necesidad puntual</strong>
+
+                  <strong>
+                    Por hora, día o necesidad puntual
+                  </strong>
                 </div>
 
                 <div class="metric-row">
                   <span>Gestión</span>
-                  <strong>Desde la app</strong>
+
+                  <strong>
+                    Desde la app
+                  </strong>
                 </div>
 
-                <div class="rounded-xl bg-[#FFC72C] p-4 text-[#0D1B2A]">
-                  <p class="text-sm font-semibold opacity-70">Propósito</p>
+                <div
+                  class="rounded-xl bg-[#FFC72C] p-4 text-[#0D1B2A]"
+                >
+                  <p class="text-sm font-semibold opacity-70">
+                    Propósito
+                  </p>
+
                   <p class="mt-1 font-bold">
                     Hacer visible el espacio disponible y convertirlo en valor para la ciudad.
                   </p>
@@ -401,7 +494,7 @@
           </div>
         </div>
       </div>
-    </section>  
+    </section>
 
     <!-- ============================ FINAL CTA ============================ -->
     <section class="bg-[#020617] py-20">
@@ -411,34 +504,25 @@
         </h2>
 
         <p class="mx-auto mb-8 max-w-2xl text-white/70">
-          Descargá la app y formá parte de una nueva manera de estacionar, publicar
+          Descubrí una nueva manera de estacionar, publicar
           y aprovechar mejor cada espacio.
         </p>
 
-        <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <button
-            type="button"
-            @click="openDownload('android-final')"
-            class="store-badge store-badge-lg"
-            aria-label="Descargar en Google Play"
-          >
-            <img :src="googlePlayBadge" alt="Google Play" />
-          </button>
-
-          <button
-            type="button"
-            @click="openDownload('ios-final')"
-            class="store-badge store-badge-lg"
-            aria-label="Descargar en App Store"
-          >
-            <img :src="appStoreBadge" alt="App Store" />
-          </button>
-        </div>
+        <router-link
+          to="/download-app-test"
+          class="inline-flex rounded-xl px-8 py-4 text-[#0D1B2A] font-semibold
+                 bg-gradient-to-r from-[#00B4D8] to-[#06D6A0]
+                 shadow-lg shadow-cyan-900/30
+                 hover:from-[#06D6A0] hover:to-[#00B4D8]
+                 transition-all duration-300"
+        >
+          Probar HayLugAR
+        </router-link>
 
         <button
           type="button"
           @click="sendWhatsAppLead"
-          class="mt-6 text-sm font-semibold text-[#00B4D8] hover:underline"
+          class="mt-6 block mx-auto text-sm font-semibold text-[#00B4D8] hover:underline"
         >
           Avisame cuando HayLugAR llegue a mi ciudad
         </button>
@@ -446,7 +530,9 @@
     </section>
 
     <!-- ============================ FOOTER ============================ -->
-    <section class="bg-gradient-to-b from-[#020617] via-[#020617] to-[#0EA5E9]/10 px-4 pt-8 pb-8">
+    <section
+      class="bg-gradient-to-b from-[#020617] via-[#020617] to-[#0EA5E9]/10 px-4 pt-8 pb-8"
+    >
       <footer
         class="mx-auto max-w-6xl rounded-[28px] bg-white px-6 py-8 text-[#0F172A]
                shadow-[0_-10px_40px_rgba(15,23,42,0.25)] md:px-10"
@@ -458,14 +544,17 @@
             </div>
 
             <div>
-              <p class="font-semibold leading-tight">HayLugAR</p>
+              <p class="font-semibold leading-tight">
+                HayLugAR
+              </p>
+
               <p class="text-xs text-[#64748B]">
                 Smart parking urbano
               </p>
             </div>
           </div>
 
-          <div class="h-px bg-[#E2E8F0]" />
+          <div class="h-px bg-[#E2E8F0]"></div>
         </div>
 
         <div class="grid gap-8 md:grid-cols-[1.3fr_1fr_1fr_1fr]">
@@ -473,6 +562,7 @@
             <h4 class="mb-3 text-base font-semibold text-[#0F172A]">
               HayLugAR
             </h4>
+
             <p class="max-w-sm text-sm leading-relaxed text-[#475569]">
               Una app para estacionar mejor y hacer rendir espacios disponibles en la ciudad.
             </p>
@@ -485,13 +575,19 @@
 
             <ul class="space-y-2 text-sm text-[#475569]">
               <li>
-                <router-link to="/termsConditions" class="hover:text-[#00B4D8]">
+                <router-link
+                  to="/termsConditions"
+                  class="hover:text-[#00B4D8]"
+                >
                   Términos y condiciones
                 </router-link>
               </li>
 
               <li>
-                <router-link to="/PrivacyPolicy" class="hover:text-[#00B4D8]">
+                <router-link
+                  to="/PrivacyPolicy"
+                  class="hover:text-[#00B4D8]"
+                >
                   Política de privacidad
                 </router-link>
               </li>
@@ -504,7 +600,12 @@
                   class="inline-flex items-center gap-2 hover:text-[#00B4D8]"
                 >
                   Contacto
-                  <img src="../../assets/wp-logo.png" alt="WhatsApp" class="h-6 w-6 object-contain" />
+
+                  <img
+                    src="../../assets/wp-logo.png"
+                    alt="WhatsApp"
+                    class="h-6 w-6 object-contain"
+                  />
                 </a>
               </li>
             </ul>
@@ -518,10 +619,14 @@
             <ul class="space-y-2 text-sm text-[#475569]">
               <li class="flex items-center gap-2">
                 Argentina
-                <span class="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-xs text-[#64748B]">
+
+                <span
+                  class="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-xs text-[#64748B]"
+                >
                   Inicio
                 </span>
               </li>
+
               <li class="text-xs text-[#94A3B8]">
                 Crecimiento progresivo por zonas.
               </li>
@@ -541,7 +646,11 @@
                 class="transition-transform hover:scale-110"
                 aria-label="LinkedIn HayLugAR"
               >
-                <img src="../../assets/linkedin.png" alt="LinkedIn" class="h-7 w-7 object-contain" />
+                <img
+                  src="../../assets/linkedin.png"
+                  alt="LinkedIn"
+                  class="h-7 w-7 object-contain"
+                />
               </a>
 
               <a
@@ -551,7 +660,11 @@
                 class="transition-transform hover:scale-110"
                 aria-label="Instagram HayLugAR"
               >
-                <img src="../../assets/instagram.png" alt="Instagram" class="h-7 w-7 object-contain" />
+                <img
+                  src="../../assets/instagram.png"
+                  alt="Instagram"
+                  class="h-7 w-7 object-contain"
+                />
               </a>
 
               <a
@@ -561,7 +674,11 @@
                 class="transition-transform hover:scale-110"
                 aria-label="TikTok HayLugAR"
               >
-                <img src="../../assets/tiktok.png" alt="TikTok" class="h-7 w-7 object-contain" />
+                <img
+                  src="../../assets/tiktok.png"
+                  alt="TikTok"
+                  class="h-7 w-7 object-contain"
+                />
               </a>
             </div>
 
@@ -571,28 +688,26 @@
           </div>
         </div>
 
-        <div class="mt-8 h-px bg-[#E2E8F0]" />
+        <div class="mt-8 h-px bg-[#E2E8F0]"></div>
 
-        <div class="mt-6 flex flex-col items-center justify-between gap-5 md:flex-row">
-          <div class="flex items-center gap-4">
-            <button
-              type="button"
-              @click="openDownload('android-footer')"
-              class="w-[142px] transition hover:opacity-90"
-              aria-label="Descargar en Google Play"
-            >
-              <img :src="googlePlayBadge" alt="Google Play" class="h-auto w-full object-contain" />
-            </button>
+        <div
+          class="mt-6 flex flex-col items-center justify-between gap-5 md:flex-row"
+        >
+          <!--
+            APP STORE / GOOGLE PLAY
+            ---------------------------------
+            Se ocultan temporalmente hasta definir
+            la distribución oficial de la aplicación.
+          -->
 
-            <button
-              type="button"
-              @click="openDownload('ios-footer')"
-              class="w-[142px] transition hover:opacity-90"
-              aria-label="Descargar en App Store"
-            >
-              <img :src="appStoreBadge" alt="App Store" class="h-auto w-full object-contain" />
-            </button>
-          </div>
+          <router-link
+            to="/download-app-test"
+            class="inline-flex rounded-full border border-[#CBD5E1] px-5 py-2.5
+                   text-sm font-semibold text-[#0F172A]
+                   transition hover:border-[#00B4D8] hover:text-[#00B4D8]"
+          >
+            Conocer la app
+          </router-link>
 
           <div class="text-center text-xs text-[#94A3B8]">
             © {{ currentYear }} · HayLugAR · Todos los derechos reservados.
@@ -605,18 +720,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-
 import Logo from '../components/layout/Logo.vue'
-
-import googlePlayBadge from '../../assets/GooglePlay.png'
-import appStoreBadge from '../../assets/appstore.png'
 
 const currentYear = computed(() => new Date().getFullYear())
 
 const WHATSAPP_PHONE = '5493813022017'
-
-const GOOGLE_PLAY_URL = import.meta.env.VITE_GOOGLE_PLAY_URL || ''
-const APP_STORE_URL = import.meta.env.VITE_APP_STORE_URL || ''
 
 const whatsappLink = (message: string): string => {
   return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`
@@ -626,34 +734,12 @@ const openExternal = (url: string): void => {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
 
-const openDownload = (source = ''): void => {
-  const normalized = source.toLowerCase()
-  const isIos = normalized.includes('ios') || normalized.includes('iphone')
-  const targetUrl = isIos ? APP_STORE_URL : GOOGLE_PLAY_URL
-
-  if (targetUrl) {
-    openExternal(targetUrl)
-    return
-  }
-
-  const message = isIos
-    ? 'Hola! Quiero descargar HayLugAR para iPhone. ¿Me pasan el link cuando esté disponible?'
-    : 'Hola! Quiero descargar HayLugAR para Android. ¿Me pasan el link cuando esté disponible?'
-
-  openExternal(whatsappLink(message))
-}
-
 const sendWhatsAppLead = (): void => {
   openExternal(
-    whatsappLink('Hola! Quiero que HayLugAR llegue a mi ciudad y descargar la app cuando esté disponible.')
+    whatsappLink(
+      'Hola! Quiero que HayLugAR llegue a mi ciudad y descargar la app cuando esté disponible.'
+    )
   )
-}
-
-const scrollToDownload = (): void => {
-  document.getElementById('download')?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  })
 }
 </script>
 
@@ -934,37 +1020,6 @@ const scrollToDownload = (): void => {
   font-weight: 600;
 }
 
-.store-badge {
-  display: inline-flex;
-  width: 150px;
-  min-height: 46px;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 4px;
-  transition: all 0.25s ease;
-}
-
-.store-badge:hover {
-  transform: translateY(-2px);
-  border-color: rgba(0, 180, 216, 0.55);
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.store-badge img {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
-.store-badge-lg {
-  width: 170px;
-}
-
 .landing-card {
   position: relative;
   padding: 28px;
@@ -1115,10 +1170,6 @@ const scrollToDownload = (): void => {
 
   .metric-row strong {
     text-align: left;
-  }
-
-  .store-badge-lg {
-    width: 158px;
   }
 }
 
